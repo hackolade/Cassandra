@@ -1,0 +1,55 @@
+{
+	"model": {
+		"modelName": "New model",
+		"dbVersion": "5.1.x",
+		"dbVendor": "CASSANDRA"
+	},
+	"container": {
+		"name": "New keyspace",
+		"indexes": []
+	},
+	"collection": {
+		"collectionName": "New table",
+		"collectionUsers": [],
+		"collation": {}
+	},
+	"field": {
+		"name": "New column"
+	},
+	"patternField": {
+		"name": "^New Pattern Column$"
+	},
+	"multipleField": {
+		"primaryKey": true
+	},
+	"subschema": {},
+	"arrayItem": {},
+	"choice": {},
+	"relationship": {},
+	"user": {},
+	"view": {
+		"viewOn": "",
+		"pipeline": ""
+	},
+	"UDFs": {
+		"name": "New UDF",
+		"udfID": "",
+		"udfDescription": "",
+		"udfFunction": "",
+		"udfComments": ""
+	},
+	"UDAs": {
+		"name": "New UDA",
+		"udfID": "",
+		"udfDescription": "",
+		"udfFunction": "",
+		"udfComments": ""
+	},
+	"SecIdxs": {
+		"name": "New Secondary Index",
+		"udfID": "",
+		"udfDescription": "",
+		"udfFunction": "",
+		"udfComments": ""
+	}
+}

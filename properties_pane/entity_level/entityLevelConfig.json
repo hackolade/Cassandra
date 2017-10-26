@@ -1,0 +1,75 @@
+/*
+* Copyright © 2016-2017 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+*/
+
+[
+	{
+		"lowerTab": "Details",
+		"structure": [
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "comments",
+				"propertyType": "details",
+				"template": "textarea",
+				"valueType": "string"
+			}
+		]
+	}, 
+	{
+		"lowerTab": "Secondary Indexes",
+		"structure": [{
+			"propertyName": "Secondary Index",
+			"propertyType": "group",
+			"propertyKeyword": "SecIDxs",
+			"shouldValidate": false,
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"shouldValidate": false,
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Id",
+					"propertyKeyword": "SecIdxID",
+					"shouldValidate": false,
+					"propertyTooltip": "Secondary Index ID",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Description",
+					"propertyKeyword": "SecIdxDescription",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Function",
+					"propertyKeyword": "storedProcFunction",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "storedProcComments",
+					"shouldValidate": false,
+					"propertyTooltip": "comments",
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	}
+]

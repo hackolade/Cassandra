@@ -1,0 +1,16 @@
+{
+	"name": "binary",
+	"erdAbbreviation": "<bin>",
+	"dtdAbbreviation": "{BIN}",
+	"parentType": "binary",
+	"useSample": false,
+	"defaultValues": {
+		"type": "binary",
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignEntity": "",
+		"foreignField": []
+	}
+}

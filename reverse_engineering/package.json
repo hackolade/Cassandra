@@ -1,0 +1,9 @@
+{
+  "name": "Datastax",
+  "version": "1.0.0",
+  "description": "",
+  "author": "Hackolade",
+  "dependencies": {
+    "cassandra-driver": "^3.3.0"
+  }
+}

@@ -1,0 +1,16 @@
+{
+	"name": "blob",
+	"erdAbbreviation": "<blb>",
+	"dtdAbbreviation": "{blb}",
+	"parentType": "binary",
+	"useSample": false,
+	"defaultValues": {
+		"type": "blob",
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignEntity": "",
+		"foreignField": []
+	}
+}

@@ -1,0 +1,22 @@
+{
+	"name": "map",
+	"erdAbbreviation": "<map>",
+	"dtdAbbreviation": "{...}",
+	"parentType": "array",
+	"sample": ["sample"],
+	"useSample": true,
+	"defaultValues": {
+		"type": "map", 
+		"dependencies": [],
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"properties": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false
+	}
+}

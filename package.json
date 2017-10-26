@@ -1,0 +1,25 @@
+{
+	"name": "Cassandra",
+	"version": "0.0.1",
+	"versionDate": "2017-09-13",
+	"author": "hackolade",
+	"engines": {
+		"hackolade": "1.9.x",
+		"hackoladePlugin": "1.0.0"
+	},
+	"contributes": {
+		"target": {
+			"applicationTarget": "CASSANDRA",
+			"title": "Cassandra Datastax",
+			"versions": [
+				"4.8.x",
+				"5.0.x",
+				"5.1.x"
+			]
+		},
+		"features": {
+			"nestedCollections": false
+		}
+	},
+	"description": "Hackolade plugin for Cassandra Datastax"
+}

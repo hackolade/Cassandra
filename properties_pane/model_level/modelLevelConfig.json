@@ -1,0 +1,110 @@
+/*
+* Copyright © 2016-2017 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"shouldValidate": false,
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyValidate": false,
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "text",
+				"valueType": "number"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"shouldValidate": false,
+				"propertyType": "checkbox"
+			}
+
+*/
+
+[
+	{
+		"lowerTab": "Details",
+		"structure": [
+			{
+				"propertyName": "DB vendor",
+				"propertyKeyword": "dbVendor",
+				"shouldValidate": false,
+				"propertyTooltip": "DB vendor",
+				"propertyType": "select",
+				"options": [
+					"Datastax-Cassandra"
+				],
+				"disabledOption": true
+			},
+			{
+				"propertyName": "DB version",
+				"propertyKeyword": "dbVersion",
+				"shouldValidate": false,
+				"propertyTooltip": "DB version",
+				"propertyType": "select",
+				"options": [
+					"3.0.x",
+					"3.1.x",
+					"5.0.x",
+					"5.1.x"
+				],
+				"disabledOption": false
+			},
+			{
+				"propertyName": "Host",
+				"propertyKeyword": "host",
+				"shouldValidate": false,
+				"propertyTooltip": "Host",
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Port",
+				"propertyKeyword": "port",
+				"shouldValidate": false,
+				"propertyTooltip": "Port",
+				"propertyDefault": 9200,
+				"propertyType": "numeric",
+				"valueType": "number"
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "comments",
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		]
+	}
+]

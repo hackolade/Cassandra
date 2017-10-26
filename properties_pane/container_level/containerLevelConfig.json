@@ -1,0 +1,205 @@
+/*
+* Copyright © 2016-2017 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+*
+* The copyright to the computer software herein is the property of IntegrIT S.A.
+* The software may be used and/or copied only with the written permission of 
+* IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+* the agreement/contract under which the software has been supplied. 
+
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"shouldValidate": false,
+				"propertyType": "text"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyValidate": false,
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"shouldValidate": false,
+				"propertyType": "checkbox"
+			}
+
+*/
+
+[
+	{
+		"lowerTab": "Details",
+		"structure": [
+			{
+				"propertyName": "Description",
+				"propertyKeyword": "description",
+				"shouldValidate": false,
+				"propertyTooltip": "description",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Replication Strategy",
+				"propertyKeyword": "replStrategy",
+				"shouldValidate": false,
+				"propertyTooltip": "description",
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"SimpleStrategy",
+					"NetworkTopologyStrategy"
+				]
+			},
+			{
+				"propertyName": "Replication Factor",
+				"propertyKeyword": "replFactor",
+				"shouldValidate": true,
+				"propertyTooltip": "description",
+				"propertyType": "numeric",
+				"valueType": "number"
+			},
+			{
+				"propertyName": "Durable Writes",
+				"propertyKeyword": "durableWrites",
+				"propertyTooltip": "description",
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Comments",
+				"propertyKeyword": "comments",
+				"shouldValidate": false,
+				"propertyTooltip": "comments",
+				"propertyType": "details",
+				"template": "textarea"
+			}
+		],
+		"containerLevelKeys": []
+	},
+	{
+		"lowerTab": "UDFs",
+		"structure": [{
+			"propertyName": "UDFs",
+			"propertyType": "group",
+			"propertyKeyword": "UDFs",
+			"shouldValidate": false,
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"shouldValidate": false,
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Id",
+					"propertyKeyword": "UDFID",
+					"shouldValidate": false,
+					"propertyTooltip": "UDF unique ID",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Description",
+					"propertyKeyword": "storedProcDescription",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Function",
+					"propertyKeyword": "storedProcFunction",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "storedProcComments",
+					"shouldValidate": false,
+					"propertyTooltip": "comments",
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	},
+	{
+		"lowerTab": "UDAs",
+		"structure": [{
+			"propertyName": "UDAs",
+			"propertyType": "group",
+			"propertyKeyword": "UDAs",
+			"shouldValidate": false,
+			"propertyTooltip": "",
+			"structure": [
+				{
+					"propertyName": "Name",
+					"propertyKeyword": "name",
+					"shouldValidate": false,
+					"propertyTooltip": "",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Id",
+					"propertyKeyword": "UDAID",
+					"shouldValidate": false,
+					"propertyTooltip": "UDA unique ID",
+					"propertyType": "text"
+				},
+				{
+					"propertyName": "Description",
+					"propertyKeyword": "storedProcDescription",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Function",
+					"propertyKeyword": "storedProcFunction",
+					"shouldValidate": false,
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea"
+				},
+				{
+					"propertyName": "Comments",
+					"propertyKeyword": "storedProcComments",
+					"shouldValidate": false,
+					"propertyTooltip": "comments",
+					"propertyType": "details",
+					"template": "textarea"
+				}
+			]
+		}]
+	}
+]

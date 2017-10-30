@@ -1,5 +1,5 @@
 {
-	"name": "array",
+	"name": "list",
 	"erdAbbreviation": "<arr>",
 	"dtdAbbreviation": "[...]",
 	"parentType": "array",
@@ -7,7 +7,7 @@
 	"useSample": true,
 	"defaultValues": {
 		"type": "array",
-		"childType": "array",
+		"childType": "list",
 		"properties": [],
 		"primaryKey": false,
 		"relationshipType": "",

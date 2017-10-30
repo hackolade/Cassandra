@@ -144,6 +144,11 @@ making sure that you maintain a proper JSON format.
 		"blob": "binary",
 		"___1": [],
 		"map": "document",
-		"list": "array"
+		"list": "array",
+		"___2": [],
+		"numberSet": "array",
+		"stringSet": "array",
+		"binarySet": "array",
+		"___3": []
 	}
 }

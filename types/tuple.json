@@ -1,13 +1,13 @@
 {
-	"name": "array",
-	"erdAbbreviation": "<arr>",
+	"name": "tuple",
+	"erdAbbreviation": "<tup>",
 	"dtdAbbreviation": "[...]",
 	"parentType": "array",
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
 		"type": "array",
-		"childType": "array",
+		"childType": "tuple",
 		"properties": [],
 		"primaryKey": false,
 		"relationshipType": "",

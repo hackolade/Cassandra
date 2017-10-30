@@ -1,0 +1,25 @@
+{
+	"name": "timestamp",
+	"erdAbbreviation": "<ts>",
+	"dtdAbbreviation": "{ABC}",
+	"parentType": "string",
+	"useSample": true,
+	"defaultValues": {
+		"type": "string",
+		"childType": "timestamp",
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"default": "",
+		"minLength": "",
+		"maxLength": "",
+		"enum": [],
+		"sample":"",
+		"pattern": "",
+		"comments":"",
+		"format": "date-time"
+	}
+}

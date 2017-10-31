@@ -5,7 +5,8 @@
 	"parentType": "binary",
 	"useSample": false,
 	"defaultValues": {
-		"type": "blob",
+		"type": "binary",
+		"childType": "blob",
 		"primaryKey": false,
 		"relationshipType": "",
 		"parentRelationship": "",

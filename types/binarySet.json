@@ -1,23 +1,24 @@
 {
-	"name": "array",
-	"erdAbbreviation": "<arr>",
-	"dtdAbbreviation": "[...]",
+	"name": "binarySet",
+	"erdAbbreviation": "<set>",
+	"dtdAbbreviation": "{...}",
 	"parentType": "array",
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
 		"type": "array",
-		"childType": "array",
-		"properties": [],
+		"childType": "binarySet",
+		"childValueType": "binary", 
+		"dependencies": [],
 		"primaryKey": false,
 		"relationshipType": "",
 		"parentRelationship": "",
 		"childRelationships": [],
 		"foreignCollection": "",
 		"foreignField": [],
-		"additionalItems": true,
-		"minItems": "",
-		"maxItems": "",
-		"uniqueItems": false
+		"properties": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false
 	}
 }

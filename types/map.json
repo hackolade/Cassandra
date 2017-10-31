@@ -6,7 +6,8 @@
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
-		"type": "map", 
+		"type": "array",
+		"childType": "map", 
 		"dependencies": [],
 		"primaryKey": false,
 		"relationshipType": "",

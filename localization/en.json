@@ -131,5 +131,6 @@
 	"COLLECTION_SCHEMA_DEFINITION_NAME": "Table definitions",
 	"COLLECTION_SCHEMA_DEFINITION_TYPE": "document",
 	"MONGODB_SCRIPT_WARNING_MESSAGE": "This view is not associated to a type (viewOn property).",
-	"TYPE": {}
+	"TYPE": {},
+	"CENTRAL_PANE___TAB_MODEL_DEFINITIONS": "User-Defined Types"
 }

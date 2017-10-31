@@ -5,7 +5,6 @@
 	"parentType": "string",
 	"useSample": true,
 	"defaultValues": {
-		"type": "string",
 		"primaryKey": false,
 		"relationshipType": "",
 		"parentRelationship": "",

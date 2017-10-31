@@ -6,8 +6,6 @@
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
-		"type": "array",
-		"childType": "stringSet",
 		"childValueType": "string", 
 		"dependencies": [],
 		"primaryKey": false,

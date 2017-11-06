@@ -80,26 +80,10 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Replication Factor",
 				"propertyKeyword": "replFactor",
-				"shouldValidate": false,
-				"propertyTooltip": "Replication Factor",
-				"propertyType": "details",
-				"template": "textarea",
-				"dependency": {
-					"key": "replStrategy",
-					"value": "NetworkTopologyStrategy"
-				}
-			},
-			{
-				"propertyName": "Replication Factor",
-				"propertyKeyword": "replFactor",
 				"shouldValidate": true,
 				"propertyTooltip": "description",
 				"propertyType": "numeric",
-				"valueType": "number",
-				"dependency": {
-					"key": "replStrategy",
-					"value": "SimpleStrategy"
-				}
+				"valueType": "number"
 			},
 			{
 				"propertyName": "Durable Writes",

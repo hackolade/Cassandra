@@ -117,18 +117,6 @@ making sure that you maintain a proper JSON format.
 					"value": "NetworkTopologyStrategy"
 				}
 			},
-			/*{
-				"propertyName": "Replication Factor",
-				"propertyKeyword": "replFactor",
-				"shouldValidate": true,
-				"propertyTooltip": "description",
-				"propertyType": "details",
-				"template": "textarea",
-				"dependency": {
-					"key": "replStrategy",
-					"value": "NetworkTopologyStrategy"
-				}
-			},*/
 			{
 				"propertyName": "Durable Writes",
 				"propertyKeyword": "durableWrites",

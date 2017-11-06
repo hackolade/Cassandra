@@ -21,7 +21,30 @@
 				"valueType": "string"
 			}
 		]
-	}, 
+	},
+	{
+		"lowerTab": "Primary key",
+		"structure": [
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "tagInput",
+				"template": "collectiontree"
+			}, 
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
+				"shouldValidate": false,
+				"propertyType": "tagInput",
+				"template": "collectiontree",
+				"types": [
+					"ascending",
+					"descending"
+				]
+			}
+		]
+	},
 	{
 		"lowerTab": "Secondary Indexes",
 		"structure": [{
@@ -36,7 +59,19 @@
 					"propertyKeyword": "name",
 					"shouldValidate": false,
 					"propertyTooltip": "",
-					"propertyType": "text"
+					"propertyType": "text",
+					"defaultValue": "New field"
+				},
+				{
+					"propertyName": "Key",
+					"propertyKeyword": "key",
+					"shouldValidate": false,
+					"propertyType": "tagInput",
+					"template": "collectiontree",
+					"types": [
+						"ascending",
+						"descending"
+					]
 				},
 				{
 					"propertyName": "Id",

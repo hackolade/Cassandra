@@ -59,8 +59,7 @@
 					"propertyKeyword": "name",
 					"shouldValidate": false,
 					"propertyTooltip": "",
-					"propertyType": "text",
-					"defaultValue": "New field"
+					"propertyType": "text"
 				},
 				{
 					"propertyName": "Key",

@@ -93,7 +93,6 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "port",
 				"shouldValidate": false,
 				"propertyTooltip": "Port",
-				"propertyDefault": 9200,
 				"propertyType": "numeric",
 				"valueType": "number"
 			},

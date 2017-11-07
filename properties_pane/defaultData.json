@@ -6,7 +6,8 @@
 	},
 	"container": {
 		"name": "New keyspace",
-		"indexes": []
+		"indexes": [],
+		"replStrategy": "SimpleStrategy"
 	},
 	"collection": {
 		"collectionName": "New table",

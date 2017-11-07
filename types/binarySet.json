@@ -6,8 +6,6 @@
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
-		"type": "array",
-		"childType": "binarySet",
 		"childValueType": "binary", 
 		"dependencies": [],
 		"primaryKey": false,

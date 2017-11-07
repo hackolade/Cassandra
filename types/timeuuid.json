@@ -5,8 +5,6 @@
 	"parentType": "string",
 	"useSample": true,
 	"defaultValues": {
-		"type": "string",
-		"childType": "timeuuid",
 		"primaryKey": false,
 		"relationshipType": "",
 		"parentRelationship": "",

@@ -6,8 +6,6 @@
 	"sample": true,
 	"useSample": true,
 	"defaultValues": {
-		"type": "boolean",
-		"childType": "boolean",
 		"default": "",
 		"enum": [],
 		"primaryKey": false,

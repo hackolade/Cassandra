@@ -1,6 +1,6 @@
 {
-	"name": "array",
-	"erdAbbreviation": "<arr>",
+	"name": "tuple",
+	"erdAbbreviation": "<tup>",
 	"dtdAbbreviation": "[...]",
 	"parentType": "array",
 	"sample": ["sample"],

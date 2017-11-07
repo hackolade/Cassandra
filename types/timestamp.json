@@ -1,6 +1,6 @@
 {
-	"name": "string",
-	"erdAbbreviation": "<str>",
+	"name": "timestamp",
+	"erdAbbreviation": "<ts>",
 	"dtdAbbreviation": "{ABC}",
 	"parentType": "string",
 	"useSample": true,
@@ -14,9 +14,10 @@
 		"default": "",
 		"minLength": "",
 		"maxLength": "",
-		"pattern": "",
 		"enum": [],
 		"sample":"",
-		"comments":""
+		"pattern": "",
+		"comments":"",
+		"format": "date-time"
 	}
 }

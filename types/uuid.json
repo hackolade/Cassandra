@@ -1,6 +1,6 @@
 {
-	"name": "string",
-	"erdAbbreviation": "<str>",
+	"name": "uuid",
+	"erdAbbreviation": "<uuid>",
 	"dtdAbbreviation": "{ABC}",
 	"parentType": "string",
 	"useSample": true,
@@ -12,11 +12,11 @@
 		"foreignCollection": "",
 		"foreignField": [],
 		"default": "",
-		"minLength": "",
-		"maxLength": "",
-		"pattern": "",
+		"minLength": 36,
+		"maxLength": 36,
 		"enum": [],
 		"sample":"",
+		"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
 		"comments":""
 	}
 }

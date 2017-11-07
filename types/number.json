@@ -6,8 +6,6 @@
 	"sample": 15,
 	"useSample": true,
 	"defaultValues": {
-		"type": "numeric",
-		"childType": "number",
 		"unit": "",
 		"minimum": "",
 		"exclusiveMinimum": false,

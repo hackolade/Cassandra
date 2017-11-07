@@ -5,8 +5,7 @@
 	"parentType": "array",
 	"sample": ["sample"],
 	"useSample": true,
-	"defaultValues": {
-		"type": "map", 
+	"defaultValues": { 
 		"dependencies": [],
 		"primaryKey": false,
 		"relationshipType": "",

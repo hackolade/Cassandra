@@ -1,5 +1,5 @@
 {
-	"name": "array",
+	"name": "list",
 	"erdAbbreviation": "<arr>",
 	"dtdAbbreviation": "[...]",
 	"parentType": "array",

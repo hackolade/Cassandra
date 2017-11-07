@@ -1,21 +1,22 @@
 {
-	"name": "array",
-	"erdAbbreviation": "<arr>",
-	"dtdAbbreviation": "[...]",
+	"name": "numberSet",
+	"erdAbbreviation": "<set>",
+	"dtdAbbreviation": "{...}",
 	"parentType": "array",
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
-		"properties": [],
+		"childValueType": "number", 
+		"dependencies": [],
 		"primaryKey": false,
 		"relationshipType": "",
 		"parentRelationship": "",
 		"childRelationships": [],
 		"foreignCollection": "",
 		"foreignField": [],
-		"additionalItems": true,
-		"minItems": "",
-		"maxItems": "",
-		"uniqueItems": false
+		"properties": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false
 	}
 }

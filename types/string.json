@@ -17,6 +17,7 @@
 		"pattern": "",
 		"enum": [],
 		"sample":"",
-		"comments":""
+		"comments":"",
+		"mode": "text"
 	}
 }

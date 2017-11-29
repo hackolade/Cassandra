@@ -23,7 +23,7 @@
 	"OBJECT___BROWSER_NOT_IN_BUCKET": "Undefined Keyspace",
 	"OBJECT___BROWSER_COLLECTION": "Tables",
 	"OBJECT___BROWSER_VIEWS": "Views",
-	"OBJECT___BROWSER_DEFINITIONS": "Definitions",
+	"OBJECT___BROWSER_DEFINITIONS": "User-Defined Types",
 	"OBJECT___BROWSER_FIELDS": "Columns",
 	"PROPERTIES_PANE___BUCKET_NAME": "Keyspace name",
 	"PROPERTIES_PANE___VIEW_NAME": "View name",

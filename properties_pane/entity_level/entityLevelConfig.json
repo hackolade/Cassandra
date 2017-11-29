@@ -15,18 +15,18 @@
 				"propertyName": "Partition key",
 				"propertyKeyword": "partitionKey",
 				"shouldValidate": false,
-				"propertyType": "tagInput",
-				"template": "collectiontree"
+				"propertyType": "primaryKeySetter",
+				"abbr": "PK"
 			}, 
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
-				"propertyType": "tagInput",
-				"template": "collectiontree",
+				"propertyType": "primaryKeySetter",
+				"abbr": "CK",
 				"types": [
-					"ascending",
-					"descending"
+					{ "name": "ascending", "abbr": "&#8593;" },
+					{ "name": "descending", "abbr": "&#8595;" }
 				]
 			},
 			{

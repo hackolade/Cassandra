@@ -68,10 +68,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -80,15 +80,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -127,10 +125,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -139,15 +137,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -194,10 +190,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			"default",
 			"sample",
@@ -217,10 +213,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -229,15 +225,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -260,10 +254,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -272,15 +266,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -304,10 +296,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -316,15 +308,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -350,10 +340,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -362,15 +352,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -395,10 +383,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -407,15 +395,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -440,10 +426,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -452,15 +438,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -486,10 +470,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -498,15 +482,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -531,10 +513,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -543,15 +525,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -573,10 +553,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -585,15 +565,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -617,10 +595,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -629,15 +607,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -661,10 +637,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -673,15 +649,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -705,10 +679,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -717,15 +691,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -750,10 +722,10 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disableIf": {
+				"disabledOnCondition": [{
 					"key": "primaryKey",
 					"value": true
-				}
+				}]
 			},
 			{
 				"propertyName": "Primary key",
@@ -762,15 +734,13 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": ""
+					"key": "primaryKey",
+					"value": true
 				},
-				"disableIf": {
-					"key": "compositePrimaryKey",
-					"exist": true,
-					"value": "" 
-				}
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
 			},
 			"foreignCollection",
 			"foreignField",

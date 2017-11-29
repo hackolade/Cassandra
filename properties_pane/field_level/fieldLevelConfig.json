@@ -62,8 +62,34 @@ making sure that you maintain a proper JSON format.
 			"type",
 			"description",
 			"dependencies",
-			"required",
-			"primaryKey",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -95,8 +121,34 @@ making sure that you maintain a proper JSON format.
 			"type",
 			"description",
 			"dependencies",
-			"required",
-			"primaryKey",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -136,19 +188,597 @@ making sure that you maintain a proper JSON format.
 			"type",
 			"description",
 			"dependencies",
-			"required",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
 			"default",
 			"sample",
 			"comments"
 		],
-		"blob": "binary",
+		"blob": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"gridFS",
+			"comments"
+		],
 		"___1": [],
-		"map": "document",
-		"list": "array",
+		"map": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
+		"list": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
 		"___2": [],
-		"numberSet": "array",
-		"stringSet": "array",
-		"binarySet": "array",
-		"___3": []
+		"numberSet": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
+		"stringSet": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
+		"binarySet": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
+		"___3": [],
+		"array": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
+		"binary": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"gridFS",
+			"comments"
+		],
+		"object": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
+		"timestamp": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
+		"timeuuid": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
+		"tuple": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
+		"uuid": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disableIf": {
+					"key": "primaryKey",
+					"value": true
+				}
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": ""
+				},
+				"disableIf": {
+					"key": "compositePrimaryKey",
+					"exist": true,
+					"value": "" 
+				}
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		]   
 	}
 }

@@ -134,5 +134,6 @@
 	"TYPE": {},
 	"CENTRAL_PANE___TAB_MODEL_DEFINITIONS": "User-Defined Types",
 	"CONTEXT_MENU___ADD_MODEL_REFERENCE": "User-Defined Type",
-	"CONTEXT_MENU___GO_TO_DEFINITION": "Go to User-Defined Type"
+	"CONTEXT_MENU___GO_TO_DEFINITION": "Go to User-Defined Type",
+	"DOCUMENTATION___DB_DEFINITIONS": "User-Defined Types"
 }

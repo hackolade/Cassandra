@@ -110,6 +110,7 @@ making sure that you maintain a proper JSON format.
 					"integer",
 					"bigint",
 					"smallint",
+					"tinyint",
 					"counter",
 					"decimal",
 					"double",

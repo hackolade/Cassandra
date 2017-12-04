@@ -1,0 +1,23 @@
+{
+	"name": "date",
+	"erdAbbreviation": "<d>",
+	"dtdAbbreviation": "{ABC}",
+	"parentType": "string",
+	"useSample": true,
+	"defaultValues": {
+		"primaryKey": false,
+		"relationshipType": "",
+		"parentRelationship": "",
+		"childRelationships": [],
+		"foreignCollection": "",
+		"foreignField": [],
+		"default": "",
+		"minLength": "",
+		"maxLength": "",
+		"enum": [],
+		"sample":"2014-12-03",
+		"pattern": "^([0-9]*|[0-9]{4}-[0-9]{2}-[0-9]{2})$",
+		"comments":"",
+		"format": ""
+	}
+}

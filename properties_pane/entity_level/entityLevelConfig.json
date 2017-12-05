@@ -25,8 +25,8 @@
 				"propertyType": "primaryKeySetter",
 				"abbr": "CK",
 				"types": [
-					{ "name": "ascending", "abbr": "&#8593;" },
-					{ "name": "descending", "abbr": "&#8595;" }
+					{ "name": "ascending", "abbr": "\u2b61" },
+					{ "name": "descending", "abbr": "\u2b63" }
 				]
 			},
 			{

@@ -624,6 +624,132 @@ making sure that you maintain a proper JSON format.
 			"additionalProperties",
 			"comments"
 		],
+		"time": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
+		"date": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
+		"duration": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "primaryKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
+			"comments"
+		],
 		"timeuuid": [
 			"name",
 			"sampleName",
@@ -752,4 +878,4 @@ making sure that you maintain a proper JSON format.
 			"comments"
 		]   
 	}
-}
+} 

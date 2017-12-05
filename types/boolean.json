@@ -8,7 +8,6 @@
 	"defaultValues": {
 		"default": "",
 		"enum": [],
-		"primaryKey": false,
 		"relationshipType": "",
 		"parentRelationship": "",
 		"childRelationships": [],

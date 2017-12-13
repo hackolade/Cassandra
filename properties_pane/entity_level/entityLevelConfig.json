@@ -15,19 +15,21 @@
 				"propertyName": "Partition key",
 				"propertyKeyword": "partitionKey",
 				"shouldValidate": false,
-				"propertyType": "tagInput",
-				"template": "collectiontree"
+				"propertyType": "primaryKeySetter",
+				"abbr": "PK",
+				"ratioColumns": [3, 5]
 			}, 
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
-				"propertyType": "tagInput",
-				"template": "collectiontree",
+				"propertyType": "primaryKeySetter",
+				"abbr": "CK",
 				"types": [
-					"ascending",
-					"descending"
-				]
+					{ "name": "ascending", "abbr": "\u2b61" },
+					{ "name": "descending", "abbr": "\u2b63" }
+				],
+				"ratioColumns": [3, 5]
 			},
 			{
 				"propertyName": "Comments",

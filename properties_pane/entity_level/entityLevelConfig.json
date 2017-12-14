@@ -16,8 +16,7 @@
 				"propertyKeyword": "partitionKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
-				"abbr": "PK",
-				"ratioColumns": [3, 5]
+				"abbr": "PK"
 			}, 
 			{
 				"propertyName": "Clustering key",
@@ -28,8 +27,7 @@
 				"types": [
 					{ "name": "ascending", "abbr": "\u2b61" },
 					{ "name": "descending", "abbr": "\u2b63" }
-				],
-				"ratioColumns": [3, 5]
+				]
 			},
 			{
 				"propertyName": "Comments",
@@ -40,7 +38,8 @@
 				"template": "textarea",
 				"valueType": "string"
 			}
-		]
+		],
+		"ratioColumns": [3, 5]
 	},
 	{
 		"lowerTab": "Secondary Indexes",

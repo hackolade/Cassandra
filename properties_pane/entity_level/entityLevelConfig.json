@@ -13,20 +13,20 @@
 		"structure": [
 			{
 				"propertyName": "Partition key",
-				"propertyKeyword": "partitionKey",
+				"propertyKeyword": "compositePartitionKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
 				"abbr": "PK"
 			}, 
 			{
 				"propertyName": "Clustering key",
-				"propertyKeyword": "clusteringKey",
+				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
 				"abbr": "CK",
 				"types": [
-					{ "name": "ascending", "abbr": "\uf176" },
-					{ "name": "descending", "abbr": "\uf175" }
+					{ "name": "ascending", "abbr": "\u2191" },
+					{ "name": "descending", "abbr": "\u2193" }
 				]
 			},
 			{

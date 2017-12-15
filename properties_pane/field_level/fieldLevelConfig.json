@@ -74,17 +74,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -131,17 +146,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -198,17 +228,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -236,17 +281,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -277,17 +337,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -319,17 +394,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -363,17 +453,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -406,17 +511,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -449,17 +569,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -493,17 +628,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -536,17 +686,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -576,17 +741,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -618,17 +798,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -660,17 +855,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -702,17 +912,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -744,17 +969,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -786,17 +1026,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -828,17 +1083,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},
@@ -871,17 +1141,32 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
-				"propertyName": "Primary key",
-				"propertyKeyword": "primaryKey",
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
 				"dependency": {
-					"key": "primaryKey",
+					"key": "clusteringKey",
 					"value": true
 				},
 				"disabledOnCondition": [{
-					"key": "primaryKey",
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
 					"value": true
 				}]
 			},

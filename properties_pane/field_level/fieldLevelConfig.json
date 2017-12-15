@@ -88,6 +88,36 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "clusteringKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "clusteringKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "clusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "partitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "partitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "partitionKey",
+					"value": true
+				}]
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",

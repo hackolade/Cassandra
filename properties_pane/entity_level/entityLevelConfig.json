@@ -39,7 +39,7 @@
 				"valueType": "string"
 			}
 		],
-		"ratioColumns": [3, 5]
+		"columnsRatio": [3, 5]
 	},
 	{
 		"lowerTab": "Secondary Indexes",

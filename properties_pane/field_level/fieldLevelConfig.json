@@ -206,6 +206,7 @@ making sure that you maintain a proper JSON format.
 			"exclusiveMaximum",
 			"multipleOf",
 			"divisibleBy",
+			"pattern",
 			"enum",
 			"sample",
 			"comments"
@@ -745,6 +746,7 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			"pattern",
 			"default",
 			"enum",
 			"sample",
@@ -799,6 +801,7 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			"pattern",
 			"default",
 			"enum",
 			"sample",
@@ -853,6 +856,7 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			"pattern",
 			"default",
 			"enum",
 			"sample",
@@ -907,6 +911,7 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			"pattern",
 			"default",
 			"enum",
 			"sample",
@@ -965,6 +970,7 @@ making sure that you maintain a proper JSON format.
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
+			"pattern",
 			"default",
 			"enum",
 			"sample",
@@ -1022,6 +1028,7 @@ making sure that you maintain a proper JSON format.
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
+			"pattern",
 			"default",
 			"enum",
 			"sample",

@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{ABC}",
 	"parentType": "string",
 	"useSample": true,
+	"sample": "50554d6e-29bb-11e5-b345-feff819cdc9f",
 	"defaultValues": {
 		"primaryKey": false,
 		"relationshipType": "",
@@ -12,11 +13,11 @@
 		"foreignCollection": "",
 		"foreignField": [],
 		"default": "",
-		"minLength": 36,
-		"maxLength": 36,
+		"minLength": "",
+		"maxLength": "",
 		"enum": [],
 		"sample":"",
-		"pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+		"pattern": "",
 		"comments":""
 	}
 }

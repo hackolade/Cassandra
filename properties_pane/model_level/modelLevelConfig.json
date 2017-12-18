@@ -63,9 +63,10 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "DB vendor",
 				"propertyType": "select",
 				"options": [
-					"Datastax-Cassandra"
+					"Cassandra",
+					"Datastax"
 				],
-				"disabledOption": true
+				"disabledOption": false
 			},
 			{
 				"propertyName": "DB version",

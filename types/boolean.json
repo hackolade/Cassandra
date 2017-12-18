@@ -9,11 +9,6 @@
 		"primaryKey": false,
 		"default": "",
 		"enum": [],
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignEntity": "",
-		"foreignField": [],
 		"sample": ""
 	}
 }

@@ -1,22 +1,15 @@
 {
 	"name": "duration",
 	"erdAbbreviation": "<dur>",
-	"dtdAbbreviation": "{ABC}",
+	"dtdAbbreviation": "{dur}",
 	"parentType": "string",
 	"useSample": true,
 	"defaultValues": {
 		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignCollection": "",
-		"foreignField": [],
 		"default": "",
-		"minLength": "",
-		"maxLength": "",
 		"enum": [],
-		"sample":"89h4m48s",
-		"pattern": "^(([0-9]{1,3}(y|mo|w|d|h|m|s|ms|us|µs|ns))*|((P|Y|M|D|T|H|M|S)\\d*)*|P\\d*W|P\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2})$",
+		"sample":"",
+		"pattern": "",
 		"comments":"",
 		"format": ""
 	}

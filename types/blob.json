@@ -5,11 +5,6 @@
 	"parentType": "binary",
 	"useSample": false,
 	"defaultValues": {
-		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignEntity": "",
-		"foreignField": []
+		"primaryKey": false
 	}
 }

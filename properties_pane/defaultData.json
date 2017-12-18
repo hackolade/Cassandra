@@ -1,8 +1,8 @@
 {
 	"model": {
 		"modelName": "New model",
-		"dbVersion": "5.1.x",
-		"dbVendor": "Datastax-Cassandra"
+		"dbVersion": "3.1.x",
+		"dbVendor": "Cassandra"
 	},
 	"container": {
 		"name": "New keyspace",

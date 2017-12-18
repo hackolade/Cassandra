@@ -90,9 +90,9 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-				"propertyName": "Replication Factor",
+				"propertyName": "Data Centers",
 				"propertyType": "group",
-				"propertyKeyword": "replFactor",
+				"propertyKeyword": "dataCenters",
 				"shouldValidate": true,
 				"propertyTooltip": "",
 				"structure": [
@@ -106,9 +106,9 @@ making sure that you maintain a proper JSON format.
 					{
 						"propertyName": "Replication Factor",
 						"propertyKeyword": "replFactorValue",
-						"shouldValidate": false,
+						"shouldValidate": true,
 						"propertyTooltip": "",
-						"propertyType": "text",
+						"propertyType": "numeric",
 						"valueType": "number"
 					}
 				],

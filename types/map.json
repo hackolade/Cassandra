@@ -8,11 +8,6 @@
 	"defaultValues": { 
 		"dependencies": [],
 		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignCollection": "",
-		"foreignField": [],
 		"properties": [],
 		"minProperties": "",
 		"maxProperties": "",

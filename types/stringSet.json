@@ -1,11 +1,12 @@
 {
-	"name": "map",
-	"erdAbbreviation": "<map>",
+	"name": "stringSet",
+	"erdAbbreviation": "<set>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "array",
 	"sample": ["sample"],
 	"useSample": true,
-	"defaultValues": { 
+	"defaultValues": {
+		"childValueType": "string", 
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],

@@ -1,11 +1,12 @@
 {
-	"name": "map",
-	"erdAbbreviation": "<map>",
+	"name": "numberSet",
+	"erdAbbreviation": "<set>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "array",
-	"sample": ["sample"],
+	"sample": [12],
 	"useSample": true,
-	"defaultValues": { 
+	"defaultValues": {
+		"childValueType": "number", 
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],

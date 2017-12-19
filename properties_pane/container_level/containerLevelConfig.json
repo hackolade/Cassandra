@@ -83,7 +83,39 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": true,
 				"propertyTooltip": "description",
 				"propertyType": "numeric",
-				"valueType": "number"
+				"valueType": "number",
+				"dependency": {
+					"key": "replStrategy",
+					"value": "SimpleStrategy"
+				}
+			},
+			{
+				"propertyName": "Data Centers",
+				"propertyType": "group",
+				"propertyKeyword": "dataCenters",
+				"shouldValidate": true,
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Data center name",
+						"propertyKeyword": "dataCenterName",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Replication Factor",
+						"propertyKeyword": "replFactorValue",
+						"shouldValidate": true,
+						"propertyTooltip": "",
+						"propertyType": "numeric",
+						"valueType": "number"
+					}
+				],
+				"dependency": {
+					"key": "replStrategy",
+					"value": "NetworkTopologyStrategy"
+				}
 			},
 			{
 				"propertyName": "Durable Writes",

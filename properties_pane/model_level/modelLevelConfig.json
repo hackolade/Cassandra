@@ -63,9 +63,10 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "DB vendor",
 				"propertyType": "select",
 				"options": [
-					"Datastax-Cassandra"
+					"Cassandra",
+					"Datastax"
 				],
-				"disabledOption": true
+				"disabledOption": false
 			},
 			{
 				"propertyName": "DB version",
@@ -74,10 +75,13 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "DB version",
 				"propertyType": "select",
 				"options": [
+					"2.0.x",
+					"2.1.x",
 					"3.0.x",
 					"3.1.x",
-					"5.0.x",
-					"5.1.x"
+					"DSE 4.8.x",
+					"DSE 5.0.x",
+					"DSE 5.1.x"
 				],
 				"disabledOption": false
 			},
@@ -93,9 +97,9 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "port",
 				"shouldValidate": false,
 				"propertyTooltip": "Port",
-				"propertyDefault": 9200,
 				"propertyType": "numeric",
-				"valueType": "number"
+				"valueType": "number",
+				"allowNegative": false
 			},
 			{
 				"propertyName": "Comments",

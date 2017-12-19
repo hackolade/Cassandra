@@ -1,0 +1,19 @@
+{
+	"name": "time",
+	"erdAbbreviation": "<tm>",
+	"dtdAbbreviation": "{tm}",
+	"parentType": "string",
+	"useSample": true,
+	"sample":"08:45:12.123123",
+	"defaultValues": {
+		"primaryKey": false,
+		"default": "",
+		"minLength": "",
+		"maxLength": "",
+		"enum": [],
+		"sample":"",
+		"pattern": "",
+		"comments":"",
+		"format": ""
+	}
+}

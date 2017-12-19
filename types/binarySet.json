@@ -1,11 +1,12 @@
 {
-	"name": "map",
-	"erdAbbreviation": "<map>",
+	"name": "binarySet",
+	"erdAbbreviation": "<set>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "array",
-	"sample": ["sample"],
+	"sample": [],
 	"useSample": true,
-	"defaultValues": { 
+	"defaultValues": {
+		"childValueType": "binary", 
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],

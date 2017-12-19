@@ -1,0 +1,19 @@
+{
+	"name": "duration",
+	"erdAbbreviation": "<dur>",
+	"dtdAbbreviation": "{dur}",
+	"parentType": "string",
+	"useSample": true,
+	"sample": "89h4m48s",
+	"defaultValues": {
+		"primaryKey": false,
+		"default": "",
+		"enum": [],
+		"sample":"",
+		"pattern": "",
+		"comments":"",
+		"format": ""
+	}
+}
+
+

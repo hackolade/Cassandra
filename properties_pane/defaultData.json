@@ -1,12 +1,13 @@
 {
 	"model": {
 		"modelName": "New model",
-		"dbVersion": "5.1.x",
-		"dbVendor": "CASSANDRA"
+		"dbVersion": "3.1.x",
+		"dbVendor": "Cassandra"
 	},
 	"container": {
 		"name": "New keyspace",
-		"indexes": []
+		"indexes": [],
+		"replStrategy": "SimpleStrategy"
 	},
 	"collection": {
 		"collectionName": "New table",
@@ -20,7 +21,7 @@
 		"name": "^New Pattern Column$"
 	},
 	"multipleField": {
-		"primaryKey": true
+		"primaryKey": false
 	},
 	"subschema": {},
 	"arrayItem": {},

@@ -1,6 +1,6 @@
 {
-	"name": "array",
-	"erdAbbreviation": "<arr>",
+	"name": "tuple",
+	"erdAbbreviation": "<tup>",
 	"dtdAbbreviation": "[...]",
 	"parentType": "array",
 	"sample": ["sample"],
@@ -8,11 +8,6 @@
 	"defaultValues": {
 		"properties": [],
 		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignCollection": "",
-		"foreignField": [],
 		"additionalItems": true,
 		"minItems": "",
 		"maxItems": "",

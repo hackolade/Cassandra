@@ -6,16 +6,9 @@
 	"sample": true,
 	"useSample": true,
 	"defaultValues": {
-		"type": "boolean",
-		"childType": "boolean",
+		"primaryKey": false,
 		"default": "",
 		"enum": [],
-		"primaryKey": false,
-		"relationshipType": "",
-		"parentRelationship": "",
-		"childRelationships": [],
-		"foreignEntity": "",
-		"foreignField": [],
 		"sample": ""
 	}
 }

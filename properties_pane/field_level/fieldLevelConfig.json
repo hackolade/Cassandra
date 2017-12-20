@@ -1033,60 +1033,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			"comments"
-		],
-		"multiple": [
-			"name",
-			"schemaId",
-			"refPath",
-			"multipleType",
-			"description",
-			"dependencies",
-			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			"foreignCollection",
-			"foreignField",
-			"relationshipType",
-			"comments",
-			"dynamic"
 		]
 	}
 } 

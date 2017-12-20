@@ -89,7 +89,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "fieldList",
 				"template": "orderedList",
-				"types": [
+				"attributeList": [
 					"ascending",
 					"descending"
 				]
@@ -114,7 +114,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
 				"abbr": "CK",
-				"types": [
+				"attributeList": [
 					{ "name": "ascending", "abbr": "\u2191" },
 					{ "name": "descending", "abbr": "\u2193" }
 				]
@@ -127,6 +127,99 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "details",
 				"template": "textarea",
 				"valueType": "string"
+			},
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"shouldValidate": false,
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyValidate": false,
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"shouldValidate": false,
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Properties Group",
+				"propertyType": "group",
+				"propertyKeyword": "grpProp",
+				"shouldValidate": true,
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Description",
+						"propertyKeyword": "indexDescription",
+						"shouldValidate": false,
+						"propertyTooltip": "description",
+						"propertyType": "details",
+						"template": "textarea"
+				},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false,
+						"sampleGen": "&containerName|&entityName|&random|<value>"
+					}					
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
+				"shouldValidate": false,
+				"propertyType": "tagInput",
+				"template": "collectiontree"
+			}, 
+			{
+				"propertyName": "Field List w/ dropdown",
+				"propertyKeyword": "keyListOrder",
+				"shouldValidate": false,
+				"propertyType": "tagInput",
+				"template": "collectiontree",
+				"attributeList": [
+					"ascending",
+					"descending"
+				]
 			}
 		],
 		"columnsRatio": [3.7, 5]
@@ -153,7 +246,7 @@ making sure that you maintain a proper JSON format.
 					"shouldValidate": false,
 					"propertyType": "fieldList",
 					"template": "orderedList",
-					"types": [
+					"attributeList": [
 						"ascending",
 						"descending"
 					]

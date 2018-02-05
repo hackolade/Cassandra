@@ -106,14 +106,14 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "compositePartitionKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
-				"abbr": "PK"
+				"abbr": "K"
 			}, 
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
-				"abbr": "CK",
+				"abbr": "C",
 				"attributeList": [
 					{ "name": "ascending", "abbr": "\u2191" },
 					{ "name": "descending", "abbr": "\u2193" }

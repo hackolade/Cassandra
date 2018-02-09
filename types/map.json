@@ -2,7 +2,7 @@
 	"name": "map",
 	"erdAbbreviation": "<map>",
 	"dtdAbbreviation": "{...}",
-	"parentType": "array",
+	"parentType": "object",
 	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": { 

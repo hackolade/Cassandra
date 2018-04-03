@@ -229,7 +229,7 @@ making sure that you maintain a proper JSON format.
 		"structure": [{
 			"propertyName": "Secondary Index",
 			"propertyType": "group",
-			"propertyKeyword": "SecIDxs",
+			"propertyKeyword": "SecIndxs",
 			"shouldValidate": false,
 			"propertyTooltip": "",
 			"structure": [
@@ -242,7 +242,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Key",
-					"propertyKeyword": "key",
+					"propertyKeyword": "SecIndxKey",
 					"shouldValidate": false,
 					"propertyType": "fieldList",
 					"template": "orderedList",
@@ -253,14 +253,14 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Id",
-					"propertyKeyword": "SecIdxID",
+					"propertyKeyword": "SecIndxID",
 					"shouldValidate": false,
 					"propertyTooltip": "Secondary Index ID",
 					"propertyType": "text"
 				},
 				{
 					"propertyName": "Description",
-					"propertyKeyword": "SecIdxDescription",
+					"propertyKeyword": "SecIndxDescription",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
 					"propertyType": "details",
@@ -268,7 +268,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Function",
-					"propertyKeyword": "storedProcFunction",
+					"propertyKeyword": "SecIndxFunction",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
 					"propertyType": "details",
@@ -276,7 +276,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Comments",
-					"propertyKeyword": "storedProcComments",
+					"propertyKeyword": "SecIndxComments",
 					"shouldValidate": false,
 					"propertyTooltip": "comments",
 					"propertyType": "details",

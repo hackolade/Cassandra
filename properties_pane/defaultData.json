@@ -48,9 +48,10 @@
 	},
 	"SecIdxs": {
 		"name": "New Secondary Index",
-		"udfID": "",
-		"udfDescription": "",
-		"udfFunction": "",
-		"udfComments": ""
+		"SecIndxKey": "",
+		"SecIndxID": "",
+		"SecIndxDescription": "",
+		"SecIndxFunction": "",
+		"SecIndxComments": ""
 	}
 }

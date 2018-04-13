@@ -18,7 +18,7 @@
 		"name": "New column"
 	},
 	"patternField": {
-		"name": "^New Pattern Column$"
+		"name": "^[a-zA-Z0-9_.-]+$"
 	},
 	"multipleField": {
 		"primaryKey": false

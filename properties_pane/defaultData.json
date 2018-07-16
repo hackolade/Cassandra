@@ -1,8 +1,8 @@
 {
 	"model": {
 		"modelName": "New model",
-		"dbVersion": "5.1.x",
-		"dbVendor": "CASSANDRA"
+		"dbVersion": "3.1.x",
+		"dbVendor": "Cassandra"
 	},
 	"container": {
 		"name": "New keyspace",
@@ -18,10 +18,10 @@
 		"name": "New column"
 	},
 	"patternField": {
-		"name": "^New Pattern Column$"
+		"name": "^[a-zA-Z0-9_.-]+$"
 	},
 	"multipleField": {
-		"primaryKey": true
+		"primaryKey": false
 	},
 	"subschema": {},
 	"arrayItem": {},
@@ -48,9 +48,10 @@
 	},
 	"SecIdxs": {
 		"name": "New Secondary Index",
-		"udfID": "",
-		"udfDescription": "",
-		"udfFunction": "",
-		"udfComments": ""
+		"SecIndxKey": "",
+		"SecIndxID": "",
+		"SecIndxDescription": "",
+		"SecIndxFunction": "",
+		"SecIndxComments": ""
 	}
 }

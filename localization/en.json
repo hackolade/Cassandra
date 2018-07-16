@@ -8,6 +8,7 @@
 	"MAIN_MENU___INSERT_FIELD": "Insert Column",
 	"MAIN_MENU___APPEND_FIELD": "Append Column",
 	"MAIN_MENU___REVERSE_MONGODB_COLLECTIONS": "Cassandra keyspaces...",
+	"MAIN_MENU___FORWARD_DB_COLLECTIONS": "Cassandra Query Language",
 	"TOOLBAR___ADD_BUCKET": "Add keyspace",
 	"TOOLBAR___ADD_COLLECTION": "Add table",
 	"TOOLBAR___ADD_VIEW": "Add View",
@@ -132,5 +133,8 @@
 	"COLLECTION_SCHEMA_DEFINITION_TYPE": "document",
 	"MONGODB_SCRIPT_WARNING_MESSAGE": "This view is not associated to a type (viewOn property).",
 	"TYPE": {},
-	"CENTRAL_PANE___TAB_MODEL_DEFINITIONS": "User-Defined Types"
+	"CENTRAL_PANE___TAB_MODEL_DEFINITIONS": "User-Defined Types",
+	"CENTRAL_PANE___FE_SCRIPT": "Cassandra Query Language",
+	"MODAL_WINDOW___FE_SCRIPT_OPTION_UPDATE": "Update",
+	"MODAL_WINDOW___FE_SCRIPT_OPTION_CREATE": "Create"
 }

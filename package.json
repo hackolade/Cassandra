@@ -19,7 +19,8 @@
 		},
 		"features": {
 			"nestedCollections": false,
-			"disablePatternField": true
+			"disablePatternField": true,
+			"enableForwardEngineering": true
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

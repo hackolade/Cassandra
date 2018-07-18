@@ -20,5 +20,21 @@
 				"inputType": "numeric"
 			}
 		]
+	}, {
+		"lowerTab": "Authentication",
+		"structure": [
+			{
+				"inputLabel": "User Name",
+				"inputKeyword": "user",
+				"inputType": "text",
+				"inputPlaceholder": "User Name"
+				
+			},
+			{
+				"inputLabel": "Password",
+				"inputKeyword": "password",
+				"inputType": "password"
+			}
+		]	
 	}
 ]

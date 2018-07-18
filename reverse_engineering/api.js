@@ -5,13 +5,16 @@ const cassandra = require('cassandra-driver');
 config.endpoint = ['40.112.248.195', '40.112.253.209', '40.112.255.51'];
 config.keyspace = 'cfs';
 
-var authProvider = new cassandra.auth.PlainTextAuthProvider('datastax', 'p@foo123!');
-const client = new cassandra.Client({ contactPoints: config.endpoint, keyspace: config.keyspace, authProvider });
-const async = require('async');
-const _ = require('lodash');
+
+var client = null;
+//const async = require('async');
+//const _ = require('lodash');
 
 module.exports = {
-	connect: function(connectionInfo, cb){
+	connect: function(connectionInfo, logger, cb){
+		var authProvider = new cassandra.auth.PlainTextAuthProvider(connectionInfo.user, connectionInfo.password);
+		client = new cassandra.Client({ contactPoints: config.endpoint, keyspace: config.keyspace, authProvider });
+		
 		client.connect(function (err) {
 		  if (err){ 
 		  	console.error(err);
@@ -23,12 +26,17 @@ module.exports = {
 		});
 	},
 
-	disconnect: function(connectionInfo, cb){
+	disconnect: function(connectionInfo, logger, cb){
 		cb()
 	},
 
-	testConnection: function(connectionInfo, cb){
-		cb(true);
+	testConnection: function(connectionInfo, logger, cb){
+		this.connect(connectionInfo, logger, err => {
+			if (err) {
+				return cb(err);
+			}
+			return cb(null);
+		});
 	},
 
 	getDatabases: function(connectionInfo, cb){

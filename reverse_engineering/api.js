@@ -1,14 +1,26 @@
 'use strict';
 
 const config = require("./config");
-const documentClient = require("documentdb").DocumentClient;
-const client = new documentClient(config.endpoint, { "masterKey": config.accountKey });
+const cassandra = require('cassandra-driver');
+config.endpoint = ['40.112.248.195', '40.112.253.209', '40.112.255.51'];
+config.keyspace = 'cfs';
+
+var authProvider = new cassandra.auth.PlainTextAuthProvider('datastax', 'p@foo123!');
+const client = new cassandra.Client({ contactPoints: config.endpoint, keyspace: config.keyspace, authProvider });
 const async = require('async');
 const _ = require('lodash');
 
 module.exports = {
 	connect: function(connectionInfo, cb){
-		cb()
+		client.connect(function (err) {
+		  if (err){ 
+		  	console.error(err);
+		  	return cb(err);
+		  }
+
+		  console.log('Connected to cluster with %d host(s): %j', client.hosts.length, client.hosts.keys());
+		  cb(null);
+		});
 	},
 
 	disconnect: function(connectionInfo, cb){

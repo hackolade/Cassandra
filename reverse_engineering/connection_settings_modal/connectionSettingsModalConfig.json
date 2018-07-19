@@ -10,14 +10,33 @@
 				
 			},
 			{
-				"inputLabel": "Host",
-				"inputKeyword": "host",
-				"inputType": "text"
-			},
-			{
-				"inputLabel": "Port",
-				"inputKeyword": "port",
-				"inputType": "numeric"
+				"inputLabel": "Hosts",
+				"inputKeyword": "hosts",
+				"inputType": "dynamicListInput",
+				"description": "",
+				"modalTitle": "Add new host",
+				"modalInputs": [
+					{
+						"inputLabel": "Address",
+						"inputKeyword": "host",
+						"inputType": "text",
+						"inputPlaceholder": "Address",
+						"description": "",
+						"validation": {
+							"regex": "([^\\s])" //not empty
+						}
+					},
+					{
+						"inputLabel": "Port",
+						"inputKeyword": "port",
+						"inputType": "text",
+						"inputPlaceholder": "Port",
+						"description": "",
+						"validation": {
+							"regex": "([^\\s])" //not empty
+						}
+					}
+				]
 			}
 		]
 	}, {

@@ -2,9 +2,7 @@
 
 const config = require("./config");
 const cassandra = require('cassandra-driver');
-config.endpoint = ['40.112.248.195', '40.112.253.209', '40.112.255.51'];
 config.keyspace = 'cfs';
-
 
 var client = null;
 //const async = require('async');
@@ -12,8 +10,9 @@ var client = null;
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb){
-		var authProvider = new cassandra.auth.PlainTextAuthProvider(connectionInfo.user, connectionInfo.password);
-		client = new cassandra.Client({ contactPoints: config.endpoint, keyspace: config.keyspace, authProvider });
+		const contactPoints = connectionInfo.hosts.map(item => `${item.host}:${item.port}`);
+		const authProvider = new cassandra.auth.PlainTextAuthProvider(connectionInfo.user, connectionInfo.password);
+		client = new cassandra.Client({ contactPoints, keyspace: config.keyspace, authProvider });
 		
 		client.connect(function (err) {
 		  if (err){ 

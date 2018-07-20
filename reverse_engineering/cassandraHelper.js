@@ -4,24 +4,15 @@ var state = {
 };
 
 const connect = (info) => {
-	return new Promise((resolve, reject) => {
-		if (!state.client) {
-			const username = info.user;
-			const password = info.password;
-			const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
-			const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-			state.client = new cassandra.Client({ contactPoints, authProvider });
-		}
-		
-		state.client.connect(err => {
-			if (err){
-				state.client = null;
-				reject(error);
-			} else {
-				resolve();
-			}
-		});
-	});
+	if (!state.client) {
+		const username = info.user;
+		const password = info.password;
+		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
+		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
+		state.client = new cassandra.Client({ contactPoints, authProvider });
+	}
+	
+	return state.client.connect();
 };
 
 const close = () => {

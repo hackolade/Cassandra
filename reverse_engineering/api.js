@@ -1,117 +1,42 @@
 'use strict';
 
-const config = require("./config");
-const cassandra = require('cassandra-driver');
-config.keyspace = 'cfs';
-
-var client = null;
-//const async = require('async');
-//const _ = require('lodash');
+const cassandra = require('./cassandraHelper');
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb){
-		const contactPoints = connectionInfo.hosts.map(item => `${item.host}:${item.port}`);
-		const authProvider = new cassandra.auth.PlainTextAuthProvider(connectionInfo.user, connectionInfo.password);
-		client = new cassandra.Client({ contactPoints, keyspace: config.keyspace, authProvider });
-		
-		client.connect(function (err) {
-		  if (err){ 
-		  	console.error(err);
-		  	return cb(err);
-		  }
-
-		  console.log('Connected to cluster with %d host(s): %j', client.hosts.length, client.hosts.keys());
-		  cb(null);
-		});
+		logger.clear();
+		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+		cassandra.connect(connectionInfo).then(cb, cb);
 	},
 
-	disconnect: function(connectionInfo, logger, cb){
-		cb()
+	disconnect: function(connectionInfo, cb){
+		cassandra.close();
+		cb();
 	},
 
 	testConnection: function(connectionInfo, logger, cb){
-		this.connect(connectionInfo, logger, err => {
-			if (err) {
-				return cb(err);
-			}
-			return cb(null);
+		this.connect(connectionInfo, logger, (error) => {
+			this.disconnect(connectionInfo, () => {});
+			return cb(error);
 		});
 	},
 
-	getDatabases: function(connectionInfo, cb){
-		listDatabases((err, dbs) => {
-			if(err){
-				console.log(err);
-			} else {
-				dbs = dbs.map(item => item.id);
-				cb(err, dbs);
-			}
+	getDbCollectionsNames: function(connectionInfo, logger, cb) {
+		let keyspaces;
+		let result = {
+			dbName: '',
+			dbCollections: ''
+		};
+
+		cassandra.connect(connectionInfo).then(() => {
+			keyspaces = cassandra.getKeyspaces();
+			console.log(keyspaces)
+		}).catch((error) => {
+			cb(error || 'error');
 		});
 	},
 
-	getDocumentKinds: function(connectionInfo, cb) {
-		readDatabaseById(connectionInfo.database, (err, database) => {
-			if(err){
-				console.log(err);
-			} else {
-				listCollections(database._self, (err, collections) => {
-					if(err){
-						console.log(err);
-						dbItemCallback(err)
-					} else {
-
-						async.map(collections, (collectionItem, collItemCallback) => {
-							readCollectionById(database.id, collectionItem.id, (err, collection) => {
-								if(err){
-									console.log(err);
-								} else {
-									let size = getSampleDocSize(1000, connectionInfo.recordSamplingSettings) || 1000;
-
-									listDocuments(collection._self, size, (err, documents) => {
-										if(err){
-											console.log(err);
-										} else {
-											documents  = filterDocuments(documents);
-
-											let inferSchema = generateCustomInferSchema(collectionItem.id, documents, { sampleSize: 20 });
-											let documentsPackage = getDocumentKindDataFromInfer({ bucketName: collectionItem.id, inference: inferSchema, isCustomInfer: true }, 90);
-
-											collItemCallback(err, documentsPackage);
-										}
-									});
-								}
-							});
-						}, (err, items) => {
-							if(err){
-								console.log(err);
-							}
-							return cb(err, items);
-						});
-					}
-				});
-			}
-		});
-	},
-
-	getDbCollectionsNames: function(connectionInfo, cb) {
-		readDatabaseById(connectionInfo.database, (err, database) => {
-			if(err){
-				console.log(err);
-			} else {
-				listCollections(database._self, (err, collections) => {
-					if(err){
-						console.log(err);
-						cb(err)
-					} else {
-						let collectionNames = collections.map(item => item.id);
-						handleBucket(connectionInfo, collectionNames, database, cb);
-					}
-				});
-			}
-		});
-	},
-
-	getDbCollectionsData: function(data, cb){
+	getDbCollectionsData: function(data, logger, cb){
 		let includeEmptyCollection = data.includeEmptyCollection;
 		let { recordSamplingSettings, fieldInference } = data;
 		let size = getSampleDocSize(1000, recordSamplingSettings) || 1000;
@@ -189,6 +114,7 @@ module.exports = {
 		});
 	}
 };
+
 
 
 function readCollectionById(dbLink, collectionId, callback) {

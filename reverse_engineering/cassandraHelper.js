@@ -21,8 +21,13 @@ const close = () => {
 	}
 };
 
-const getKeyspaces = () => {
+const getKeyspacesNames = () => {
 	return Object.keys(state.client.metadata.keyspaces);
+};
+
+const getTablesNames = (keyspace) => {
+	const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name='${keyspace}'`;
+	return state.client.execute(query);
 };
 
 const prepareConnectionDataItem = (keyspace, tables) => {
@@ -37,6 +42,7 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 module.exports = {
 	connect,
 	close,
-	getKeyspaces,
+	getKeyspacesNames,
+	getTablesNames,
 	prepareConnectionDataItem
 };

@@ -1,5 +1,5 @@
 'use strict';
-
+const async = require('async');
 const cassandra = require('./cassandraHelper');
 
 module.exports = {
@@ -22,96 +22,33 @@ module.exports = {
 	},
 
 	getDbCollectionsNames: function(connectionInfo, logger, cb) {
-		let keyspaces;
-		let result = {
-			dbName: '',
-			dbCollections: ''
-		};
-
 		cassandra.connect(connectionInfo).then(() => {
-			keyspaces = cassandra.getKeyspaces();
-			console.log(keyspaces)
-		}).catch((error) => {
-			cb(error || 'error');
-		});
+				const keyspaces = cassandra.getKeyspacesNames();
+				async.map(keyspaces, (keyspace, next) => {
+					cassandra.getTablesNames(keyspace).then(tablesData => {
+						const tableNames = tablesData.rows.map(table => table.table_name);
+						return next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames)); 
+					}).catch(next);
+				}, (err, result) => {
+					return cb(err, result);
+				});
+			}).catch((error) => {
+				return cb(error || 'error');
+			});
 	},
 
 	getDbCollectionsData: function(data, logger, cb){
-		let includeEmptyCollection = data.includeEmptyCollection;
-		let { recordSamplingSettings, fieldInference } = data;
-		let size = getSampleDocSize(1000, recordSamplingSettings) || 1000;
-		let bucketList = data.collectionData.dataBaseNames;
+		logger.clear();
+		logger.log('info', data, 'connectionInfo', data.hiddenKeys);
 
-		readDatabaseById(data.database, (err, database) => {
-			if(err){
-				console.log(err);
-			} else {
-				async.map(bucketList, (bucketName, collItemCallback) => {
-					readCollectionById(database.id, bucketName, (err, collection) => {
-						if(err){
-							console.log(err);
-						} else {
-							getOfferType(collection, (err, info) => {
-								if(err){
+		const collections = data.collectionData.collections;
+		const dataBaseNames = data.collectionData.dataBaseNames;
+		const fieldInference = data.fieldInference;
+		const includeEmptyCollection = data.includeEmptyCollection;
+		const includeSystemCollection = data.includeSystemCollection;
+		const recordSamplingSettings = data.recordSamplingSettings;
 
-								} else {
-									let bucketInfo = {
-										throughput: info.content.offerThroughput,
-										rump: info.content.offerIsRUPerMinuteThroughputEnabled ? 'OFF' : 'On'
- 									};
-
- 									let indexes = getIndexes(collection.indexingPolicy);
-
-									listDocuments(collection._self, size, (err, documents) => {
-										if(err){
-											console.log(err);
-										} else {
-											documents = filterDocuments(documents);
-											let documentKindName = data.documentKinds[collection.id].documentKindName || '*';
-											let docKindsList = data.collectionData.collections[bucketName];
-											let collectionPackages = [];
-
-											if(documentKindName !== '*'){
-												docKindsList.forEach(docKindItem => {
-													let newArrayDocuments = documents.filter((item) => {
-														return item[documentKindName] === docKindItem;
-													});
-
-													let documentsPackage = {
-														dbName: bucketName,
-														collectionName: docKindItem,
-														documents: newArrayDocuments || [],
-														indexes: [],
-														bucketIndexes: indexes,
-														views: [],
-														validation: false,
-														docType: documentKindName,
-														bucketInfo
-													};
-
-													if(fieldInference.active === 'field'){
-														documentsPackage.documentTemplate = documents[0] || null;
-													}
-
-													collectionPackages.push(documentsPackage)
-												});
-											}
-
-											collItemCallback(err, collectionPackages);
-										}
-									});
-								}
-							})
-						}
-					});
-				}, (err, items) => {
-					if(err){
-						console.log(err);
-					}
-					return cb(err, items);
-				});
-			}
-		});
+		cb();
 	}
 };
 

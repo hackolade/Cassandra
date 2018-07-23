@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<tup>",
 	"dtdAbbreviation": "[...]",
 	"parentType": "array",
-	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
 		"properties": [],

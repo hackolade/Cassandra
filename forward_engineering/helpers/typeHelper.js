@@ -1,45 +1,81 @@
 'use strict'
 
-const typeHandler = () => {
-	const getSetType = (propertyData, defaultType) => {
-		let valueType = getValueTypeFromArray(propertyData, defaultType);
+const ifType = type => {
+	let result;
 
-		return getComplexDefinition(`set<${valueType}>`, hasComplex(valueType));
+	const handler = (wanted, returnValue) => {
+		if (wanted === type) {
+			result = returnValue;
+		} else if (wanted === undefined) {
+			return result;
+		}
+
+		return handler;
 	};
 
-	const string = (propertyData) => (propertyData.mode || "text");
-	const number = (propertyData) => { 
-		const type = (propertyData.mode || "integer");
+	return handler;
+};
 
-		if (type === "integer") {
-			return "int";
+const getScalarType = (type) => {
+	const simpleType = (propertyData) => propertyData.type;
+
+	return ifType(type)
+		("string", (propertyData) => (propertyData.mode || "text"))
+		("number", (propertyData) => { 
+			const type = (propertyData.mode || "integer");
+	
+			return (type === "integer") ? "int" : type;
+		})
+		("binary", () => "blob")
+		("boolean", simpleType)
+		("blob", simpleType)
+		("timestamp", simpleType)
+		("date", simpleType)
+		("time", simpleType)
+		("duration", simpleType)
+		("uuid", simpleType)
+		("timeuuid", simpleType)
+		();
+};
+
+const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
+	const getValueTypeFromArray = (arraySchema, defaultType) => {
+		if (arraySchema.items) {
+			if (Array.isArray(arraySchema.items)) {
+				return complexType(arraySchema.items[0]);
+			} else {
+				return complexType(arraySchema.items);
+			}
+		}
+
+		return defaultType;
+	};
+
+	const getValueTypeFromObject = (objectSchema, defaultType) => {
+		if (objectSchema.properties) {
+			const propertyName = Object.keys(objectSchema.properties)[0];
+			
+			if (propertyName) {
+				const nestedPropertyData = objectSchema.properties[propertyName];
+				
+				return complexType(nestedPropertyData);
+			}
+		}
+
+		return defaultType;
+	};
+
+	const complexType = (nestedPropertyData) => {
+		if (nestedPropertyData) {
+			return getNestedTypeByData(nestedPropertyData, isNeedToBeFrozen);
 		} else {
-			return type;
+			return "text";
 		}
 	};
-	const binary = (propertyData) => "blob";
 
-	const boolean = simpleType.bind(null);
-	const blob = simpleType.bind(null);
-	const timestamp = simpleType.bind(null);
-	const date = simpleType.bind(null);
-	const time = simpleType.bind(null);
-	const duration = simpleType.bind(null);
-	const uuid = simpleType.bind(null);
-	const timeuuid = simpleType.bind(null);
+	const getSetType = (propertyData, defaultType) => `set<${getValueTypeFromArray(propertyData, defaultType)}>`;
 
-	const map = (propertyData) => {
-		const keyType = "varchar";
-		let valueType = getValueTypeFromObject(propertyData, "text");
-
-		return getComplexDefinition(`map<${keyType}, ${valueType}>`, hasComplex(valueType));
-	};
-
-	const list = (propertyData) => {
-		let valueType = getValueTypeFromArray(propertyData, "text");
-
-		return getComplexDefinition(`list<${valueType}>`, hasComplex(valueType));
-	};
+	const list = (propertyData) => `list<${getValueTypeFromArray(propertyData, "text")}>`;
 
 	const tuple = (propertyData) => {
 		let items = Array.isArray(propertyData.items) ? propertyData.items : [propertyData.items];
@@ -47,72 +83,71 @@ const typeHandler = () => {
 		return `tuple<${items.map(complexType).join(', ')}>`;
 	};
 
-	const arrayHandler = list.bind(null);
+	const map = (propertyData) => {
+		const keyType = "varchar";
+		const valueType = getValueTypeFromObject(propertyData, "text");
 
-	const stringSet = (propertyData) => getSetType(propertyData, "varchar");
-	const numberSet = (propertyData) => getSetType(propertyData, "int");
-	const binarySet = (propertyData) => getSetType(propertyData, "blob");
-
-	const handlersMap = {
-		string, number, binary, 
-		boolean, blob, timestamp,
-		date, time, duration, 
-		uuid, timeuuid, map,
-		list, tuple, stringSet,
-		numberSet, binarySet,
-		array: arrayHandler
+		return `map<${keyType}, ${valueType}>`;
 	};
 
-	return handlersMap;
+	return ifType(type)
+		("map", map)
+		("list", list)
+		("array", list)
+		("tuple", tuple)
+		("stringSet", data => getSetType(data, "varchar"))
+		("numberSet", data => getSetType(data, "int"))
+		("binarySet", data => getSetType(data, "blob"))
+		();
 };
 
-const hasComplex = (valueType) => /(map|list|tuple|set)/i.test(valueType);
+const getUDTHandler = (type) => {
+	return () => type;
+};
 
 const getFrozen = (typeDefinition) => `frozen<${typeDefinition}>`;
 
-const getComplexDefinition = (typeDefinition, hasComplex) => {
-	if (hasComplex) {
-		return getFrozen(typeDefinition);
+const getHandlerByType = (type) => (
+	getScalarType(type)
+	||
+	getStructuralTypeHandler(type, true)
+	||
+	getUDTHandler(type)
+);
+
+const getNestedTypeByData = (propertyData, isNeedToBeFrozen) => {
+	const type = getTypeByPropertyData(propertyData);
+	const scalarTypeHandler = getScalarType(type);
+
+	if (scalarTypeHandler) {
+		return scalarTypeHandler(propertyData);
+	}
+
+	const freezingType = (
+		getStructuralTypeHandler(type, false)
+		||
+		getUDTHandler(type)
+	)(propertyData);
+
+	return (isNeedToBeFrozen) ? getFrozen(freezingType) : freezingType;
+};
+
+const getTypeByPropertyData = (propertyData) => {
+	if (propertyData.$ref) {
+		return propertyData.$ref.split('/').pop();
+	} else if (propertyData.type) {
+		return propertyData.type;
 	} else {
-		return typeDefinition;
+		return "string";
 	}
 };
-const getValueTypeFromArray = (arraySchema, defaultType) => {
-	if (arraySchema.items) {
-		if (Array.isArray(arraySchema.items)) {
-			return complexType(arraySchema.items[0]);
-		} else {
-			return complexType(arraySchema.items);
-		}
-	}
 
-	return defaultType;
-};
+const getTypeByData = (propertyData) => {
+	const type = getTypeByPropertyData(propertyData);
 
-const getValueTypeFromObject = (objectSchema, defaultType) => {
-	if (objectSchema.properties) {
-		const propertyName = Object.keys(objectSchema.properties)[0];
-		
-		if (propertyName) {
-			const nestedPropertyData = objectSchema.properties[propertyName];
-			
-			return complexType(nestedPropertyData);
-		}
-	}
-
-	return defaultType;
-};
-
-const simpleType = (propertyData) => propertyData.type;
-
-const complexType = (nestedPropertyData) => {
-	if (nestedPropertyData) {	
-		return typeHandler()[nestedPropertyData.type](nestedPropertyData);
-	} else {
-		return "text";
-	}
+	return getHandlerByType(type)(propertyData);
 };
 
 module.exports = {
-	typeHandler	
+	getTypeByData
 };

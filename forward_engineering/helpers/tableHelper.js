@@ -10,8 +10,7 @@ module.exports = {
 		tableMetaData,
 		modelDefinitions,
 		internalDefinition,
-		keyspaceMetaData,
-		typeHandler
+		keyspaceMetaData
 	}) {
 		const tableFirstTab = (tableMetaData[0] || {});
 		const keyspaceName = (keyspaceMetaData[0] || {}).name || "";
@@ -31,7 +30,7 @@ module.exports = {
 		return getCreateTableStatement(
 			keyspaceName,
 			tableName,
-			getColumnDefinition(tableData.properties, typeHandler),
+			getColumnDefinition(tableData.properties),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
 			getOptions(clusteringKeys, clusteringKeysHash)
 		);

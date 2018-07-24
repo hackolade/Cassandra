@@ -4,14 +4,14 @@ const { tab } = require('./formatHelper');
 const { getColumnDefinition } = require('./columnHelper');
 
 module.exports = {
-	getUserDefinedTypes(keyspaceName, definitions, typeHandler) {
+	getUserDefinedTypes(keyspaceName, definitions) {
 		const properties = definitions.properties || {};
 
 		return Object.keys(properties).map(
 			typeName => getCreateTypeStatement(
 				keyspaceName,
 				typeName,
-				getFieldsDefinitions(typeName, properties[typeName], typeHandler)
+				getFieldsDefinitions(typeName, properties[typeName])
 			)
 		).join('\n\n');
 	}
@@ -21,10 +21,10 @@ const getCreateTypeStatement = (keyspaceName, typeName, fieldsDefinitions) => {
 	return `CREATE TYPE IF NOT EXISTS "${keyspaceName}".${typeName} (\n${tab(fieldsDefinitions)}\n);`
 };
 
-const getFieldsDefinitions = (typeName, typeData, typeHandler) => {
+const getFieldsDefinitions = (typeName, typeData) => {
 	if (typeData.properties) {
-		return getColumnDefinition(typeData.properties, typeHandler);
+		return getColumnDefinition(typeData.properties);
 	} else {
-		return getColumnDefinition({ [typeName]: typeData }, typeHandler);
+		return getColumnDefinition({ [typeName]: typeData });
 	}
 };

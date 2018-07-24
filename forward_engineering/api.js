@@ -2,7 +2,6 @@
 
 const { tab } = require('./helpers/formatHelper'); 
 const { getTableStatement } = require('./helpers/tableHelper');
-const { typeHandler } = require('./helpers/typeHelper');
 const { getUserDefinedTypes } = require('./helpers/udtHelper');
 
 module.exports = {
@@ -12,15 +11,14 @@ module.exports = {
 		data.internalDefinitions = JSON.parse(data.internalDefinitions);
 		let result = JSON.stringify(data, null, 2);
 		const keyspace = getKeyspaceStatement(data.containerData[0]);
-		const modelUdt = getUserDefinedTypes(data.containerData[0].name, data.modelDefinitions, typeHandler);
-		const internalUdt = getUserDefinedTypes(data.containerData[0].name, data.internalDefinitions, typeHandler);
+		const modelUdt = getUserDefinedTypes(data.containerData[0].name, data.modelDefinitions);
+		const internalUdt = getUserDefinedTypes(data.containerData[0].name, data.internalDefinitions);
 		const table = getTableStatement({
 			tableData: data.jsonSchema,
 			tableMetaData: data.entityData,
 			keyspaceMetaData: data.containerData,
 			modelDefinitions: data.modelDefinitions,
-			internalDefinition: data.internalDefinitions,
-			typeHandler
+			internalDefinition: data.internalDefinitions
 		});
 
 		callback(null, [keyspace, modelUdt, internalUdt, table, result].join('\n\n\n'));

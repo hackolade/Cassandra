@@ -32,7 +32,7 @@ module.exports = {
 			tableName,
 			getColumnDefinition(tableData.properties),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash)
+			getOptions(clusteringKeys, clusteringKeysHash, tableFirstTab.schemaId, tableFirstTab.comments)
 		);
 	}
 };
@@ -91,7 +91,7 @@ const getClusteringKeys = (clusteringKeysHash) => {
 	}
 };
 
-const getOptions = (clusteringKeys, clusteringKeysHash) => {
+const getOptions = (clusteringKeys, clusteringKeysHash, id, comment) => {
 	const getClusteringOrder = (clusteringKeys, clusteringKeysHash) => {
 		const order = (order) => (order === 'ascending') ? 'ASC' : 'DESC'; 
 		const orderString = clusteringKeys.map(key => {
@@ -114,6 +114,14 @@ const getOptions = (clusteringKeys, clusteringKeysHash) => {
 
 	if (clusteringOrder) {
 		options.push(clusteringOrder);
+	}
+
+	if (id) {
+		options.push(`ID='${id}'`);
+	}
+
+	if (comment) {
+		options.push(`comment='${comment}'`);
 	}
 
 	if (options.length) {

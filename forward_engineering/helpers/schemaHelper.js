@@ -43,15 +43,17 @@ const findFieldNameById = (id, source) => {
 };
 
 const getNamesByIds = (ids, sources) => {
-	return ids.map(id => {
+	return ids.reduce((hash, id) => {
 		for (let i = 0; i < sources.length; i++) {
 			const name = findFieldNameById(id, sources[i]);
 
 			if (name) {
-				return name;
+				return Object.assign({}, hash, { [id]: name });
 			}
 		}
-	}).filter(item => item);
+
+		return hash;
+	}, {});
 };
 
 module.exports = {

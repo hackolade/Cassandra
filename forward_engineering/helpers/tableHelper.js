@@ -13,54 +13,113 @@ module.exports = {
 		keyspaceMetaData,
 		typeHandler
 	}) {
+		const tableFirstTab = (tableMetaData[0] || {});
 		const keyspaceName = (keyspaceMetaData[0] || {}).name || "";
-		const tableName = (tableMetaData[0] || {}).collectionName || "";
+		const tableName = tableFirstTab.collectionName || "";
+		const partitionKeys = (tableFirstTab.compositePartitionKey || []);
+		const clusteringKeys = (tableFirstTab.compositeClusteringKey || []);
+
+		const partitionKeysHash = getNamesByIds(
+			partitionKeys.map(key => key.keyId),
+			[ tableData, modelDefinitions, internalDefinition ]
+		);
+		const clusteringKeysHash = getNamesByIds(
+			clusteringKeys.map(key => key.keyId),
+			[ tableData, modelDefinitions, internalDefinition ]
+		);
 
 		return getCreateTableStatement(
 			keyspaceName,
 			tableName,
 			getColumnDefinition(tableData.properties, typeHandler),
-			getPrimaryKeyList(tableMetaData[0], [ tableData, modelDefinitions, internalDefinition ]),
-			getOptions()
+			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
+			getOptions(clusteringKeys, clusteringKeysHash)
 		);
 	}
 };
 
-const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options) => 
-	`CREATE TABLE IF NOT EXISTS "${keyspaceName}"."${tableName}" (\n` + 
-		`${tab(columnDefinition)},\n` + 
-		`${tab(`PRIMARY KEY (${primaryKeys})`)}\n`+
+const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options) => {
+	const items = [];
+
+	if (columnDefinition) {
+		items.push(columnDefinition);
+	}
+
+	if (primaryKeys) {
+		items.push(`PRIMARY KEY (${primaryKeys})`);
+	}
+
+	return `CREATE TABLE IF NOT EXISTS "${keyspaceName}"."${tableName}" (\n` + 
+		items.map(item => tab(item)).join(',\n') + '\n' +
 	`)${options};`;
-
-const getPrimaryKeyList = (tableMetaData, fieldSources) => {
-	const partitionKeys = getPartitionKeys(tableMetaData.compositePartitionKey || [], fieldSources);
-	const clusteringKeys = getClusteringKeys(tableMetaData.compositeClusteringKey || [], fieldSources);
-
-	return [partitionKeys, clusteringKeys].join(', ');
 };
 
-const getPartitionKeys = (partitionKeys, sources) => {
-	const names = getNamesByIds(partitionKeys.map(key => key.keyId), sources);
+const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash) => {
+	const partitionKeys = getPartitionKeys(partitionKeysHash);
+	const clusteringKeys = getClusteringKeys(clusteringKeysHash);
+	const keys = [];
 
-	if (names) {
-		if (names.length > 1) {
-			return `("${names.join('", "')}")`;
+	if (partitionKeys) {
+		keys.push(partitionKeys);
+	}
+
+	if (clusteringKeys) {
+		keys.push(clusteringKeys);
+	}
+
+	return keys.join(', ');
+};
+
+const getPartitionKeys = (partitionKeysHash) => {
+	const keysIds = Object.keys(partitionKeysHash);
+
+	if (keysIds.length) {
+		const keysString = `"${keysIds.map(id => partitionKeysHash[id]).join('", "')}"`;
+
+		return (keysIds.length > 1) ? `(${keysString})` : keysString;
+	} else {
+		return "";
+	}
+};
+
+const getClusteringKeys = (clusteringKeysHash) => {
+	const keysIds = Object.keys(clusteringKeysHash);
+
+	if (keysIds.length) {
+		return `"${keysIds.map(id => clusteringKeysHash[id]).join('", "')}"`;
+	} else {
+		return "";
+	}
+};
+
+const getOptions = (clusteringKeys, clusteringKeysHash) => {
+	const getClusteringOrder = (clusteringKeys, clusteringKeysHash) => {
+		const order = (order) => (order === 'ascending') ? 'ASC' : 'DESC'; 
+		const orderString = clusteringKeys.map(key => {
+			const name = clusteringKeysHash[key.keyId];
+
+			if (name) {
+				return `"${name}" ${order(key.type)}`;
+			}
+		}).filter(key => key).join(', ');
+
+		if (orderString) {
+			return `CLUSTERING ORDER BY (${orderString})`;
 		} else {
-			return `"${names[0]}"`;
+			return false;
 		}
+	};
+
+	const options = [];
+	const clusteringOrder = getClusteringOrder(clusteringKeys, clusteringKeysHash);
+
+	if (clusteringOrder) {
+		options.push(clusteringOrder);
+	}
+
+	if (options.length) {
+		return `\nWITH ${ options.join("\n" + tab("AND ")) }`;
 	} else {
 		return "";
 	}
 };
-
-const getClusteringKeys = (clusteringKeys, sources) => {
-	const names = getNamesByIds(clusteringKeys.map(key => key.keyId), sources);
-
-	if (names) {
-		return `"${names.join('", "')}"`;
-	} else {
-		return "";
-	}
-};
-
-const getOptions = () => "";

@@ -10,26 +10,39 @@ module.exports = {
 		data.jsonSchema = JSON.parse(data.jsonSchema);
 		data.modelDefinitions = JSON.parse(data.modelDefinitions);
 		data.internalDefinitions = JSON.parse(data.internalDefinitions);
-		// let result = JSON.stringify(data, null, 2);
+		data.externalDefinitions = JSON.parse(data.externalDefinitions);
+
 		const keyspace = getKeyspaceStatement(data.containerData[0]);
 		const modelUdt = getUserDefinedTypes(data.containerData[0].name, data.modelDefinitions);
 		const internalUdt = getUserDefinedTypes(data.containerData[0].name, data.internalDefinitions);
+		const externalUdt = getUserDefinedTypes(data.containerData[0].name, data.externalDefinitions);
 		const table = getTableStatement({
 			tableData: data.jsonSchema,
 			tableMetaData: data.entityData,
 			keyspaceMetaData: data.containerData,
 			modelDefinitions: data.modelDefinitions,
-			internalDefinition: data.internalDefinitions
+			internalDefinition: data.internalDefinitions,
+			externalDefinitions: data.externalDefinitions
 		});
 		const indexes = getIndexes((data.entityData[1].SecIndxs || []), [
 			data.jsonSchema,
 			data.modelDefinitions,
-			data.internalDefinitions
+			data.internalDefinitions,
+			data.externalDefinitions
 		], data.entityData[0].collectionName, data.containerData[0].name);
-		const UDF = getUserDefinedFunctions(data.containerData[1].UDFs);
-		const UDA = getUserDefinedAggregations(data.containerData[2].UDAs);
+		const UDF = getUserDefinedFunctions(data.containerData[1].UDFs || []);
+		const UDA = getUserDefinedAggregations(data.containerData[2].UDAs || []);
 
-		callback(null, [keyspace, modelUdt, internalUdt, table, indexes, UDF, UDA].filter(item => item).join('\n\n'));
+		callback(null, [
+			keyspace,
+			UDF,
+			UDA,
+			modelUdt,
+			internalUdt,
+			externalUdt,
+			table,
+			indexes
+		].filter(item => item).join('\n\n'));
 	},
 };
 

@@ -10,6 +10,7 @@ module.exports = {
 		tableMetaData,
 		modelDefinitions,
 		internalDefinition,
+		externalDefinitions,
 		keyspaceMetaData
 	}) {
 		const tableFirstTab = (tableMetaData[0] || {});
@@ -20,11 +21,11 @@ module.exports = {
 
 		const partitionKeysHash = getNamesByIds(
 			partitionKeys.map(key => key.keyId),
-			[ tableData, modelDefinitions, internalDefinition ]
+			[ tableData, modelDefinitions, internalDefinition, externalDefinitions ]
 		);
 		const clusteringKeysHash = getNamesByIds(
 			clusteringKeys.map(key => key.keyId),
-			[ tableData, modelDefinitions, internalDefinition ]
+			[ tableData, modelDefinitions, internalDefinition, externalDefinitions ]
 		);
 
 		return getCreateTableStatement(

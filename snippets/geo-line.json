@@ -1,0 +1,12 @@
+{
+	"name": "geo-line",
+	"parentType": "array",
+	"properties": [{
+		"type": "numberSet",
+		"properties": [{
+			"type": "number"
+		}, {
+			"type": "number"
+		}]
+	}]
+}

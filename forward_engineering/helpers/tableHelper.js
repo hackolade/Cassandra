@@ -1,6 +1,12 @@
 'use strict'
 
-const { tab } = require('./formatHelper');
+const { 
+	tab,
+	retrieveContainerName,
+	retrieveEntityName,
+	retrivePropertyFromConfig,
+	getTableNameStatement
+} = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
 
@@ -8,32 +14,31 @@ module.exports = {
 	getTableStatement({
 		tableData,
 		tableMetaData,
-		modelDefinitions,
-		internalDefinition,
-		externalDefinitions,
+		dataSources,
 		keyspaceMetaData
 	}) {
-		const tableFirstTab = (tableMetaData[0] || {});
-		const keyspaceName = (keyspaceMetaData[0] || {}).name || "";
-		const tableName = tableFirstTab.collectionName || "";
-		const partitionKeys = (tableFirstTab.compositePartitionKey || []);
-		const clusteringKeys = (tableFirstTab.compositeClusteringKey || []);
+		const keyspaceName = retrieveContainerName(keyspaceMetaData);
+		const tableName = retrieveEntityName(tableMetaData);
+		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
+		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
+		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
+		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
 
 		const partitionKeysHash = getNamesByIds(
 			partitionKeys.map(key => key.keyId),
-			[ tableData, modelDefinitions, internalDefinition, externalDefinitions ]
+			dataSources
 		);
 		const clusteringKeysHash = getNamesByIds(
 			clusteringKeys.map(key => key.keyId),
-			[ tableData, modelDefinitions, internalDefinition, externalDefinitions ]
+			dataSources
 		);
 
 		return getCreateTableStatement(
 			keyspaceName,
 			tableName,
-			getColumnDefinition(tableData.properties),
+			getColumnDefinition(tableData.properties || {}),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash, tableFirstTab.schemaId, tableFirstTab.comments)
+			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableComment)
 		);
 	}
 };
@@ -49,7 +54,7 @@ const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, prim
 		items.push(`PRIMARY KEY (${primaryKeys})`);
 	}
 
-	return `CREATE TABLE IF NOT EXISTS "${keyspaceName}"."${tableName}" (\n` + 
+	return `CREATE TABLE IF NOT EXISTS ${getTableNameStatement(keyspaceName, tableName)} (\n` + 
 		items.map(item => tab(item)).join(',\n') + '\n' +
 	`)${options};`;
 };

@@ -1,6 +1,6 @@
 'use strict'
 
-const { tab } = require('./formatHelper');
+const { tab } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 
 module.exports = {

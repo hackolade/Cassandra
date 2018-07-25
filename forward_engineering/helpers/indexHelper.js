@@ -1,6 +1,6 @@
 'use strict'
 
-const { tab } = require('./formatHelper');
+const { tab, getTableNameStatement } = require('./generalHelper');
 const { getNamesByIds } = require('./schemaHelper');
 
 const getIndexes = (indexes, dataSources, tableName, keyspaceName) => {
@@ -15,7 +15,7 @@ const getIndexes = (indexes, dataSources, tableName, keyspaceName) => {
 };
 
 const getIndex = (name, keyspaceName, tableName, indexColumnStatement) => (
-	`CREATE INDEX IF NOT EXISTS "${name}"\n${tab(`ON "${keyspaceName}"."${tableName}" (${indexColumnStatement});`)}`	
+	`CREATE INDEX IF NOT EXISTS "${name}"\n${tab(`ON ${getTableNameStatement(keyspaceName, tableName)} (${indexColumnStatement});`)}`	
 );
 
 const getIndexColumnStatement = (key, dataSources) => {

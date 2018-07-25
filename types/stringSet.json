@@ -3,7 +3,6 @@
 	"erdAbbreviation": "<set>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "array",
-	"sample": ["sample"],
 	"useSample": true,
 	"defaultValues": {
 		"childValueType": "string", 

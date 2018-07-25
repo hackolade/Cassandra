@@ -1,0 +1,10 @@
+{
+	"name": "DseExecutorStateType",
+	"erdAbbreviation": "<DseEST>",
+	"dtdAbbreviation": "{DEST}",
+	"parentType": "binary",
+	"useSample": false,
+	"defaultValues": {
+		"primaryKey": false
+	}
+}

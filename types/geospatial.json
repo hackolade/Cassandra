@@ -1,5 +1,5 @@
 {
-	"name": "geo-spatial",
+	"name": "geospatial",
 	"erdAbbreviation": "<geo>",
 	"dtdAbbreviation": "{geo}",
 	"parentType": "array",

@@ -957,6 +957,67 @@ making sure that you maintain a proper JSON format.
 			"sample",
 			"comments"
 		],
+		"DateRangeType": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "compositeClusteringKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositeClusteringKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "compositeClusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "compositePartitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePartitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "compositePartitionKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
+			"pattern",
+			"default",
+			"enum",
+			"sample",
+			"comments"
+		],
 		"___4": [],
 		"uuid": [
 			"name",
@@ -1089,7 +1150,7 @@ making sure that you maintain a proper JSON format.
 			"comments"
 		],
 		"___5": [],
-		"geo-spatial": [
+		"geospatial": [
 			"name",
 			"schemaId",
 			"type",

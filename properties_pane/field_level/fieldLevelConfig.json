@@ -103,6 +103,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"foreignCollection",
 			"foreignField",
 			"relationshipType",
@@ -175,6 +182,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"foreignCollection",
 			"foreignField",
@@ -259,6 +273,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"default",
 			"sample",
 			"comments"
@@ -312,6 +333,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"comments"
 		],
 		"___1": [],
@@ -363,6 +391,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"minProperties",
 			"maxProperties",
@@ -417,6 +452,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"minItems",
 			"maxItems",
@@ -529,6 +571,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"minItems",
 			"maxItems",
 			"uniqueItems",
@@ -584,6 +633,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"minItems",
 			"maxItems",
 			"uniqueItems",
@@ -638,6 +694,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"minItems",
 			"maxItems",
@@ -695,6 +758,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"pattern",
 			"default",
 			"enum",
@@ -749,6 +819,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"pattern",
 			"default",
@@ -805,6 +882,13 @@ making sure that you maintain a proper JSON format.
 					"value": true
 				}]
 			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
 			"pattern",
 			"default",
 			"enum",
@@ -859,6 +943,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"pattern",
 			"default",
@@ -915,6 +1006,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"foreignCollection",
 			"foreignField",
@@ -973,6 +1071,13 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Static",
+				"propertyKeyword": "static",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
 			},
 			"foreignCollection",
 			"foreignField",

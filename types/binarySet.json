@@ -5,7 +5,7 @@
 	"parentType": "array",
 	"useSample": true,
 	"defaultValues": {
-		"childValueType": "binary", 
+		"childValueType": "blob", 
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],

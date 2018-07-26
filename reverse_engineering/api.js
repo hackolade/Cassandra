@@ -38,18 +38,67 @@ module.exports = {
 	},
 
 	getDbCollectionsData: function(data, logger, cb){
-		console.log(JSON.stringify(data, null, 4));
 		logger.clear();
 		logger.log('info', data, 'connectionInfo', data.hiddenKeys);
-
-		const collections = data.collectionData.collections;
-		const dataBaseNames = data.collectionData.dataBaseNames;
+	
+		const tables = data.collectionData.collections;
+		const keyspacesNames = data.collectionData.dataBaseNames;
 		const fieldInference = data.fieldInference;
 		const includeEmptyCollection = data.includeEmptyCollection;
 		const includeSystemCollection = data.includeSystemCollection;
 		const recordSamplingSettings = data.recordSamplingSettings;
+	
+		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
+			const tableNames = tables[keyspaceName];
 
-		cb();
+			if (!tableNames.length) {
+				let packageData = {
+					dbName: keyspaceName,
+					emptyBucket: true
+				};
+				return keyspaceCallback(null, packageData);
+			} else {
+				async.map(tableNames, (tableName, tableCallback) => {
+					let packageData = {
+						dbName: keyspaceName,
+						collectionName: tableName
+					};
+					let columns = [];
+
+					cassandra.getTableMetadata(keyspaceName, tableName)
+					.then(table => {
+						columns = table.columns;
+						if (columns) {
+							const schema = cassandra.getTableSchema(columns);
+							packageData.validation = {
+								jsonSchema: schema
+							};
+						} else if (includeEmptyCollection) {
+							packageData.documents = [];
+						} else {
+							packageData = null;
+						}
+						return packageData;
+					})
+					.then(packageData => {
+						return columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName) : null;
+					})
+					.then(res => {
+						if (res) {
+							console.log(res)
+							packageData.documents = [];
+						}
+						packageData.documents = [];
+						return tableCallback(null, packageData);
+					})
+					.catch(tableCallback);
+				}, (err, res) => {
+					return keyspaceCallback(err, res)
+				});
+			}
+		}, (err, res) => {
+			return cb(err, res);
+		});
 	}
 };
 
@@ -358,15 +407,15 @@ let connectionInfo = {
     host: "",
     hosts: [
         {
-            host: "104.210.50.99",
+            host: "104.42.208.185",
             port: "9042"
         },
         {
-            host: "104.42.123.34",
+            host: "104.42.208.14",
             port: "9042"
         },
         {
-            host: "104.42.124.62",
+            host: "104.42.210.175",
             port: "9042"
         }
     ],
@@ -416,21 +465,54 @@ const getDbCollectionsData = (data, cb) => {
     const recordSamplingSettings = data.recordSamplingSettings;
 
     connect(connectionInfo, (err, aaa) => {
-	    async.map(keyspacesNames, (keyspace, keyspaceCallback) => {
-	    	const tableNames = tables[keyspace];
-	    	async.map(tableNames, (table, tableCallback) => {
-	    		cassandra.getTableMetadata(keyspace, table)
-	    		.then(table => {
-	    			table.columns.forEach(function (column) {
-						const columnType = cassandra.getDataTypeNameByCode(column.type);
-						console.log('Column %s with type %j', column.name, columnType);
-	    			});
-	    			return tableCallback(null, table);
-	    		})
-	    		.catch(tableCallback);
-	    	}, (err, res) => {
-	    		return keyspaceCallback(err, res)
-	    	});
+	    async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
+	    	const tableNames = tables[keyspaceName];
+
+	    	if (!tableNames.length) {
+				let packageData = {
+					dbName: keyspaceName,
+					emptyBucket: true
+				};
+	    		return keyspaceCallback(null, packageData);
+	    	} else {
+		    	async.map(tableNames, (tableName, tableCallback) => {
+					let packageData = {
+						dbName: keyspaceName,
+						collectionName: tableName
+					};
+					let columns = [];
+
+		    		cassandra.getTableMetadata(keyspaceName, tableName)
+		    		.then(table => {
+						columns = table.columns;
+		    			if (columns) {
+			    			const schema = cassandra.getTableSchema(columns);
+			    			packageData.validation = {
+								jsonSchema: schema
+							};
+		    			} else if (includeEmptyCollection) {
+	    					packageData.documents = [];
+		    			} else {
+		    				packageData = null;
+		    			}
+		    			return packageData;
+					})
+					.then(packageData => {
+						return columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName) : null;
+					})
+					.then(res => {
+						if (res) {
+							console.log(res)
+							packageData.documents = [];
+						}
+						packageData.documents = [];
+						return tableCallback(null, packageData);
+					})
+		    		.catch(tableCallback);
+		    	}, (err, res) => {
+		    		return keyspaceCallback(err, res)
+		    	});
+	    	}
 	    }, (err, res) => {
 	    	return cb(err, res);
 	    });

@@ -58,6 +58,21 @@ const getDataTypeNameByCode = (code) => {
 	return types.getDataTypeNameByCode(code);
 };
 
+const getTableSchema = (columns) => {
+	let schema = {};
+	columns.forEach(column => {
+		const columnType = getDataTypeNameByCode(column.type);
+		schema[column.name] = columnType;
+	});
+	return schema;
+};
+
+const scanRecords = (keyspace, table) => {
+	const options = { prepare : true , fetchSize : 1000 };
+	const query = `SELECT * FROM ${keyspace}.${table}`;
+	return execute(query);
+};
+
 module.exports = {
 	connect,
 	close,
@@ -66,5 +81,7 @@ module.exports = {
 	prepareConnectionDataItem,
 	getColumnInfo,
 	getTableMetadata,
-	getDataTypeNameByCode
+	getDataTypeNameByCode,
+	getTableSchema,
+	scanRecords
 };

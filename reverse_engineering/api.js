@@ -38,6 +38,7 @@ module.exports = {
 	},
 
 	getDbCollectionsData: function(data, logger, cb){
+		console.log(JSON.stringify(data, null, 4));
 		logger.clear();
 		logger.log('info', data, 'connectionInfo', data.hiddenKeys);
 
@@ -303,3 +304,140 @@ function getIndexes(indexingPolicy){
 
 	return generalIndexes;
 }
+
+
+let data = {
+    "collectionData": {
+        "collections": {
+            "cfs": [
+                "cleanup",
+                "inode",
+                "rules",
+                "sblocks"
+            ],
+            "videodb": [
+                "videos",
+                "video_rating",
+                "video_event"
+            ]
+        },
+        "dataBaseNames": [
+            "cfs",
+            "videodb"
+        ]
+    },
+    "fieldInference": {
+        "active": "alphabetical"
+    },
+    "includeEmptyCollection": false,
+    "pagination": {
+        "enabled": false,
+        "value": 1000
+    },
+    "pluginPath": "/home/eduard/.hackolade/plugins/Link to Cassandra",
+    "recordSamplingSettings": {
+        "absolute": {
+            "value": "10"
+        },
+        "active": "relative",
+        "maxValue": 10000,
+        "relative": {
+            "value": "100"
+        }
+    },
+    "target": "CASSANDRA"
+};
+
+
+let connectionInfo = {
+    appVersion: "2.0.6",
+    excludeDocKind: [
+        "id"
+    ],
+    hiddenKeys: [],
+    host: "",
+    hosts: [
+        {
+            host: "104.210.50.99",
+            port: "9042"
+        },
+        {
+            host: "104.42.123.34",
+            port: "9042"
+        },
+        {
+            host: "104.42.124.62",
+            port: "9042"
+        }
+    ],
+    id: "c6814170-8b59-11e8-a9b4-a7357fb9ce45",
+    includeEmptyCollection: false,
+    includeSystemCollection: false,
+    name: "Datasax",
+    pagination: {
+        enabled: false,
+        value: 1000
+    },
+    password: "bar456$",
+    pluginPath: "/home/eduard/.hackolade/plugins/Link to Cassandra",
+    recordSamplingSettings: {
+        absolute: {
+            value: "10"
+        },
+        active: "relative",
+        maxValue: 10000,
+        relative: {
+            value: "100"
+        }
+    },
+    target: "CASSANDRA",
+    undefined: [],
+    user: "cassandra"
+};
+
+const connect = (connectionInfo, cb) => {
+	cassandra.connect(connectionInfo).then(res => {
+		return cb(null, res);
+	}).catch((error) => {
+		return cb(error || 'error');
+	});
+};
+
+const getDbCollectionsData = (data, cb) => {
+    console.log(JSON.stringify(data, null, 4));
+    // logger.clear();
+    // logger.log('info', data, 'connectionInfo', data.hiddenKeys);
+
+    const tables = data.collectionData.collections;
+    const keyspacesNames = data.collectionData.dataBaseNames;
+    const fieldInference = data.fieldInference;
+    const includeEmptyCollection = data.includeEmptyCollection;
+    const includeSystemCollection = data.includeSystemCollection;
+    const recordSamplingSettings = data.recordSamplingSettings;
+
+    connect(connectionInfo, (err, aaa) => {
+	    async.map(keyspacesNames, (keyspace, keyspaceCallback) => {
+	    	const tableNames = tables[keyspace];
+	    	async.map(tableNames, (table, tableCallback) => {
+	    		cassandra.getTableMetadata(keyspace, table)
+	    		.then(table => {
+	    			table.columns.forEach(function (column) {
+						const columnType = cassandra.getDataTypeNameByCode(column.type);
+						console.log('Column %s with type %j', column.name, columnType);
+	    			});
+	    			return tableCallback(null, table);
+	    		})
+	    		.catch(tableCallback);
+	    	}, (err, res) => {
+	    		return keyspaceCallback(err, res)
+	    	});
+	    }, (err, res) => {
+	    	return cb(err, res);
+	    });
+    });
+
+};
+
+getDbCollectionsData(data, (err, res) => {
+	console.log(err)
+});

@@ -1,4 +1,6 @@
 const cassandra = require('cassandra-driver');
+const types = require('cassandra-driver').types;
+
 var state = {
 	client: null
 };
@@ -27,7 +29,20 @@ const getKeyspacesNames = () => {
 
 const getTablesNames = (keyspace) => {
 	const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name='${keyspace}'`;
+	return execute(query);
+};
+
+const execute = (query) => {
 	return state.client.execute(query);
+};
+
+const getTableMetadata = (keyspace, table) => {
+	return state.client.metadata.getTable(keyspace, table);
+};
+
+const getColumnInfo = (keyspace, table) => {
+	const query = `SELECT * FROM system_schema.columns WHERE keyspace_name='${keyspace}' AND table_name='${table}';`;
+	return execute(query);
 };
 
 const prepareConnectionDataItem = (keyspace, tables) => {
@@ -39,10 +54,17 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 	return connectionDataItem;
 };
 
+const getDataTypeNameByCode = (code) => {
+	return types.getDataTypeNameByCode(code);
+};
+
 module.exports = {
 	connect,
 	close,
 	getKeyspacesNames,
 	getTablesNames,
-	prepareConnectionDataItem
+	prepareConnectionDataItem,
+	getColumnInfo,
+	getTableMetadata,
+	getDataTypeNameByCode
 };

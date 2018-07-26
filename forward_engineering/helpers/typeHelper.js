@@ -18,6 +18,7 @@ const ifType = type => {
 
 const getScalarType = (type) => {
 	const simpleType = (propertyData) => propertyData.type;
+	const geoSpatioalType = (propertyData) => `'${propertyData.subType || "PointType"}'`;
 
 	return ifType(type)
 		("string", (propertyData) => (propertyData.mode || "text"))
@@ -35,6 +36,9 @@ const getScalarType = (type) => {
 		("duration", simpleType)
 		("uuid", simpleType)
 		("timeuuid", simpleType)
+		("DseExecutorStateType", (propertyData) => `'${simpleType(propertyData)}'`)
+		("DateRangeType", (propertyData) => `'${simpleType(propertyData)}'`)
+		("geospatial", geoSpatioalType)
 		();
 };
 

@@ -43,12 +43,19 @@ const getScalarType = (type) => {
 };
 
 const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
+	const isFrozen = property => Boolean(property.frozen);
+	const setFrozen = typeHandler => propertyData => {
+		const type = typeHandler(propertyData);
+
+		return isFrozen(propertyData) ? getFrozen(type) : type;
+	};
+
 	const getValueTypeFromArray = (arraySchema, defaultType) => {
 		if (arraySchema.items) {
 			if (Array.isArray(arraySchema.items)) {
-				return complexType(arraySchema.items[0]);
+				return complexType(arraySchema.items[0], isFrozen(arraySchema));
 			} else {
-				return complexType(arraySchema.items);
+				return complexType(arraySchema.items, isFrozen(arraySchema));
 			}
 		}
 
@@ -62,20 +69,20 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 			if (propertyName) {
 				const nestedPropertyData = objectSchema.properties[propertyName];
 				
-				return complexType(nestedPropertyData);
+				return complexType(nestedPropertyData, isFrozen(objectSchema));
 			}
 		}
 
 		return defaultType;
 	};
 
-	const complexType = (nestedPropertyData) => {
+	const complexType = (isNeedToBeFrozen => (nestedPropertyData, isParentFrozen) => {
 		if (nestedPropertyData) {
-			return getNestedTypeByData(nestedPropertyData, isNeedToBeFrozen);
+			return getNestedTypeByData(nestedPropertyData, !isParentFrozen && isNeedToBeFrozen);
 		} else {
 			return "text";
 		}
-	};
+	})(isNeedToBeFrozen);
 
 	const getSetType = (propertyData, defaultType) => `set<${getValueTypeFromArray(propertyData, defaultType)}>`;
 
@@ -84,7 +91,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 	const tuple = (propertyData) => {
 		let items = Array.isArray(propertyData.items) ? propertyData.items : [propertyData.items];
 
-		return `tuple<${items.map(complexType).join(', ')}>`;
+		return `tuple<${items.map(item => complexType(item, true)).join(', ')}>`;
 	};
 
 	const map = (propertyData) => {
@@ -95,13 +102,13 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 	};
 
 	return ifType(type)
-		("map", map)
-		("list", list)
-		("array", list)
+		("map", setFrozen(map))
+		("list", setFrozen(list))
+		("array", setFrozen(list))
 		("tuple", tuple)
-		("stringSet", data => getSetType(data, "varchar"))
-		("numberSet", data => getSetType(data, "int"))
-		("binarySet", data => getSetType(data, "blob"))
+		("stringSet", setFrozen(data => getSetType(data, "varchar")))
+		("numberSet", setFrozen(data => getSetType(data, "int")))
+		("binarySet", setFrozen(data => getSetType(data, "blob")))
 		();
 };
 

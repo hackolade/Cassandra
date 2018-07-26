@@ -7,13 +7,15 @@ module.exports = {
 		return Object.keys(properties).map(name => {
 			const data = properties[name];
 	
-			return getColumn(name, getTypeDefinition(data));
+			return getColumn(name, getTypeDefinition(data), isStatic(data));
 		}).join(',\n');
 	}
 };
 
-const getColumn = (name, typeDefinition, isPrimary, isStatic) => {
-	return `"${name}" ${typeDefinition}`;
+const isStatic = (data) => Boolean((data || {}).static);
+
+const getColumn = (name, typeDefinition, isStatic) => {
+	return `"${name}" ${typeDefinition}${isStatic ? ' STATIC' : ''}`;
 };
 
 const getTypeDefinition = (data) => {

@@ -1,2 +1,4 @@
 node_modules
-.vscode
+.vscode/
+forward_engineering/script.js
+forward_engineering/node_modules

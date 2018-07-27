@@ -54,17 +54,78 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 	return connectionDataItem;
 };
 
-const getDataTypeNameByCode = (code) => {
-	return types.getDataTypeNameByCode(code);
-};
-
 const getTableSchema = (columns) => {
 	let schema = {};
 	columns.forEach(column => {
-		const columnType = getDataTypeNameByCode(column.type);
+		const columnType = getColumnType(column.type);
 		schema[column.name] = columnType;
+		schema[column.name].isStatic = column.isStatic;
+		schema[column.name].frozen = column.type.options.frozen;
 	});
-	return schema;
+	return { properties: schema };
+};
+
+const getColumnType = (code) => {
+	const cassanddraType = types.getDataTypeNameByCode(code);
+	return getType(cassanddraType);
+};
+
+const getType = (type, value) => {
+	// custom:     0x0000,
+	// udt:        0x0030
+
+	switch(type) {
+		case "smallint":
+		case "tinyint":
+		case "int":
+		case "bigint":
+		case "counter":
+		case "decimal":
+		case "double":
+		case "float":
+		case "varint":
+			return {
+				type: "number",
+				mode: type	
+			};
+		case "text":
+		case "varchar":
+		case "ascii":
+		case "inet":
+			return {
+				type: "string",
+				mode: type
+			};
+		case "timestamp":
+		case "timeuuid":
+		case "tuple":
+		case "boolean":
+		case "blob":
+		case "date":
+		case "time":
+		case "uuid":
+			return { type };
+		case "list":
+		case "set":
+			return { 
+				type,
+				subtype: getSubtype(value)
+			};
+		case "map":
+			return { 
+				type,
+				subtype: getSubtype(value),
+				keyType: getSubtype(value)
+			};
+		default:
+			return {
+				type: 'string'
+			};
+	}
+};
+
+const getSubtype = (type, value) => {
+	return 'string';
 };
 
 const scanRecords = (keyspace, table) => {
@@ -72,6 +133,76 @@ const scanRecords = (keyspace, table) => {
 	const query = `SELECT * FROM ${keyspace}.${table}`;
 	return execute(query);
 };
+
+
+/*
+const generateCustomInferSchema = (bucketName, documents, params) => {
+	function typeOf(obj) {
+		return {}.toString.call(obj).split(' ')[1].slice(0, -1).toLowerCase();
+	};
+
+	let sampleSize = params.sampleSize || 30;
+
+	let inferSchema = {
+		"#docs": 0,
+		"$schema": "http://json-schema.org/schema#",
+		"properties": {}
+	};
+
+	documents.forEach(item => {
+		inferSchema["#docs"]++;
+		
+		for(let prop in item){
+			if(inferSchema.properties.hasOwnProperty(prop)){
+				inferSchema.properties[prop]["#docs"]++;
+				inferSchema.properties[prop]["samples"].indexOf(item[prop]) === -1 && inferSchema.properties[prop]["samples"].length < sampleSize? inferSchema.properties[prop]["samples"].push(item[prop]) : '';
+				inferSchema.properties[prop]["type"] = typeOf(item[prop]);
+			} else {
+				inferSchema.properties[prop] = {
+					"#docs": 1,
+					"%docs": 100,
+					"samples": [item[prop]],
+					"type": typeOf(item[prop])
+				}
+			}
+		}
+	});
+
+	for (let prop in inferSchema.properties){
+		inferSchema.properties[prop]["%docs"] = Math.round((inferSchema.properties[prop]["#docs"] / inferSchema["#docs"] * 100), 2);
+	}
+	return inferSchema;
+};
+
+const getSampleDocSize = (count, recordSamplingSettings) => {
+	let per = recordSamplingSettings.relative.value;
+	return (recordSamplingSettings.active === 'absolute')
+		? recordSamplingSettings.absolute.value
+			: Math.round( count/100 * per);
+};
+
+const getIndexes = (indexingPolicy) => {
+	let generalIndexes = [];
+	
+	if(indexingPolicy){
+		indexingPolicy.includedPaths.forEach(item => {
+			let indexes = item.indexes;
+			indexes = indexes.map(index => {
+				index.indexPrecision = index.precision;
+				index.automatic = item.automatic;
+				index.mode = indexingPolicy.indexingMode;
+				index.indexIncludedPath = item.path;
+				return index;
+			});
+
+			generalIndexes = generalIndexes.concat(generalIndexes, indexes);
+		});
+	}
+
+	return generalIndexes;
+};
+
+*/
 
 module.exports = {
 	connect,
@@ -81,7 +212,6 @@ module.exports = {
 	prepareConnectionDataItem,
 	getColumnInfo,
 	getTableMetadata,
-	getDataTypeNameByCode,
 	getTableSchema,
 	scanRecords
 };

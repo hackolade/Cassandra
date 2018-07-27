@@ -1,5 +1,6 @@
 'use strict'
-
+const fs = require('fs');
+const path = require('path');
 const TAB_SIZE = 2;
 
 const tab = (text, count = 1) => {
@@ -17,6 +18,55 @@ const retrieveUDA = (containerConfig) => retrivePropertyFromConfig(containerConf
 const retrieveIndexes = (entityConfig) => retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []);
 const getTableNameStatement = (keyspaceName, tableName) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}"${tableName}"`;
 
+const getConfig = (pathToConfig) => {
+	try {
+		const config = fs.readFileSync(path.join(__dirname, "..", "..", pathToConfig));
+
+		return JSON.parse(config.toString().replace(/\/\*[\s\S]*?\*\//g, ""));
+	} catch (e) {
+		return {};
+	}
+};
+
+const cacheResult = (method) => {
+	let result;
+
+	return (...args) => {
+		if (!result) {
+			result = method(...args);
+		}
+
+		return result;
+	}
+};
+
+const getFieldLevelConfig = cacheResult(() => getConfig(path.join("properties_pane", "field_level", "fieldLevelConfig.json")));
+
+const getTypesConfig = cacheResult(() => {
+	const getName = typeFile => typeFile.replace(/\.json/, "");
+	const typeDir = path.join(__dirname, "..", "..", "types");
+	const types = fs.readdirSync(typeDir);
+
+	return types.reduce((typesMap, fileName) => {
+		typesMap[getName(fileName)] = getConfig(path.join("types", fileName));
+
+		return typesMap;
+	}, {});
+});
+
+const getTypeConfig = (type) => getTypesConfig()[type];
+
+const getFieldConfig = (type, property) => {
+	const fieldLevelConfig = getFieldLevelConfig().structure;
+
+	if (!fieldLevelConfig[type]) {
+		return;
+	}
+	const propertyData = fieldLevelConfig[type].find(config => config.propertyKeyword === property);
+
+	return propertyData;
+};
+
 module.exports = {
 	tab,
 	retrieveContainerName,
@@ -25,5 +75,7 @@ module.exports = {
 	retrieveUDA,
 	retrieveIndexes,
 	retrivePropertyFromConfig,
-	getTableNameStatement
+	getTableNameStatement,
+	getFieldConfig,
+	getTypeConfig
 };

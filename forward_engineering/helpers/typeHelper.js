@@ -1,5 +1,7 @@
 'use strict'
 
+const { getFieldConfig, getTypeConfig } = require('./generalHelper');
+
 const ifType = type => {
 	let result;
 
@@ -14,6 +16,19 @@ const ifType = type => {
 	};
 
 	return handler;
+};
+
+const getModeType = (type, defaultType) => {
+	if (type) {
+		const mode = getFieldConfig(type, "mode");
+		if (mode && mode.options) {
+			return mode.options[0];
+		} else {
+			return type;
+		}
+	}
+
+	return defaultType;
 };
 
 const getScalarType = (type) => {
@@ -57,6 +72,14 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 			} else {
 				return complexType(arraySchema.items, isFrozen(arraySchema));
 			}
+		} else {
+			const typeConfig = getTypeConfig(arraySchema.type);
+			if (typeConfig.subtypes && arraySchema.subtype) {
+				const subTypeConfig = typeConfig.subtypes[arraySchema.subtype];
+				if (subTypeConfig && subTypeConfig.childValueType) {
+					return getModeType(subTypeConfig.childValueType, defaultType);
+				}
+			}
 		}
 
 		return defaultType;
@@ -71,6 +94,14 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 				
 				return complexType(nestedPropertyData, isFrozen(objectSchema));
 			}
+		} else {
+			const typeConfig = getTypeConfig(objectSchema.type);
+			if (typeConfig.subtypes && objectSchema.subtype) {
+				const subTypeConfig = typeConfig.subtypes[objectSchema.subtype];
+				if (subTypeConfig && subTypeConfig.childValueType) {
+					return getModeType(subTypeConfig.childValueType, defaultType);
+				}
+			}
 		}
 
 		return defaultType;
@@ -84,7 +115,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 		}
 	})(isNeedToBeFrozen);
 
-	const getSetType = (propertyData, defaultType) => `set<${getValueTypeFromArray(propertyData, defaultType)}>`;
+	const typeSet = (propertyData) => `set<${getValueTypeFromArray(propertyData, "varchar")}>`;
 
 	const list = (propertyData) => `list<${getValueTypeFromArray(propertyData, "text")}>`;
 
@@ -95,7 +126,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 	};
 
 	const map = (propertyData) => {
-		const keyType = "varchar";
+		const keyType = getModeType(propertyData.keyType);
 		const valueType = getValueTypeFromObject(propertyData, "text");
 
 		return `map<${keyType}, ${valueType}>`;
@@ -104,11 +135,8 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen) => {
 	return ifType(type)
 		("map", setFrozen(map))
 		("list", setFrozen(list))
-		("array", setFrozen(list))
+		("set", setFrozen(typeSet))
 		("tuple", tuple)
-		("stringSet", setFrozen(data => getSetType(data, "varchar")))
-		("numberSet", setFrozen(data => getSetType(data, "int")))
-		("binarySet", setFrozen(data => getSetType(data, "blob")))
 		();
 };
 

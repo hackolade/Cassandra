@@ -25,6 +25,7 @@
 		"features": {
 			"nestedCollections": false,
 			"disablePatternField": true,
+			"enableForwardEngineering": true,
 			"disableMultipleTypes": true,
 			"disableReverseEngineering": true,
 			"disableChoices": true

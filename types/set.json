@@ -1,0 +1,45 @@
+{
+	"name": "set",
+	"erdAbbreviation": "<set>",
+	"dtdAbbreviation": "{...}",
+	"parentType": "array",
+	"useSample": true,
+	"defaultValues": {
+		"subtype": "set<str>",
+		"dependencies": [],
+		"primaryKey": false,
+		"properties": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false
+	},
+	"subtypes": {
+		"set<str>": {
+			"childValueType": "string"
+		},
+		"set<num>": {
+			"childValueType": "number"
+		},
+		"set<blob>": {
+			"childValueType": "blob"
+		},
+		"set<ts>": {
+			"childValueType": "timestamp"
+		},
+		"set<date>": {
+			"childValueType": "date"
+		},
+		"set<set>": {
+			"childValueType": "set"
+		},
+		"set<list>": {
+			"childValueType": "list"
+		},
+		"set<tuple>": {
+			"childValueType": "tuple"
+		},
+		"set<map>": {
+			"childValueType": "map"
+		}
+	}
+}

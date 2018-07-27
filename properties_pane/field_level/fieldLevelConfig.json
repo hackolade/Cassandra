@@ -613,8 +613,7 @@ making sure that you maintain a proper JSON format.
 			"additionalItems",
 			"comments"
 		],
-		"___2": [],
-		"stringSet": [
+		"set": [
 			"name",
 			"sampleName",
 			"schemaId",
@@ -670,129 +669,22 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean"
 			},
-			"minItems",
-			"maxItems",
-			"uniqueItems",
-			"additionalItems",
-			"comments"
-		],
-		"numberSet": [
-			"name",
-			"sampleName",
-			"schemaId",
-			"refPath",
-			"type",
-			"description",
-			"dependencies",
 			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
+				"propertyName": "Subtype",
+				"propertyKeyword": "subtype",
 				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Frozen",
-				"propertyKeyword": "frozen",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean"
-			},
-			"minItems",
-			"maxItems",
-			"uniqueItems",
-			"additionalItems",
-			"comments"
-		],
-		"binarySet": [
-			"name",
-			"sampleName",
-			"schemaId",
-			"refPath",
-			"type",
-			"description",
-			"dependencies",
-			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Frozen",
-				"propertyKeyword": "frozen",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean"
+				"propertyType": "select",
+				"options": [
+					"set<str>",
+					"set<num>",
+					"set<blob>",
+					"set<ts>",
+					"set<date>",
+					"set<set>",
+					"set<list>",
+					"set<tuple>",
+					"set<map>"
+				]
 			},
 			"minItems",
 			"maxItems",

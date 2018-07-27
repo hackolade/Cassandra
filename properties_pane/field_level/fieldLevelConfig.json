@@ -458,6 +458,20 @@ making sure that you maintain a proper JSON format.
 				"valueType": "boolean"
 			},
 			{
+				"propertyName": "Key type",
+				"propertyKeyword": "keyType",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"string",
+					"number",
+					"blob",
+					"timestamp",
+					"time",
+					"date"
+				]
+			},
+			{
 				"propertyName": "Subtype",
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,

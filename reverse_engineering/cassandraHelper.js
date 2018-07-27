@@ -130,7 +130,7 @@ const getSubtype = (type, value) => {
 
 const scanRecords = (keyspace, table) => {
 	const options = { prepare : true , fetchSize : 1000 };
-	const query = `SELECT * FROM ${keyspace}.${table}`;
+	const query = `SELECT * FROM "${keyspace}"."${table}"`;
 	return execute(query);
 };
 

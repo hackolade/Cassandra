@@ -27,7 +27,8 @@
 			"disablePatternField": true,
 			"enableForwardEngineering": true,
 			"disableMultipleTypes": true,
-			"disableReverseEngineering": true
+			"disableReverseEngineering": true,
+			"disableChoices": true
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

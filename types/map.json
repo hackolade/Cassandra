@@ -4,12 +4,42 @@
 	"dtdAbbreviation": "{...}",
 	"parentType": "document",
 	"useSample": true,
-	"defaultValues": { 
+	"defaultValues": {
+		"subtype": "map<str>",
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],
 		"minProperties": "",
 		"maxProperties": "",
 		"additionalProperties": false
+	},
+	"subtypes": {
+		"map<str>": {
+			"childValueType": "string"
+		},
+		"map<num>": {
+			"childValueType": "number"
+		},
+		"map<blob>": {
+			"childValueType": "blob"
+		},
+		"map<ts>": {
+			"childValueType": "timestamp"
+		},
+		"map<date>": {
+			"childValueType": "date"
+		},
+		"map<set>": {
+			"childValueType": "set"
+		},
+		"map<list>": {
+			"childValueType": "list"
+		},
+		"map<tuple>": {
+			"childValueType": "tuple"
+		},
+		"map<map>": {
+			"childValueType": "map"
+		}
 	}
 }

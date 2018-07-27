@@ -1,5 +1,5 @@
 # Cassandra
-Hackolade plugin for Cassandra Datastax
+Hackolade plugin for Cassandra DataStax
 
 Not ready for production!!
 

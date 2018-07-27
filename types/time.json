@@ -1,17 +1,19 @@
 {
-	"name": "timestamp",
-	"erdAbbreviation": "<ts>",
-	"dtdAbbreviation": "{ABC}",
+	"name": "time",
+	"erdAbbreviation": "<tm>",
+	"dtdAbbreviation": "{tm}",
 	"parentType": "string",
 	"useSample": true,
-	"sample": "2011-02-03 04:05:00+0000",
+	"sample":"08:45:12.123123",
 	"defaultValues": {
 		"primaryKey": false,
 		"default": "",
+		"minLength": "",
+		"maxLength": "",
 		"enum": [],
 		"sample":"",
+		"pattern": "",
 		"comments":"",
-		"pattern":"",
 		"format": ""
 	}
 }

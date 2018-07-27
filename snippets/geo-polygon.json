@@ -1,0 +1,15 @@
+{
+	"name": "geo-polygon",
+	"parentType": "array",
+	"properties": [{
+		"type": "list",
+		"properties": [{
+			"type": "numberSet",
+			"properties": [{
+				"type": "number"
+			}, {
+				"type": "number"
+			}]
+		}]
+	}]
+}

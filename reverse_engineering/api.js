@@ -1,6 +1,8 @@
 'use strict';
+
 const async = require('async');
 const cassandra = require('./cassandraHelper');
+
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb){
@@ -523,3 +525,28 @@ const getDbCollectionsData = (data, cb) => {
 getDbCollectionsData(data, (err, res) => {
 	console.log(err)
 });
+=======
+		cb()
+	},
+
+	testConnection: function(connectionInfo, cb){
+		cb(true);
+	},
+
+	getDatabases: function(connectionInfo, cb){
+		cb();
+	},
+
+	getDocumentKinds: function(connectionInfo, cb) {
+		cb();
+	},
+
+	getDbCollectionsNames: function(connectionInfo, cb) {
+		cb();
+	},
+
+	getDbCollectionsData: function(data, cb){
+		cb();
+	}
+};
+>>>>>>> develop

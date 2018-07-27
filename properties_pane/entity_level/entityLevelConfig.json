@@ -5,12 +5,120 @@
 * The software may be used and/or copied only with the written permission of 
 * IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
 * the agreement/contract under which the software has been supplied. 
+
+In order to define custom properties for any object's properties pane, you may copy/paste from the following,
+making sure that you maintain a proper JSON format.
+
+			{
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"shouldValidate": false,
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyValidate": false,
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"shouldValidate": false,
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Properties Group",
+				"propertyType": "group",
+				"propertyKeyword": "grpProp",
+				"shouldValidate": true,
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyValidate": true,
+						"propertyType": "numeric",
+						"valueType": "number",
+						"allowNegative": false
+					}
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
+				"shouldValidate": false,
+				"propertyType": "fieldList",
+				"template": "orderedList"
+			}, 
+			{
+				"propertyName": "List with attribute",
+				"propertyKeyword": "keyListOrder",
+				"shouldValidate": false,
+				"propertyType": "fieldList",
+				"template": "orderedList",
+				"attributeList": [
+					"ascending",
+					"descending"
+				]
+			}
+
 */
 
 [
 	{
 		"lowerTab": "Details",
 		"structure": [
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "compositePartitionKey",
+				"shouldValidate": false,
+				"propertyType": "primaryKeySetter",
+				"abbr": "K"
+			}, 
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "compositeClusteringKey",
+				"shouldValidate": false,
+				"propertyType": "primaryKeySetter",
+				"abbr": "C",
+				"attributeList": [
+					{ "name": "ascending", "abbr": "\u2191" },
+					{ "name": "descending", "abbr": "\u2193" }
+				]
+			},
 			{
 				"propertyName": "Comments",
 				"propertyKeyword": "comments",
@@ -19,38 +127,109 @@
 				"propertyType": "details",
 				"template": "textarea",
 				"valueType": "string"
-			}
-		]
-	},
-	{
-		"lowerTab": "Primary key",
-		"structure": [
+			},
 			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "partitionKey",
+				"propertyName": "Simple text",
+				"propertyKeyword": "simpletextProp",
+				"shouldValidate": false,
+				"propertyType": "text",
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Text area",
+				"propertyKeyword": "textareaProp",
+				"propertyValidate": false,
+				"propertyTooltip": "Popup for multi-line text entry",
+				"propertyType": "details",
+				"template": "textarea"
+			},
+			{
+				"propertyName": "Dropdown selection",
+				"propertyKeyword": "dropdownProp",
+				"shouldValidate": false,
+				"propertyTooltip": "Select from list of options",
+				"propertyType": "select",
+				"options": [
+					"Option 1",
+					"Option 2",
+					"Option 3",
+					"Option 4"
+				]
+			},
+			{
+				"propertyName": "Numeric",
+				"propertyKeyword": "numericProp",
+				"propertyValidate": true,
+				"propertyType": "numeric",
+				"valueType": "number",
+				"allowNegative": false,
+				"sampleGen": "&containerName|&entityName|&random|<value>"
+			},
+			{
+				"propertyName": "Checkbox",
+				"propertyKeyword": "checkboxProp",
+				"shouldValidate": false,
+				"propertyType": "checkbox"
+			},
+			{
+				"propertyName": "Properties Group",
+				"propertyType": "group",
+				"propertyKeyword": "grpProp",
+				"shouldValidate": true,
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Simple Grp Text",
+						"propertyKeyword": "simpleGrpText",
+						"shouldValidate": false,
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Description",
+						"propertyKeyword": "indexDescription",
+						"shouldValidate": false,
+						"propertyTooltip": "description",
+						"propertyType": "details",
+						"template": "textarea"
+				},
+					{
+						"propertyName": "Group Number",
+						"propertyKeyword": "grpNumber",
+						"propertyType": "text",
+						"valueType": "number",
+						"allowNegative": false,
+						"sampleGen": "&containerName|&entityName|&random|<value>"
+					}					
+				]
+			},
+			{
+				"propertyName": "Field List",
+				"propertyKeyword": "keyList",
 				"shouldValidate": false,
 				"propertyType": "tagInput",
 				"template": "collectiontree"
 			}, 
 			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "clusteringKey",
+				"propertyName": "Field List w/ dropdown",
+				"propertyKeyword": "keyListOrder",
 				"shouldValidate": false,
 				"propertyType": "tagInput",
 				"template": "collectiontree",
-				"types": [
+				"attributeList": [
 					"ascending",
 					"descending"
 				]
 			}
-		]
+		],
+		"columnsRatio": [3.7, 5]
 	},
 	{
 		"lowerTab": "Secondary Indexes",
 		"structure": [{
 			"propertyName": "Secondary Index",
 			"propertyType": "group",
-			"propertyKeyword": "SecIDxs",
+			"propertyKeyword": "SecIndxs",
 			"shouldValidate": false,
 			"propertyTooltip": "",
 			"structure": [
@@ -63,25 +242,25 @@
 				},
 				{
 					"propertyName": "Key",
-					"propertyKeyword": "key",
+					"propertyKeyword": "SecIndxKey",
 					"shouldValidate": false,
-					"propertyType": "tagInput",
-					"template": "collectiontree",
-					"types": [
+					"propertyType": "fieldList",
+					"template": "orderedList",
+					"attributeList": [
 						"ascending",
 						"descending"
 					]
 				},
 				{
 					"propertyName": "Id",
-					"propertyKeyword": "SecIdxID",
+					"propertyKeyword": "SecIndxID",
 					"shouldValidate": false,
 					"propertyTooltip": "Secondary Index ID",
 					"propertyType": "text"
 				},
 				{
 					"propertyName": "Description",
-					"propertyKeyword": "SecIdxDescription",
+					"propertyKeyword": "SecIndxDescription",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
 					"propertyType": "details",
@@ -89,7 +268,7 @@
 				},
 				{
 					"propertyName": "Function",
-					"propertyKeyword": "storedProcFunction",
+					"propertyKeyword": "SecIndxFunction",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
 					"propertyType": "details",
@@ -97,7 +276,7 @@
 				},
 				{
 					"propertyName": "Comments",
-					"propertyKeyword": "storedProcComments",
+					"propertyKeyword": "SecIndxComments",
 					"shouldValidate": false,
 					"propertyTooltip": "comments",
 					"propertyType": "details",

@@ -5,11 +5,41 @@
 	"parentType": "array",
 	"useSample": true,
 	"defaultValues": {
+		"subtype": "list<str>",
 		"properties": [],
 		"primaryKey": false,
 		"additionalItems": true,
 		"minItems": "",
 		"maxItems": "",
 		"uniqueItems": false
+	},
+	"subtypes": {
+		"list<str>": {
+			"childValueType": "string"
+		},
+		"list<num>": {
+			"childValueType": "number"
+		},
+		"list<blob>": {
+			"childValueType": "blob"
+		},
+		"list<ts>": {
+			"childValueType": "timestamp"
+		},
+		"list<date>": {
+			"childValueType": "date"
+		},
+		"list<set>": {
+			"childValueType": "set"
+		},
+		"list<list>": {
+			"childValueType": "list"
+		},
+		"list<tuple>": {
+			"childValueType": "tuple"
+		},
+		"list<map>": {
+			"childValueType": "map"
+		}
 	}
 }

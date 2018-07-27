@@ -518,6 +518,23 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean"
 			},
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "subtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"list<str>",
+					"list<num>",
+					"list<blob>",
+					"list<ts>",
+					"list<date>",
+					"list<set>",
+					"list<list>",
+					"list<tuple>",
+					"list<map>"
+				]
+			},
 			"minItems",
 			"maxItems",
 			"uniqueItems",

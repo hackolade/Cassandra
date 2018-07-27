@@ -59,7 +59,7 @@ const getTableSchema = (columns) => {
 	columns.forEach(column => {
 		const columnType = getColumnType(column.type);
 		schema[column.name] = columnType;
-		schema[column.name].isStatic = column.isStatic;
+		schema[column.name].static = column.isStatic;
 		schema[column.name].frozen = column.type.options.frozen;
 	});
 	return { properties: schema };
@@ -137,7 +137,13 @@ const scanRecords = (keyspace, table) => {
 
 const getEntityLevelData = (table) => {
 	const partitionKeys = (table.partitionKeys || []).map(item => item.name);
-	const clusteringKeys = (table.clusteringKeys || []).map(item => item.name);
+	const clusteringKeys = (table.clusteringKeys || []).map((item, index) => {
+		let clusteringOrder = table.clusteringOrder ? table.clusteringOrder[index] : '';
+		return {
+			name: item.name,
+			type: getKeyOrder(clusteringOrder)
+		};
+	});
 	const indexes = (table.indexes || []).map(item => {
 		return { name: item.name };
 	});
@@ -146,6 +152,16 @@ const getEntityLevelData = (table) => {
 		compositePartitionKey: partitionKeys,
 		compositeClusteringKey: clusteringKeys,
 		indexes
+	}
+};
+
+const getKeyOrder = (order) => {
+	switch(order) {
+		case 'DESC':
+			return 'descending';
+		case 'ASC':
+		default:
+			return 'ascending';
 	}
 };
 

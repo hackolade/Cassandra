@@ -3,8 +3,11 @@
 	"parentType": "array",
 	"properties": [{
 		"type": "list",
+		"subtype": "list<set>",
+		"frozen": true,
 		"properties": [{
-			"type": "numberSet",
+			"type": "set",
+			"subtype": "set<num>",
 			"properties": [{
 				"type": "number"
 			}, {

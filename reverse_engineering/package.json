@@ -4,6 +4,9 @@
   "description": "",
   "author": "Hackolade",
   "dependencies": {
-    "cassandra-driver": "^3.3.0"
-  }
+    "cassandra-driver": "^3.5.0",
+    "async": "^2.6.0",
+    "lodash": "^4.17.5"
+  },
+  "installed": false
 }

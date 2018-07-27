@@ -135,6 +135,20 @@ const scanRecords = (keyspace, table) => {
 };
 
 
+const getEntityLevelData = (table) => {
+	const partitionKeys = (table.partitionKeys || []).map(item => item.name);
+	const clusteringKeys = (table.clusteringKeys || []).map(item => item.name);
+	const indexes = (table.indexes || []).map(item => {
+		return { name: item.name };
+	});
+	
+	return {
+		compositePartitionKey: partitionKeys,
+		compositeClusteringKey: clusteringKeys,
+		indexes
+	}
+};
+
 /*
 const generateCustomInferSchema = (bucketName, documents, params) => {
 	function typeOf(obj) {
@@ -213,5 +227,6 @@ module.exports = {
 	getColumnInfo,
 	getTableMetadata,
 	getTableSchema,
-	scanRecords
+	scanRecords,
+	getEntityLevelData
 };

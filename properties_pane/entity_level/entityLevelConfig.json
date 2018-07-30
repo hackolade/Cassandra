@@ -120,6 +120,15 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Options",
+				"propertyKeyword": "options",
+				"shouldValidate": false,
+				"propertyTooltip": "Table options separated by 'AND'",
+				"propertyType": "details",
+				"template": "textarea",
+				"valueType": "string"
+			},
+			{
 				"propertyName": "Comments",
 				"propertyKeyword": "comments",
 				"shouldValidate": false,

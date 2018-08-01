@@ -32,11 +32,15 @@ const getKeyspaceStatement = (keyspaceData) => {
 	const dataCenters = retrivePropertyFromConfig(keyspaceData, 0, "dataCenters", []);
 	const durableWrites = retrivePropertyFromConfig(keyspaceData, 0, "durableWrites", false);
 
-	return getCreateStatement(
-		keyspaceName,
-		getReplication(replicationStrategy, replicationFactor, dataCenters),
-		getDurableWrites(durableWrites)
-	);
+	if (keyspaceName === "") {
+		return "";
+	} else {
+		return getCreateStatement(
+			keyspaceName,
+			getReplication(replicationStrategy, replicationFactor, dataCenters),
+			getDurableWrites(durableWrites)
+		);	
+	}
 };
 
 module.exports = {

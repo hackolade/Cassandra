@@ -1,6 +1,6 @@
 'use strict'
 
-const { tab } = require('./generalHelper');
+const { tab, getNameWithKeyspace } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
 };
 
 const getCreateTypeStatement = (keyspaceName, typeName, fieldsDefinitions) => {
-	return `CREATE TYPE IF NOT EXISTS "${keyspaceName}".${typeName} (\n${tab(fieldsDefinitions)}\n);`
+	return `CREATE TYPE IF NOT EXISTS ${getNameWithKeyspace(keyspaceName, typeName)} (\n${tab(fieldsDefinitions)}\n);`
 };
 
 const getFieldsDefinitions = (typeName, typeData) => {

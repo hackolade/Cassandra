@@ -16,7 +16,8 @@ const retrieveEntityName = (entityConfig) => retrivePropertyFromConfig(entityCon
 const retrieveUDF = (containerConfig) => retrivePropertyFromConfig(containerConfig, 1, "UDFs", []);
 const retrieveUDA = (containerConfig) => retrivePropertyFromConfig(containerConfig, 2, "UDAs", []);
 const retrieveIndexes = (entityConfig) => retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []);
-const getTableNameStatement = (keyspaceName, tableName) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}"${tableName}"`;
+const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
+const getNameWithKeyspace = (keyspaceName, name) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}${name}`;
 
 const getConfig = (pathToConfig) => {
 	try {
@@ -77,5 +78,6 @@ module.exports = {
 	retrivePropertyFromConfig,
 	getTableNameStatement,
 	getFieldConfig,
-	getTypeConfig
+	getTypeConfig,
+	getNameWithKeyspace
 };

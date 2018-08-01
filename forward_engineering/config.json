@@ -2,5 +2,9 @@
 	"extension": "cql",
 	"filterName": "Cassandra Query Language",
 	"namePrefix": "Cassandra",
-	"hasUpdateScript": false
+	"hasUpdateScript": false,
+	"level": {
+		"entity": true,
+		"container": true
+	}
 }

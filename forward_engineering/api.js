@@ -57,6 +57,54 @@ module.exports = {
 			}, 150);
 		}
 	},
+
+	generateContainerScript(data, logger, callback) {
+		const modelDefinitions = JSON.parse(data.modelDefinitions);
+		const externalDefinitions = JSON.parse(data.externalDefinitions);
+		const containerData = data.containerData;
+		let cqlScriptData = [];
+
+		const containerName = retrieveContainerName(containerData);
+		const keyspace = getKeyspaceStatement(containerData);
+		const modelUdt = getUserDefinedTypes(containerName, modelDefinitions);
+		const externalUdt = getUserDefinedTypes(containerName, externalDefinitions);
+		const UDF = getUserDefinedFunctions(retrieveUDF(containerData));
+		const UDA = getUserDefinedAggregations(retrieveUDA(containerData));
+
+		cqlScriptData.push(
+			keyspace,
+			modelUdt,
+			externalUdt
+		);
+
+		data.entities.forEach(entityId => {
+			const internalDefinitions = JSON.parse(data.internalDefinitions[entityId]);
+			const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+			const entityData = data.entityData[entityId];
+
+			const entityName = retrieveEntityName(entityData);
+			const dataSources = [
+				jsonSchema,
+				modelDefinitions,
+				internalDefinitions,
+				externalDefinitions
+			];
+			const internalUdt = getUserDefinedTypes(containerName, internalDefinitions);
+			const table = getTableStatement({
+				tableData: jsonSchema,
+				tableMetaData: entityData,
+				keyspaceMetaData: containerData,
+				dataSources
+			});
+			const indexes = getIndexes(retrieveIndexes(entityData), dataSources, entityName, containerName);
+	
+			cqlScriptData.push(internalUdt, table, indexes);
+		});
+
+		cqlScriptData.push(UDF, UDA);
+
+		callback(null, getScript(cqlScriptData));
+	}
 };
 
 const getScript = (structure) => {

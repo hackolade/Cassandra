@@ -401,7 +401,7 @@ making sure that you maintain a proper JSON format.
 			"comments"
 		],
 		"___1": [],
-		"map": [
+		"set": [
 			"name",
 			"sampleName",
 			"schemaId",
@@ -457,9 +457,27 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean"
 			},
-			"minProperties",
-			"maxProperties",
-			"additionalProperties",
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "subtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"set<str>",
+					"set<num>",
+					"set<blob>",
+					"set<ts>",
+					"set<date>",
+					"set<set>",
+					"set<list>",
+					"set<map>",
+					"set<tuple>"
+				]
+			},
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
 			"comments"
 		],
 		"list": [
@@ -518,10 +536,119 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"valueType": "boolean"
 			},
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "subtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"list<str>",
+					"list<num>",
+					"list<blob>",
+					"list<ts>",
+					"list<date>",
+					"list<set>",
+					"list<list>",
+					"list<map>",
+					"list<tuple>"
+				]
+			},
 			"minItems",
 			"maxItems",
 			"uniqueItems",
 			"additionalItems",
+			"comments"
+		],
+		"map": [
+			"name",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"type",
+			"description",
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "compositeClusteringKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositeClusteringKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "compositeClusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "compositePartitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePartitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "compositePartitionKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
+			{
+				"propertyName": "Key type",
+				"propertyKeyword": "keyType",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"string",
+					"number",
+					"blob",
+					"timestamp",
+					"time",
+					"date"
+				]
+			},
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "subtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"map<str>",
+					"map<num>",
+					"map<blob>",
+					"map<ts>",
+					"map<date>",
+					"map<set>",
+					"map<list>",
+					"map<map>",
+					"map<tuple>"
+				]
+			},
+			"minProperties",
+			"maxProperties",
+			"additionalProperties",
 			"comments"
 		],
 		"tuple": [
@@ -572,193 +699,6 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				}]
-			},
-			"minItems",
-			"maxItems",
-			"uniqueItems",
-			"additionalItems",
-			"comments"
-		],
-		"___2": [],
-		"stringSet": [
-			"name",
-			"sampleName",
-			"schemaId",
-			"refPath",
-			"type",
-			"description",
-			"dependencies",
-			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Frozen",
-				"propertyKeyword": "frozen",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean"
-			},
-			"minItems",
-			"maxItems",
-			"uniqueItems",
-			"additionalItems",
-			"comments"
-		],
-		"numberSet": [
-			"name",
-			"sampleName",
-			"schemaId",
-			"refPath",
-			"type",
-			"description",
-			"dependencies",
-			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Frozen",
-				"propertyKeyword": "frozen",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean"
-			},
-			"minItems",
-			"maxItems",
-			"uniqueItems",
-			"additionalItems",
-			"comments"
-		],
-		"binarySet": [
-			"name",
-			"sampleName",
-			"schemaId",
-			"refPath",
-			"type",
-			"description",
-			"dependencies",
-			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Frozen",
-				"propertyKeyword": "frozen",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean"
 			},
 			"minItems",
 			"maxItems",
@@ -1077,6 +1017,59 @@ making sure that you maintain a proper JSON format.
 			"comments"
 		],
 		"___4": [],
+		"geospatial": [
+			"name",
+			"schemaId",
+			"type",
+			"description",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [{
+					"key": "primaryKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "compositeClusteringKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositeClusteringKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "compositeClusteringKey",
+					"value": true
+				}]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "compositePartitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePartitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [{
+					"key": "compositePartitionKey",
+					"value": true
+				}]
+			},
+			"foreignCollection",
+			"foreignField",
+			"relationshipType",
+			"comments",
+			"subtype"
+		],
+		"___5": [],
 		"uuid": [
 			"name",
 			"sampleName",
@@ -1206,59 +1199,6 @@ making sure that you maintain a proper JSON format.
 			"enum",
 			"sample",
 			"comments"
-		],
-		"___5": [],
-		"geospatial": [
-			"name",
-			"schemaId",
-			"type",
-			"description",
-			{
-				"propertyName": "Required",
-				"propertyKeyword": "required",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Clustering key",
-				"propertyKeyword": "compositeClusteringKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositeClusteringKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
-			},
-			{
-				"propertyName": "Partition key",
-				"propertyKeyword": "compositePartitionKey",
-				"shouldValidate": false,
-				"propertyType": "checkbox",
-				"valueType": "boolean",
-				"dependency": {
-					"key": "compositePartitionKey",
-					"value": true
-				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
-			},
-			"foreignCollection",
-			"foreignField",
-			"relationshipType",
-			"comments",
-			"subtype"
 		]
 	}
 } 

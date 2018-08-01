@@ -1,44 +1,44 @@
 {
-	"name": "list",
-	"erdAbbreviation": "<arr>",
-	"dtdAbbreviation": "[...]",
+	"name": "set",
+	"erdAbbreviation": "<set>",
+	"dtdAbbreviation": "{...}",
 	"parentType": "array",
 	"useSample": true,
 	"defaultValues": {
-		"subtype": "list<str>",
-		"properties": [],
+		"subtype": "set<str>",
+		"dependencies": [],
 		"primaryKey": false,
-		"additionalItems": true,
-		"minItems": "",
-		"maxItems": "",
-		"uniqueItems": false
+		"properties": [],
+		"minProperties": "",
+		"maxProperties": "",
+		"additionalProperties": false
 	},
 	"subtypes": {
-		"list<str>": {
+		"set<str>": {
 			"childValueType": "string"
 		},
-		"list<num>": {
+		"set<num>": {
 			"childValueType": "number"
 		},
-		"list<blob>": {
+		"set<blob>": {
 			"childValueType": "blob"
 		},
-		"list<ts>": {
+		"set<ts>": {
 			"childValueType": "timestamp"
 		},
-		"list<date>": {
+		"set<date>": {
 			"childValueType": "date"
 		},
-		"list<set>": {
+		"set<set>": {
 			"childValueType": "set"
 		},
-		"list<list>": {
+		"set<list>": {
 			"childValueType": "list"
 		},
-		"list<tuple>": {
+		"set<tuple>": {
 			"childValueType": "tuple"
 		},
-		"list<map>": {
+		"set<map>": {
 			"childValueType": "map"
 		}
 	}

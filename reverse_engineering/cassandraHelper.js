@@ -27,6 +27,22 @@ const getKeyspaceMetaData = (keyspace) => {
 	return state.client.metadata.keyspaces[keyspace];
 };
 
+const getKeyspaceInfo = (keyspace) => {
+	const metaData = getKeyspaceMetaData(keyspace);
+	const strategy = metaData.strategy.split('.').slice(-1).pop();
+	let keyspaceInfo = {
+		durableWrites: metaData.durableWrites,
+		replStrategy: strategy
+	};
+
+	if (strategy === 'SimpleStrategy') {
+		keyspaceInfo.replFactor = metaData.strategyOptions.replication_factor;
+	} else if (strategy === 'NetworkTopologyStrategy') {
+		keyspaceInfo.dataCenters = []; //{dataCenterName, replFactorValue}
+	}
+	return keyspaceInfo;
+};
+
 const getKeyspacesNames = () => {
 	return Object.keys(state.client.metadata.keyspaces);
 };
@@ -69,12 +85,15 @@ const getTableSchema = (columns) => {
 	return { properties: schema };
 };
 
-const getColumnType = (code) => {
-	const cassanddraType = types.getDataTypeNameByCode(code);
-	return getType(cassanddraType);
+const getColumnType = (type) => {
+	//temporary
+	let info = type.info;
+	delete type.info;
+	const cassanddraType = types.getDataTypeNameByCode(type);
+	return getType(cassanddraType, info);
 };
 
-const getType = (type, value) => {
+const getType = (type, info) => {
 	// custom:     0x0000,
 	// udt:        0x0030
 
@@ -110,16 +129,20 @@ const getType = (type, value) => {
 		case "uuid":
 			return { type };
 		case "list":
+			return {
+				type,
+				subtype: 'list<str>'
+			};
 		case "set":
 			return { 
 				type,
-				subtype: getSubtype(value)
+				subtype: 'set<str>'
 			};
 		case "map":
 			return { 
 				type,
-				subtype: getSubtype(value),
-				keyType: getSubtype(value)
+				subtype: 'map<str>',
+				keyType: 'string',
 			};
 		default:
 			return {
@@ -249,5 +272,6 @@ module.exports = {
 	getTableSchema,
 	scanRecords,
 	getEntityLevelData,
-	getKeyspaceMetaData
+	getKeyspaceMetaData,
+	getKeyspaceInfo
 };

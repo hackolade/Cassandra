@@ -1,5 +1,5 @@
 const cassandra = require('cassandra-driver');
-const types = require('cassandra-driver').types;
+const typesHelper = require('./typesHelper');
 
 var state = {
 	client: null
@@ -21,6 +21,10 @@ const close = () => {
 	if (state.client) {
 		state.client = null;
 	}
+};
+
+const getKeyspaceMetaData = (keyspace) => {
+	return state.client.metadata.keyspaces[keyspace];
 };
 
 const getKeyspacesNames = () => {
@@ -57,7 +61,7 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 const getTableSchema = (columns) => {
 	let schema = {};
 	columns.forEach(column => {
-		const columnType = getColumnType(column.type);
+		const columnType = typesHelper.getColumnType(column.type);
 		schema[column.name] = columnType;
 		schema[column.name].static = column.isStatic;
 		schema[column.name].frozen = column.type.options.frozen;
@@ -244,5 +248,6 @@ module.exports = {
 	getTableMetadata,
 	getTableSchema,
 	scanRecords,
-	getEntityLevelData
+	getEntityLevelData,
+	getKeyspaceMetaData
 };

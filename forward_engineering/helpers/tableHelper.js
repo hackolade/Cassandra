@@ -23,6 +23,7 @@ module.exports = {
 		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
 		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
 		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
+		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "options", "");
 
 		const partitionKeysHash = getNamesByIds(
 			partitionKeys.map(key => key.keyId),
@@ -38,7 +39,7 @@ module.exports = {
 			tableName,
 			getColumnDefinition(tableData.properties || {}),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableComment)
+			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableComment, tableOptions)
 		);
 	}
 };
@@ -97,7 +98,7 @@ const getClusteringKeys = (clusteringKeysHash) => {
 	}
 };
 
-const getOptions = (clusteringKeys, clusteringKeysHash, id, comment) => {
+const getOptions = (clusteringKeys, clusteringKeysHash, id, comment, tableOptions) => {
 	const getClusteringOrder = (clusteringKeys, clusteringKeysHash) => {
 		const order = (order) => (order === 'ascending') ? 'ASC' : 'DESC'; 
 		const orderString = clusteringKeys.map(key => {
@@ -114,21 +115,30 @@ const getOptions = (clusteringKeys, clusteringKeysHash, id, comment) => {
 			return false;
 		}
 	};
+	const parseTableOptions = (tableOptions) => (tableOptions || "")
+		.replace(/;$/, "")
+		.split('AND')
+		.map(option => String(option).trim())
+		.filter(option => option);
 
-	const options = [];
+	let options = [];
 	const clusteringOrder = getClusteringOrder(clusteringKeys, clusteringKeysHash);
+	const hasId = id && !/id\=/gi.test(tableOptions);
+	const hasComment = comment && !/comments\=/gi.test(tableOptions);
 
 	if (clusteringOrder) {
 		options.push(clusteringOrder);
 	}
 
-	if (id) {
+	if (hasId) {
 		options.push(`ID='${id}'`);
 	}
 
-	if (comment) {
+	if (hasComment) {
 		options.push(`comment='${comment}'`);
 	}
+
+	options = options.concat(parseTableOptions(tableOptions));
 
 	if (options.length) {
 		return `\nWITH ${ options.join("\n" + tab("AND ")) }`;

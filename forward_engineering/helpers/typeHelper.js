@@ -21,11 +21,15 @@ const ifType = type => {
 const getModeType = (type, defaultType) => {
 	if (type) {
 		const mode = getFieldConfig(type, "mode");
-		if (mode && mode.options) {
-			return mode.options[0];
-		} else {
-			return type;
-		}
+		const definedType = (mode && mode.options) ? mode.options[0] : type;
+
+		return getHandlerByType(definedType)({
+			type: type,
+			mode: (mode && mode.options && mode.options[0]),
+			keyType: "string",
+			items: { type: "string", mode: "varchar" },
+			properties: { field: { type: "string", mode: "varchar" } }
+		});
 	}
 
 	return defaultType;

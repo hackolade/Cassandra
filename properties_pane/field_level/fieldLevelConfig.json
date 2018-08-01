@@ -58,6 +58,7 @@ making sure that you maintain a proper JSON format.
 	"structure": {
 		"string": [
 			"name",
+			"code",
 			"schemaId",
 			"type",
 			"description",
@@ -138,6 +139,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"number": [
 			"name",
+			"code",
 			"schemaId",
 			"type",
 			"description",
@@ -227,6 +229,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"boolean": [
 			"name",
+			"code",
 			"schemaId",
 			"type",
 			"description",
@@ -286,6 +289,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"blob": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -344,6 +348,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"DseExecutorStateType": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -403,6 +408,7 @@ making sure that you maintain a proper JSON format.
 		"___1": [],
 		"set": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -482,6 +488,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"list": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -561,6 +568,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"map": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -653,6 +661,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"tuple": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -709,6 +718,7 @@ making sure that you maintain a proper JSON format.
 		"___3": [],
 		"timestamp": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -771,6 +781,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"date": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -833,6 +844,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"time": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -895,6 +907,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"duration": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -957,6 +970,7 @@ making sure that you maintain a proper JSON format.
 		],
 		"DateRangeType": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"type",
@@ -1019,6 +1033,7 @@ making sure that you maintain a proper JSON format.
 		"___4": [],
 		"geospatial": [
 			"name",
+			"code",
 			"schemaId",
 			"type",
 			"description",
@@ -1072,6 +1087,7 @@ making sure that you maintain a proper JSON format.
 		"___5": [],
 		"uuid": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",
@@ -1137,6 +1153,7 @@ making sure that you maintain a proper JSON format.
 		],   
 		"timeuuid": [
 			"name",
+			"code",
 			"sampleName",
 			"schemaId",
 			"refPath",

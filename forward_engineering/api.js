@@ -2,7 +2,7 @@
 
 const { retrieveContainerName, retrieveEntityName, retrieveUDA, retrieveUDF, retrieveIndexes } = require('./helpers/generalHelper'); 
 const { getTableStatement } = require('./helpers/tableHelper');
-const { getUserDefinedTypes } = require('./helpers/udtHelper');
+const { getUserDefinedTypes, getUdtMap } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 
@@ -24,14 +24,30 @@ module.exports = {
 			];
 
 			const keyspace = getKeyspaceStatement(data.containerData);
-			const modelUdt = getUserDefinedTypes(containerName, data.modelDefinitions);
-			const internalUdt = getUserDefinedTypes(containerName, data.internalDefinitions);
-			const externalUdt = getUserDefinedTypes(containerName, data.externalDefinitions);
+
+			let udtTypeMap = getUdtMap([
+				data.modelDefinitions,
+				data.externalDefinitions,
+				data.internalDefinitions
+			]);
+
+			const {
+				modelUdt,
+				externalUdt,
+				internalUdt
+			} = getUdtScripts(
+				containerName,
+				data.modelDefinitions,
+				data.externalDefinitions,
+				data.internalDefinitions
+			);
+
 			const table = getTableStatement({
 				tableData: data.jsonSchema,
 				tableMetaData: data.entityData,
 				keyspaceMetaData: data.containerData,
-				dataSources
+				dataSources,
+				udtTypeMap
 			});
 			const indexes = getIndexes(retrieveIndexes(data.entityData), dataSources, entityName, containerName);
 			const UDF = getUserDefinedFunctions(retrieveUDF(data.containerData));
@@ -48,7 +64,7 @@ module.exports = {
 				indexes
 			]);
 
-			callback(null, cqlScript);	
+			callback(null, cqlScript);
 		} catch (e) {
 			logger.log('error', { message: e.message, stack: e.stack }, 'Cassandra Forward-Engineering Error');
 
@@ -59,51 +75,64 @@ module.exports = {
 	},
 
 	generateContainerScript(data, logger, callback) {
-		const modelDefinitions = JSON.parse(data.modelDefinitions);
-		const externalDefinitions = JSON.parse(data.externalDefinitions);
-		const containerData = data.containerData;
-		let cqlScriptData = [];
+		try {
+			const modelDefinitions = JSON.parse(data.modelDefinitions);
+			const externalDefinitions = JSON.parse(data.externalDefinitions);
+			const containerData = data.containerData;
+			let cqlScriptData = [];
 
-		const containerName = retrieveContainerName(containerData);
-		const keyspace = getKeyspaceStatement(containerData);
-		const modelUdt = getUserDefinedTypes(containerName, modelDefinitions);
-		const externalUdt = getUserDefinedTypes(containerName, externalDefinitions);
-		const UDF = getUserDefinedFunctions(retrieveUDF(containerData));
-		const UDA = getUserDefinedAggregations(retrieveUDA(containerData));
+			const containerName = retrieveContainerName(containerData);
+			const keyspace = getKeyspaceStatement(containerData);
 
-		cqlScriptData.push(
-			keyspace,
-			modelUdt,
-			externalUdt
-		);
+			const generalUdtTypeMap = getUdtMap([modelDefinitions, externalDefinitions]);
+			const modelUdt = getUserDefinedTypes(containerName, modelDefinitions, generalUdtTypeMap);
+			const externalUdt = getUserDefinedTypes(containerName, externalDefinitions, generalUdtTypeMap);
 
-		data.entities.forEach(entityId => {
-			const internalDefinitions = JSON.parse(data.internalDefinitions[entityId]);
-			const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
-			const entityData = data.entityData[entityId];
+			const UDF = getUserDefinedFunctions(retrieveUDF(containerData));
+			const UDA = getUserDefinedAggregations(retrieveUDA(containerData));
 
-			const entityName = retrieveEntityName(entityData);
-			const dataSources = [
-				jsonSchema,
-				modelDefinitions,
-				internalDefinitions,
-				externalDefinitions
-			];
-			const internalUdt = getUserDefinedTypes(containerName, internalDefinitions);
-			const table = getTableStatement({
-				tableData: jsonSchema,
-				tableMetaData: entityData,
-				keyspaceMetaData: containerData,
-				dataSources
+			cqlScriptData.push(
+				keyspace,
+				modelUdt,
+				externalUdt
+			);
+
+			data.entities.forEach(entityId => {
+				const internalDefinitions = JSON.parse(data.internalDefinitions[entityId]);
+				const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+				const entityData = data.entityData[entityId];
+				const udtTypeMap = Object.assign({}, generalUdtTypeMap, getUdtMap([internalDefinitions]));
+
+				const entityName = retrieveEntityName(entityData);
+				const dataSources = [
+					jsonSchema,
+					modelDefinitions,
+					internalDefinitions,
+					externalDefinitions
+				];
+				const internalUdt = getUserDefinedTypes(containerName, internalDefinitions, udtTypeMap);
+				const table = getTableStatement({
+					tableData: jsonSchema,
+					tableMetaData: entityData,
+					keyspaceMetaData: containerData,
+					dataSources,
+					udtTypeMap
+				});
+				const indexes = getIndexes(retrieveIndexes(entityData), dataSources, entityName, containerName);
+		
+				cqlScriptData.push(internalUdt, table, indexes);
 			});
-			const indexes = getIndexes(retrieveIndexes(entityData), dataSources, entityName, containerName);
-	
-			cqlScriptData.push(internalUdt, table, indexes);
-		});
 
-		cqlScriptData.push(UDF, UDA);
+			cqlScriptData.push(UDF, UDA);
 
-		callback(null, getScript(cqlScriptData));
+			callback(null, getScript(cqlScriptData));
+		} catch (e) {
+			logger.log('error', { message: e.message, stack: e.stack }, 'Cassandra Forward-Engineering Error');
+
+			setTimeout(() => {
+				callback({ message: e.message, stack: e.stack });
+			}, 150);
+		}
 	}
 };
 
@@ -117,4 +146,21 @@ const getUserDefinedFunctions = (udfItems) => {
 
 const getUserDefinedAggregations = (udaItems) => {
 	return udaItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
+};
+
+const getUdtScripts = (containerName, modelDefinitions, externalDefinitions, internalDefinitions) => {
+	let udtMap = getUdtMap([
+		modelDefinitions,
+		externalDefinitions
+	]);
+
+	const modelUdt = getUserDefinedTypes(containerName, modelDefinitions, udtMap);
+	const externalUdt = getUserDefinedTypes(containerName, externalDefinitions, udtMap);
+	const internalUdt = getUserDefinedTypes(containerName, internalDefinitions, Object.assign(udtMap, getUdtMap([internalDefinitions])));
+
+	return {
+		modelUdt,
+		externalUdt,
+		internalUdt
+	};
 };

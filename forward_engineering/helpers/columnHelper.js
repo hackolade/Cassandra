@@ -3,11 +3,11 @@
 const { getTypeByData } = require('./typeHelper');
 
 module.exports = {
-	getColumnDefinition(properties) {
+	getColumnDefinition(properties, udtTypeMap = {}) {
 		return Object.keys(properties).map(name => {
 			const data = properties[name];
 	
-			return getColumn(name, getTypeDefinition(data), isStatic(data));
+			return getColumn(data.code || name, getTypeDefinition(data, udtTypeMap), isStatic(data));
 		}).join(',\n');
 	}
 };
@@ -18,6 +18,6 @@ const getColumn = (name, typeDefinition, isStatic) => {
 	return `"${name}" ${typeDefinition}${isStatic ? ' STATIC' : ''}`;
 };
 
-const getTypeDefinition = (data) => {
-	return getTypeByData(data);
+const getTypeDefinition = (data, udtTypeMap) => {
+	return getTypeByData(data, udtTypeMap);
 };

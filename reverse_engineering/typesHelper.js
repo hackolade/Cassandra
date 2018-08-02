@@ -1,5 +1,9 @@
 const types = require('cassandra-driver').types;
 const regex = '\<(.*)\>';
+const abbrHash = {
+	number: 'num',
+	string: 'str'
+};
 
 const getColumnType = (column, udtHash) => {
 	const cassandraType = types.getDataTypeNameByCode(column.type);
@@ -99,13 +103,13 @@ const getSubtype = (cassandraType) => {
 		subtype = subtype.split(',');
 
 		if (Array.isArray(subtype)) {
-			let sType = `${type}<${subtype[0]}>`; 
+			let sType = `${type}<${abbrHash[subtype[0]]}>`; 
 			return {
 				key: subtype[1],
 				subtype: sType
 			};
 		} else {
-			let sType = `${type}<${subtype}>`; 
+			let sType = `${type}<${abbrHash[subtype]}>`; 
 			return {
 				subtype: sType
 			};

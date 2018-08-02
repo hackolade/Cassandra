@@ -8,5 +8,5 @@
     "cassandra-driver": "^3.5.0",
     "lodash": "^4.17.5"
   },
-  "installed": true
+  "installed": false
 }

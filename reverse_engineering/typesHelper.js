@@ -2,7 +2,8 @@ const types = require('cassandra-driver').types;
 const regex = '\<(.*)\>';
 const abbrHash = {
 	number: 'num',
-	string: 'str'
+	string: 'str',
+	timestamp: 'st'
 };
 
 const getColumnType = (column, udtHash) => {
@@ -88,8 +89,8 @@ const getSubtype = (cassandraType) => {
 				jsonType.key = typeData.key; 
 			}
 		} else {
-			const bla = cassandraType.split(',');
-			if(bla && bla.length > 1) {
+			const csType = cassandraType.split(',');
+			if(csType && csType.length > 1) {
 				jsonType.type = cassandraType;
 			} else {
 				jsonType = Object.assign(jsonType, getType(cassandraType));
@@ -101,15 +102,24 @@ const getSubtype = (cassandraType) => {
 
 	const handleType = (type, subtype) => {
 		subtype = subtype.split(',');
+		
+		if (Array.isArray(subtype) && subtype.length === 1) {
+			subtype = subtype[0];
+		}
 
 		if (Array.isArray(subtype)) {
-			let sType = `${type}<${abbrHash[subtype[0]]}>`; 
+			subtype[0] = getType(subtype[0]).type;
+			subtype[0] = abbrHash[subtype[0]]; 
+			let sType = `${type}<${subtype[0]}>`;
+			
 			return {
-				key: subtype[1],
+				keyType: getType(subtype[1].trim()).type,
 				subtype: sType
 			};
 		} else {
-			let sType = `${type}<${abbrHash[subtype]}>`; 
+			subtype = getType(subtype).type;
+			subtype = abbrHash[subtype]; 
+			let sType = `${type}<${subtype}>`; 
 			return {
 				subtype: sType
 			};

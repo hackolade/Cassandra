@@ -51,7 +51,7 @@ module.exports = {
 		const recordSamplingSettings = data.recordSamplingSettings;
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
-            const tableNames = tables[keyspaceName];
+            const tableNames = tables[keyspaceName] || [];
             let udtHash = [];
 
 			if (!tableNames.length) {

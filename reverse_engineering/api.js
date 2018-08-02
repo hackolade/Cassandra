@@ -76,7 +76,7 @@ module.exports = {
 								jsonSchema: schema
                             };
                             packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
-                            packageData.entityLevel = cassandra.getEntityLevelData(table);
+                            packageData.entityLevel = cassandra.getEntityLevelData(table, tableName);
 						} else if (includeEmptyCollection) {
 							packageData.documents = [];
 						} else {
@@ -108,14 +108,14 @@ module.exports = {
 let data = {
     "collectionData": {
         "collections": {
-            "videodb3": [
+            "videodb": [
 				"videos",
                 "video_rating",
                 "video_event"
             ]
         },
         "dataBaseNames": [
-            "videodb3"
+            "videodb"
         ]
     },
     "fieldInference": {
@@ -150,15 +150,15 @@ let connectionInfo = {
     host: "",
     hosts: [
         {
-            host: "104.42.183.164",
+            host: "104.42.47.228",
             port: "9042"
         },
         {
-            host: "104.42.177.63",
+            host: "104.42.45.233",
             port: "9042"
         },
         {
-            host: "104.42.181.176",
+            host: "104.42.47.244",
             port: "9042"
         }
     ],

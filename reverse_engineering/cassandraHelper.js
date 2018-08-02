@@ -31,6 +31,7 @@ const getKeyspaceInfo = (keyspace) => {
 	const metaData = getKeyspaceMetaData(keyspace);
 	const strategy = metaData.strategy.split('.').slice(-1).pop();
 	let keyspaceInfo = {
+		code: keyspace,
 		durableWrites: metaData.durableWrites,
 		replStrategy: strategy
 	};
@@ -84,6 +85,7 @@ const getTableSchema = (columns) => {
 	columns.forEach(column => {
 		const columnType = typesHelper.getColumnType(column.type);
 		schema[column.name] = columnType;
+		schema[column.name].code = column.name;
 		schema[column.name].static = column.isStatic;
 		schema[column.name].frozen = column.type.options.frozen;
 	});
@@ -97,12 +99,13 @@ const scanRecords = (keyspace, table) => {
 };
 
 
-const getEntityLevelData = (table) => {
+const getEntityLevelData = (table, tableName) => {
 	const partitionKeys = handlePartitionKeys(table.partitionKeys);
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
 	
 	return {
+		code: tableName,
 		compositePartitionKey: partitionKeys,
 		compositeClusteringKey: clusteringKeys,
 		SecIndxs: indexes

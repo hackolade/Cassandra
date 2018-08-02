@@ -15,7 +15,8 @@ module.exports = {
 		tableData,
 		tableMetaData,
 		dataSources,
-		keyspaceMetaData
+		keyspaceMetaData,
+		udtTypeMap
 	}) {
 		const keyspaceName = retrieveContainerName(keyspaceMetaData);
 		const tableName = retrieveEntityName(tableMetaData);
@@ -37,7 +38,7 @@ module.exports = {
 		return getCreateTableStatement(
 			keyspaceName,
 			tableName,
-			getColumnDefinition(tableData.properties || {}),
+			getColumnDefinition(tableData.properties || {}, udtTypeMap),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
 			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableComment, tableOptions)
 		);

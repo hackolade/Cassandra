@@ -11,8 +11,14 @@ const tab = (text, count = 1) => {
 
 const retrivePropertyFromConfig = (config, tab, propertyName, defaultValue = "") => ((config || [])[tab] || {})[propertyName] || defaultValue;
 
-const retrieveContainerName = (containerConfig) => retrivePropertyFromConfig(containerConfig, 0, "name", "");
-const retrieveEntityName = (entityConfig) => retrivePropertyFromConfig(entityConfig, 0, "collectionName", "");
+const retrieveContainerName = (containerConfig) => retrivePropertyFromConfig(
+		containerConfig, 0, "code", 
+		retrivePropertyFromConfig(containerConfig, 0, "name", "")	
+	);
+const retrieveEntityName = (entityConfig) => retrivePropertyFromConfig(
+	entityConfig, 0, "code",
+	retrivePropertyFromConfig(entityConfig, 0, "collectionName", "")
+);
 const retrieveUDF = (containerConfig) => retrivePropertyFromConfig(containerConfig, 1, "UDFs", []);
 const retrieveUDA = (containerConfig) => retrivePropertyFromConfig(containerConfig, 2, "UDAs", []);
 const retrieveIndexes = (entityConfig) => retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []);

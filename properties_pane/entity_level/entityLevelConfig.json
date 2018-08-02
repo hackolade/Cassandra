@@ -102,6 +102,12 @@ making sure that you maintain a proper JSON format.
 		"lowerTab": "Details",
 		"structure": [
 			{
+				"propertyName": "Technical name",
+				"propertyKeyword": "code",
+				"shouldValidate": true,
+				"propertyType": "text"
+			},
+			{
 				"propertyName": "Partition key",
 				"propertyKeyword": "compositePartitionKey",
 				"shouldValidate": false,

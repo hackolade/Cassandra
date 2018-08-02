@@ -38,7 +38,12 @@ const getKeyspaceInfo = (keyspace) => {
 	if (strategy === 'SimpleStrategy') {
 		keyspaceInfo.replFactor = metaData.strategyOptions.replication_factor;
 	} else if (strategy === 'NetworkTopologyStrategy') {
-		keyspaceInfo.dataCenters = []; //{dataCenterName, replFactorValue}
+		keyspaceInfo.dataCenters = Object.keys(metaData.strategyOptions).map(key => {
+			return {
+				dataCenterName: key,
+				replFactorValue: metaData.strategyOptions[key]
+			};
+		});
 	}
 	return keyspaceInfo;
 };

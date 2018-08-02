@@ -98,23 +98,15 @@ const scanRecords = (keyspace, table) => {
 
 
 const getEntityLevelData = (table) => {
-	const partitionKeys = (table.partitionKeys || []).map(item => item.name);
-	const clusteringKeys = (table.clusteringKeys || []).map((item, index) => {
-		let clusteringOrder = table.clusteringOrder ? table.clusteringOrder[index] : '';
-		return {
-			name: item.name,
-			type: getKeyOrder(clusteringOrder)
-		};
-	});
-	const indexes = (table.indexes || []).map(item => {
-		return { name: item.name };
-	});
+	const partitionKeys = handlePartitionKeys(table.partitionKeys);
+	const clusteringKeys = handleClusteringKeys(table);
+	const indexes = handleIndexes(table.indexes);
 	
 	return {
 		compositePartitionKey: partitionKeys,
 		compositeClusteringKey: clusteringKeys,
-		indexes
-	}
+		SecIndxs: indexes
+	};
 };
 
 const getKeyOrder = (order) => {
@@ -125,6 +117,34 @@ const getKeyOrder = (order) => {
 		default:
 			return 'ascending';
 	}
+};
+const handlePartitionKeys = (partitionKeys) => {
+	return (partitionKeys || []).map(item => item.name);
+};
+
+const handleClusteringKeys = (table) => {
+	return (table.clusteringKeys || []).map((item, index) => {
+		let clusteringOrder = table.clusteringOrder ? table.clusteringOrder[index] : '';
+		return {
+			name: item.name,
+			type: getKeyOrder(clusteringOrder)
+		};
+	});
+};
+
+const handleIndexes = (indexes) => {
+	return indexes.map(item => {
+		return {
+			name: item.name,
+			SecIndxKey: [getIndexKey(item.target)]
+		};
+	});
+};
+
+const getIndexKey = (target) => {
+	const regex = /\((.*?)\)/;
+	const key = target.match(regex);
+	return key ? key[1] : '';
 };
 
 /*
@@ -209,4 +229,5 @@ module.exports = {
 	getEntityLevelData,
 	getKeyspaceMetaData,
 	getKeyspaceInfo
+	
 };

@@ -75,10 +75,8 @@ module.exports = {
 							packageData.validation = {
 								jsonSchema: schema
                             };
-                            let keyspaceMetaData = cassandra.getKeyspaceMetaData(keyspaceName);
-                            const strategy = keyspaceMetaData.strategy.split('.').slice(-1).pop();
                             packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
-                            cassandra.getEntityLevelData(table);
+                            packageData.entityLevel = cassandra.getEntityLevelData(table);
 						} else if (includeEmptyCollection) {
 							packageData.documents = [];
 						} else {
@@ -110,14 +108,14 @@ module.exports = {
 let data = {
     "collectionData": {
         "collections": {
-            "videodb": [
+            "videodb3": [
 				"videos",
                 "video_rating",
                 "video_event"
             ]
         },
         "dataBaseNames": [
-            "videodb"
+            "videodb3"
         ]
     },
     "fieldInference": {
@@ -152,15 +150,15 @@ let connectionInfo = {
     host: "",
     hosts: [
         {
-            host: "104.42.63.142",
+            host: "104.42.183.164",
             port: "9042"
         },
         {
-            host: "40.78.16.105",
+            host: "104.42.177.63",
             port: "9042"
         },
         {
-            host: "40.78.18.202",
+            host: "104.42.181.176",
             port: "9042"
         }
     ],
@@ -235,7 +233,7 @@ const getDbCollectionsData = (data, cb) => {
                             console.log(JSON.stringify(schema, null, 4));
                             packageData.validation = {
                                 jsonSchema: schema
-                            };
+							};
                         } else if (includeEmptyCollection) {
                             packageData.documents = [];
                         } else {

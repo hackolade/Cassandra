@@ -29,7 +29,13 @@ const getPathById = (schema, id, path) => {
 };
 
 const getRootItemNameById = (id, properties) => {
-	return Object.keys(properties).find(propertyName => (properties[propertyName].GUID === id));
+	const propertyName = Object.keys(properties).find(propertyName => (properties[propertyName].GUID === id));
+
+	if (properties[propertyName] && properties[propertyName].code) {
+		return properties[propertyName].code;
+	}
+
+	return propertyName;
 };
 
 const findFieldNameById = (id, source) => {

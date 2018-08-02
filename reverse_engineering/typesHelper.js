@@ -1,8 +1,11 @@
 const types = require('cassandra-driver').types;
 const regex = '\<(.*)\>';
 
-const getColumnType = (type) => {
-	const cassandraType = types.getDataTypeNameByCode(type);
+const getColumnType = (column, udtHash) => {
+	const cassandraType = types.getDataTypeNameByCode(column.type);
+	if (udtHash && cassandraType === 'udt') {
+		udtHash.push(column);
+	}
 	return getType(cassandraType);
 };
 

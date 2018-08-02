@@ -80,10 +80,10 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 	return connectionDataItem;
 };
 
-const getTableSchema = (columns) => {
+const getTableSchema = (columns, udtHash) => {
 	let schema = {};
 	columns.forEach(column => {
-		const columnType = typesHelper.getColumnType(column.type);
+		const columnType = typesHelper.getColumnType(column, udtHash);
 		schema[column.name] = columnType;
 		schema[column.name].code = column.name;
 		schema[column.name].static = column.isStatic;
@@ -148,6 +148,11 @@ const getIndexKey = (target) => {
 	const regex = /\((.*?)\)/;
 	const key = target.match(regex);
 	return key ? key[1] : '';
+};
+
+const handleUdts = (udts) => {
+	let schema = getTableSchema(udts);
+	return schema;
 };
 
 /*
@@ -231,6 +236,7 @@ module.exports = {
 	scanRecords,
 	getEntityLevelData,
 	getKeyspaceMetaData,
-	getKeyspaceInfo
+	getKeyspaceInfo,
+	handleUdts
 	
 };

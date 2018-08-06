@@ -127,7 +127,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Options",
-				"propertyKeyword": "options",
+				"propertyKeyword": "tableOptions",
 				"shouldValidate": false,
 				"propertyTooltip": "Table options separated by 'AND'",
 				"propertyType": "details",

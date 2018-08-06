@@ -10,8 +10,13 @@ const getColumnType = (column, udtHash) => {
 	const cassandraType = types.getDataTypeNameByCode(column.type);
 	if (udtHash && cassandraType === 'udt') {
 		udtHash.push(column);
+		return getRef(column);
 	}
 	return getType(cassandraType);
+};
+
+const getRef = (column) => {
+	return { type: 'reference' };
 };
 
 const getType = (cassandraType) => {

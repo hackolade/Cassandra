@@ -61,45 +61,81 @@ module.exports = {
 				};
 				return keyspaceCallback(null, packageData);
 			} else {
-				async.map(tableNames, (tableName, tableCallback) => {
-					let packageData = {
-						dbName: keyspaceName,
-						collectionName: tableName
-					};
-					let columns = [];
-
-					cassandra.getTableMetadata(keyspaceName, tableName)
-					.then(table => {
-                        packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
-                        packageData.entityLevel = cassandra.getEntityLevelData(table, tableName);
-                        columns = table.columns;
-                        
-						if (columns) {
-							const schema = cassandra.getTableSchema(columns, udtHash);
-							packageData.validation = {
-								jsonSchema: schema
-                            };
-						} else if (includeEmptyCollection) {
-							packageData.documents = [];
+				async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
+					const tableNames = tables[keyspaceName] || [];
+					let udtHash = [];
+					
+					cassandra.getUDF(keyspaceName)
+					.then(udf => {
+						let udfData = udf.rows.map(item => {
+							return {
+								name: item.function_name,
+								storedProcFunction: item.body
+							};
+						});
+						pipeline(udfData);
+					})
+					.catch(err => {
+						pipeline([]);
+					});
+		
+					let pipeline = (UDFs) => {
+						if (!tableNames.length) {
+							let packageData = {
+								dbName: keyspaceName,
+								emptyBucket: true,
+								udfs
+							};
+							return keyspaceCallback(null, packageData);
 						} else {
-							packageData = null;
+							async.map(tableNames, (tableName, tableCallback) => {
+								let packageData = {
+									dbName: keyspaceName,
+									collectionName: tableName,
+									UDFs
+								};
+								//bucketInfo
+								let columns = [];
+			
+								cassandra.getTableMetadata(keyspaceName, tableName)
+								.then(table => {
+									packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
+									packageData.bucketInfo.UDFs = UDFs;
+									packageData.entityLevel = cassandra.getEntityLevelData(table, tableName);
+									columns = table.columns;
+									
+									if (columns) {
+										const schema = cassandra.getTableSchema(columns, udtHash);
+										packageData.validation = {
+											jsonSchema: schema
+										};
+									} else if (includeEmptyCollection) {
+										packageData.documents = [];
+									} else {
+										packageData = null;
+									}
+									return packageData;
+								})
+								.then(packageData => {
+									return columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName) : null;
+								})
+								.then(res => {
+									if (res) {
+										packageData.documents = [];
+									}
+									packageData.documents = [];
+									packageData.modelDefinitions = cassandra.handleUdts(udtHash);
+									return tableCallback(null, packageData);
+								})
+								.catch(tableCallback);
+							}, (err, res) => {
+								return keyspaceCallback(err, res)
+							});
 						}
-						return packageData;
-					})
-					.then(packageData => {
-						return columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName) : null;
-					})
-					.then(res => {
-						if (res) {
-							packageData.documents = [];
-						}
-                        packageData.documents = [];
-                        packageData.modelDefinitions = cassandra.handleUdts(udtHash);
-						return tableCallback(null, packageData);
-					})
-					.catch(tableCallback);
+					};
+		
 				}, (err, res) => {
-					return keyspaceCallback(err, res)
+					return cb(err, res);
 				});
 			}
 		}, (err, res) => {

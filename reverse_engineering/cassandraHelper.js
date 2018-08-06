@@ -29,6 +29,7 @@ const getKeyspaceMetaData = (keyspace) => {
 
 const getKeyspaceInfo = (keyspace) => {
 	const metaData = getKeyspaceMetaData(keyspace);
+	getUDF(keyspace, 'fLog');
 	const strategy = metaData.strategy.split('.').slice(-1).pop();
 	let keyspaceInfo = {
 		code: keyspace,
@@ -151,8 +152,18 @@ const getIndexKey = (target) => {
 };
 
 const handleUdts = (udts) => {
-	let schema = getTableSchema(udts);
+	let schema = udts.length ? getTableSchema(udts) : null;
 	return schema;
+};
+
+const getUDF = (keyspace, udfName) => {
+	const query = `SELECT * FROM system_schema.functions WHERE keyspace_name='${keyspace}'`;
+	return execute(query);
+};
+
+const getUDA = (keyspace, aggrName) => {
+	const metaData = getKeyspaceMetaData(keyspace);
+	return metadata.getAggregates(keyspace, aggrName);
 };
 
 /*
@@ -237,6 +248,7 @@ module.exports = {
 	getEntityLevelData,
 	getKeyspaceMetaData,
 	getKeyspaceInfo,
-	handleUdts
+	handleUdts,
+	getUDF
 	
 };

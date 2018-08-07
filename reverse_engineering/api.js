@@ -64,28 +64,42 @@ module.exports = {
 				async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
 					const tableNames = tables[keyspaceName] || [];
 					let udtHash = [];
+					let udfData = [];
 					
 					cassandra.getUDF(keyspaceName)
 					.then(udf => {
-						let udfData = udf.rows.map(item => {
+						udfData = udf.rows.map(item => {
 							return {
 								name: item.function_name,
 								storedProcFunction: item.body
 							};
 						});
-						pipeline(udfData);
+						return cassandra.getUDF(keyspaceName)
+					})
+					.then(uda => {
+						let udaData = uda.rows.map(item => {
+							return {
+								name: item.function_name,
+								storedProcFunction: item.body
+							};
+						});
+						pipeline(udaData, udfData);
 					})
 					.catch(err => {
-						pipeline([]);
+						pipeline([], []);
 					});
 		
-					let pipeline = (UDFs) => {
+					let pipeline = (UDAs, UDFs) => {
 						if (!tableNames.length) {
 							let packageData = {
 								dbName: keyspaceName,
-								emptyBucket: true,
-								udfs
+								emptyBucket: true
 							};
+
+							packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
+							packageData.bucketInfo.UDFs = UDFs;
+							packageData.bucketInfo.UDAs = UDAs;
+
 							return keyspaceCallback(null, packageData);
 						} else {
 							async.map(tableNames, (tableName, tableCallback) => {
@@ -94,13 +108,13 @@ module.exports = {
 									collectionName: tableName,
 									UDFs
 								};
-								//bucketInfo
 								let columns = [];
 			
 								cassandra.getTableMetadata(keyspaceName, tableName)
 								.then(table => {
 									packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
 									packageData.bucketInfo.UDFs = UDFs;
+									packageData.bucketInfo.UDAs = UDAs;
 									packageData.entityLevel = cassandra.getEntityLevelData(table, tableName);
 									columns = table.columns;
 									

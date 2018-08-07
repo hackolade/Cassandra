@@ -180,7 +180,7 @@ const getUDF = (keyspace) => {
 };
 
 const getUDA = (keyspace) => {
-	const query = `SELECT * FROM system.schema_aggregates WHERE keyspace_name='${keyspace}'`;
+	const query = `SELECT * FROM system_schema.aggregates WHERE keyspace_name='${keyspace}'`;
 	return execute(query);
 };
 

@@ -74,7 +74,7 @@ module.exports = {
 								storedProcFunction: item.body
 							};
 						});
-						return cassandra.getUDF(keyspaceName)
+						return cassandra.getUDA(keyspaceName)
 					})
 					.then(uda => {
 						let udaData = uda.rows.map(item => {
@@ -105,8 +105,7 @@ module.exports = {
 							async.map(tableNames, (tableName, tableCallback) => {
 								let packageData = {
 									dbName: keyspaceName,
-									collectionName: tableName,
-									UDFs
+									collectionName: tableName
 								};
 								let columns = [];
 			

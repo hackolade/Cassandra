@@ -71,7 +71,7 @@
 	"MODAL_WINDOW___RECORDS_MAX": "Documents max",
 	"MODAL_WINDOW___SUBDOCUMENT_IN_CHILD": "Sub-document in child",
 	"MODAL_WINDOW___ARRAY_IN_PARENT": "Array in parent",
-	"MODAL_WINDOW___INCLUDE_EMPTY_COLLECTION": "Include empty indices",
+	"MODAL_WINDOW___INCLUDE_EMPTY_COLLECTION": "Include empty tables",
 	"MODAL_WINDOW___CREATE_COLLECTION": "Create table",
 	"MODAL_WINDOW___CREATE_BUCKET": "Create keyspace",
 	"MODAL_WINDOW___ALL_COLLECTIONS": "and all nested tables",

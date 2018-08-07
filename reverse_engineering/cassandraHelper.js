@@ -29,7 +29,6 @@ const getKeyspaceMetaData = (keyspace) => {
 
 const getKeyspaceInfo = (keyspace) => {
 	const metaData = getKeyspaceMetaData(keyspace);
-	getUDF(keyspace, 'fLog');
 	const strategy = metaData.strategy.split('.').slice(-1).pop();
 	let keyspaceInfo = {
 		code: keyspace,
@@ -106,7 +105,7 @@ const getEntityLevelData = (table, tableName) => {
 	const indexes = handleIndexes(table.indexes);
 	const getTableOptions = (table) => {
 		const options = {
-			readRepairChance: table.readRepairChance
+			readRepairChance: table.readRepairChance,
 			localReadRepairChance: table.localReadRepairChance,
 			gcGraceSeconds: table.gcGraceSeconds,
 			bloomFilterFalsePositiveChance: table.bloomFilterFalsePositiveChance,
@@ -175,14 +174,14 @@ const handleUdts = (udts) => {
 	return schema;
 };
 
-const getUDF = (keyspace, udfName) => {
+const getUDF = (keyspace) => {
 	const query = `SELECT * FROM system_schema.functions WHERE keyspace_name='${keyspace}'`;
 	return execute(query);
 };
 
-const getUDA = (keyspace, aggrName) => {
-	const metaData = getKeyspaceMetaData(keyspace);
-	return metadata.getAggregates(keyspace, aggrName);
+const getUDA = (keyspace) => {
+	const query = `SELECT * FROM system.schema_aggregates WHERE keyspace_name='${keyspace}'`;
+	return execute(query);
 };
 
 const handleRows = (rows) => {
@@ -272,6 +271,6 @@ module.exports = {
 	getKeyspaceMetaData,
 	getKeyspaceInfo,
 	handleUdts,
-	getUDF
-	
+	getUDF,
+	getUDA
 };

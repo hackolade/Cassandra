@@ -1,5 +1,6 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
+const _ = require('lodash');
 
 var state = {
 	client: null
@@ -29,7 +30,6 @@ const getKeyspaceMetaData = (keyspace) => {
 
 const getKeyspaceInfo = (keyspace) => {
 	const metaData = getKeyspaceMetaData(keyspace);
-	getUDF(keyspace, 'fLog');
 	const strategy = metaData.strategy.split('.').slice(-1).pop();
 	let keyspaceInfo = {
 		code: keyspace,
@@ -104,12 +104,31 @@ const getEntityLevelData = (table, tableName) => {
 	const partitionKeys = handlePartitionKeys(table.partitionKeys);
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
-	
+	const getTableOptions = (table) => {
+		const options = [
+			`read_repair_chance = ${table.readRepairChance}`,
+			`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
+			`gc_grace_seconds = ${table.gcGraceSeconds}`,
+			`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
+			`caching = ${table.caching}`,
+			`compaction = ${JSON.stringify(table.compactionOptions)}`,
+			`compression = ${JSON.stringify(table.compression)}`,
+			`default_time_to_live = ${table.defaultTtl}`,
+			`speculative_retry = '${table.speculativeRetry}'`,
+			`min_index_interval = ${table.minIndexInterval}`,
+			`max_index_interval = ${table.maxIndexInterval}`,
+			`crc_check_chance = ${table.crcCheckChance}`
+		];
+		return options.join('\nAND ');
+	};
+
 	return {
 		code: tableName,
 		compositePartitionKey: partitionKeys,
 		compositeClusteringKey: clusteringKeys,
-		SecIndxs: indexes
+		SecIndxs: indexes,
+		comments: table.comment,
+		tableOptions: getTableOptions(table)
 	};
 };
 
@@ -152,18 +171,23 @@ const getIndexKey = (target) => {
 };
 
 const handleUdts = (udts) => {
+	udts = _.uniqBy(udts, 'name');
 	let schema = udts.length ? getTableSchema(udts) : null;
 	return schema;
 };
 
-const getUDF = (keyspace, udfName) => {
+const getUDF = (keyspace) => {
 	const query = `SELECT * FROM system_schema.functions WHERE keyspace_name='${keyspace}'`;
 	return execute(query);
 };
 
-const getUDA = (keyspace, aggrName) => {
-	const metaData = getKeyspaceMetaData(keyspace);
-	return metadata.getAggregates(keyspace, aggrName);
+const getUDA = (keyspace) => {
+	const query = `SELECT * FROM system_schema.aggregates WHERE keyspace_name='${keyspace}'`;
+	return execute(query);
+};
+
+const handleRows = (rows) => {
+
 };
 
 /*
@@ -249,6 +273,6 @@ module.exports = {
 	getKeyspaceMetaData,
 	getKeyspaceInfo,
 	handleUdts,
-	getUDF
-	
+	getUDF,
+	getUDA
 };

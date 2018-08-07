@@ -130,7 +130,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 	};
 
 	const map = (propertyData) => {
-		const keyType = getModeType(propertyData.keyType, udtTypeMap);
+		const keyType = getModeType(propertyData.keyType, "text", udtTypeMap);
 		const valueType = getValueTypeFromObject(propertyData, "text", udtTypeMap);
 
 		return `map<${keyType}, ${valueType}>`;

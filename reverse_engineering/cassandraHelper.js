@@ -105,21 +105,21 @@ const getEntityLevelData = (table, tableName) => {
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
 	const getTableOptions = (table) => {
-		const options = {
-			readRepairChance: table.readRepairChance,
-			localReadRepairChance: table.localReadRepairChance,
-			gcGraceSeconds: table.gcGraceSeconds,
-			bloomFilterFalsePositiveChance: table.bloomFilterFalsePositiveChance,
-			caching: table.caching,
-			compactionOptions: table.compactionOptions,
-			compression: table.compression,
-			defaultTtl: table.defaultTtl,
-			speculativeRetry: table.speculativeRetry,
-			minIndexInterval: table.minIndexInterval,
-			maxIndexInterval: table.maxIndexInterval,
-			crcCheckChance: table.crcCheckChance,
-		};
-		return JSON.stringify(options, null, 4) || '';
+		const options = [
+			`read_repair_chance = ${table.readRepairChance}`,
+			`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
+			`gc_grace_seconds = ${table.gcGraceSeconds}`,
+			`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
+			`caching = ${table.caching}`,
+			`compaction = ${JSON.stringify(table.compactionOptions)}`,
+			`compression = ${JSON.stringify(table.compression)}`,
+			`default_time_to_live = ${table.defaultTtl}`,
+			`speculative_retry = '${table.speculativeRetry}'`,
+			`min_index_interval = ${table.minIndexInterval}`,
+			`max_index_interval = ${table.maxIndexInterval}`,
+			`crc_check_chance = ${table.crcCheckChance}`
+		];
+		return options.join('\nAND ');
 	};
 
 	return {

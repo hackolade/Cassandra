@@ -1,5 +1,6 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
+const _ = require('lodash');
 
 var state = {
 	client: null
@@ -170,6 +171,7 @@ const getIndexKey = (target) => {
 };
 
 const handleUdts = (udts) => {
+	udts = _.uniqBy(udts, 'name');
 	let schema = udts.length ? getTableSchema(udts) : null;
 	return schema;
 };

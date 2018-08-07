@@ -104,12 +104,31 @@ const getEntityLevelData = (table, tableName) => {
 	const partitionKeys = handlePartitionKeys(table.partitionKeys);
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
-	
+	const getTableOptions = (table) => {
+		const options = {
+			readRepairChance: table.readRepairChance
+			localReadRepairChance: table.localReadRepairChance,
+			gcGraceSeconds: table.gcGraceSeconds,
+			bloomFilterFalsePositiveChance: table.bloomFilterFalsePositiveChance,
+			caching: table.caching,
+			compactionOptions: table.compactionOptions,
+			compression: table.compression,
+			defaultTtl: table.defaultTtl,
+			speculativeRetry: table.speculativeRetry,
+			minIndexInterval: table.minIndexInterval,
+			maxIndexInterval: table.maxIndexInterval,
+			crcCheckChance: table.crcCheckChance,
+		};
+		return JSON.stringify(options, null, 4) || '';
+	};
+
 	return {
 		code: tableName,
 		compositePartitionKey: partitionKeys,
 		compositeClusteringKey: clusteringKeys,
-		SecIndxs: indexes
+		SecIndxs: indexes,
+		comments: table.comment,
+		tableOptions: getTableOptions(table)
 	};
 };
 
@@ -164,6 +183,10 @@ const getUDF = (keyspace, udfName) => {
 const getUDA = (keyspace, aggrName) => {
 	const metaData = getKeyspaceMetaData(keyspace);
 	return metadata.getAggregates(keyspace, aggrName);
+};
+
+const handleRows = (rows) => {
+
 };
 
 /*

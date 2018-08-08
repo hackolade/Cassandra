@@ -1,5 +1,6 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
+const _ = require('lodash');
 
 var state = {
 	client: null
@@ -104,21 +105,21 @@ const getEntityLevelData = (table, tableName) => {
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
 	const getTableOptions = (table) => {
-		const options = {
-			readRepairChance: table.readRepairChance,
-			localReadRepairChance: table.localReadRepairChance,
-			gcGraceSeconds: table.gcGraceSeconds,
-			bloomFilterFalsePositiveChance: table.bloomFilterFalsePositiveChance,
-			caching: table.caching,
-			compactionOptions: table.compactionOptions,
-			compression: table.compression,
-			defaultTtl: table.defaultTtl,
-			speculativeRetry: table.speculativeRetry,
-			minIndexInterval: table.minIndexInterval,
-			maxIndexInterval: table.maxIndexInterval,
-			crcCheckChance: table.crcCheckChance,
-		};
-		return JSON.stringify(options, null, 4) || '';
+		const options = [
+			`read_repair_chance = ${table.readRepairChance}`,
+			`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
+			`gc_grace_seconds = ${table.gcGraceSeconds}`,
+			`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
+			`caching = ${table.caching}`,
+			`compaction = ${JSON.stringify(table.compactionOptions)}`,
+			`compression = ${JSON.stringify(table.compression)}`,
+			`default_time_to_live = ${table.defaultTtl}`,
+			`speculative_retry = '${table.speculativeRetry}'`,
+			`min_index_interval = ${table.minIndexInterval}`,
+			`max_index_interval = ${table.maxIndexInterval}`,
+			`crc_check_chance = ${table.crcCheckChance}`
+		];
+		return options.join('\nAND ');
 	};
 
 	return {
@@ -170,6 +171,7 @@ const getIndexKey = (target) => {
 };
 
 const handleUdts = (udts) => {
+	udts = _.uniqBy(udts, 'name');
 	let schema = udts.length ? getTableSchema(udts) : null;
 	return schema;
 };
@@ -180,7 +182,7 @@ const getUDF = (keyspace) => {
 };
 
 const getUDA = (keyspace) => {
-	const query = `SELECT * FROM system.schema_aggregates WHERE keyspace_name='${keyspace}'`;
+	const query = `SELECT * FROM system_schema.aggregates WHERE keyspace_name='${keyspace}'`;
 	return execute(query);
 };
 

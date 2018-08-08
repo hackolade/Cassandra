@@ -104,23 +104,6 @@ const getEntityLevelData = (table, tableName) => {
 	const partitionKeys = handlePartitionKeys(table.partitionKeys);
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
-	const getTableOptions = (table) => {
-		const options = [
-			`read_repair_chance = ${table.readRepairChance}`,
-			`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
-			`gc_grace_seconds = ${table.gcGraceSeconds}`,
-			`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
-			`caching = ${table.caching}`,
-			`compaction = ${JSON.stringify(table.compactionOptions)}`,
-			`compression = ${JSON.stringify(table.compression)}`,
-			`default_time_to_live = ${table.defaultTtl}`,
-			`speculative_retry = '${table.speculativeRetry}'`,
-			`min_index_interval = ${table.minIndexInterval}`,
-			`max_index_interval = ${table.maxIndexInterval}`,
-			`crc_check_chance = ${table.crcCheckChance}`
-		];
-		return options.join('\nAND ');
-	};
 
 	return {
 		code: tableName,
@@ -130,6 +113,24 @@ const getEntityLevelData = (table, tableName) => {
 		comments: table.comment,
 		tableOptions: getTableOptions(table)
 	};
+};
+
+const getTableOptions = (table) => {
+	const options = [
+		`read_repair_chance = ${table.readRepairChance}`,
+		`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
+		`gc_grace_seconds = ${table.gcGraceSeconds}`,
+		`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
+		`caching = ${table.caching}`,
+		`compaction = ${JSON.stringify(table.compactionOptions)}`,
+		`compression = ${JSON.stringify(table.compression)}`,
+		`default_time_to_live = ${table.defaultTtl}`,
+		`speculative_retry = '${table.speculativeRetry}'`,
+		`min_index_interval = ${table.minIndexInterval}`,
+		`max_index_interval = ${table.maxIndexInterval}`,
+		`crc_check_chance = ${table.crcCheckChance}`
+	];
+	return options.join('\nAND ');
 };
 
 const getKeyOrder = (order) => {
@@ -184,6 +185,52 @@ const getUDF = (keyspace) => {
 const getUDA = (keyspace) => {
 	const query = `SELECT * FROM system_schema.aggregates WHERE keyspace_name='${keyspace}'`;
 	return execute(query);
+};
+
+const handleUDF = (udf) => {
+	const udfData = udf.rows.map(item => {
+		const args = item.argument_names.map((name, index) => {
+			return `${name} ${item.argument_types[index] || ''}`;
+		}).join(', ');
+
+		const deterministic = item.deterministic ? 'DETERMINISTIC' : '';
+		const monotonic = item.monotonic ? 'MONOTONIC ON' + item.monotonic_on.join(', ') : '';
+
+		const func = `CREATE OR REPLACE FUNCTION ${item.function_name} ( ${args} )
+			${item.called_on_null_input ? 'CALLED' : 'RETURNS NULL'} ON NULL INPUT
+			RETURNS ${item.return_type}  ${deterministic} ${monotonic}
+			LANGUAGE ${item.language} AS
+			$$ ${item.body} $$ ;`;
+
+		console.log(func + '\n');
+
+		return {
+			name: item.function_name,
+			storedProcFunction: func
+		};
+	});
+	return udfData;
+};
+
+const handleUDA = (uda) => {
+	const udaData = uda.rows.map(item => {
+		const args = item.argument_types.join(', ');
+		
+		const aggr = `CREATE AGGREGATE  ${item.aggregate_name} (${args})
+			SFUNC ${item.state_func}
+			STYPE ${item.state_type}
+			FINALFUNC ${item.final_func}
+			INITCOND ${item.initcond}
+			${item.deterministic ? 'DETERMINISTIC' : ''};`;
+
+		console.log(aggr + '\n');
+
+		return {
+			name: item.aggregate_name,
+			storedProcFunction: aggr
+		};
+	});
+	return udaData;
 };
 
 const handleRows = (rows) => {
@@ -274,5 +321,7 @@ module.exports = {
 	getKeyspaceInfo,
 	handleUdts,
 	getUDF,
-	getUDA
+	getUDA,
+	handleUDF,
+	handleUDA
 };

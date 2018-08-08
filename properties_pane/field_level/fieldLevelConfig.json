@@ -56,7 +56,7 @@ making sure that you maintain a proper JSON format.
 {
 	"lowerTab": "JsonDetails",
 	"structure": {
-		"string": [
+		"char": [
 			"name",
 			"code",
 			"schemaId",
@@ -137,7 +137,7 @@ making sure that you maintain a proper JSON format.
 			"sample",
 			"comments"
 		],
-		"number": [
+		"numeric": [
 			"name",
 			"code",
 			"schemaId",

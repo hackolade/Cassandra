@@ -123,6 +123,22 @@
 					"type": "set",
 					"subtype": "set<str>"
 				}
+			},
+			{
+				"from": {
+					"type": "string"
+				},
+				"to": {
+					"type": "char"
+				}
+			},
+			{
+				"from": {
+					"type": "number"
+				},
+				"to": {
+					"type": "numeric"
+				}
 			}
 		]
 	}

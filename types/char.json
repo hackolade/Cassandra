@@ -1,5 +1,5 @@
 {
-	"name": "string",
+	"name": "char",
 	"erdAbbreviation": "<str>",
 	"dtdAbbreviation": "{ABC}",
 	"parentType": "string",

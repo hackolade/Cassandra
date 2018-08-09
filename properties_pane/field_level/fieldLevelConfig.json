@@ -227,7 +227,7 @@ making sure that you maintain a proper JSON format.
 			"sample",
 			"comments"
 		],
-		"boolean": [
+		"bool": [
 			"name",
 			"code",
 			"schemaId",

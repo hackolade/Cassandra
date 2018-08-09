@@ -139,6 +139,14 @@
 				"to": {
 					"type": "numeric"
 				}
+			},
+			{
+				"from": {
+					"type": "boolean"
+				},
+				"to": {
+					"type": "bool"
+				}
 			}
 		]
 	}

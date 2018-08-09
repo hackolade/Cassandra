@@ -5,6 +5,7 @@
 	"parentType": "string",
 	"useSample": true,
 	"jsonType": true,
+	"default": true,
 	"defaultValues": {
 		"primaryKey": false,
 		"relationshipType": "",

@@ -294,71 +294,19 @@ const getPackageData = (data, includeEmptyCollection) => {
 	return packageData;
 };
 
-/*
-const generateCustomInferSchema = (bucketName, documents, params) => {
-	function typeOf(obj) {
-		return {}.toString.call(obj).split(' ')[1].slice(0, -1).toLowerCase();
+const prepareError = (error) => {
+	return {
+		message: error.message,
+		stack: error.stack
 	};
-
-	let sampleSize = params.sampleSize || 30;
-
-	let inferSchema = {
-		"#docs": 0,
-		"$schema": "http://json-schema.org/schema#",
-		"properties": {}
-	};
-
-	documents.forEach(item => {
-		inferSchema["#docs"]++;
-		
-		for(let prop in item){
-			if(inferSchema.properties.hasOwnProperty(prop)){
-				inferSchema.properties[prop]["#docs"]++;
-				inferSchema.properties[prop]["samples"].indexOf(item[prop]) === -1 && inferSchema.properties[prop]["samples"].length < sampleSize? inferSchema.properties[prop]["samples"].push(item[prop]) : '';
-				inferSchema.properties[prop]["type"] = typeOf(item[prop]);
-			} else {
-				inferSchema.properties[prop] = {
-					"#docs": 1,
-					"%docs": 100,
-					"samples": [item[prop]],
-					"type": typeOf(item[prop])
-				}
-			}
-		}
-	});
-
-	for (let prop in inferSchema.properties){
-		inferSchema.properties[prop]["%docs"] = Math.round((inferSchema.properties[prop]["#docs"] / inferSchema["#docs"] * 100), 2);
-	}
-	return inferSchema;
 };
 
+/*
 const getSampleDocSize = (count, recordSamplingSettings) => {
 	let per = recordSamplingSettings.relative.value;
 	return (recordSamplingSettings.active === 'absolute')
 		? recordSamplingSettings.absolute.value
 			: Math.round( count/100 * per);
-};
-
-const getIndexes = (indexingPolicy) => {
-	let generalIndexes = [];
-	
-	if(indexingPolicy){
-		indexingPolicy.includedPaths.forEach(item => {
-			let indexes = item.indexes;
-			indexes = indexes.map(index => {
-				index.indexPrecision = index.precision;
-				index.automatic = item.automatic;
-				index.mode = indexingPolicy.indexingMode;
-				index.indexIncludedPath = item.path;
-				return index;
-			});
-
-			generalIndexes = generalIndexes.concat(generalIndexes, indexes);
-		});
-	}
-
-	return generalIndexes;
 };
 
 */
@@ -382,5 +330,6 @@ module.exports = {
 	handleUDF,
 	handleUDA,
 	handleRows,
-	getPackageData
+	getPackageData,
+	prepareError
 };

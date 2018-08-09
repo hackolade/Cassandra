@@ -68,7 +68,7 @@ module.exports = {
 				pipeline([], []);
 			});
 
-			let pipeline = (UDAs, UDFs) => {
+			const pipeline = (UDAs, UDFs) => {
 				if (!tableNames.length) {
 					let packageData = {
 						dbName: keyspaceName,
@@ -113,11 +113,11 @@ module.exports = {
 						})
 						.catch(tableCallback);
 					}, (err, res) => {
+						logger.log('error', cassandra.prepareError(err), "Error");
 						return keyspaceCallback(err, res)
 					});
 				}
 			};
-
 		}, (err, res) => {
 			return cb(err, res);
 		});

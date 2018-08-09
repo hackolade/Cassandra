@@ -202,8 +202,6 @@ const handleUDF = (udf) => {
 			LANGUAGE ${item.language} AS
 			$$ ${item.body} $$ ;`;
 
-		console.log(func + '\n');
-
 		return {
 			name: item.function_name,
 			storedProcFunction: func
@@ -223,8 +221,6 @@ const handleUDA = (uda) => {
 			INITCOND ${item.initcond}
 			${item.deterministic ? 'DETERMINISTIC' : ''};`;
 
-		console.log(aggr + '\n');
-
 		return {
 			name: item.aggregate_name,
 			storedProcFunction: aggr
@@ -234,7 +230,65 @@ const handleUDA = (uda) => {
 };
 
 const handleRows = (rows) => {
+	console.log(rows);
 
+	let data = {
+		hashTable: {},
+		documents: [],
+		schema: {
+			properties: {}
+		}
+	};
+
+	rows.rows.forEach(row => {
+		let doc = {};
+
+		for(let column in row) {
+			let parsedType = getParsedType(row[column]);
+			
+			if (parsedType) {
+				doc[column] = parsedType;
+			}
+
+			if (row[column] === Object(row[column])) {
+				//
+			}
+		}
+
+		data.documents.push(doc);
+	});
+
+	return data;
+};
+
+const getParsedType = (columnData) => {
+	if (columnData && typeof columnData === 'string') {
+		try {
+			let parsedData = JSON.parse(columnData);
+			return parsedData;
+		} catch(err) {
+			return false;
+		}
+	}
+};
+
+const getPackageData = (keyspaceName, table, includeEmptyCollection) => {
+	let packageData = {};
+
+	if (table.columns && table.columns.length) {
+		packageData.bucketInfo = getKeyspaceInfo(keyspaceName);
+		packageData.bucketInfo.UDFs = UDFs;
+		packageData.bucketInfo.UDAs = UDAs;
+		packageData.entityLevel = getEntityLevelData(table, tableName);
+		
+		const schema = getTableSchema(table.columns, udtHash);
+		packageData.validation = {
+			jsonSchema: schema
+		};
+		packageData.modelDefinitions = handleUdts(udtHash);
+	} else if (!includeEmptyCollection) {
+		packageData = null;
+	}
 };
 
 /*
@@ -323,5 +377,7 @@ module.exports = {
 	getUDF,
 	getUDA,
 	handleUDF,
-	handleUDA
+	handleUDA,
+	handleRows,
+	getPackageData
 };

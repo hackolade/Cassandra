@@ -91,7 +91,14 @@ module.exports = {
 						cassandra.getTableMetadata(keyspaceName, tableName)
 						.then(table => {
 							columns = table.columns;
-							packageData = cassandra.getPackageData(keyspaceName, table, includeEmptyCollection);
+							packageData = cassandra.getPackageData({
+								keyspaceName,
+								table,
+								tableName,
+								udtHash,
+								UDFs,
+								UDAs
+							}, includeEmptyCollection);
 							return packageData;
 						})
 						.then(packageData => {

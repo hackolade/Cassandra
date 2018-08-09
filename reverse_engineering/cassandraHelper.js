@@ -230,8 +230,6 @@ const handleUDA = (uda) => {
 };
 
 const handleRows = (rows) => {
-	console.log(rows);
-
 	let data = {
 		hashTable: {},
 		documents: [],
@@ -272,23 +270,28 @@ const getParsedType = (columnData) => {
 	}
 };
 
-const getPackageData = (keyspaceName, table, includeEmptyCollection) => {
-	let packageData = {};
+const getPackageData = (data, includeEmptyCollection) => {
+	let packageData = {
+		dbName: data.keyspaceName,
+		collectionName: data.tableName,
+		documents: []
+	};
 
-	if (table.columns && table.columns.length) {
-		packageData.bucketInfo = getKeyspaceInfo(keyspaceName);
-		packageData.bucketInfo.UDFs = UDFs;
-		packageData.bucketInfo.UDAs = UDAs;
-		packageData.entityLevel = getEntityLevelData(table, tableName);
+	if (data.table.columns && data.table.columns.length) {
+		packageData.bucketInfo = getKeyspaceInfo(data.keyspaceName);
+		packageData.bucketInfo.UDFs = data.UDFs;
+		packageData.bucketInfo.UDAs = data.UDAs;
+		packageData.entityLevel = getEntityLevelData(data.table, data.tableName);
 		
-		const schema = getTableSchema(table.columns, udtHash);
+		const schema = getTableSchema(data.table.columns, data.udtHash);
 		packageData.validation = {
 			jsonSchema: schema
 		};
-		packageData.modelDefinitions = handleUdts(udtHash);
+		packageData.modelDefinitions = handleUdts(data.udtHash);
 	} else if (!includeEmptyCollection) {
 		packageData = null;
 	}
+	return packageData;
 };
 
 /*

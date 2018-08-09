@@ -113,7 +113,9 @@ module.exports = {
 						})
 						.catch(tableCallback);
 					}, (err, res) => {
-						logger.log('error', cassandra.prepareError(err), "Error");
+						if (err) {
+							logger.log('error', cassandra.prepareError(err), "Error");
+						}
 						return keyspaceCallback(err, res)
 					});
 				}

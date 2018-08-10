@@ -104,23 +104,6 @@ const getEntityLevelData = (table, tableName) => {
 	const partitionKeys = handlePartitionKeys(table.partitionKeys);
 	const clusteringKeys = handleClusteringKeys(table);
 	const indexes = handleIndexes(table.indexes);
-	const getTableOptions = (table) => {
-		const options = [
-			`read_repair_chance = ${table.readRepairChance}`,
-			`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
-			`gc_grace_seconds = ${table.gcGraceSeconds}`,
-			`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
-			`caching = ${table.caching}`,
-			`compaction = ${JSON.stringify(table.compactionOptions)}`,
-			`compression = ${JSON.stringify(table.compression)}`,
-			`default_time_to_live = ${table.defaultTtl}`,
-			`speculative_retry = '${table.speculativeRetry}'`,
-			`min_index_interval = ${table.minIndexInterval}`,
-			`max_index_interval = ${table.maxIndexInterval}`,
-			`crc_check_chance = ${table.crcCheckChance}`
-		];
-		return options.join('\nAND ');
-	};
 
 	return {
 		code: tableName,
@@ -130,6 +113,24 @@ const getEntityLevelData = (table, tableName) => {
 		comments: table.comment,
 		tableOptions: getTableOptions(table)
 	};
+};
+
+const getTableOptions = (table) => {
+	const options = [
+		`read_repair_chance = ${table.readRepairChance}`,
+		`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
+		`gc_grace_seconds = ${table.gcGraceSeconds}`,
+		`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
+		`caching = ${table.caching}`,
+		`compaction = ${JSON.stringify(table.compactionOptions)}`,
+		`compression = ${JSON.stringify(table.compression)}`,
+		`default_time_to_live = ${table.defaultTtl}`,
+		`speculative_retry = '${table.speculativeRetry}'`,
+		`min_index_interval = ${table.minIndexInterval}`,
+		`max_index_interval = ${table.maxIndexInterval}`,
+		`crc_check_chance = ${table.crcCheckChance}`
+	];
+	return options.join('\nAND ');
 };
 
 const getKeyOrder = (order) => {
@@ -171,9 +172,25 @@ const getIndexKey = (target) => {
 };
 
 const handleUdts = (udts) => {
-	udts = _.uniqBy(udts, 'name');
-	let schema = udts.length ? getTableSchema(udts) : null;
-	return schema;
+	if (udts && udts.length) {
+		let schema = { properties: {}};
+
+		udts.forEach(udt => {
+			schema.properties[udt.name] = {
+				type: 'udt',
+				static: udt.isStatic,
+				properties: getTableSchema(udt.type.info.fields).properties
+			};
+		});
+		return schema;
+	} else {
+		return null;
+	}
+};
+
+const getUDT = (keyspace) => {
+	const query = `SELECT * FROM system_schema.types WHERE keyspace_name='${keyspace}'`;
+	return execute(query);
 };
 
 const getUDF = (keyspace) => {
@@ -186,75 +203,130 @@ const getUDA = (keyspace) => {
 	return execute(query);
 };
 
-const handleRows = (rows) => {
+const handleUDF = (udf) => {
+	const udfData = udf.rows.map(item => {
+		const args = item.argument_names.map((name, index) => {
+			return `${name} ${item.argument_types[index] || ''}`;
+		}).join(', ');
 
+		const deterministic = item.deterministic ? 'DETERMINISTIC' : '';
+		const monotonic = item.monotonic ? 'MONOTONIC ON' + item.monotonic_on.join(', ') : '';
+
+		const func = `CREATE OR REPLACE FUNCTION ${item.function_name} ( ${args} )
+			${item.called_on_null_input ? 'CALLED' : 'RETURNS NULL'} ON NULL INPUT
+			RETURNS ${item.return_type}  ${deterministic} ${monotonic}
+			LANGUAGE ${item.language} AS
+			$$ ${item.body} $$ ;`;
+
+		return {
+			name: item.function_name,
+			storedProcFunction: func
+		};
+	});
+	return udfData;
+};
+
+const handleUDA = (uda) => {
+	const udaData = uda.rows.map(item => {
+		const args = item.argument_types.join(', ');
+		
+		const aggr = `CREATE AGGREGATE  ${item.aggregate_name} (${args})
+			SFUNC ${item.state_func}
+			STYPE ${item.state_type}
+			FINALFUNC ${item.final_func}
+			INITCOND ${item.initcond}
+			${item.deterministic ? 'DETERMINISTIC' : ''};`;
+
+		return {
+			name: item.aggregate_name,
+			storedProcFunction: aggr
+		};
+	});
+	return udaData;
+};
+
+const handleRows = (rows) => {
+	let data = {
+		hashTable: {},
+		documents: [],
+		schema: {
+			properties: {}
+		}
+	};
+
+	rows.rows.forEach(row => {
+		let doc = {};
+
+		for(let column in row) {
+			let parsedType = getParsedType(row[column]);
+			
+			if (parsedType) {
+				doc[column] = parsedType;
+			}
+
+			if (row[column] === Object(row[column])) {
+				//
+			}
+		}
+
+		data.documents.push(doc);
+	});
+
+	return data;
+};
+
+const getParsedType = (columnData) => {
+	if (columnData && typeof columnData === 'string') {
+		try {
+			let parsedData = JSON.parse(columnData);
+			return parsedData;
+		} catch(err) {
+			return false;
+		}
+	}
+};
+
+const getPackageData = (data, includeEmptyCollection) => {
+	let packageData = {
+		dbName: data.keyspaceName,
+		collectionName: data.tableName,
+		documents: []
+	};
+
+	if (data.table.columns && data.table.columns.length) {
+		packageData.bucketInfo = getKeyspaceInfo(data.keyspaceName);
+		packageData.bucketInfo.UDFs = data.UDFs;
+		packageData.bucketInfo.UDAs = data.UDAs;
+		packageData.entityLevel = getEntityLevelData(data.table, data.tableName);
+		
+		const schema = getTableSchema(data.table.columns, data.udtHash);
+		packageData.validation = {
+			jsonSchema: schema
+		};
+		packageData.modelDefinitions = handleUdts(data.udtHash);
+	} else if (!includeEmptyCollection) {
+		packageData = null;
+	}
+	return packageData;
+};
+
+const prepareError = (error) => {
+	return {
+		message: error.message,
+		stack: error.stack
+	};
+};
+
+const filterKeyspaces = (keyspaces, systemKeyspaces) => {
+	return _.difference(keyspaces, systemKeyspaces || []);
 };
 
 /*
-const generateCustomInferSchema = (bucketName, documents, params) => {
-	function typeOf(obj) {
-		return {}.toString.call(obj).split(' ')[1].slice(0, -1).toLowerCase();
-	};
-
-	let sampleSize = params.sampleSize || 30;
-
-	let inferSchema = {
-		"#docs": 0,
-		"$schema": "http://json-schema.org/schema#",
-		"properties": {}
-	};
-
-	documents.forEach(item => {
-		inferSchema["#docs"]++;
-		
-		for(let prop in item){
-			if(inferSchema.properties.hasOwnProperty(prop)){
-				inferSchema.properties[prop]["#docs"]++;
-				inferSchema.properties[prop]["samples"].indexOf(item[prop]) === -1 && inferSchema.properties[prop]["samples"].length < sampleSize? inferSchema.properties[prop]["samples"].push(item[prop]) : '';
-				inferSchema.properties[prop]["type"] = typeOf(item[prop]);
-			} else {
-				inferSchema.properties[prop] = {
-					"#docs": 1,
-					"%docs": 100,
-					"samples": [item[prop]],
-					"type": typeOf(item[prop])
-				}
-			}
-		}
-	});
-
-	for (let prop in inferSchema.properties){
-		inferSchema.properties[prop]["%docs"] = Math.round((inferSchema.properties[prop]["#docs"] / inferSchema["#docs"] * 100), 2);
-	}
-	return inferSchema;
-};
-
 const getSampleDocSize = (count, recordSamplingSettings) => {
 	let per = recordSamplingSettings.relative.value;
 	return (recordSamplingSettings.active === 'absolute')
 		? recordSamplingSettings.absolute.value
 			: Math.round( count/100 * per);
-};
-
-const getIndexes = (indexingPolicy) => {
-	let generalIndexes = [];
-	
-	if(indexingPolicy){
-		indexingPolicy.includedPaths.forEach(item => {
-			let indexes = item.indexes;
-			indexes = indexes.map(index => {
-				index.indexPrecision = index.precision;
-				index.automatic = item.automatic;
-				index.mode = indexingPolicy.indexingMode;
-				index.indexIncludedPath = item.path;
-				return index;
-			});
-
-			generalIndexes = generalIndexes.concat(generalIndexes, indexes);
-		});
-	}
-
-	return generalIndexes;
 };
 
 */
@@ -274,5 +346,11 @@ module.exports = {
 	getKeyspaceInfo,
 	handleUdts,
 	getUDF,
-	getUDA
+	getUDA,
+	handleUDF,
+	handleUDA,
+	handleRows,
+	getPackageData,
+	prepareError,
+	filterKeyspaces
 };

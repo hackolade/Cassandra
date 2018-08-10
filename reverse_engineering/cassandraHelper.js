@@ -172,9 +172,25 @@ const getIndexKey = (target) => {
 };
 
 const handleUdts = (udts) => {
-	udts = _.uniqBy(udts, 'name');
-	let schema = udts.length ? getTableSchema(udts) : null;
-	return schema;
+	if (udts && udts.length) {
+		let schema = { properties: {}};
+
+		udts.forEach(udt => {
+			schema.properties[udt.name] = {
+				type: 'udt',
+				static: udt.isStatic,
+				properties: getTableSchema(udt.type.info.fields).properties
+			};
+		});
+		return schema;
+	} else {
+		return null;
+	}
+};
+
+const getUDT = (keyspace) => {
+	const query = `SELECT * FROM system_schema.types WHERE keyspace_name='${keyspace}'`;
+	return execute(query);
 };
 
 const getUDF = (keyspace) => {

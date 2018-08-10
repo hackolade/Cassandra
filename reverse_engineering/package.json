@@ -8,7 +8,23 @@
     "cassandra-driver": "^3.5.0",
     "lodash": "^4.17.5"
   },
-  "systemKeyspaces": ["cfs", "cfs_archive", "dse_leases", "dse_perf", "dse_security", "dse_system", "dsefs",
-    "HiveMetaStore", "OpsCenter", "solr_admin", "spark_system", "system", "system_auth", "system_distributed", "system_schema", "system_traces"], 
-  "installed": false
+  "systemKeyspaces": [
+    "cfs",
+    "cfs_archive",
+    "dse_leases",
+    "dse_perf",
+    "dse_security",
+    "dse_system",
+    "dsefs",
+    "HiveMetaStore",
+    "OpsCenter",
+    "solr_admin",
+    "spark_system",
+    "system",
+    "system_auth",
+    "system_distributed",
+    "system_schema",
+    "system_traces"
+  ],
+  "installed": true
 }

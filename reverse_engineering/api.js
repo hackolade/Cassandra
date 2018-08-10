@@ -2,6 +2,7 @@
 
 const async = require('async');
 const cassandra = require('./cassandraHelper');
+const systemKeyspaces = require('./package').systemKeyspaces;
 
 
 module.exports = {
@@ -24,8 +25,15 @@ module.exports = {
 	},
 
 	getDbCollectionsNames: function(connectionInfo, logger, cb) {
+		const { includeSystemCollection } = connectionInfo;
+
 		cassandra.connect(connectionInfo).then(() => {
-				const keyspaces = cassandra.getKeyspacesNames();
+				let keyspaces = cassandra.getKeyspacesNames();
+
+				if (!includeSystemCollection) {
+					keyspaces = cassandra.filterKeyspaces(keyspaces, systemKeyspaces);
+				}
+
 				async.map(keyspaces, (keyspace, next) => {
 					cassandra.getTablesNames(keyspace).then(tablesData => {
 						const tableNames = tablesData.rows.map(table => table.table_name);

@@ -301,6 +301,10 @@ const prepareError = (error) => {
 	};
 };
 
+const filterKeyspaces = (keyspaces, systemKeyspaces) => {
+	return _.difference(keyspaces, systemKeyspaces || []);
+};
+
 /*
 const getSampleDocSize = (count, recordSamplingSettings) => {
 	let per = recordSamplingSettings.relative.value;
@@ -331,5 +335,6 @@ module.exports = {
 	handleUDA,
 	handleRows,
 	getPackageData,
-	prepareError
+	prepareError,
+	filterKeyspaces
 };

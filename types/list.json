@@ -15,10 +15,10 @@
 	},
 	"subtypes": {
 		"list<str>": {
-			"childValueType": "string"
+			"childValueType": "char"
 		},
 		"list<num>": {
-			"childValueType": "number"
+			"childValueType": "numeric"
 		},
 		"list<blob>": {
 			"childValueType": "blob"

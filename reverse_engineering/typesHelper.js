@@ -41,7 +41,7 @@ const getType = (cassandraType) => {
 		case "float":
 		case "varint":
 			return {
-				type: "number",
+				type: "numeric",
 				mode: type	
 			};
 		case "text":
@@ -49,13 +49,16 @@ const getType = (cassandraType) => {
 		case "ascii":
 		case "inet":
 			return {
-				type: "string",
+				type: "char",
 				mode: type
+			};
+		case "boolean":
+			return {
+				type: 'bool'
 			};
 		case "timestamp":
 		case "timeuuid":
 		case "tuple":
-		case "boolean":
 		case "blob":
 		case "date":
 		case "time":

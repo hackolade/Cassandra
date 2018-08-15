@@ -86,7 +86,7 @@
 				"to": {
 					"type": "map",
 					"subtype": "map<str>",
-					"keyType": "string"
+					"keyType": "char"
 				}
 			},
 			{
@@ -146,6 +146,22 @@
 				},
 				"to": {
 					"type": "bool"
+				}
+			},
+			{
+				"from": {
+					"keyType": "string"
+				},
+				"to": {
+					"keyType": "char"
+				}
+			},
+			{
+				"from": {
+					"keyType": "number"
+				},
+				"to": {
+					"keyType": "numeric"
 				}
 			}
 		]

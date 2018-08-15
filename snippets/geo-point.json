@@ -2,8 +2,8 @@
 	"name": "geo-point",
 	"parentType": "array",
 	"properties": [{
-		"type": "number"
+		"type": "numeric"
 	}, {
-		"type": "number"
+		"type": "numeric"
 	}]
 }

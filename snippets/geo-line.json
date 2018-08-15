@@ -5,9 +5,9 @@
 		"type": "set",
 		"subtype": "set<num>",
 		"properties": [{
-			"type": "number"
+			"type": "numeric"
 		}, {
-			"type": "number"
+			"type": "numeric"
 		}]
 	}]
 }

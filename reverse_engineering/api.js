@@ -114,8 +114,7 @@ module.exports = {
 						})
 						.then(columns => {
 							if (columns) {
-								let docData = cassandra.handleRows(columns);
-								packageData.documents = docData.documents;
+								packageData.documents = columns.rows;
 							}
 							return tableCallback(null, packageData);
 						})

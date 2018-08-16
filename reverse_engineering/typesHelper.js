@@ -1,8 +1,8 @@
 const types = require('cassandra-driver').types;
 const regex = '\<(.*)\>';
 const abbrHash = {
-	number: 'num',
-	string: 'str',
+	numeric: 'num',
+	char: 'str',
 	timestamp: 'st'
 };
 
@@ -70,7 +70,7 @@ const getType = (cassandraType) => {
 			return getSubtype(cassandraType);
 		default:
 			return {
-				type: 'string'
+				type: 'char'
 			};
 	}
 };

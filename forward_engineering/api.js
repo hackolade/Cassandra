@@ -2,7 +2,7 @@
 
 const { retrieveContainerName, retrieveEntityName, retrieveUDA, retrieveUDF, retrieveIndexes } = require('./helpers/generalHelper'); 
 const { getTableStatement } = require('./helpers/tableHelper');
-const { getUserDefinedTypes, getUdtMap } = require('./helpers/udtHelper');
+const { getUserDefinedTypes, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 
@@ -24,23 +24,10 @@ module.exports = {
 			];
 
 			const keyspace = getKeyspaceStatement(data.containerData);
+			
+			let udtTypeMap = getUdtMap(dataSources);
 
-			let udtTypeMap = getUdtMap([
-				data.modelDefinitions,
-				data.externalDefinitions,
-				data.internalDefinitions
-			]);
-
-			const {
-				modelUdt,
-				externalUdt,
-				internalUdt
-			} = getUdtScripts(
-				containerName,
-				data.modelDefinitions,
-				data.externalDefinitions,
-				data.internalDefinitions
-			);
+			let UDT = getUdtScripts(containerName, dataSources, udtTypeMap)
 
 			const table = getTableStatement({
 				tableData: data.jsonSchema,
@@ -57,9 +44,7 @@ module.exports = {
 				keyspace,
 				UDF,
 				UDA,
-				modelUdt,
-				internalUdt,
-				externalUdt,
+				...UDT,
 				table,
 				indexes
 			]);
@@ -85,23 +70,24 @@ module.exports = {
 			const keyspace = getKeyspaceStatement(containerData);
 
 			const generalUdtTypeMap = getUdtMap([modelDefinitions, externalDefinitions]);
-			const modelUdt = getUserDefinedTypes(containerName, modelDefinitions, generalUdtTypeMap);
-			const externalUdt = getUserDefinedTypes(containerName, externalDefinitions, generalUdtTypeMap);
+			let generalUDT = getUdtScripts(containerName, [
+				modelDefinitions,
+				externalDefinitions
+			], generalUdtTypeMap);
 
 			const UDF = getUserDefinedFunctions(retrieveUDF(containerData));
 			const UDA = getUserDefinedAggregations(retrieveUDA(containerData));
 
 			cqlScriptData.push(
 				keyspace,
-				modelUdt,
-				externalUdt
+				...generalUDT
 			);
 
 			data.entities.forEach(entityId => {
 				const internalDefinitions = JSON.parse(data.internalDefinitions[entityId]);
 				const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 				const entityData = data.entityData[entityId];
-				const udtTypeMap = Object.assign({}, generalUdtTypeMap, getUdtMap([internalDefinitions]));
+				const udtTypeMap = Object.assign({}, generalUdtTypeMap, getUdtMap([internalDefinitions, jsonSchema]));
 
 				const entityName = retrieveEntityName(entityData);
 				const dataSources = [
@@ -110,7 +96,7 @@ module.exports = {
 					internalDefinitions,
 					externalDefinitions
 				];
-				const internalUdt = getUserDefinedTypes(containerName, internalDefinitions, udtTypeMap);
+				const internalUdt = getUdtScripts(containerName, [ jsonSchema, internalDefinitions ], udtTypeMap);
 				const table = getTableStatement({
 					tableData: jsonSchema,
 					tableMetaData: entityData,
@@ -120,7 +106,7 @@ module.exports = {
 				});
 				const indexes = getIndexes(retrieveIndexes(entityData), dataSources, entityName, containerName);
 		
-				cqlScriptData.push(internalUdt, table, indexes);
+				cqlScriptData.push(...internalUdt, table, indexes);
 			});
 
 			cqlScriptData.push(UDF, UDA);
@@ -146,21 +132,4 @@ const getUserDefinedFunctions = (udfItems) => {
 
 const getUserDefinedAggregations = (udaItems) => {
 	return udaItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
-};
-
-const getUdtScripts = (containerName, modelDefinitions, externalDefinitions, internalDefinitions) => {
-	let udtMap = getUdtMap([
-		modelDefinitions,
-		externalDefinitions
-	]);
-
-	const modelUdt = getUserDefinedTypes(containerName, modelDefinitions, udtMap);
-	const externalUdt = getUserDefinedTypes(containerName, externalDefinitions, udtMap);
-	const internalUdt = getUserDefinedTypes(containerName, internalDefinitions, Object.assign(udtMap, getUdtMap([internalDefinitions])));
-
-	return {
-		modelUdt,
-		externalUdt,
-		internalUdt
-	};
 };

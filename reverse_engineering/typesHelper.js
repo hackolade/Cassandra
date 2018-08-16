@@ -21,8 +21,6 @@ const getRef = (column) => {
 
 const getType = (cassandraType) => {
 	// custom:     0x0000,
-	// udt:        0x0030
-	
 	let type = cassandraType;
 	let matchedType = type.match(regex);
 	if (matchedType) {

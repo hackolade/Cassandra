@@ -1,8 +1,8 @@
 const types = require('cassandra-driver').types;
 const regex = '\<(.*)\>';
 const abbrHash = {
-	number: 'num',
-	string: 'str',
+	numeric: 'num',
+	char: 'str',
 	timestamp: 'st'
 };
 
@@ -21,8 +21,6 @@ const getRef = (column) => {
 
 const getType = (cassandraType) => {
 	// custom:     0x0000,
-	// udt:        0x0030
-	
 	let type = cassandraType;
 	let matchedType = type.match(regex);
 	if (matchedType) {
@@ -41,7 +39,7 @@ const getType = (cassandraType) => {
 		case "float":
 		case "varint":
 			return {
-				type: "number",
+				type: "numeric",
 				mode: type	
 			};
 		case "text":
@@ -49,13 +47,16 @@ const getType = (cassandraType) => {
 		case "ascii":
 		case "inet":
 			return {
-				type: "string",
+				type: "char",
 				mode: type
+			};
+		case "boolean":
+			return {
+				type: 'bool'
 			};
 		case "timestamp":
 		case "timeuuid":
 		case "tuple":
-		case "boolean":
 		case "blob":
 		case "date":
 		case "time":
@@ -67,7 +68,7 @@ const getType = (cassandraType) => {
 			return getSubtype(cassandraType);
 		default:
 			return {
-				type: 'string'
+				type: 'char'
 			};
 	}
 };

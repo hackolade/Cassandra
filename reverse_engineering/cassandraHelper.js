@@ -245,46 +245,7 @@ const handleUDA = (uda) => {
 	return udaData;
 };
 
-const handleRows = (rows) => {
-	let data = {
-		hashTable: {},
-		documents: [],
-		schema: {
-			properties: {}
-		}
-	};
 
-	rows.rows.forEach(row => {
-		let doc = {};
-
-		for(let column in row) {
-			let parsedType = getParsedType(row[column]);
-			
-			if (parsedType) {
-				doc[column] = parsedType;
-			}
-
-			if (row[column] === Object(row[column])) {
-				//
-			}
-		}
-
-		data.documents.push(doc);
-	});
-
-	return data;
-};
-
-const getParsedType = (columnData) => {
-	if (columnData && typeof columnData === 'string') {
-		try {
-			let parsedData = JSON.parse(columnData);
-			return parsedData;
-		} catch(err) {
-			return false;
-		}
-	}
-};
 
 const getPackageData = (data, includeEmptyCollection) => {
 	let packageData = {
@@ -349,7 +310,6 @@ module.exports = {
 	getUDA,
 	handleUDF,
 	handleUDA,
-	handleRows,
 	getPackageData,
 	prepareError,
 	filterKeyspaces

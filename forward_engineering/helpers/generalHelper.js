@@ -74,6 +74,38 @@ const getFieldConfig = (type, property) => {
 	return propertyData;
 };
 
+const eachField = (jsonSchema, callback) => {
+	const resultSchema = Object.assign({}, jsonSchema);
+
+	const eachProperty = (properties, callback) => {
+		return Object.keys(properties).reduce((resultSchema, propertyName) => {
+			const property = properties[propertyName];
+
+			resultSchema[propertyName] = callback(eachField(property, callback), propertyName);
+
+			return resultSchema;
+		}, {});
+	};
+	const eachItem = (items, callback) => {
+		return items.map((item, i) => {
+			return callback(eachField(item, callback), i);
+		});
+	};
+
+	if (resultSchema.hasOwnProperty('properties')) {
+		resultSchema.properties = eachProperty(resultSchema.properties, callback);
+	}
+
+	if (resultSchema.hasOwnProperty('items')) {
+		const items = Array.isArray(resultSchema.items) ? resultSchema.items : [resultSchema.items];
+
+		resultSchema.items = eachItem(items, callback);
+	}
+
+	return resultSchema;
+};
+
+
 module.exports = {
 	tab,
 	retrieveContainerName,
@@ -85,5 +117,6 @@ module.exports = {
 	getTableNameStatement,
 	getFieldConfig,
 	getTypeConfig,
-	getNameWithKeyspace
+	getNameWithKeyspace,
+	eachField
 };

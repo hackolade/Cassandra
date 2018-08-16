@@ -1,22 +1,16 @@
 'use strict'
 
-const { tab, getNameWithKeyspace } = require('./generalHelper');
+const { tab, getNameWithKeyspace, eachField } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 
-const getUserDefinedTypes = (keyspaceName, definitions, udtTypeMap) => {
-	const properties = definitions.properties || {};
+const getUdtScripts = (keyspaceName, sources, udtMap) => {
+	return sources.reduce((definitions, source) => {
+		const udts = getAllUdt(source, udtMap).map(({ name, definition }) => {
+			return getCreateTypeStatement(keyspaceName, name, definition);
+		});
 
-	return Object.keys(properties).map(
-		typeName => getCreateTypeStatement(
-			keyspaceName,
-			getName(typeName, properties[typeName]),
-			getFieldsDefinitions(
-				getName(typeName, properties[typeName]),
-				properties[typeName],
-				udtTypeMap
-			)
-		)
-	).join('\n\n');
+		return definitions.concat(udts);
+	}, []);
 };
 
 const getName = (name, property) => {
@@ -27,29 +21,38 @@ const getCreateTypeStatement = (keyspaceName, typeName, fieldsDefinitions) => {
 	return `CREATE TYPE IF NOT EXISTS ${getNameWithKeyspace(keyspaceName, typeName)} (\n${tab(fieldsDefinitions)}\n);`
 };
 
-const getFieldsDefinitions = (typeName, typeData, udtTypeMap) => {
-	if (typeData.properties) {
-		return getColumnDefinition(typeData.properties, udtTypeMap);
-	} else {
-		return getColumnDefinition({ [typeName]: typeData }, udtTypeMap);
-	}
-};
-
 const getUdtMap = (udtSources) => {
 	return udtSources.reduce((map, source) => {
-		if (source.properties) {
-			return Object.assign(
-				{}, map, Object.keys(source.properties).reduce((map, name) => {
-					return Object.assign(map, { [name]: getName(name, source.properties[name]) });
-				},{})
-			);
-		} else {
-			return map;
-		}
+		eachField(source, (field, fieldName) => {
+			if (field.type === 'udt') {
+				map[fieldName] = getName(fieldName, field);
+			}
+
+			return field;
+		});
+		
+		return map;
 	}, {});
 };
 
+const getAllUdt = (jsonSchema, udtTypeMap) => {
+	const udts = [];
+
+	eachField(jsonSchema, (field, fieldName) => {
+		if (field.type === 'udt' && field.properties) {
+			udts.push({
+				name: getName(fieldName, field),
+				definition: getColumnDefinition(field.properties, udtTypeMap)
+			});
+		}
+
+		return field;
+	});
+
+	return udts;
+};
+
 module.exports = {
-	getUserDefinedTypes,
+	getUdtScripts,
 	getUdtMap
 };

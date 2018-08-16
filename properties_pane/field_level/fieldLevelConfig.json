@@ -629,8 +629,8 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "select",
 				"options": [
-					"string",
-					"number",
+					"char",
+					"numeric",
 					"blob",
 					"timestamp",
 					"time",

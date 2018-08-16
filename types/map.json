@@ -44,10 +44,10 @@
 		}
 	},
 	"keyTypes": {
-		"string": {
+		"char": {
 			"childValueName": "New column"
 		},
-		"number": {
+		"numeric": {
 			"childValueName": "12345"
 		},
 		"blob": {

@@ -6,9 +6,14 @@ module.exports = {
 	getColumnDefinition(properties, udtTypeMap = {}) {
 		return Object.keys(properties).map(name => {
 			const data = properties[name];
-	
-			return getColumn(data.code || name, getTypeDefinition(data, udtTypeMap), isStatic(data));
-		}).join(',\n');
+			const typeDefinition = getTypeDefinition(data, udtTypeMap, name);
+
+			if (typeDefinition === undefined) {
+				return '';
+			} else {
+				return getColumn(data.code || name, typeDefinition, isStatic(data));
+			}
+		}).filter(column => column).join(',\n');
 	}
 };
 
@@ -18,6 +23,6 @@ const getColumn = (name, typeDefinition, isStatic) => {
 	return `"${name}" ${typeDefinition}${isStatic ? ' STATIC' : ''}`;
 };
 
-const getTypeDefinition = (data, udtTypeMap) => {
-	return getTypeByData(data, udtTypeMap);
+const getTypeDefinition = (data, udtTypeMap, name) => {
+	return getTypeByData(data, udtTypeMap, name);
 };

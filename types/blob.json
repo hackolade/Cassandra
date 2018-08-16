@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{blb}",
 	"parentType": "binary",
 	"useSample": false,
+	"jsonType": true,
 	"defaultValues": {
 		"primaryKey": false
 	}

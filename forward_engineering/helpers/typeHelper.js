@@ -27,8 +27,8 @@ const getModeType = (type, defaultType, udtTypeMap) => {
 			type: type,
 			mode: (mode && mode.options && mode.options[0]),
 			keyType: "string",
-			items: { type: "string", mode: "varchar" },
-			properties: { field: { type: "string", mode: "varchar" } }
+			items: { type: "char", mode: "varchar" },
+			properties: { field: { type: "char", mode: "varchar" } }
 		});
 	}
 
@@ -40,8 +40,8 @@ const getScalarType = (type) => {
 	const geoSpatioalType = (propertyData) => `'${propertyData.subType || "PointType"}'`;
 
 	return ifType(type)
-		("string", (propertyData) => (propertyData.mode || "text"))
-		("number", (propertyData) => { 
+		("char", (propertyData) => (propertyData.mode || "text"))
+		("numeric", (propertyData) => { 
 			const type = (propertyData.mode || "integer");
 	
 			return (type === "integer") ? "int" : type;
@@ -181,7 +181,7 @@ const getTypeByPropertyData = (propertyData, udtTypeMap) => {
 	} else if (propertyData.type) {
 		return propertyData.type;
 	} else {
-		return "string";
+		return "char";
 	}
 };
 

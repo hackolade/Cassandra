@@ -1,5 +1,5 @@
 {
-	"name": "number",
+	"name": "numeric",
 	"erdAbbreviation": "<num>",
 	"dtdAbbreviation": "{123}",
 	"parentType": "numeric",

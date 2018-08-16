@@ -15,10 +15,10 @@
 	},
 	"subtypes": {
 		"set<str>": {
-			"childValueType": "string"
+			"childValueType": "char"
 		},
 		"set<num>": {
-			"childValueType": "number"
+			"childValueType": "numeric"
 		},
 		"set<blob>": {
 			"childValueType": "blob"

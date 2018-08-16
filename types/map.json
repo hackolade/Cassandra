@@ -16,10 +16,10 @@
 	},
 	"subtypes": {
 		"map<str>": {
-			"childValueType": "string"
+			"childValueType": "char"
 		},
 		"map<num>": {
-			"childValueType": "number"
+			"childValueType": "numeric"
 		},
 		"map<blob>": {
 			"childValueType": "blob"

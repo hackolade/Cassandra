@@ -38,6 +38,11 @@ const getModeType = (type, defaultType, udtTypeMap) => {
 const getScalarType = (type) => {
 	const simpleType = (propertyData) => propertyData.type;
 	const geoSpatialType = (propertyData) => `'${propertyData.subType || "PointType"}'`;
+	const getJsonType = (propertyData) => {
+		if (propertyData.physicalType) {
+			return getHandlerByType(propertyData.physicalType)(Object.assign(propertyData, { type: propertyData.physicalType }));
+		}
+	};
 
 	return ifType(type)
 		("char", (propertyData) => (propertyData.mode || "text"))
@@ -61,6 +66,8 @@ const getScalarType = (type) => {
 		("udt", (propertyData, propertyName) => {
 			return propertyData.code || propertyName;
 		})
+		("jsonObject", getJsonType)
+		("jsonArray", getJsonType)
 		();
 };
 

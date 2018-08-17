@@ -78,7 +78,7 @@ const getSubtype = (cassandraType) => {
 		let matchedType = cassandraType.match(regex);
 		let jsonType = {};
 
-		if (matchedType) {
+		if (matchedType && cassandraType[cassandraType.length-1] === '>') {
 			const subTypeBlock = matchedType[0];
 			const subType = matchedType[1];
 			jsonType.type = cassandraType.replace(subTypeBlock, '');
@@ -92,7 +92,7 @@ const getSubtype = (cassandraType) => {
 				let typeData = handleType(jsonType.type,  jsonType.properties[0].type);
 				jsonType.properties = [];
 				jsonType.subtype = typeData.subtype; 
-				jsonType.key = typeData.key; 
+				jsonType.keyType = typeData.keyType; 
 			}
 		} else {
 			const csType = cassandraType.split(',');
@@ -115,7 +115,7 @@ const getSubtype = (cassandraType) => {
 
 		if (Array.isArray(subtype)) {
 			subtype[0] = getType(subtype[0]).type;
-			subtype[0] = abbrHash[subtype[0]]; 
+			subtype[0] = abbrHash[subtype[0]] || subtype[0]; 
 			let sType = `${type}<${subtype[0]}>`;
 			
 			return {
@@ -124,7 +124,7 @@ const getSubtype = (cassandraType) => {
 			};
 		} else {
 			subtype = getType(subtype).type;
-			subtype = abbrHash[subtype]; 
+			subtype = abbrHash[subtype] || subtype; 
 			let sType = `${type}<${subtype}>`; 
 			return {
 				subtype: sType

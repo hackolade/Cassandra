@@ -4,7 +4,10 @@
 	"dtdAbbreviation": "{ABC}",
 	"parentType": "string",
 	"useSample": true,
-	"jsonType": true,
+	"jsonType": {
+		"order": 1,
+		"name": "text"
+	},
 	"default": true,
 	"defaultValues": {
 		"primaryKey": false,

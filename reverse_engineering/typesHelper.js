@@ -1,10 +1,11 @@
 const types = require('cassandra-driver').types;
+const defaultData = require('../properties_pane/defaultData.json');
 const abbrHash = {
 	numeric: 'num',
 	char: 'str',
 	timestamp: 'st'
 };
-const defaultColumnName = 'new column';
+const defaultColumnName = defaultData.field.name;
 
 const getColumnType = (column, udtHash) => {
 	const fullCassandraType = types.getDataTypeNameByCode(column.type || column);

@@ -634,7 +634,12 @@ making sure that you maintain a proper JSON format.
 					"blob",
 					"timestamp",
 					"time",
-					"date"
+					"date",
+					"uuid",
+					"set",
+					"list",
+					"map",
+					"tuple"
 				]
 			},
 			{

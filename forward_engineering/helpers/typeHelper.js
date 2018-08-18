@@ -26,6 +26,7 @@ const getModeType = (type, defaultType, udtTypeMap) => {
 		return getHandlerByType(type, udtTypeMap)({
 			type: type,
 			mode: definedType,
+			frozen: true,
 			keyType: "char",
 			items: { type: "char", mode: "varchar" },
 			properties: { field: { type: "char", mode: "varchar" } }

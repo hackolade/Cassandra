@@ -6,7 +6,7 @@
 	"useSample": true,
 	"defaultValues": {
 		"subtype": "map<str>",
-		"keyType": "string",
+		"keyType": "char",
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],

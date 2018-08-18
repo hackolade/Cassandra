@@ -166,9 +166,7 @@ const handleIndexes = (indexes) => {
 };
 
 const getIndexKey = (target) => {
-	const regex = /\((.*?)\)/;
-	const key = target.match(regex);
-	return key ? key[1] : '';
+	return target;
 };
 
 const handleUdts = (udts) => {

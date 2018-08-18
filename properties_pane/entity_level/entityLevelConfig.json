@@ -102,22 +102,37 @@ making sure that you maintain a proper JSON format.
 		"lowerTab": "Details",
 		"structure": [
 			{
+				"propertyName": "Technical name",
+				"propertyKeyword": "code",
+				"shouldValidate": true,
+				"propertyType": "text"
+			},
+			{
 				"propertyName": "Partition key",
 				"propertyKeyword": "compositePartitionKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
-				"abbr": "K"
+				"abbr": "PK"
 			}, 
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
 				"propertyType": "primaryKeySetter",
-				"abbr": "C",
+				"abbr": "CK",
 				"attributeList": [
 					{ "name": "ascending", "abbr": "\u2191" },
 					{ "name": "descending", "abbr": "\u2193" }
 				]
+			},
+			{
+				"propertyName": "Options",
+				"propertyKeyword": "tableOptions",
+				"shouldValidate": false,
+				"propertyTooltip": "Table options separated by 'AND'",
+				"propertyType": "details",
+				"template": "textarea",
+				"valueType": "string"
 			},
 			{
 				"propertyName": "Comments",

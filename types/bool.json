@@ -1,8 +1,8 @@
 {
-	"name": "boolean",
+	"name": "bool",
 	"erdAbbreviation": "<bool>",
 	"dtdAbbreviation": "{0/1}",
-	"parentType": "boolean",
+	"parentType": "bool",
 	"sample": true,
 	"useSample": true,
 	"defaultValues": {

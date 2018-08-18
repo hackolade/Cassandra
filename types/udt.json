@@ -1,12 +1,10 @@
 {
-	"name": "binarySet",
-	"erdAbbreviation": "<set>",
+	"name": "udt",
+	"erdAbbreviation": "<udt>",
 	"dtdAbbreviation": "{...}",
-	"parentType": "array",
-	"sample": [],
-	"useSample": true,
+	"parentType": "document",
+	"useSample": false,
 	"defaultValues": {
-		"childValueType": "binary", 
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],

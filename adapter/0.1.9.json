@@ -1,0 +1,169 @@
+/**
+ * Copyright © 2016-2018 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+ *
+ * The copyright to the computer software herein is the property of IntegrIT S.A.
+ * The software may be used and/or copied only with the written permission of 
+ * IntegrIT S.A. or in accordance with the terms and conditions stipulated in 
+ * the agreement/contract under which the software has been supplied. 
+ * 
+ * {
+ * 		"add": {
+ * 			"entity": [<names of new property>],
+ * 			"container": [<names of new property>],
+ * 			"model": [<names of new property>],
+ * 			"view": [<names of new property>],
+ *			"field": {
+ *				"<type>": [<names of new property>]
+ *			}
+ * 		},
+ * 		"remove": {
+ * 			"entity": [<names of new property>],
+ * 			"container": [<names of new property>],
+ * 			"model": [<names of new property>],
+ * 			"view": [<names of new property>],
+ *			"field": {
+ *				"<type>": [<names of new property>]
+ *			}
+ * 		},
+ * 		"modify": {
+ *	 		"entity": [
+ *	 			{
+ *					"from": { <properties that identify record> },
+ *					"to": { <properties that need to be changed> }
+ *				}
+ *			],
+ *			"container": [],
+ *			"model": [],
+ *			"view": [],
+ *			"field": []
+ * 		},
+ * }
+ */
+{
+	"add": {
+		"entity": [
+			"tableOptions"
+		],
+		"field": {
+			"map": [
+				"keyType",
+				"subtype"
+			],
+			"set": [
+				"subtype"
+			],
+			"list": [
+				"subtype"
+			]
+		}
+	},
+	"delete": {
+		"entity": [
+			"simpletextProp",
+			"textareaProp",
+			"dropdownProp",
+			"numericProp",
+			"checkboxProp",
+			"grpProp",
+			"keyList",
+			"keyListOrder"
+		]
+	},
+	"modify": {
+		"field": [
+			{
+				"from": {
+					"type": "array"
+				},
+				"to": {
+					"type": "tuple"
+				}
+			},
+			{
+				"from": {
+					"type": "object"
+				},
+				"to": {
+					"type": "map",
+					"subtype": "map<str>",
+					"keyType": "char"
+				}
+			},
+			{
+				"from": {
+					"type": "binary"
+				},
+				"to": {
+					"type": "blob"
+				}
+			},
+			{
+				"from": {
+					"type": "binarySet"
+				},
+				"to": {
+					"type": "set",
+					"subtype": "set<blob>"
+				}
+			},
+			{
+				"from": {
+					"type": "numberSet"
+				},
+				"to": {
+					"type": "set",
+					"subtype": "set<num>"
+				}
+			},
+			{
+				"from": {
+					"type": "stringSet"
+				},
+				"to": {
+					"type": "set",
+					"subtype": "set<str>"
+				}
+			},
+			{
+				"from": {
+					"type": "string"
+				},
+				"to": {
+					"type": "char"
+				}
+			},
+			{
+				"from": {
+					"type": "number"
+				},
+				"to": {
+					"type": "numeric"
+				}
+			},
+			{
+				"from": {
+					"type": "boolean"
+				},
+				"to": {
+					"type": "bool"
+				}
+			},
+			{
+				"from": {
+					"keyType": "string"
+				},
+				"to": {
+					"keyType": "char"
+				}
+			},
+			{
+				"from": {
+					"keyType": "number"
+				},
+				"to": {
+					"keyType": "numeric"
+				}
+			}
+		]
+	}
+}

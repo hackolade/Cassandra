@@ -1,33 +1,82 @@
 const types = require('cassandra-driver').types;
-const regex = '\<(.*)\>';
 const abbrHash = {
 	numeric: 'num',
 	char: 'str',
 	timestamp: 'st'
 };
+const defaultColumnName = 'new column';
 
 const getColumnType = (column, udtHash) => {
-	const cassandraType = types.getDataTypeNameByCode(column.type);
+	const fullCassandraType = types.getDataTypeNameByCode(column.type || column);
+	const cassandraType = fullCassandraType.split('<')[0];
+
 	if (udtHash && cassandraType === 'udt') {
 		udtHash.push(column);
 		return getRef(column);
 	}
-	return getType(cassandraType);
+	return getType(cassandraType, column);
 };
 
 const getRef = (column) => {
 	return { type: 'reference' };
 };
 
-const getType = (cassandraType) => {
-	// custom:     0x0000,
-	let type = cassandraType;
-	let matchedType = type.match(regex);
-	if (matchedType) {
-		const subTypeBlock = matchedType[0];
-		type = type.replace(subTypeBlock, '');
+const getType = (cassandraType, column) => {
+	let appType = getAppType(cassandraType);
+
+	if (cassandraType === 'map') {
+		handleMap(appType, column);
 	}
 
+	if (cassandraType === 'tuple') {
+		handleTuple(appType, column);
+	}
+
+	if (cassandraType === 'set' || cassandraType === 'list') {
+		handleList(appType, column);
+	}
+
+	return appType;
+};
+
+const handleMap = (appType, column) => {
+	const keyData = (column.info || column.type.info)[0];
+	const valueData = (column.info || column.type.info)[1];
+	const handledKeyData = getColumnType(keyData);
+	const handledValueData = getColumnType(valueData);
+	const keyType = handledKeyData.type;
+	const subtype = getSubType(appType.type, handledValueData.type);
+	
+	appType.keyType = keyType;
+	appType.subtype = subtype;
+	appType.properties = {
+		[defaultColumnName]: handledValueData
+	};
+
+	return appType;
+};
+
+const handleTuple = (appType, column) => {
+	const valueData = (column.info || column.type.info).map(item => {
+		const valueData = item;
+		const handledValueData = getColumnType(valueData);
+		return handledValueData;
+	});
+	appType.items = valueData;
+	return appType;
+};
+
+const handleList = (appType, column) => {
+	const valueData = (column.info || column.type.info);
+	const handledValueData = getColumnType(valueData);
+	const subtype = getSubType(appType.type, handledValueData.type);
+
+	appType.subtype = subtype;
+	appType.items = [handledValueData];
+	return appType;
+};
+
+const getAppType = (type) => {
 	switch(type) {
 		case "smallint":
 		case "tinyint":
@@ -56,88 +105,27 @@ const getType = (cassandraType) => {
 			};
 		case "timestamp":
 		case "timeuuid":
-		case "tuple":
 		case "blob":
 		case "date":
 		case "time":
 		case "uuid":
 			return { type };
+		case "tuple":
 		case "list":
 		case "set":
 		case "map":
-			return getSubtype(cassandraType);
+			return { type };
 		default:
 			return {
 				type: 'char'
 			};
 	}
-};
+}
 
-const getSubtype = (cassandraType) => {
-	const handleCassandraType = (cassandraType) => {
-		let matchedType = cassandraType.match(regex);
-		let jsonType = {};
-
-		if (matchedType && cassandraType[cassandraType.length-1] === '>') {
-			const subTypeBlock = matchedType[0];
-			const subType = matchedType[1];
-			jsonType.type = cassandraType.replace(subTypeBlock, '');
-
-			if (jsonType.type === 'set' || jsonType.type === 'list') {
-				jsonType.items = [handleCassandraType(subType)];
-				let typeData = handleType(jsonType.type,  jsonType.items[0].type);
-				jsonType.subtype = typeData.subtype; 
-			} else {
-				jsonType.properties = [handleCassandraType(subType)];
-				let typeData = handleType(jsonType.type,  jsonType.properties[0].type);
-				jsonType.properties = [];
-				jsonType.subtype = typeData.subtype; 
-				jsonType.keyType = typeData.keyType; 
-			}
-		} else {
-			const csType = cassandraType.split(',');
-			if(csType && csType.length > 1) {
-				jsonType.type = cassandraType;
-			} else {
-				jsonType = Object.assign(jsonType, getType(cassandraType));
-			}
-		}
-
-		return jsonType;
-	};
-
-	const handleType = (type, subtype) => {
-		subtype = subtype.split(',');
-		
-		if (Array.isArray(subtype) && subtype.length === 1) {
-			subtype = subtype[0];
-		}
-
-		if (Array.isArray(subtype)) {
-			subtype[0] = getType(subtype[0]).type;
-			subtype[0] = abbrHash[subtype[0]] || subtype[0]; 
-			let sType = `${type}<${subtype[0]}>`;
-			
-			return {
-				keyType: getType(subtype[1].trim()).type,
-				subtype: sType
-			};
-		} else {
-			subtype = getType(subtype).type;
-			subtype = abbrHash[subtype] || subtype; 
-			let sType = `${type}<${subtype}>`; 
-			return {
-				subtype: sType
-			};
-		}
-	};
-
-	return handleCassandraType(cassandraType);
-};
-
+const getSubType = (type, subType) => {
+	return `${type}<${abbrHash[subType] || subType}>`;
+}
 
 module.exports = {
-    getColumnType,
-	getType,
-	getSubtype
+    getColumnType
 };

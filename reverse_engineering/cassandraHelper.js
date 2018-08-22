@@ -100,7 +100,7 @@ const scanRecords = (keyspace, table, recordSamplingSettings) => {
 	
 	return execute(query)
 	.then(count => new Promise((resolve, reject) => {
-		const rowsCount = _.get(count, 'count.rows[0].count', defaultCount);
+		const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);
 		const size = getSampleDocSize(rowsCount, recordSamplingSettings)
 		const options = { prepare : true , autoPage: true };
 		const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;

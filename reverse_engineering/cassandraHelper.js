@@ -20,6 +20,7 @@ const connect = (info) => {
 
 const close = () => {
 	if (state.client) {
+		state.client.shutdown();
 		state.client = null;
 	}
 };
@@ -73,7 +74,7 @@ const getColumnInfo = (keyspace, table) => {
 };
 
 const prepareConnectionDataItem = (keyspace, tables) => {
-	let connectionDataItem = {
+	const connectionDataItem = {
 		dbName: keyspace,
 		dbCollections: tables
 	};
@@ -93,10 +94,24 @@ const getTableSchema = (columns, udtHash) => {
 	return { properties: schema };
 };
 
-const scanRecords = (keyspace, table) => {
-	const options = { prepare : true , fetchSize : 1000 };
-	const query = `SELECT * FROM "${keyspace}"."${table}"`;
-	return execute(query);
+const scanRecords = (keyspace, table, recordSamplingSettings) => {
+	const defaultCount = 1000;
+	const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}"`;
+	
+	return execute(query)
+	.then(count => new Promise((resolve, reject) => {
+		const rowsCount = _.get(count, 'count.rows[0].count', defaultCount);
+		const size = getSampleDocSize(rowsCount, recordSamplingSettings)
+		const options = { prepare : true , autoPage: true };
+		const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
+		let rows = [];
+		
+		state.client.eachRow(selQuery, [], options, function(n, row) {
+			rows.push(row)
+		}, (err, rs) => {
+			return (err ? reject(err) : resolve(rows))
+		});
+	}));
 };
 
 
@@ -148,7 +163,7 @@ const handlePartitionKeys = (partitionKeys) => {
 
 const handleClusteringKeys = (table) => {
 	return (table.clusteringKeys || []).map((item, index) => {
-		let clusteringOrder = table.clusteringOrder ? table.clusteringOrder[index] : '';
+		const clusteringOrder = table.clusteringOrder ? table.clusteringOrder[index] : '';
 		return {
 			name: item.name,
 			type: getKeyOrder(clusteringOrder)
@@ -243,8 +258,6 @@ const handleUDA = (uda) => {
 	return udaData;
 };
 
-
-
 const getPackageData = (data, includeEmptyCollection) => {
 	let packageData = {
 		dbName: data.keyspaceName,
@@ -280,15 +293,13 @@ const filterKeyspaces = (keyspaces, systemKeyspaces) => {
 	return _.difference(keyspaces, systemKeyspaces || []);
 };
 
-/*
+
 const getSampleDocSize = (count, recordSamplingSettings) => {
-	let per = recordSamplingSettings.relative.value;
+	const per = recordSamplingSettings.relative.value;
 	return (recordSamplingSettings.active === 'absolute')
 		? recordSamplingSettings.absolute.value
 			: Math.round( count/100 * per);
 };
-
-*/
 
 module.exports = {
 	connect,

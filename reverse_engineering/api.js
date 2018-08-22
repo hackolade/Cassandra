@@ -4,7 +4,6 @@ const async = require('async');
 const cassandra = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 
-
 module.exports = {
 	connect: function(connectionInfo, logger, cb){
 		logger.clear();
@@ -53,9 +52,7 @@ module.exports = {
 	
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;
-		const fieldInference = data.fieldInference;
 		const includeEmptyCollection = data.includeEmptyCollection;
-		const includeSystemCollection = data.includeSystemCollection;
 		const recordSamplingSettings = data.recordSamplingSettings;
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
@@ -110,11 +107,11 @@ module.exports = {
 							return packageData;
 						})
 						.then(packageData => {
-							return packageData && columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName) : null;
+							return packageData && columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings) : null;
 						})
 						.then(columns => {
 							if (columns) {
-								packageData.documents = columns.rows;
+								packageData.documents = columns;
 							}
 							return tableCallback(null, packageData);
 						})

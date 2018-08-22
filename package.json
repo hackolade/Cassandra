@@ -1,10 +1,10 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.9",
-	"versionDate": "2018-04-18",
+	"version": "0.1.11",
+	"versionDate": "2018-08-18",
 	"author": "hackolade",
 	"engines": {
-		"hackolade": "2.0.x",
+		"hackolade": "2.1.x",
 		"hackoladePlugin": "1.1.0"
 	},
 	"contributes": {
@@ -15,7 +15,7 @@
 				"2.0.x",
 				"2.1.x",
 				"3.0.x",
-				"3.1.x",
+				"3.11.x",
 				"DSE 4.8.x",
 				"DSE 5.0.x",
 				"DSE 5.1.x",

@@ -115,7 +115,7 @@ making sure that you maintain a proper JSON format.
 			"foreignField",
 			"relationshipType",
 			{
-				"propertyName": "Mode",
+				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
 				"shouldValidate": false,
 				"propertyType": "select",
@@ -197,7 +197,7 @@ making sure that you maintain a proper JSON format.
 			"relationshipType",
 			"default",
 			{
-				"propertyName": "Mode",
+				"propertyName": "Subtype",
 				"propertyKeyword": "mode",
 				"shouldValidate": false,
 				"propertyType": "select",

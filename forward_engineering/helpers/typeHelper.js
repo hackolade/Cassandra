@@ -53,7 +53,7 @@ const getScalarType = (type) => {
 			return (type === "integer") ? "int" : type;
 		})
 		("binary", () => "blob")
-		("boolean", simpleType)
+		("bool", () => "boolean")
 		("blob", simpleType)
 		("timestamp", simpleType)
 		("date", simpleType)

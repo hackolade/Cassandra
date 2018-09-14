@@ -101,10 +101,15 @@ const scanRecords = (keyspace, table, recordSamplingSettings) => {
 	return execute(query)
 	.then(count => new Promise((resolve, reject) => {
 		const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);
+		let rows = [];
+
+		if (!rowsCount) {
+			return resolve(rows);
+		}
+
 		const size = getSampleDocSize(rowsCount, recordSamplingSettings)
 		const options = { prepare : true , autoPage: true };
 		const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
-		let rows = [];
 		
 		state.client.eachRow(selQuery, [], options, function(n, row) {
 			rows.push(row)

@@ -54,6 +54,10 @@ const handleMap = (appType, column) => {
 		[defaultColumnName]: handledValueData
 	};
 
+	if (handledKeyData.mode) {
+		appType.keySubtype = handledKeyData.mode;
+	}
+
 	return appType;
 };
 

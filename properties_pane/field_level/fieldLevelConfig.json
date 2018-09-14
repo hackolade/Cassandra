@@ -908,6 +908,43 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "Key subtype",
+				"propertyKeyword": "keySubtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"text",
+					"varchar",
+					"ascii",
+					"inet"
+				],
+				"dependency": {
+					"key": "keyType",
+					"value": "char"
+				}
+			},
+			{
+				"propertyName": "Key subtype",
+				"propertyKeyword": "keySubtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					"integer",
+					"bigint",
+					"smallint",
+					"tinyint",
+					"counter",
+					"decimal",
+					"double",
+					"float",
+					"varint"
+				],
+				"dependency": {
+					"key": "keyType",
+					"value": "numeric"
+				}
+			},
+			{
 				"propertyName": "Subtype",
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,

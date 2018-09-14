@@ -105,6 +105,17 @@ const eachField = (jsonSchema, callback) => {
 	return resultSchema;
 };
 
+const canTypeHaveSubtype = (type, subtype) => {
+	const subtypeConfig = getFieldConfig(type, "mode") || {};
+
+	if (!Array.isArray(subtypeConfig.options)) {
+		return false;
+	}
+
+	const hasSubtype = subtypeConfig.options.includes(subtype);
+
+	return hasSubtype;
+};
 
 module.exports = {
 	tab,
@@ -118,5 +129,6 @@ module.exports = {
 	getFieldConfig,
 	getTypeConfig,
 	getNameWithKeyspace,
-	eachField
+	eachField,
+	canTypeHaveSubtype
 };

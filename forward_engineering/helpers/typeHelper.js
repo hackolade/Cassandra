@@ -1,6 +1,6 @@
 'use strict'
 
-const { getFieldConfig, getTypeConfig } = require('./generalHelper');
+const { getFieldConfig, getTypeConfig, canTypeHaveSubtype } = require('./generalHelper');
 
 const ifType = type => {
 	let result;
@@ -28,6 +28,7 @@ const getModeType = (type, defaultType, udtTypeMap) => {
 			mode: definedType,
 			frozen: true,
 			keyType: "char",
+			keySubtype: "text",
 			items: { type: "char", mode: "varchar" },
 			properties: { field: { type: "char", mode: "varchar" } }
 		});
@@ -147,7 +148,9 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 	};
 
 	const map = (propertyData, propertyName) => {
-		const keyType = getModeType(propertyData.keyType, "text", udtTypeMap);
+		const keyType = canTypeHaveSubtype(propertyData.keyType, propertyData.keySubtype)
+			? propertyData.keySubtype
+			: getModeType(propertyData.keyType, "text", udtTypeMap);
 		const valueType = getValueTypeFromObject(propertyData, "text", udtTypeMap, propertyName);
 
 		return `map<${keyType}, ${valueType}>`;

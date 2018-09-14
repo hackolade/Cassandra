@@ -2,7 +2,7 @@
 	"name": "bool",
 	"erdAbbreviation": "<bool>",
 	"dtdAbbreviation": "{0/1}",
-	"parentType": "bool",
+	"parentType": "boolean",
 	"sample": true,
 	"useSample": true,
 	"defaultValues": {

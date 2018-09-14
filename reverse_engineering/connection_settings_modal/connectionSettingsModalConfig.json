@@ -52,7 +52,8 @@
 			{
 				"inputLabel": "Password",
 				"inputKeyword": "password",
-				"inputType": "password"
+				"inputType": "password",
+				"isHiddenKey": true
 			}
 		]	
 	}

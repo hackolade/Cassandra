@@ -6,7 +6,7 @@
 	"MAIN_MENU___ADD_ATTRIBUTE": "Add Column",
 	"MAIN_MENU___INSERT_FIELD": "Insert Column",
 	"MAIN_MENU___APPEND_FIELD": "Append Column",
-	"MAIN_MENU___REVERSE_DB_COLLECTIONS": "Cassandra keyspaces...",
+	"MAIN_MENU___REVERSE_DB_COLLECTIONS": "Cassandra Tables...",
 	"MAIN_MENU___FORWARD_DB_COLLECTIONS": "CQL of Table",
 	"MAIN_MENU___FORWARD_DB_BUCKETS": "CQL of Keyspace",
 	"TOOLBAR___ADD_BUCKET": "Add keyspace",

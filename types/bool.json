@@ -1,5 +1,5 @@
 {
-	"name": "boolean",
+	"name": "bool",
 	"erdAbbreviation": "<bool>",
 	"dtdAbbreviation": "{0/1}",
 	"parentType": "boolean",

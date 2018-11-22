@@ -3,14 +3,65 @@
 	"erdAbbreviation": "<map>",
 	"dtdAbbreviation": "{...}",
 	"parentType": "document",
-	"sample": ["sample"],
 	"useSample": true,
-	"defaultValues": { 
+	"defaultValues": {
+		"subtype": "map<str>",
+		"keyType": "char",
+		"keySubtype": "text",
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],
 		"minProperties": "",
 		"maxProperties": "",
 		"additionalProperties": false
+	},
+	"subtypes": {
+		"map<str>": {
+			"childValueType": "char"
+		},
+		"map<num>": {
+			"childValueType": "numeric"
+		},
+		"map<blob>": {
+			"childValueType": "blob"
+		},
+		"map<ts>": {
+			"childValueType": "timestamp"
+		},
+		"map<date>": {
+			"childValueType": "date"
+		},
+		"map<set>": {
+			"childValueType": "set"
+		},
+		"map<list>": {
+			"childValueType": "list"
+		},
+		"map<tuple>": {
+			"childValueType": "tuple"
+		},
+		"map<map>": {
+			"childValueType": "map"
+		}
+	},
+	"keyTypes": {
+		"char": {
+			"childValueName": "New column"
+		},
+		"numeric": {
+			"childValueName": "12345"
+		},
+		"blob": {
+			"childValueName": "0xFFFE"
+		},
+		"timestamp": {
+			"childValueName": "2011-02-03 04:05:00+0000"
+		},
+		"time": {
+			"childValueName": "08:45:12.123123"
+		},
+		"date": {
+			"childValueName": "2014-12-03"
+		}
 	}
 }

@@ -1,6 +1,6 @@
 const { tab, retrieveContainerName, retrivePropertyFromConfig } = require('./generalHelper'); 
 
-const getCreateStatement = (name, replication, durableWrites) => `CREATE KEYSPACE IF NOT EXISTS "${name}" \n${tab(replication)}\n${durableWrites};`;
+const getCreateStatement = (name, replication, durableWrites) => `USE "${name}"; \n\nCREATE KEYSPACE IF NOT EXISTS "${name}" \n${tab(replication)}\n${durableWrites};`;
 
 const getSimpleStrategy = (factor) => `'class' : 'SimpleStrategy',\n'replication_factor' : ${factor}`;
 

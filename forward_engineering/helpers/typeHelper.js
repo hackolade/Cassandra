@@ -66,7 +66,7 @@ const getScalarType = (type, udtTypeMap) => {
 		("DateRangeType", (propertyData) => `'${simpleType(propertyData)}'`)
 		("geospatial", geoSpatialType)
 		("udt", (propertyData, propertyName) => {
-			return getUDTHandler(propertyName, udtTypeMap)(); //propertyData.code || propertyName;
+			return getUDTHandler(propertyName, udtTypeMap)();
 		})
 		("jsonObject", getJsonType)
 		("jsonArray", getJsonType)

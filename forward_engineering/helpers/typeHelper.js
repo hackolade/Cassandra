@@ -37,7 +37,7 @@ const getModeType = (type, defaultType, udtTypeMap) => {
 	return defaultType;
 };
 
-const getScalarType = (type) => {
+const getScalarType = (type, udtTypeMap) => {
 	const simpleType = (propertyData) => propertyData.type;
 	const geoSpatialType = (propertyData) => `'${propertyData.subType || "PointType"}'`;
 	const getJsonType = (propertyData) => {
@@ -66,7 +66,7 @@ const getScalarType = (type) => {
 		("DateRangeType", (propertyData) => `'${simpleType(propertyData)}'`)
 		("geospatial", geoSpatialType)
 		("udt", (propertyData, propertyName) => {
-			return propertyData.code || propertyName;
+			return getUDTHandler(propertyName, udtTypeMap)(); //propertyData.code || propertyName;
 		})
 		("jsonObject", getJsonType)
 		("jsonArray", getJsonType)
@@ -165,13 +165,21 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 };
 
 const getUDTHandler = (type, udtTypeMap) => {
-	return () => udtTypeMap[type];
+	return () => {
+		const data = (udtTypeMap[type] || {});
+
+		if (data.frozen) {
+			return getFrozen(data.name);
+		} else {
+			return data.name;
+		}
+	};
 };
 
 const getFrozen = (typeDefinition) => typeDefinition === undefined ? undefined : `frozen<${typeDefinition}>`;
 
 const getHandlerByType = (type, udtTypeMap) => (
-	getScalarType(type)
+	getScalarType(type, udtTypeMap)
 	||
 	getStructuralTypeHandler(type, true, udtTypeMap)
 	||
@@ -180,7 +188,7 @@ const getHandlerByType = (type, udtTypeMap) => (
 
 const getNestedTypeByData = (propertyData, isNeedToBeFrozen, udtTypeMap, propertyName) => {
 	const type = getTypeByPropertyData(propertyData);
-	const scalarTypeHandler = getScalarType(type);
+	const scalarTypeHandler = getScalarType(type, udtTypeMap);
 
 	if (scalarTypeHandler) {
 		return scalarTypeHandler(propertyData, propertyName);

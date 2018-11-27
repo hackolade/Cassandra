@@ -4,13 +4,21 @@ const { tab, getNameWithKeyspace, eachField } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 
 const getUdtScripts = (keyspaceName, sources, udtMap) => {
+	const copyUdtTypeMap = setFrozenForAllUdt(udtMap);
+
 	return sources.reduce((definitions, source) => {
-		const udts = getAllUdt(source, udtMap).map(({ name, definition }) => {
+		const udts = getAllUdt(source, copyUdtTypeMap).map(({ name, definition }) => {
 			return getCreateTypeStatement(keyspaceName, name, definition);
 		});
 
 		return definitions.concat(udts);
 	}, []);
+};
+
+const setFrozenForAllUdt = (udtTypeMap) => {
+	return Object.keys(udtTypeMap).reduce((typeMap, typeName) => {
+		return Object.assign(typeMap, { [typeName]: Object.assign({}, udtTypeMap[typeName], { frozen: true }) })
+	}, {});
 };
 
 const getName = (name, property) => {
@@ -25,7 +33,10 @@ const getUdtMap = (udtSources) => {
 	return udtSources.reduce((map, source) => {
 		eachField(source, (field, fieldName) => {
 			if (field.type === 'udt') {
-				map[fieldName] = getName(fieldName, field);
+				map[fieldName] = {
+					name: getName(fieldName, field),
+					frozen: field.frozen
+				};
 			}
 
 			return field;

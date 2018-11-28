@@ -63,7 +63,62 @@ const getAllUdt = (jsonSchema, udtTypeMap) => {
 	return udts;
 };
 
+const sortUdt = (definitionJsonSchema) => {
+	if (!definitionJsonSchema.properties) {
+		return definitionJsonSchema;
+	}
+
+	const udtNames = Object.keys(definitionJsonSchema.properties);
+	let orderedUdtNames = [];
+	
+	udtNames.forEach(udtName => {
+		let references = [];
+
+		eachField(definitionJsonSchema.properties[udtName], (field) => {
+			if (field.$ref) {
+				const udtName = field.$ref.split('/').pop();
+				
+				if (references.indexOf(udtName) === -1) {
+					references.push(udtName);
+				}
+			}
+		});
+
+		if (references.length) {
+			orderedUdtNames.push(...references.filter(name => orderedUdtNames.indexOf(name) === -1));
+		} else {
+			const i = orderedUdtNames.indexOf(udtName);
+
+			if (i === -1) {
+				orderedUdtNames.unshift(udtName);
+			} else {
+				orderedUdtNames.unshift(...orderedUdtNames.splice(i, 1));
+			}
+		}
+	});
+
+
+	udtNames.forEach(udtName => {
+		if (orderedUdtNames.indexOf(udtName) === -1) {
+			orderedUdtNames.push(udtName);
+		}
+	});
+
+	let properties = {};
+
+	orderedUdtNames.forEach(udtName => {
+		if (definitionJsonSchema.properties[udtName]) {
+			properties[udtName] = Object.assign({}, definitionJsonSchema.properties[udtName]);
+		}
+	});
+
+	definitionJsonSchema.properties = properties;
+
+	return definitionJsonSchema;
+};
+
 module.exports = {
 	getUdtScripts,
-	getUdtMap
+	getUdtMap,
+	sortUdt
 };

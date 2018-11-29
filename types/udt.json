@@ -10,6 +10,7 @@
 		"properties": [],
 		"minProperties": "",
 		"maxProperties": "",
+		"frozen": true,
 		"additionalProperties": false
 	}
 }

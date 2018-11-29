@@ -23,7 +23,7 @@ module.exports = {
 		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
 		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
 		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
-		const tableComment = "";
+		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
 		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "tableOptions", "");
 
 		const partitionKeysHash = getNamesByIds(

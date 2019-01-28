@@ -12,7 +12,14 @@ const connect = (info) => {
 		const password = info.password;
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-		state.client = new cassandra.Client({ contactPoints, authProvider });
+		const readTimeout = 60 * 1000;
+		state.client = new cassandra.Client({
+			contactPoints,
+			authProvider,
+			socketOptions: {
+				readTimeout
+			}
+		});
 	}
 	
 	return state.client.connect();

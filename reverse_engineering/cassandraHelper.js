@@ -41,17 +41,17 @@ const getKeyspaceInfo = (keyspace) => {
 	const strategy = metaData.strategy.split('.').slice(-1).pop();
 	let keyspaceInfo = {
 		code: keyspace,
-		durableWrites: metaData.durableWrites,
+		durableWrites: Boolean(metaData.durableWrites),
 		replStrategy: strategy
 	};
 
 	if (strategy === 'SimpleStrategy') {
-		keyspaceInfo.replFactor = metaData.strategyOptions.replication_factor;
+		keyspaceInfo.replFactor = Number(metaData.strategyOptions.replication_factor);
 	} else if (strategy === 'NetworkTopologyStrategy') {
 		keyspaceInfo.dataCenters = Object.keys(metaData.strategyOptions).map(key => {
 			return {
 				dataCenterName: key,
-				replFactorValue: metaData.strategyOptions[key]
+				replFactorValue: Number(metaData.strategyOptions[key])
 			};
 		});
 	}

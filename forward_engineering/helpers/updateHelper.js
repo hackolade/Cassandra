@@ -9,109 +9,144 @@ const getUpdate = updateData => getDelete(updateData) + getAdd(updateData);
 const objectContainProp = (object, key) => object[key] ? true : false;
 const getAnd = data => ` AND ${data.key} = "${data.value}"`
 const getChangeOption = changeData => {
-    let script = '';
+    let alterTableScript = '';
     const firstModified = changeData.modified.shift();
     const firstKey = Object.keys(firstModified)[0];
     const firstValue = firstModified[firstKey];
 
-    script += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = "${firstValue}"`;
+    alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
 
     if (changeData.modified.length) {
-        script += '\n' + changeData.modified.map((element) => {
-            const key = Object.keys(element)[0];
-            const value = element[key];
-            return getAnd({ key, value });
-        }).join('\n');
+        return alterTableScript += ';\n\n';
     }
 
-    return script += ';\n\n'
+    alterTableScript += '\n' + changeData.modified.map((element) => {
+        const key = Object.keys(element)[0];
+        const value = element[key];
+        return getAnd({ key, value });
+    }).join('\n');
+
+    return alterTableScript += ';\n\n';
 };
 
 const handleChange = (child, udtMap, generator, data) => {
-    let script = '';
+    let alterTableScript = '';
+
     if (objectContainProp(child, 'items') && child.items.length) {
         child.items.forEach(element => {
-            script += handleItem(element, udtMap, generator, data);
+            alterTableScript += handleItem(element, udtMap, generator, data);
         });
     } else if (objectContainProp(child, 'items')) {
-        script += handleItem(child.items, udtMap, generator, data);
+        alterTableScript += handleItem(child.items, udtMap, generator, data);
     }
 
-    return script;
+    return alterTableScript;
 }
 
-const handleOptions = () => {
+const handleOptions = (generator, itemCompModData, tableName) => {
+    let alterTableScript = '';
 
+    if (generator.name !== 'getUpdate' || !itemCompModData) {
+        return alterTableScript;
+    }
+
+    if (itemCompModData.modified) {
+        alterTableScript += getChangeOption({
+            keySpace: itemCompModData.keyspaceName,
+            tableName: tableName,
+            modified: itemCompModData.modified
+        });
+    }
+
+    return alterTableScript;
 }
 
-handleItem = (item, udtMap, generator, data) => {
-    let script = '';
-    if (objectContainProp(item, 'properties')) {
-        for (let key in item.properties) {
-            if (generator.name === 'getUpdate' && item.properties[key].role.compMod) {
-                if (item.properties[key].role.compMod.modified) {
-                    const keySpace = item.properties[key].role.compMod ? item.properties[key].role.compMod.keyspaceName : '';
-                    const data = {
-                        keySpace: keySpace,
-                        tableName: key,
-                        modified: item.properties[key].role.compMod.modified
-                    }
-                    script += getChangeOption(data);
-                }
-            }
+const handleItem = (item, udtMap, generator, data) => {
+    let alterTableScript = '';
 
-            if (!item.properties[key].role.compMod.deleted && !item.properties[key].role.compMod.created) {
-                if (item.properties[key].properties) {
-                    for (let column in item.properties[key].properties) {
-                        item.properties[key].properties[column] = getTypeByData(item.properties[key].properties[column], udtMap, column);
-                        const keySpace = item.properties[key].role.compMod ? item.properties[key].role.compMod.keyspaceName : '';
+    if (!objectContainProp(item, 'properties')) {
+        return alterTableScript;
+    }
 
-                        const data = {
-                            keySpace: keySpace,
-                            tableName: key,
-                            columnData: {
-                                name: column,
-                                type: item.properties[key].properties[column]
-                            }
-                        }
-                        script += generator(data);
-                    }
-                }
-            }
+    const itemProperties = item.properties;
+
+    alterTableScript += Object.keys(itemProperties).reduce((alterTableScript, tableName) => {
+        const itemCompModData = itemProperties[tableName].role.compMod;
+
+        if (!itemCompModData) {
+            return alterTableScript;
         }
-    }
 
-    return script;
+        const tableProperties = item.properties[tableName].properties;
+
+        alterTableScript += handleOptions(generator, itemCompModData, tableName);
+
+        if (itemCompModData.deleted) {
+            return alterTableScript;
+        }
+
+        if (!tableProperties) {
+            return alterTableScript;
+        }
+
+        alterTableScript += handlePropeties({ generator, tableProperties, udtMap, itemCompModData, tableName });
+
+        return alterTableScript;
+    }, '');
+
+    return alterTableScript;
+}
+
+const handlePropeties = ({ generator, tableProperties, udtMap, itemCompModData, tableName }) => {
+    return Object.keys(tableProperties).reduce((alterTableScript, columnName) => {
+        const columnData = getTypeByData(tableProperties[columnName], udtMap, columnName);
+        let keyspaceName;
+
+        if (itemCompModData && itemCompModData.keyspaceName) {
+            keyspaceName = itemCompModData.keyspaceName;
+        };
+
+        alterTableScript += generator({
+            keySpace: keyspaceName,
+            tableName: tableName,
+            columnData: {
+                name: columnName,
+                type: columnData
+            }
+        });
+
+        return alterTableScript;
+    }, '');
 }
 
 const getAlterTableScript = (child, udtMap, data) => {
-    let atScript = '';
+    let alterTableScript = '';
 
     if (objectContainProp(child, 'properties')) {
-        atScript += getAlterTableScript(child.properties, udtMap, data);
+        alterTableScript += getAlterTableScript(child.properties, udtMap, data);
     }
 
     if (objectContainProp(child, 'items')) {
-        atScript += getAlterTableScript(child.items, udtMap, data);
+        alterTableScript += getAlterTableScript(child.items, udtMap, data);
     }
 
     if (objectContainProp(child, 'entities')) {
-        atScript += getAlterTableScript(child.entities, udtMap, data);
+        alterTableScript += getAlterTableScript(child.entities, udtMap, data);
     }
 
     if (objectContainProp(child, 'modified')) {
-        atScript += handleChange(child.modified, udtMap, getUpdate, data);
+        alterTableScript += handleChange(child.modified, udtMap, getUpdate, data);
     }
 
     if (objectContainProp(child, 'deleted')) {
-        atScript += handleChange(child.deleted, udtMap, getDelete, data);
+        alterTableScript += handleChange(child.deleted, udtMap, getDelete, data);
     }
 
     if (objectContainProp(child, 'added')) {
-        atScript += handleChange(child.added, udtMap, getAdd, data);
+        alterTableScript += handleChange(child.added, udtMap, getAdd, data);
     }
 
-    return atScript;
+    return alterTableScript;
 }
 
 module.exports = {

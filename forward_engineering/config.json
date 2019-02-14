@@ -6,5 +6,6 @@
 	"level": {
 		"entity": true,
 		"container": true
-	}
+	},
+	"applyScriptToInstance": true
 }

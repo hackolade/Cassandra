@@ -313,6 +313,42 @@ const getSampleDocSize = (count, recordSamplingSettings) => {
 			: Math.round( count/100 * per);
 };
 
+const batch = (script, progress) => {
+	const queries = script
+		.split(';')
+		.map(query => query.trim())
+		.filter(Boolean);
+
+	const totalQueries = queries.length;
+	let currentQuery = 0;
+
+	return promiseSeriesAll(
+		queries.map(query => () => state.client.execute(query)),
+		(result) => {
+			const query = queries[currentQuery];
+
+			progress(query, result, currentQuery, totalQueries);
+
+			currentQuery++;
+		}
+	).then(
+		result => result,
+		error => Promise.reject({ error, query: queries[currentQuery] })
+	);
+};
+
+const promiseSeriesAll = (promises, callback) => {
+	if (!promises.length) {
+		return Promise.resolve();
+	}
+
+	return promises[0]().then(result => {
+		callback(result);
+
+		return promiseSeriesAll(promises.slice(1), callback);
+	});
+};
+
 module.exports = {
 	connect,
 	close,
@@ -333,5 +369,6 @@ module.exports = {
 	handleUDA,
 	getPackageData,
 	prepareError,
-	filterKeyspaces
+	filterKeyspaces,
+	batch
 };

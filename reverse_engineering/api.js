@@ -127,5 +127,53 @@ module.exports = {
 		}, (err, res) => {
 			return cb(err, res);
 		});
+	},
+
+	applyToInstance(connectionInfo, logger, cb) {
+		const script = connectionInfo.script;
+
+		this.connect(connectionInfo, logger, (err) => {
+			if (err) {
+				logger.log('error', {
+					error: err
+				}, 'Cassandra script');
+
+				return cb(cassandra.prepareError(err));
+			}
+
+			logger.log('info', {
+				message: 'Applying cassandra script has been started'
+			}, 'Cassandra script');	
+
+			cassandra.batch(script, (query, result, i, total) => {
+				logger.log('info', {
+					message: `Completed queries: ${i + 1} / ${total}`
+				});
+			})
+				.then(result => {
+					logger.log('info', {
+						message: 'Cassandra script has been applied successfully!'
+					}, 'Cassandra script');
+					cb(null);
+				}, ({ error, query }) => {
+					const preparedError = cassandra.prepareError(error);
+					logger.log('error', {
+						query: query,
+						error: preparedError,
+						detail: error
+					}, "Cassandra script: query has been executed with error");
+
+					cb(preparedError);
+				})
+				.catch(err => {
+					const error = cassandra.prepareError(err);
+					logger.log('error', {
+						error: error,
+						detail: err
+					}, "Cassandra script");
+
+					cb(error);
+				});
+		})
 	}
 };

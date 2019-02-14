@@ -142,15 +142,25 @@ const getEntityLevelData = (table, tableName) => {
 	};
 };
 
+const changeQuotes = (str) => {
+	return String(str).replace(/\"/g, '\'');
+};
+
+const getCompaction = (data) => {
+	return Object.assign({}, data.compactionOptions, {
+		class: data.compactionClass
+	});
+};
+
 const getTableOptions = (table) => {
 	const options = [
 		`read_repair_chance = ${table.readRepairChance}`,
 		`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
 		`gc_grace_seconds = ${table.gcGraceSeconds}`,
 		`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
-		`caching = ${table.caching}`,
-		`compaction = ${JSON.stringify(table.compactionOptions)}`,
-		`compression = ${JSON.stringify(table.compression)}`,
+		`caching = ${changeQuotes(table.caching)}`,
+		`compaction = ${changeQuotes(JSON.stringify(getCompaction(table)))}`,
+		`compression = ${changeQuotes(JSON.stringify(table.compression))}`,
 		`default_time_to_live = ${table.defaultTtl}`,
 		`speculative_retry = '${table.speculativeRetry}'`,
 		`min_index_interval = ${table.minIndexInterval}`,
@@ -228,10 +238,12 @@ const getUDA = (keyspace) => {
 	return execute(query);
 };
 
+const removeFrozen = str => str.replace(/frozen\<(.*)\>/i, '$1')
+
 const handleUDF = (udf) => {
 	const udfData = udf.rows.map(item => {
 		const args = item.argument_names.map((name, index) => {
-			return `${name} ${item.argument_types[index] || ''}`;
+			return `${name} ${removeFrozen(item.argument_types[index] || '')}`;
 		}).join(', ');
 
 		const deterministic = item.deterministic ? 'DETERMINISTIC' : '';
@@ -239,7 +251,7 @@ const handleUDF = (udf) => {
 
 		const func = `CREATE OR REPLACE FUNCTION ${item.function_name} ( ${args} )
 			${item.called_on_null_input ? 'CALLED' : 'RETURNS NULL'} ON NULL INPUT
-			RETURNS ${item.return_type}  ${deterministic} ${monotonic}
+			RETURNS ${removeFrozen(item.return_type)}  ${deterministic} ${monotonic}
 			LANGUAGE ${item.language} AS
 			$$ ${item.body} $$ ;`;
 
@@ -253,11 +265,11 @@ const handleUDF = (udf) => {
 
 const handleUDA = (uda) => {
 	const udaData = uda.rows.map(item => {
-		const args = item.argument_types.join(', ');
+		const args = item.argument_types.map(removeFrozen).join(', ');
 		
 		const aggr = `CREATE AGGREGATE  ${item.aggregate_name} (${args})
 			SFUNC ${item.state_func}
-			STYPE ${item.state_type}
+			STYPE ${removeFrozen(item.state_type)}
 			FINALFUNC ${item.final_func}
 			INITCOND ${item.initcond}
 			${item.deterministic ? 'DETERMINISTIC' : ''};`;
@@ -313,6 +325,59 @@ const getSampleDocSize = (count, recordSamplingSettings) => {
 			: Math.round( count/100 * per);
 };
 
+const splitScriptByQueries = (script) => {
+	const findFunctionStatements = (script) => {
+		return (script.match(/\$\$([\s\S]+?)\$\$/g) || [])
+			.map(item => item.trim().replace(/(^\$\$|\$\$$)/g, ''));
+	};
+	const getPlaceholder = (n) => `\$__HACKOLADE__PLACEHOLDER_${n}__\$`;
+	const functionStatements = findFunctionStatements(script);
+
+	const queries = functionStatements.reduce((script, func, i) => {
+		return script.replace(func, getPlaceholder(i));
+	}, script)
+		.split(';')
+		.map(query => query.trim())
+		.filter(Boolean);
+
+	return functionStatements.reduce((queries, func, i) => {
+		return queries.map(query => query.replace(getPlaceholder(i), func));
+	}, queries);
+};
+
+const batch = (script, progress) => {
+	const queries = splitScriptByQueries(script);
+
+	const totalQueries = queries.length;
+	let currentQuery = 0;
+
+	return promiseSeriesAll(
+		queries.map(query => () => state.client.execute(query)),
+		(result) => {
+			const query = queries[currentQuery];
+
+			progress(query, result, currentQuery, totalQueries);
+
+			currentQuery++;
+		}
+	).then(
+		result => result,
+		error => Promise.reject({ error, query: queries[currentQuery] })
+	);
+};
+
+const promiseSeriesAll = (promises, callback) => {
+	if (!promises.length) {
+		return Promise.resolve();
+	}
+
+	return promises[0]().then(result => {
+		callback(result);
+
+		return promiseSeriesAll(promises.slice(1), callback);
+	});
+};
+
 module.exports = {
 	connect,
 	close,
@@ -333,5 +398,6 @@ module.exports = {
 	handleUDA,
 	getPackageData,
 	prepareError,
-	filterKeyspaces
+	filterKeyspaces,
+	batch
 };

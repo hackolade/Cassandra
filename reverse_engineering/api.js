@@ -62,10 +62,14 @@ module.exports = {
 			
 			cassandra.getUDF(keyspaceName)
 			.then(udf => {
+				logger.progress({ message: 'UDF has loaded', containerName: keyspaceName, entityName: '' });
+
 				udfData = cassandra.handleUDF(udf);
 				return cassandra.getUDA(keyspaceName)
 			})
 			.then(uda => {
+				logger.progress({ message: 'UDA has loaded', containerName: keyspaceName, entityName: '' });
+
 				let udaData = cassandra.handleUDA(uda);
 				pipeline(udaData, udfData);
 			})
@@ -86,6 +90,8 @@ module.exports = {
 					return keyspaceCallback(null, packageData);
 				} else {
 					async.map(tableNames, (tableName, tableCallback) => {
+						logger.progress({ message: 'Load meta data', containerName: keyspaceName, entityName: tableName });
+
 						let packageData = {
 							dbName: keyspaceName,
 							collectionName: tableName,
@@ -95,6 +101,8 @@ module.exports = {
 	
 						cassandra.getTableMetadata(keyspaceName, tableName)
 						.then(table => {
+							logger.progress({ message: 'Meta data has loaded', containerName: keyspaceName, entityName: tableName });
+
 							columns = table.columns;
 							packageData = cassandra.getPackageData({
 								keyspaceName,
@@ -107,9 +115,13 @@ module.exports = {
 							return packageData;
 						})
 						.then(packageData => {
+							logger.progress({ message: 'Start loading records', containerName: keyspaceName, entityName: tableName });
+
 							return packageData && columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings) : null;
 						})
 						.then(columns => {
+							logger.progress({ message: 'Records have loaded', containerName: keyspaceName, entityName: tableName });
+
 							if (columns) {
 								packageData.documents = columns;
 							}
@@ -125,6 +137,10 @@ module.exports = {
 				}
 			};
 		}, (err, res) => {
+			if (!err) {
+				logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
+			}
+
 			return cb(err, res);
 		});
 	},

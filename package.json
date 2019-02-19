@@ -5,7 +5,7 @@
 	"author": "hackolade",
 	"engines": {
 		"hackolade": "2.1.x",
-		"hackoladePlugin": "1.1.0"
+		"hackoladePlugin": "1.2.0"
 	},
 	"contributes": {
 		"target": {

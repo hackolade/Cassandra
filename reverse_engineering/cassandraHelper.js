@@ -89,10 +89,10 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 	return connectionDataItem;
 };
 
-const getTableSchema = (columns, udtHash) => {
+const getTableSchema = (columns, udtHash, sample = {}) => {
 	let schema = {};
 	columns.forEach(column => {
-		const columnType = typesHelper.getColumnType(column, udtHash);
+		const columnType = typesHelper.getColumnType(column, udtHash, sample[column.name]);
 		schema[column.name] = columnType;
 		schema[column.name].code = column.name;
 		schema[column.name].static = column.isStatic;
@@ -210,11 +210,12 @@ const handleUdts = (udts) => {
 	if (udts && udts.length) {
 		let schema = { properties: {}};
 
-		udts.forEach(udt => {
-			schema.properties[udt.name] = {
+		udts.forEach(({ udt, sample }) => {
+			const name = udt.type.info.name || udt.name;
+			schema.properties[name] = {
 				type: 'udt',
 				static: udt.isStatic,
-				properties: getTableSchema(udt.type.info.fields).properties
+				properties: getTableSchema(udt.type.info.fields, null, sample).properties
 			};
 		});
 		return schema;
@@ -286,7 +287,7 @@ const getPackageData = (data, includeEmptyCollection) => {
 	let packageData = {
 		dbName: data.keyspaceName,
 		collectionName: data.tableName,
-		documents: []
+		documents: data.records
 	};
 
 	if (data.table.columns && data.table.columns.length) {
@@ -294,16 +295,106 @@ const getPackageData = (data, includeEmptyCollection) => {
 		packageData.bucketInfo.UDFs = data.UDFs;
 		packageData.bucketInfo.UDAs = data.UDAs;
 		packageData.entityLevel = getEntityLevelData(data.table, data.tableName);
-		
-		const schema = getTableSchema(data.table.columns, data.udtHash);
+		const udtHash = [];
+		const mergedDocument = mergeDocuments(data.records);
+		const schema = getTableSchema(data.table.columns, udtHash, mergedDocument);
 		packageData.validation = {
 			jsonSchema: schema
 		};
-		packageData.modelDefinitions = handleUdts(data.udtHash);
+		packageData.documentTemplate = mergedDocument;
+		packageData.modelDefinitions = handleUdts(udtHash);
 	} else if (!includeEmptyCollection) {
 		packageData = null;
 	}
 	return packageData;
+};
+const mergeDocuments = (documents) => {
+	const split = (arr, f) => {
+		return arr.reduce((result, item) => {
+			if (f(item)) {
+				return [
+					result[0].concat([ item ]),
+					result[1]
+				];
+			} else {
+				return [
+					result[0],
+					result[1].concat([ item ])
+				];
+			}
+		}, [[], []]);
+	};
+	const uniqByType = (arr) => {
+		const hash = {};
+
+		return arr.reduce((result, item) => {
+			if (!hash[typeof item]) {
+				hash[typeof item] = true;
+
+				return result.concat([item]);
+			} else {
+				return result;
+			}
+		}, []);
+	};
+	const mergeByType = (arr) => {
+		const [arrays, noArrays] = split(arr, Array.isArray);
+		const [objects, rest] = split(noArrays, isObject);
+		const scalars = uniqByType(rest);
+		const mergedObject = objects.reduce(merge, {});
+		const result = scalars.concat(arrays.reduce(merge, []));
+
+		if (Object.keys(mergedObject).length) {
+			return result.concat([mergedObject]);
+		}
+
+		return result;
+	};
+	const isObject = (obj) => obj && typeof obj === 'object' && !Array.isArray(obj);
+	const mergeArray = (arr1, arr2) => {
+		const arr = arr1.concat(arr2);
+		if (!arr.length) {
+			return [];
+		}
+
+		return mergeByType(arr);
+	};
+	const mergeObjects = (obj1, obj2) => {
+		return Object.keys(obj1).concat(Object.keys(obj2)).reduce((result, key) => {
+			return Object.assign({}, result, {
+				[key]: merge(obj1[key], obj2[key])
+			});
+		}, {});
+	};
+	const merge = (doc1, doc2) => {
+		if (Array.isArray(doc1) && Array.isArray(doc2)) {
+			return mergeArray(doc1, doc2);
+		} else if (isObject(doc1) && isObject(doc2)) {
+			return mergeObjects(doc1, doc2);
+		} else if (Array.isArray(doc1)) {
+			return merge(doc1, []);
+		} else if (Array.isArray(doc2)) {
+			return merge([], doc2);
+		} else if (isObject(doc1)) {
+			return merge(doc1, {});
+		} else if (isObject(doc2)) {
+			return merge({}, doc2);
+		} else if (doc1 !== undefined) {
+			return doc1;
+		} else if (doc2 !== undefined) {
+			return doc2;
+		}
+	};
+
+	if (!Array.isArray(documents) || !documents.length) {
+		return {};
+	}
+	
+	try {
+		return JSON.parse(JSON.stringify(documents)).reduce(merge, {});
+	} catch (e) {
+		return {};
+	}
 };
 
 const prepareError = (error) => {

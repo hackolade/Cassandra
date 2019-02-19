@@ -7,78 +7,81 @@ const abbrHash = {
 };
 const defaultColumnName = defaultData.field.name;
 
-const getColumnType = (column, udtHash) => {
+const getColumnType = (column, udtHash, sample) => {
 	const fullCassandraType = types.getDataTypeNameByCode(column.type || column);
 	const cassandraType = fullCassandraType.split('<')[0];
 
 	if (udtHash && cassandraType === 'udt') {
-		udtHash.push(column);
+		udtHash.push({
+			udt: column,
+			sample
+		});
 		return getRef(column);
 	}
-	return getType(cassandraType, column);
+	return getType(cassandraType, column, sample, udtHash);
 };
 
 const getRef = (column) => {
-	return { type: 'reference' };
+	const name = column.type.info.name || column.name;
+
+	return { type: 'reference', $ref: name };
 };
 
-const getType = (cassandraType, column) => {
+const getType = (cassandraType, column, sample, udtHash) => {
 	let appType = getAppType(cassandraType);
 
 	if (cassandraType === 'map') {
-		handleMap(appType, column);
+		return handleMap(appType, column, sample, udtHash);
+	} else if (cassandraType === 'tuple') {
+		return handleTuple(appType, column, sample, udtHash);
+	} else if (cassandraType === 'set' || cassandraType === 'list') {
+		return handleList(appType, column, sample, udtHash);
+	} else {
+		return appType;
 	}
-
-	if (cassandraType === 'tuple') {
-		handleTuple(appType, column);
-	}
-
-	if (cassandraType === 'set' || cassandraType === 'list') {
-		handleList(appType, column);
-	}
-
-	return appType;
 };
 
-const handleMap = (appType, column) => {
+const handleMap = (appType, column, sample, udtHash) => {
 	const keyData = (column.info || column.type.info)[0];
 	const valueData = (column.info || column.type.info)[1];
 	const handledKeyData = getColumnType(keyData);
-	const handledValueData = getColumnType(valueData);
+	const properties = getProperties(valueData, sample, udtHash);
+	const keySubtype = handledKeyData.mode
+		? { keySubtype: handledKeyData.mode }
+		: {};
 	const keyType = handledKeyData.type;
-	const subtype = getSubType(appType.type, handledValueData.type);
+	const valueType = getChildTypeByProperties(properties);
+	const subtype = getSubType(appType.type, valueType);
 	
-	appType.keyType = keyType;
-	appType.subtype = subtype;
-	appType.properties = {
-		[defaultColumnName]: handledValueData
-	};
-
-	if (handledKeyData.mode) {
-		appType.keySubtype = handledKeyData.mode;
-	}
-
-	return appType;
+	return Object.assign({}, appType, keySubtype, {
+		keyType,
+		subtype,
+		properties
+	});
 };
 
-const handleTuple = (appType, column) => {
-	const valueData = (column.info || column.type.info).map(item => {
-		const valueData = item;
-		const handledValueData = getColumnType(valueData);
+const handleTuple = (appType, column, sample, udtHash) => {
+	sample = Array.isArray(sample) ? sample : [];
+
+	const items = (column.info || column.type.info).map(item => {
+		const sampleItem = sample.find(sampleItem => isTypeEqual(sampleItem, item));
+		const handledValueData = getColumnType(item, udtHash, sampleItem);
+
 		return handledValueData;
 	});
-	appType.items = valueData;
-	return appType;
+
+	return Object.assign({}, appType, { items });
 };
 
-const handleList = (appType, column) => {
+const handleList = (appType, column, sample, udtHash) => {
 	const valueData = (column.info || column.type.info);
-	const handledValueData = getColumnType(valueData);
-	const subtype = getSubType(appType.type, handledValueData.type);
+	const items = getItems(valueData, sample, udtHash);
+	const valueType = (items[0] || { type: 'text' }).type;
+	const subtype = getSubType(appType.type, valueType);
 
-	appType.subtype = subtype;
-	appType.items = [handledValueData];
-	return appType;
+	return Object.assign({}, appType, {
+		items, subtype
+	});
 };
 
 const getAppType = (type) => {
@@ -130,6 +133,98 @@ const getAppType = (type) => {
 const getSubType = (type, subType) => {
 	return `${type}<${abbrHash[subType] || subType}>`;
 }
+
+const getProperties = (valueData, sample, udtHash) => {
+	if (!sample || typeof sample !== 'object') {
+		return getDefaultProperties(valueData);
+	}
+
+	return Object.keys(sample).reduce((result, propertyName) => {
+		return Object.assign({}, result, {
+			[propertyName]: getColumnType(valueData, udtHash, sample[propertyName])
+		})
+	}, {});
+};
+
+const getDefaultProperties = (valueData) => {
+	const handledValueData = getColumnType(valueData);
+
+	return {
+		[defaultColumnName]: handledValueData
+	};
+};
+
+const getJsonType = (type) => {
+	switch(type) {
+		case "smallint":
+		case "tinyint":
+		case "int":
+		case "bigint":
+		case "counter":
+		case "decimal":
+		case "double":
+		case "float":
+		case "varint":
+			return 'number';
+		case "text":
+		case "varchar":
+		case "ascii":
+		case "inet":
+		case "timestamp":
+		case "timeuuid":
+		case "blob":
+		case "date":
+		case "time":
+		case "uuid":
+			return 'string';
+		case "boolean":
+			return 'boolean';
+		case "tuple":
+		case "list":
+		case "set":
+			return 'array';
+		case "map":
+			return 'object';
+		default:
+			return 'string';
+	}
+};
+
+const isTypeEqual = (value, valueData) => {
+	const fullCassandraType = types.getDataTypeNameByCode(valueData.type || valueData);
+	const cassandraType = fullCassandraType.split('<')[0];
+	const jsonType = getJsonType(cassandraType);
+
+	if (jsonType === 'array') {
+		return Array.isArray(value);
+	} else if (jsonType === 'array') {
+		return Object(value) === value;
+	} else {
+		return typeof value === jsonType;
+	}
+};
+
+const getItems = (valueData, sample, udtHash) => {
+	if (!Array.isArray(sample)) {
+		return getDefaultItems(valueData);
+	}
+
+	return sample.map(item => {
+		return getColumnType(valueData, udtHash, item);
+	});
+};
+
+const getDefaultItems = (valueData) => {
+	const handledValueData = getColumnType(valueData);
+
+	return [handledValueData];
+};
+
+const getChildTypeByProperties = (properties) => {
+	const key = Object.keys(properties).pop();
+
+	return (properties[key] || {}).type || 'text';
+};
 
 module.exports = {
     getColumnType

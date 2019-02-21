@@ -57,15 +57,18 @@ module.exports = {
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
 			const tableNames = tables[keyspaceName] || [];
-			let udtHash = [];
 			let udfData = [];
 			
 			cassandra.getUDF(keyspaceName)
 			.then(udf => {
+				logger.progress({ message: 'UDF has loaded', containerName: keyspaceName, entityName: '' });
+
 				udfData = cassandra.handleUDF(udf);
 				return cassandra.getUDA(keyspaceName)
 			})
 			.then(uda => {
+				logger.progress({ message: 'UDA has loaded', containerName: keyspaceName, entityName: '' });
+
 				let udaData = cassandra.handleUDA(uda);
 				pipeline(udaData, udfData);
 			})
@@ -91,41 +94,112 @@ module.exports = {
 							collectionName: tableName,
 							documents: []
 						};
-						let columns = [];
+						const loadProgress = progress.bind(null, logger, keyspaceName, tableName);
+						const exec = (promise, startMessage, finishMessage) => {
+							loadProgress(startMessage);
+							return promise.then(result => {
+								loadProgress(finishMessage);
+
+								return result;
+							});
+						};
 	
-						cassandra.getTableMetadata(keyspaceName, tableName)
-						.then(table => {
-							columns = table.columns;
+						Promise.all([
+							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
+							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings), 'Load records...', 'Records have loaded')
+						]).then(([table, records]) => {
+							logger.progress({ message: 'Meta data has loaded', containerName: keyspaceName, entityName: tableName });
+
 							packageData = cassandra.getPackageData({
 								keyspaceName,
 								table,
 								tableName,
-								udtHash,
 								UDFs,
-								UDAs
+								UDAs,
+								records
 							}, includeEmptyCollection);
+
 							return packageData;
 						})
-						.then(packageData => {
-							return packageData && columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings) : null;
-						})
-						.then(columns => {
-							if (columns) {
-								packageData.documents = columns;
-							}
-							return tableCallback(null, packageData);
-						})
-						.catch(tableCallback);
+						.then(
+							packageData => tableCallback(null, packageData),
+							err => tableCallback(err)
+						);
 					}, (err, res) => {
 						if (err) {
 							logger.log('error', cassandra.prepareError(err), "Error");
 						}
+
 						return keyspaceCallback(err, res)
 					});
 				}
 			};
 		}, (err, res) => {
+			if (!err) {
+				logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
+			}
+
 			return cb(err, res);
 		});
+	},
+
+	applyToInstance(connectionInfo, logger, cb) {
+		const script = connectionInfo.script;
+
+		this.connect(connectionInfo, logger, (err) => {
+			if (err) {
+				logger.log('error', {
+					error: err
+				}, 'Cassandra script');
+
+				return cb(cassandra.prepareError(err));
+			}
+
+			logger.log('info', {
+				message: 'Applying cassandra script has been started'
+			}, 'Cassandra script');	
+
+			cassandra.batch(script, (query, result, i, total) => {
+				logger.progress({
+					message: `Completed queries: ${i + 1} / ${total}`
+				});
+			})
+				.then(result => {
+					logger.log('info', {
+						message: 'Cassandra script has been applied successfully!'
+					}, 'Cassandra script');
+					cb(null);
+				}, ({ error, query }) => {
+					const preparedError = cassandra.prepareError(error);
+					logger.log('error', {
+						query: query,
+						error: preparedError,
+						detail: error
+					}, "Cassandra script: query has been executed with error");
+
+					logger.progress({
+						message: `Query has executed with error: \n ${query} \n ${error.message}`
+					});
+
+					cb(preparedError);
+				})
+				.catch(err => {
+					const error = cassandra.prepareError(err);
+					logger.log('error', {
+						error: error,
+						detail: err
+					}, "Cassandra script");
+
+					cb(error);
+				});
+		})
 	}
 };
+
+const progress = (logger, keyspace, table, message) => {
+	logger.progress({
+		containerName: keyspace,
+		entityName: table,
+		message: message
+	});
+}

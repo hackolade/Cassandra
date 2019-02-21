@@ -8,6 +8,11 @@ module.exports = {
 	connect: function(connectionInfo, logger, cb){
 		logger.clear();
 		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
+		if (!Array.isArray(connectionInfo.hosts)) {
+			return cb({ message: 'Hosts were not defined' });
+		}
+
 		cassandra.connect(connectionInfo).then(cb, cb);
 	},
 

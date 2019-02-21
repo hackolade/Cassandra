@@ -7,13 +7,13 @@ const getDelete = deleteData => `${alterPrefix(deleteData.tableName, deleteData.
 const getAdd = addData => `${alterPrefix(addData.tableName, addData.keySpace)} ${add(addData.columnData)}`;
 const getUpdate = updateData => getDelete(updateData) + getAdd(updateData);
 const objectContainsProp = (object, key) => object[key] ? true : false;
-const getAnd = data => ` AND ${data.key} = '${data.value}'`
+const getAnd = data => ` AND ${data.key} = '${data.value}'`;
 const getChangeOption = changeData => {
     const newOptions = getComparedOptions(changeData.options.new.split("\nAND "), changeData.options.old.split("\nAND "));
     let alterTableScript = '';
-    
+
     if (changeData.comment) {
-        alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment}'`;
+        alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment ? changeData.comment.new : changeData.comment.old}'`;
     } else {
         alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
     }
@@ -31,7 +31,7 @@ const getChangeOption = changeData => {
     return alterTableScript += ';\n\n';
 };
 
-const getComparedOptions = (oldOptions, newOptions) => {
+const getComparedOptions = (newOptions, oldOptions) => {
     const newOptionsDIf = newOptions.filter(newOption => {
         const inOld = oldOptions.filter((oldOption) => {
             return (newOption === oldOption);
@@ -40,9 +40,8 @@ const getComparedOptions = (oldOptions, newOptions) => {
         return inOld.length ? false : true;
     });
 
+    return newOptionsDIf.map((option) => {
 
-
-    return newOptionsDIf.map( (option) => {
         const key = option.split(' = ')[0];
         const value = option.split(' = ')[1];
 
@@ -71,12 +70,12 @@ const handleOptions = (generator, itemCompModData, tableName) => {
         return alterTableScript;
     }
 
-    if (itemCompModData.options) {
+    if (itemCompModData.tableOptions) {
         alterTableScript += getChangeOption({
             keySpace: itemCompModData.keyspaceName,
             tableName: tableName,
-            options: itemCompModData.options,
-            comment: itemCompModData.comment
+            options: itemCompModData.tableOptions,
+            comment: itemCompModData.comments
         });
     }
 
@@ -96,7 +95,7 @@ const handleItem = (item, udtMap, generator, data) => {
         .reduce((alterTableScript, tableName) => {
             const itemCompModData = itemProperties[tableName].role.compMod;
 
-            if (!itemCompModData) {
+            if (!itemCompModData || itemCompModData.created) {
                 return alterTableScript;
             }
 
@@ -115,7 +114,7 @@ const handleItem = (item, udtMap, generator, data) => {
             alterTableScript += handlePropeties({ generator, tableProperties, udtMap, itemCompModData, tableName });
 
             return alterTableScript;
-    }, '');
+        }, '');
 
     return alterTableScript;
 }
@@ -127,9 +126,9 @@ const handlePropeties = ({ generator, tableProperties, udtMap, itemCompModData, 
             let keyspaceName;
 
             if (itemCompModData && itemCompModData.keyspaceName) {
-                keyspaceName = itemCompModData.keyspaceName; 
+                keyspaceName = itemCompModData.keyspaceName;
             };
-        
+
             alterTableScript += generator({
                 keySpace: keyspaceName,
                 tableName: tableName,
@@ -140,7 +139,7 @@ const handlePropeties = ({ generator, tableProperties, udtMap, itemCompModData, 
             });
 
             return alterTableScript;
-    }, '');
+        }, '');
 }
 
 const getAlterTableScript = (child, udtMap, data) => {

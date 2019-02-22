@@ -100,6 +100,7 @@ const getClusteringKeys = (clusteringKeysHash) => {
 };
 
 const getOptions = (clusteringKeys, clusteringKeysHash, id, comment, tableOptions) => {
+	const changeQuotes = (str) => String(str || '').replace(/[\"\`]/g, '\'');
 	const getClusteringOrder = (clusteringKeys, clusteringKeysHash) => {
 		const order = (order) => (order === 'ascending') ? 'ASC' : 'DESC'; 
 		const orderString = clusteringKeys.map(key => {
@@ -119,7 +120,8 @@ const getOptions = (clusteringKeys, clusteringKeysHash, id, comment, tableOption
 	const parseTableOptions = (tableOptions) => (tableOptions || "")
 		.replace(/;$/, "")
 		.split('AND')
-		.map(option => String(option).trim())
+		.map(option => String(option || '').trim())
+		.map(changeQuotes)
 		.filter(option => option);
 
 	let options = [];

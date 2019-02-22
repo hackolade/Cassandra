@@ -8,14 +8,17 @@ const getAdd = addData => `${alterPrefix(addData.tableName, addData.keySpace)} $
 const getUpdate = updateData => getDelete(updateData) + getAdd(updateData);
 const objectContainsProp = (object, key) => object[key] ? true : false;
 const getAnd = data => ` AND ${data.key} = '${data.value}'`;
+
 const getChangeOption = changeData => {
     const newOptions = getComparedOptions(changeData.options.new.split("\nAND "), changeData.options.old.split("\nAND "));
     let alterTableScript = '';
 
-    if (changeData.comment) {
+    if (changeData.comment && changeData.comment.new !== changeData.comment.old) {
         alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment ? changeData.comment.new : changeData.comment.old}'`;
-    } else {
+    } else if(newOptions.length) {
         alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
+    } else {
+        return alterTableScript;
     }
 
     if (!newOptions.length) {

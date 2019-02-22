@@ -215,7 +215,7 @@ const modifyLineError = (error, wholeScript, query) => {
 
 	if (!lineRegExp.test(error.message)) {
 		return Object.assign({}, error, {
-			message: `line ${lineOffset}:0 ${error.message}`
+			message: `query line ${lineOffset}:0 ${error.message}`
 		});
 	}
 

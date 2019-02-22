@@ -175,7 +175,8 @@ module.exports = {
 					}, 'Cassandra script');
 					cb(null);
 				}, ({ error, query }) => {
-					const preparedError = cassandra.prepareError(error);
+					const err = modifyLineError(error, script, query);
+					const preparedError = cassandra.prepareError(err);
 					logger.log('error', {
 						query: query,
 						error: preparedError,
@@ -183,7 +184,7 @@ module.exports = {
 					}, "Cassandra script: query has been executed with error");
 
 					logger.progress({
-						message: `Query has executed with error: \n ${query} \n ${error.message}`
+						message: `Query has executed with error: \n ${query} \n ${err.message}`
 					});
 
 					cb(preparedError);
@@ -199,6 +200,32 @@ module.exports = {
 				});
 		})
 	}
+};
+
+const modifyLineError = (error, wholeScript, query) => {
+	const lineRegExp = /^line\ (\d+)\:(\-?\d+)/i;
+
+	const i = wholeScript.indexOf(query);
+
+	if (i === -1) {
+		return error;
+	}
+
+	const lineOffset = wholeScript.slice(0, i).split('\n').length;
+
+	if (!lineRegExp.test(error.message)) {
+		return Object.assign({}, error, {
+			message: `line ${lineOffset}:0 ${error.message}`
+		});
+	}
+
+	const lineData = error.message.match(lineRegExp);
+	const line = +(lineData[1]);
+	const offset = lineData[2];
+
+	const message = error.message.replace(lineRegExp, `line ${lineOffset + line - 1}:${offset}`);
+
+	return Object.assign({}, error, { message });
 };
 
 const progress = (logger, keyspace, table, message) => {

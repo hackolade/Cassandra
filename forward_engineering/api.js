@@ -7,6 +7,7 @@ const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 const { getAlterTableScript } = require('./helpers/updateHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
+const { applyToInstance } = require('./helpers/applyToInstance');
 
 module.exports = {
 	generateScript(data, logger, callback) {
@@ -100,6 +101,20 @@ module.exports = {
 				callback({ message: e.message, stack: e.stack });
 			}, 150);
 		}
+	},
+
+	applyToInstance(connectionInfo, logger, callback) {
+		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
+		applyToInstance(connectionInfo, logger)
+			.then(result => {
+				callback(null, result);
+			})
+			.catch(error => {
+				logger.log('error', error, "Error during applying Cassandra script");
+
+				callback(error);
+			});
 	}
 };
 

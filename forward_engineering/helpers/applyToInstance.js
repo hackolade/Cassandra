@@ -18,6 +18,12 @@ const applyToInstance = (connectionInfo, logger, cb) => {
 					message: `Completed queries: ${i + 1} / ${total}`
 				});
 			});
+		}, error => {
+			const err = cassandra.prepareError(error);
+
+			logger.log('error', err, "Cassandra script");
+
+			return Promise.reject(err);
 		})
 		.then(result => {
 			logger.log('info', {
@@ -27,29 +33,31 @@ const applyToInstance = (connectionInfo, logger, cb) => {
 			cassandra.close();
 
 			return {};
-		}, ({ error, query }) => {
+		}, (commonError) => {
+			if (!commonError.query) {
+				return Promise.reject(commonError);
+			}
+
+			const { error, query } = commonError;
 			const err = modifyLineError(error, script, query);
+			const preparedError = cassandra.prepareError(err);
 
 			logger.progress({
 				message: `Query has executed with error: \n ${query} \n ${err.message}`
 			});
 
-			return Promise.reject(Object.assign(
-				{},
-				cassandra.prepareError(error),
-				err,
-				{
-					query
-				}
-			));
+			logger.log('error', {
+				query: query,
+				error: preparedError,
+				detail: err
+			}, "Cassandra script: query has been executed with error");
+
+			return Promise.reject(preparedError);
 		})
-		.catch(error => {
+		.catch(err => {
 			cassandra.close();
 
-			return Promise.reject({
-				error: cassandra.prepareError(error),
-				detail: error
-			});
+			return Promise.reject(err);
 		});
 };
 

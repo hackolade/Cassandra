@@ -104,6 +104,7 @@ module.exports = {
 	},
 
 	applyToInstance(connectionInfo, logger, callback) {
+		logger.clear();
 		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 
 		applyToInstance(connectionInfo, logger)
@@ -111,8 +112,6 @@ module.exports = {
 				callback(null, result);
 			})
 			.catch(error => {
-				logger.log('error', error, "Error during applying Cassandra script");
-
 				callback(error);
 			});
 	}

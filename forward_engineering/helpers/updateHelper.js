@@ -1,4 +1,5 @@
 const { getTypeByData } = require('./typeHelper');
+const { getCreateTableScript } = require('./createHelper');
 
 const alterPrefix = (tableName, keySpace) => { return keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"` };
 const remove = columnName => `DROP "${columnName}";\n`;
@@ -8,14 +9,14 @@ const getAdd = addData => `${alterPrefix(addData.tableName, addData.keySpace)} $
 const getUpdate = updateData => getDelete(updateData) + getAdd(updateData);
 const objectContainsProp = (object, key) => object[key] ? true : false;
 const getAnd = data => ` AND ${data.key} = '${data.value}'`;
-
+const getDeleteTable = deleteData => { return deleteData.keySpace ? `DROP TABLE "${deleteData.keySpace}"."${deleteData.tableName}";\n` : `DROP TABLE "${deleteData.tableName}";\n` };
 const getChangeOption = changeData => {
     const newOptions = getComparedOptions(changeData.options.new.split("\nAND "), changeData.options.old.split("\nAND "));
     let alterTableScript = '';
 
     if (changeData.comment && changeData.comment.new !== changeData.comment.old) {
         alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment ? changeData.comment.new : changeData.comment.old}'`;
-    } else if(newOptions.length) {
+    } else if (newOptions.length) {
         alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
     } else {
         return alterTableScript;
@@ -98,23 +99,39 @@ const handleItem = (item, udtMap, generator, data) => {
         .reduce((alterTableScript, tableName) => {
             const itemCompModData = itemProperties[tableName].role.compMod;
 
-            if (!itemCompModData || itemCompModData.created) {
+            if (!itemCompModData) {
                 return alterTableScript;
             }
 
             const tableProperties = item.properties[tableName].properties;
 
-            alterTableScript += handleOptions(generator, itemCompModData, tableName);
-
-            if (itemCompModData.deleted) {
-                return alterTableScript;
-            }
-
             if (!tableProperties) {
                 return alterTableScript;
             }
 
-            alterTableScript += handlePropeties({ generator, tableProperties, udtMap, itemCompModData, tableName });
+            let keyspaceName;
+
+            if (itemCompModData.keyspaceName) {
+                keyspaceName = itemCompModData.keyspaceName;
+            };
+
+            if (itemCompModData.deleted) {
+                alterTableScript += getDeleteTable({
+                    keySpace: keyspaceName,
+                    tableName
+                });
+                return alterTableScript;
+            }
+
+            if (itemCompModData.created) {
+                alterTableScript += handleCreate(itemProperties[tableName], keyspaceName, data, tableName);
+
+                return alterTableScript;
+            }
+
+            alterTableScript += handleOptions(generator, itemCompModData, tableName);
+
+            alterTableScript += handleProperties({ generator, tableProperties, udtMap, itemCompModData, tableName });
 
             return alterTableScript;
         }, '');
@@ -122,7 +139,38 @@ const handleItem = (item, udtMap, generator, data) => {
     return alterTableScript;
 }
 
-const handlePropeties = ({ generator, tableProperties, udtMap, itemCompModData, tableName }) => {
+const handleCreate = (table, keyspaceName, data, tableName) => {
+    const tableProperties = table.properties;
+    const partitionKeys = Object.keys(tableProperties).map(key => {
+        if (tableProperties[key].compositePartitionKey) {
+            return { keyId: tableProperties[key].GUID };
+        }
+        return;
+    }).filter(item => item);
+
+    const clusteringKeys = Object.keys(tableProperties).map(key => {
+        if (tableProperties[key].compositeClusteringKey) {
+            return { keyId: tableProperties[key].GUID };
+        }
+        return;
+    }).filter(item => item);
+
+    data.jsonSchema = table;
+    data.containerData = [{ name: keyspaceName }];
+    data.entityData = [{
+        collectionName: tableName,
+        compositePartitionKey: [...partitionKeys],
+        compositeClusteringKey: [...clusteringKeys],
+        tableOptions: table.role.tableOptions || '',
+        comments: table.role.comments || ''
+    }];
+
+    const result = getCreateTableScript(data);
+
+    return result;
+}
+
+const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName }) => {
     return Object.keys(tableProperties)
         .reduce((alterTableScript, columnName) => {
             const columnData = getTypeByData(tableProperties[columnName], udtMap, columnName);

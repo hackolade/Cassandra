@@ -1,8 +1,17 @@
 const { getTypeByData } = require('./typeHelper');
 const { getCreateTableScript } = require('./createHelper');
+const semver = require('semver');
 
+const typesCompatibility = {
+    blob: ['ascii', 'bigint', 'boolean', 'decimal', 'double', 'float', 'inet', 'int', 'timestamp', 'timeuuid', 'uuid', 'varchar', 'varint'],
+    varint: ['int'],
+    varchar: ['text'],
+    uuid: ['timeuuid'],
+    text: ['varchar']
+};
 const alterPrefix = (tableName, keySpace) => { return keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"` };
 const remove = columnName => `DROP "${columnName}";\n`;
+const getUpdateType = updateTypeData => `${alterPrefix(updateTypeData.tableName, updateTypeData.keySpace)} ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};\n`;
 const add = columnData => `ADD "${columnData.name}" ${columnData.type};\n`;
 const getDelete = deleteData => `${alterPrefix(deleteData.tableName, deleteData.keySpace)} ${remove(deleteData.columnData.name)}`;
 const getAdd = addData => `${alterPrefix(addData.tableName, addData.keySpace)} ${add(addData.columnData)}`;
@@ -93,6 +102,16 @@ const handleItem = (item, udtMap, generator, data) => {
         return alterTableScript;
     }
 
+    let isOldModel = false;
+
+    if (objectContainsProp(data, 'modelData')) {
+        const modelVersion = data.modelData.filter(element => {
+            return element.dbVersion;
+        })[0].dbVersion;
+
+        isOldModel = semver.satisfies('3.0.0', '>' + modelVersion);
+    }
+
     const itemProperties = item.properties;
 
     alterTableScript += Object.keys(itemProperties)
@@ -131,7 +150,7 @@ const handleItem = (item, udtMap, generator, data) => {
 
             alterTableScript += handleOptions(generator, itemCompModData, tableName);
 
-            alterTableScript += handleProperties({ generator, tableProperties, udtMap, itemCompModData, tableName });
+            alterTableScript += handleProperties({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel });
 
             return alterTableScript;
         }, '');
@@ -170,22 +189,60 @@ const handleCreate = (table, keyspaceName, data, tableName) => {
     return result;
 }
 
-const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName }) => {
+const fieldTypeCompatible = (oldType, newType) => {
+    const compabilityTypes = typesCompatibility[newType];
+
+    if (!compabilityTypes) {
+        return false;
+    }
+
+    const foundCapabilityType = compabilityTypes.filter(type => {
+        return type === oldType;
+    });
+
+    if (!foundCapabilityType) {
+        return false;
+    }
+
+    return true
+}
+
+const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel }) => {
     return Object.keys(tableProperties)
         .reduce((alterTableScript, columnName) => {
-            const columnData = getTypeByData(tableProperties[columnName], udtMap, columnName);
+            let columnType = getTypeByData(tableProperties[columnName], udtMap, columnName);
             let keyspaceName;
 
             if (itemCompModData && itemCompModData.keyspaceName) {
                 keyspaceName = itemCompModData.keyspaceName;
             };
 
+            if (isOldModel) {
+                const oldFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.oldField, udtMap, 'oldField');
+                const newFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.newField, udtMap, 'newField');
+
+                if (fieldTypeCompatible(oldFieldCassandraType, newFieldCassandraType)) {
+                    columnType = newFieldCassandraType;
+
+                    alterTableScript += getUpdateType({
+                        keySpace: keyspaceName,
+                        tableName: tableName,
+                        columnData: {
+                            name: columnName,
+                            type: columnType
+                        }
+                    });
+
+                    return alterTableScript;
+                }
+            }
+
             alterTableScript += generator({
                 keySpace: keyspaceName,
                 tableName: tableName,
                 columnData: {
                     name: columnName,
-                    type: columnData
+                    type: columnType
                 }
             });
 

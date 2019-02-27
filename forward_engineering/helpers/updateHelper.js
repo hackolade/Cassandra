@@ -224,8 +224,8 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
             };
 
             if (isOldModel) {
-                const oldFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.oldField, udtMap, 'oldField');
-                const newFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.newField, udtMap, 'newField');
+                const oldFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.oldField.properties, udtMap, 'oldField');
+                const newFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.newField.properties, udtMap, 'newField');
 
                 if (fieldTypeCompatible(oldFieldCassandraType, newFieldCassandraType)) {
                     columnType = newFieldCassandraType;

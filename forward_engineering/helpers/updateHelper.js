@@ -1,6 +1,7 @@
 const { getTypeByData } = require('./typeHelper');
 const { getCreateTableScript } = require('./createHelper');
-const semver = require('semver');
+const { getReplication, getDurableWrites } = require('./keyspaceHelper');
+const { tab, retrivePropertyFromConfig } = require('./generalHelper');
 
 const typesCompatibility = {
     blob: ['ascii', 'bigint', 'boolean', 'decimal', 'double', 'float', 'inet', 'int', 'timestamp', 'timeuuid', 'uuid', 'varchar', 'varint'],
@@ -9,12 +10,13 @@ const typesCompatibility = {
     uuid: ['timeuuid'],
     text: ['varchar']
 };
-const alterPrefix = (tableName, keySpace) => { return keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"` };
+const alterTablePrefix = (tableName, keySpace) => { return keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"` };
+const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE ${keyspaceName}`;
 const remove = columnName => `DROP "${columnName}";\n`;
-const getUpdateType = updateTypeData => `${alterPrefix(updateTypeData.tableName, updateTypeData.keySpace)} ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};\n`;
+const getUpdateType = updateTypeData => `${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};\n`;
 const add = columnData => `ADD "${columnData.name}" ${columnData.type};\n`;
-const getDelete = deleteData => `${alterPrefix(deleteData.tableName, deleteData.keySpace)} ${remove(deleteData.columnData.name)}`;
-const getAdd = addData => `${alterPrefix(addData.tableName, addData.keySpace)} ${add(addData.columnData)}`;
+const getDelete = deleteData => `${alterTablePrefix(deleteData.tableName, deleteData.keySpace)} ${remove(deleteData.columnData.name)}`;
+const getAdd = addData => `${alterTablePrefix(addData.tableName, addData.keySpace)} ${add(addData.columnData)}`;
 const getUpdate = updateData => getDelete(updateData) + getAdd(updateData);
 const objectContainsProp = (object, key) => object[key] ? true : false;
 const getAnd = data => ` AND ${data.key} = '${data.value}'`;
@@ -24,9 +26,9 @@ const getChangeOption = changeData => {
     let alterTableScript = '';
 
     if (changeData.comment && changeData.comment.new !== changeData.comment.old) {
-        alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment ? changeData.comment.new : changeData.comment.old}'`;
+        alterTableScript += `${alterTablePrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment ? changeData.comment.new : changeData.comment.old}'`;
     } else if (newOptions.length) {
-        alterTableScript += `${alterPrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
+        alterTableScript += `${alterTablePrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
     } else {
         return alterTableScript;
     }
@@ -108,8 +110,12 @@ const handleItem = (item, udtMap, generator, data) => {
         const modelVersion = data.modelData.filter(element => {
             return element.dbVersion;
         })[0].dbVersion;
+        const majorDigitIndex = modelVersion.search(/\d/);
 
-        isOldModel = semver.satisfies('3.0.0', '>' + modelVersion);
+        if (majorDigitIndex !== -1) {
+            const majorDigit = modelVersion[majorDigitIndex];
+            isOldModel = majorDigit < 3;
+        }
     }
 
     const itemProperties = item.properties;
@@ -250,36 +256,97 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
         }, '');
 }
 
-const getAlterTableScript = (child, udtMap, data) => {
+const alterkeyspaceScript = (child) => {
+    let alterTableScript = '';
+    const keyspaceData = [child.role];
+    const keyspaceName = child.role.name;
+    const replicationStrategyProp = retrivePropertyFromConfig(keyspaceData, 0, "replStrategy", "");
+    const replicationFactorProp = retrivePropertyFromConfig(keyspaceData, 0, "replFactor", undefined);
+    const dataCentersProp = retrivePropertyFromConfig(keyspaceData, 0, "dataCenters", []);
+    const durableWritesProp = retrivePropertyFromConfig(keyspaceData, 0, "durableWrites", false);
+
+    const replication = getReplication(replicationStrategyProp, replicationFactorProp, dataCentersProp);
+    const durableWrites = getDurableWrites(durableWritesProp);
+
+    alterTableScript += alterKeyspacePrefix(keyspaceName);
+    alterTableScript += `${tab(replication)}\n${durableWrites}; \n\n`;
+
+    return alterTableScript;
+}
+
+const generateAlterKeyspaceScript = (child, udtMap, data) => {
+    const properties = (child.properties);
     let alterTableScript = '';
 
-    if (objectContainsProp(child, 'properties')) {
-        alterTableScript += getAlterTableScript(child.properties, udtMap, data);
+    if (!properties) {
+        return alterTableScript;
     }
 
-    if (objectContainsProp(child, 'items')) {
-        alterTableScript += getAlterTableScript(child.items, udtMap, data);
-    }
-
-    if (objectContainsProp(child, 'entities')) {
-        alterTableScript += getAlterTableScript(child.entities, udtMap, data);
-    }
-
-    if (objectContainsProp(child, 'modified')) {
-        alterTableScript += handleChange(child.modified, udtMap, getUpdate, data);
-    }
-
-    if (objectContainsProp(child, 'deleted')) {
-        alterTableScript += handleChange(child.deleted, udtMap, getDelete, data);
-    }
-
-    if (objectContainsProp(child, 'added')) {
-        alterTableScript += handleChange(child.added, udtMap, getAdd, data);
+    if (Array.isArray(properties) && properties.length) {
+        properties.forEach(item => {
+            alterTableScript += alterkeyspaceScript(item);
+        });
+    } else {
+        const itemKey = Object.keys(properties)[0];
+        const item = properties[itemKey];
+        alterTableScript += alterkeyspaceScript(item);
     }
 
     return alterTableScript;
 }
 
+const getAlterKeyspaceScript = (child, udtMap, data) => {
+    let alterScript = '';
+
+    if (objectContainsProp(child, 'properties')) {
+        alterScript += getAlterKeyspaceScript(child.properties, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'modified')) {
+        alterScript += getAlterKeyspaceScript(child.modified, udtMap, getUpdate, data);
+    }
+
+    if (objectContainsProp(child, 'items')) {
+        alterScript += generateAlterKeyspaceScript(child.items, udtMap, data);
+    }
+
+    return alterScript;
+}
+
+const getAlterScript = (child, udtMap, data) => {
+    let alterScript = '';
+
+    if (objectContainsProp(child, 'properties')) {
+        alterScript += getAlterScript(child.properties, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'items')) {
+        alterScript += getAlterScript(child.items, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'containers')) {
+        alterScript += getAlterKeyspaceScript(child.containers, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'entities')) {
+        alterScript += getAlterScript(child.entities, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'modified')) {
+        alterScript += handleChange(child.modified, udtMap, getUpdate, data);
+    }
+
+    if (objectContainsProp(child, 'deleted')) {
+        alterScript += handleChange(child.deleted, udtMap, getDelete, data);
+    }
+
+    if (objectContainsProp(child, 'added')) {
+        alterScript += handleChange(child.added, udtMap, getAdd, data);
+    }
+
+    return alterScript;
+}
+
 module.exports = {
-    getAlterTableScript
+    getAlterScript
 };

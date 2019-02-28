@@ -44,5 +44,7 @@ const getKeyspaceStatement = (keyspaceData) => {
 };
 
 module.exports = {
-	getKeyspaceStatement
+	getKeyspaceStatement,
+	getReplication,
+	getDurableWrites
 };

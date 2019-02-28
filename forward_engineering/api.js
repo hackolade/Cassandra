@@ -5,7 +5,7 @@ const { getTableStatement } = require('./helpers/tableHelper');
 const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
-const { getAlterTableScript } = require('./helpers/updateHelper');
+const { getAlterScript } = require('./helpers/updateHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 
 module.exports = {
@@ -18,7 +18,7 @@ module.exports = {
 			data.externalDefinitions = JSON.parse(data.externalDefinitions);
 
 			if (data.isUpdateScript) {
-				callback(null, getAlterTableScript(data.jsonSchema, data.udtTypeMap, data));
+				callback(null, getAlterScript(data.jsonSchema, data.udtTypeMap, data));
 			} else {
 				callback(null, getCreateTableScript(data));
 			}
@@ -37,7 +37,7 @@ module.exports = {
 				let result = '';
 				data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
 				data.collections.forEach(jsonSchema => {
-					result += getAlterTableScript(JSON.parse(jsonSchema), data.udtTypeMap);
+					result += getAlterScript(JSON.parse(jsonSchema), data.udtTypeMap);
 				})
 				callback(null, result);
 			} else {

@@ -190,9 +190,7 @@ const handleCreate = (table, keyspaceName, data, tableName) => {
         comments: table.role.comments || ''
     }];
 
-    const result = getCreateTableScript(data);
-
-    return result;
+    return getCreateTableScript(data) + '\n\n';
 }
 
 const fieldTypeCompatible = (oldType, newType) => {
@@ -305,7 +303,7 @@ const getAlterKeyspaceScript = (child, udtMap, data) => {
     if (objectContainsProp(child, 'modified')) {
         alterScript += getAlterKeyspaceScript(child.modified, udtMap, getUpdate, data);
     }
-
+ 
     if (objectContainsProp(child, 'items')) {
         alterScript += generateAlterKeyspaceScript(child.items, udtMap, data);
     }

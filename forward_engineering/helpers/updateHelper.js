@@ -46,6 +46,9 @@ const getChangeOption = changeData => {
     return alterTableScript += ';\n\n';
 };
 
+const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE ${keySpaceName}`;
+const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE ${keySpaceName}`;
+
 const getComparedOptions = (newOptions, oldOptions) => {
     const newOptionsDIf = newOptions.filter(newOption => {
         const inOld = oldOptions.filter((oldOption) => {
@@ -254,7 +257,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
         }, '');
 }
 
-const alterkeyspaceScript = (child) => {
+const getKeyspaceScript = (child, mode) => {
     let alterTableScript = '';
     const keyspaceData = [child.role];
     const keyspaceName = child.role.name;
@@ -266,13 +269,21 @@ const alterkeyspaceScript = (child) => {
     const replication = getReplication(replicationStrategyProp, replicationFactorProp, dataCentersProp);
     const durableWrites = getDurableWrites(durableWritesProp);
 
-    alterTableScript += alterKeyspacePrefix(keyspaceName);
-    alterTableScript += `${tab(replication)}\n${durableWrites}; \n\n`;
+    if (mode === 'add') {
+        alterTableScript += getAddKeyspacePrefix(keyspaceName);
+        alterTableScript += `${tab(replication)}\n${durableWrites}; \n\n`;
+    } else if (mode === 'delete') {
+        alterTableScript += `${getDropKeyspace(keyspaceName)}; \n`;
+    } else {
+        alterTableScript += alterKeyspacePrefix(keyspaceName);
+        alterTableScript += `${tab(replication)}\n${durableWrites}; \n\n`;
+    }
+
 
     return alterTableScript;
 }
 
-const generateAlterKeyspaceScript = (child, udtMap, data) => {
+const generateKeyspaceScript = (child, udtMap, mode) => {
     const properties = (child.properties);
     let alterTableScript = '';
 
@@ -282,18 +293,18 @@ const generateAlterKeyspaceScript = (child, udtMap, data) => {
 
     if (Array.isArray(properties) && properties.length) {
         properties.forEach(item => {
-            alterTableScript += alterkeyspaceScript(item);
+            alterTableScript += getKeyspaceScript(item, mode);
         });
     } else {
         const itemKey = Object.keys(properties)[0];
         const item = properties[itemKey];
-        alterTableScript += alterkeyspaceScript(item);
+        alterTableScript += getKeyspaceScript(item, mode);
     }
 
     return alterTableScript;
 }
 
-const getAlterKeyspaceScript = (child, udtMap, data) => {
+const getAlterKeyspaceScript = (child, udtMap, data, mode) => {
     let alterScript = '';
 
     if (objectContainsProp(child, 'properties')) {
@@ -301,11 +312,19 @@ const getAlterKeyspaceScript = (child, udtMap, data) => {
     }
 
     if (objectContainsProp(child, 'modified')) {
-        alterScript += getAlterKeyspaceScript(child.modified, udtMap, getUpdate, data);
+        alterScript += getAlterKeyspaceScript(child.modified, udtMap, data, 'update');
     }
- 
+
+    if (objectContainsProp(child, 'deleted')) {
+        alterScript += getAlterKeyspaceScript(child.deleted, udtMap, data, 'delete');
+    }
+
+    if (objectContainsProp(child, 'added')) {
+        alterScript += getAlterKeyspaceScript(child.added, udtMap, data, 'add');
+    }
+
     if (objectContainsProp(child, 'items')) {
-        alterScript += generateAlterKeyspaceScript(child.items, udtMap, data);
+        alterScript += generateKeyspaceScript(child.items, udtMap, mode);
     }
 
     return alterScript;

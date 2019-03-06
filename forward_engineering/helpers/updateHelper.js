@@ -45,10 +45,22 @@ const getChangeOption = changeData => {
 
     return alterTableScript += ';\n\n';
 };
-
 const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE ${keySpaceName}`;
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE ${keySpaceName}`;
+const getAlterTypePrefix = (keySpaceName) => `ALTER TYPE "${keySpaceName}"`;
+const getAddToUDT = (addToUDTData) => {
+    let alterScript = '';
 
+    alterScript += Object.keys(addToUDTData.keySpaces).reduce((script, keySpaceName) => {
+        return script += `${getAlterTypePrefix(keySpaceName)}."${addToUDTData.udtName}" ADD "${addToUDTData.name}" ${addToUDTData.type};\n`;
+    }, '');
+
+    return alterScript;
+}
+const getCreateTypePrefix = (createData) => `CREATE TYPE IF NOT EXISTS "${createData.keySpaceName}".${createData.UDTName} (\n`;
+const getDropUDT = (dropUDTData) => `DROP TYPE "${dropUDTData.keySpaceName}"."${dropUDTData.typeName}";\n`;
+const getRenameType = (renameData) => `${getAlterTypePrefix(renameData.keySpaceName)}."${renameData.udtName}" RENAME "${renameData.oldFieldName}" TO "${renameData.newFieldName}";\n`;
+const DEFAULT_KEYSPACE = 'Default_Keyspace';
 const getComparedOptions = (newOptions, oldOptions) => {
     const newOptionsDIf = newOptions.filter(newOption => {
         const inOld = oldOptions.filter((oldOption) => {
@@ -197,13 +209,13 @@ const handleCreate = (table, keyspaceName, data, tableName) => {
 }
 
 const fieldTypeCompatible = (oldType, newType) => {
-    const compabilityTypes = typesCompatibility[newType];
+    const compatibility = typesCompatibility[newType];
 
-    if (!compabilityTypes) {
+    if (!compatibility) {
         return false;
     }
 
-    const foundCapabilityType = compabilityTypes.filter(type => {
+    const foundCapabilityType = compatibility.filter(type => {
         return type === oldType;
     });
 
@@ -330,6 +342,215 @@ const getAlterKeyspaceScript = (child, udtMap, data, mode) => {
     return alterScript;
 }
 
+const getAlterAddUdtScript = (child, udtMap, data) => {
+    if (!child.items) {
+        return alterTableScript;
+    }
+
+    const items = child.items;
+    let alterTableScript = '';
+
+    if (Array.isArray(items) && items.length) {
+        items.forEach(item => {
+
+            const itemKey = Object.keys(item.properties)[0];
+            const prop = item.properties[itemKey];
+            const propertiesCopy = Object.assign({}, prop.properties);
+            if (prop.compMod && prop.compMod.created) {
+                const firstPropKey = Object.keys(propertiesCopy)[0];
+                const firstProp = propertiesCopy[firstPropKey];
+                const keyspace = prop.role.compMod.bucketsWithCurrentDefinition || DEFAULT_KEYSPACE;
+
+                delete propertiesCopy[firstPropKey];
+
+                alterTableScript += getCreateTypePrefix({ keySpaceName: keyspace, UDTName: itemKey });
+                alterTableScript += ` "${firstPropKey}" ${getTypeByData(firstProp, udtMap)}`;
+
+                alterTableScript += Object.keys(propertiesCopy).reduce((alterScript, currentPropKey) => {
+                    alterScript += `,\n "${currentPropKey}" ${getTypeByData(propertiesCopy[currentPropKey], udtMap)}`;
+                    return alterScript;
+                }, '');
+                alterTableScript += '\n);\n'
+            } else {
+                alterTableScript += Object.keys(propertiesCopy).reduce((alterScript, currentPropKey) => {
+                    const currentProp = propertiesCopy[currentPropKey];
+
+                    return alterScript += getAddToUDT(
+                        {
+                            keySpaces: prop.role.compMod.bucketsWithCurrentDefinition,
+                            name: currentPropKey,
+                            type: getTypeByData(currentProp, udtMap),
+                            udtName: itemKey
+                        }
+                    );
+                }, '');
+            }
+        });
+    } else {
+        const itemKey = Object.keys(items)[0];
+        const item = items[itemKey];
+        alterTableScript += Object.keys(item.items).reduce((alterScript, currentPropKey) => {
+            const currentProp = item.items[currentPropKey];
+
+            return alterScript += getAddToUDT(
+                {
+                    keySpaces: item.role.compMod.bucketsWithCurrentDefinition,
+                    name: currentPropKey,
+                    type: getTypeByData(currentProp, udtMap),
+                    udtName: itemKey
+                }
+            );
+        }, '');
+    }
+
+    return alterTableScript;
+}
+
+const getAlterDropUdtScript = (child, udtMap, data) => {
+    const items = child.items;
+    let alterTableScript = '';
+
+    if (!items) {
+        return alterTableScript;
+    }
+
+    alterScript = items.reduce((alterScript, item) => {
+        const properties = item.properties;
+
+        if (!properties) {
+            return alterScript;
+        }
+
+        alterScript += Object.keys(properties).reduce((script, propKey) => {
+
+            if (!properties[propKey].compMod || !properties[propKey].compMod.deleted) {
+                return script;
+            }
+
+            const bucketsWithCurrentDefinition = properties[propKey].compMod.bucketsWithCurrentDefinition;
+
+            script += Object.keys(bucketsWithCurrentDefinition)
+                .reduce((dropScript, bucket) => {
+                    const tablesInKeyspace = bucketsWithCurrentDefinition[bucket];
+
+                    dropScript += tablesInKeyspace.map(table => {
+                        return getDelete({
+                            keySpace: bucket,
+                            tableName: table.collectionName,
+                            columnData: {
+                                name: propKey
+                            }
+                        });
+                    });
+
+                    return dropScript;
+                }, '');
+
+
+            script += Object.keys(bucketsWithCurrentDefinition)
+                .reduce((dropTypeScript, bucket) => {
+                    dropTypeScript += getDropUDT({
+                        keySpaceName: bucket,
+                        typeName: propKey
+                    });
+
+
+                    return dropTypeScript;
+                }, '');
+
+            return script;
+        }, '');
+
+        return alterScript;
+    }, '');
+
+    return alterTableScript;
+}
+
+const getAlterModifyScript = (child, udtMap, data) => {
+    const childProperties = child.items.properties;
+    if (!childProperties) {
+        return '';
+    }
+
+    const result = Object.keys(childProperties).reduce((resultScript, udtKey) => {
+        const fieldsInUDT = childProperties[udtKey].properties;
+        const bucketsWithCurrentDefinition = childProperties[udtKey].role.compMod.bucketsWithCurrentDefinition;
+
+        if (!fieldsInUDT) {
+            return resultScript;
+        }
+
+        resultScript += Object.keys(fieldsInUDT).reduce((alterNameScript, fieldKey) => {
+            const itemOldName = fieldsInUDT[fieldKey].compMod.name.old;
+            const itemNewName = fieldsInUDT[fieldKey].compMod.name.new;
+
+            const newType = fieldsInUDT[fieldKey].compMod.newField.properties.type;
+            const oldType = fieldsInUDT[fieldKey].compMod.oldField.properties.type;
+
+            alterNameScript += Object.keys(bucketsWithCurrentDefinition).reduce((script, bucketName) => {
+
+                if (newType && oldType && newType !== oldType) {
+                    if (fieldTypeCompatible(oldType, newType)) {
+                        script += getUpdateType({
+                            keySpace: bucketName,
+                            tableName: udtKey,
+                            columnData: {
+                                name: fieldKey,
+                                type: getTypeByData(newType)
+                            }
+                        });
+                    }
+                }
+
+
+                if (itemNewName && itemOldName && itemOldName !== itemNewName) {
+                    script += getRenameType({
+                        keySpaceName: bucketName,
+                        udtName: udtKey,
+                        oldFieldName: itemOldName,
+                        newFieldName: itemNewName
+                    })
+                }
+                return script;
+            }, '');
+
+
+            return alterNameScript;
+        }, '');
+
+        return resultScript;
+    }, '');
+
+    return result;
+}
+
+const getAlterUdtScript = (child, udtMap, data) => {
+    let alterScript = '';
+
+    if (objectContainsProp(child, 'properties')) {
+        alterScript += getAlterUdtScript(child.properties, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'added')) {
+        alterScript += getAlterAddUdtScript(child.added, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'deleted')) {
+        alterScript += getAlterDropUdtScript(child.deleted, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'modified')) {
+        alterScript += getAlterModifyScript(child.modified, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'items')) {
+        alterScript += generateAlterKeyspaceScript(child.items, udtMap, data);
+    }
+
+    return alterScript;
+}
+
 const getAlterScript = (child, udtMap, data) => {
     let alterScript = '';
 
@@ -347,6 +568,10 @@ const getAlterScript = (child, udtMap, data) => {
 
     if (objectContainsProp(child, 'entities')) {
         alterScript += getAlterScript(child.entities, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'modelDefinitions')) {
+        alterScript += getAlterUdtScript(child.modelDefinitions, udtMap, data);
     }
 
     if (objectContainsProp(child, 'modified')) {

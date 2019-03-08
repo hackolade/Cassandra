@@ -230,6 +230,9 @@ const fieldTypeCompatible = (oldType, newType) => {
 const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel }) => {
     return Object.keys(tableProperties)
         .reduce((alterTableScript, columnName) => {
+            if (tableProperties[columnName].compositePartitionKey || tableProperties[columnName].compositeClusteringKey) {
+                return alterTableScript;
+            }
             let columnType = getTypeByData(tableProperties[columnName], udtMap, columnName);
             let keyspaceName;
 
@@ -238,22 +241,26 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
             };
 
             if (isOldModel) {
-                const oldFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.oldField.properties, udtMap, 'oldField');
-                const newFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.newField.properties, udtMap, 'newField');
-
-                if (fieldTypeCompatible(oldFieldCassandraType, newFieldCassandraType)) {
-                    columnType = newFieldCassandraType;
-
-                    alterTableScript += getUpdateType({
-                        keySpace: keyspaceName,
-                        tableName: tableName,
-                        columnData: {
-                            name: columnName,
-                            type: columnType
-                        }
-                    });
-
-                    return alterTableScript;
+                const oldFielType = _.get(tableProperties[columnName], 'compMod.oldField.properties');
+                const newFieldType =  _.get(tableProperties[columnName], 'compMod.newField.properties');
+                if (oldFielType && newFieldType) {
+                    const oldFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.oldField.properties, udtMap, 'oldField');
+                    const newFieldCassandraType = getTypeByData(tableProperties[columnName].compMod.newField.properties, udtMap, 'newField');
+    
+                    if (fieldTypeCompatible(oldFieldCassandraType, newFieldCassandraType)) {
+                        columnType = newFieldCassandraType;
+    
+                        alterTableScript += getUpdateType({
+                            keySpace: keyspaceName,
+                            tableName: tableName,
+                            columnData: {
+                                name: columnName,
+                                type: columnType
+                            }
+                        });
+    
+                        return alterTableScript;
+                    }
                 }
             }
 
@@ -375,7 +382,7 @@ const getAlterAddUdtScript = (child, udtMap, data) => {
 
                     script += getCreateTypePrefix({ keySpaceName: currentKeyspace, UDTName: itemKey });
                     script += innerCreateTypes;
-                    script += ');';
+                    script += ');\n';
 
                     return script;
                 }, '');

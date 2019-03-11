@@ -4,7 +4,7 @@ const { getUdtMap, getUdtScripts } = require('./udtHelper');
 const { getIndexes } = require('./indexHelper');
 const { getKeyspaceStatement } = require('./keyspaceHelper');
 
-const getCreateTableScript = (data) => {
+const getCreateTableScript = (data, ignoreKeyspace) => {
 	const containerName = retrieveContainerName(data.containerData);
 	const entityName = retrieveEntityName(data.entityData);
 	const dataSources = [
@@ -14,7 +14,11 @@ const getCreateTableScript = (data) => {
 		data.jsonSchema
 	];
 
-	const keyspace = getKeyspaceStatement(data.containerData);
+	let keyspace = '';
+
+	if (!ignoreKeyspace) {
+		keyspace = getKeyspaceStatement(data.containerData)
+	}
 
 	let udtTypeMap = getUdtMap(dataSources);
 

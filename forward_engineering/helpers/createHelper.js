@@ -4,7 +4,7 @@ const { getUdtMap, getUdtScripts } = require('./udtHelper');
 const { getIndexes } = require('./indexHelper');
 const { getKeyspaceStatement } = require('./keyspaceHelper');
 
-const getCreateTableScript = (data, ignoreKeyspace) => {
+const getCreateTableScript = (data) => {
 	const containerName = retrieveContainerName(data.containerData);
 	const entityName = retrieveEntityName(data.entityData);
 	const dataSources = [
@@ -13,12 +13,6 @@ const getCreateTableScript = (data, ignoreKeyspace) => {
 		data.internalDefinitions,
 		data.jsonSchema
 	];
-
-	let keyspace = '';
-
-	if (!ignoreKeyspace) {
-		keyspace = getKeyspaceStatement(data.containerData)
-	}
 
 	let udtTypeMap = getUdtMap(dataSources);
 
@@ -36,7 +30,6 @@ const getCreateTableScript = (data, ignoreKeyspace) => {
 	const UDA = getUserDefinedAggregations(retrieveUDA(data.containerData));
 
 	const cqlScript = getScript([
-		keyspace,
 		UDF,
 		UDA,
 		...UDT,
@@ -44,6 +37,10 @@ const getCreateTableScript = (data, ignoreKeyspace) => {
 		indexes
 	]);
     return cqlScript;
+}
+
+const getCreateKeyspaceScript = (data) => {
+	return getScript([getKeyspaceStatement(data.containerData)]);
 }
 
 const getScript = (structure) => {
@@ -59,5 +56,6 @@ const getUserDefinedAggregations = (udaItems) => {
 };
 
 module.exports = {
-    getCreateTableScript
+	getCreateTableScript,
+	getCreateKeyspaceScript
 };

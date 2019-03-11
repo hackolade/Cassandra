@@ -208,7 +208,7 @@ const handleCreate = (table, keyspaceName, data, tableName) => {
         comments: table.role.comments || ''
     }];
 
-    return getCreateTableScript(data, true) + '\n\n';
+    return getCreateTableScript(data) + '\n\n';
 }
 
 const fieldTypeCompatible = (oldType, newType) => {

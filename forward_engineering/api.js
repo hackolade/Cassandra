@@ -6,7 +6,7 @@ const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 const { getAlterScript } = require('./helpers/updateHelper');
-const { getCreateTableScript } = require('./helpers/createHelper');
+const { getCreateTableScript, getCreateKeyspaceScript } = require('./helpers/createHelper');
 const { applyToInstance } = require('./helpers/applyToInstance');
 
 module.exports = {
@@ -21,7 +21,8 @@ module.exports = {
 			if (data.isUpdateScript) {
 				callback(null, getAlterScript(data.jsonSchema, data.udtTypeMap, data));
 			} else {
-				callback(null, getCreateTableScript(data));
+				let script = `${getCreateKeyspaceScript(data)} ${getCreateTableScript(data)}`;
+				callback(null, script);
 			}
 		} catch (e) {
 			logger.log('error', { message: e.message, stack: e.stack }, 'Cassandra Forward-Engineering Error');

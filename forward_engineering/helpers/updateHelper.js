@@ -46,7 +46,7 @@ const getChangeOption = changeData => {
 
     return alterTableScript += ';\n\n';
 };
-const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE ${keySpaceName}`;
+const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS ${keySpaceName}`;
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE ${keySpaceName}`;
 const getAlterTypePrefix = (keySpaceName) => `ALTER TYPE "${keySpaceName}"`;
 const getAddToUDT = (addToUDTData) => {
@@ -137,14 +137,16 @@ const handleItem = (item, udtMap, generator, data) => {
     const itemProperties = item.properties;
 
     alterTableScript += Object.keys(itemProperties)
-        .reduce((alterTableScript, tableName) => {
-            const itemCompModData = itemProperties[tableName].role.compMod;
+        .reduce((alterTableScript, tableKey) => {
+            const itemCompModData = itemProperties[tableKey].role.compMod;
+            const codeName = _.get(itemProperties, `${tableKey}.role.code`, '');
+            const tableName = codeName.length ? codeName : tableKey;
 
             if (!itemCompModData) {
                 return alterTableScript;
             }
 
-            const tableProperties = item.properties[tableName].properties;
+            const tableProperties = item.properties[tableKey].properties;
 
             if (!tableProperties) {
                 return alterTableScript;
@@ -165,7 +167,7 @@ const handleItem = (item, udtMap, generator, data) => {
             }
 
             if (itemCompModData.created) {
-                alterTableScript += handleCreate(itemProperties[tableName], keyspaceName, data, tableName);
+                alterTableScript += handleCreate(itemProperties[tableKey], keyspaceName, data, tableName);
 
                 return alterTableScript;
             }

@@ -14,8 +14,6 @@ const getCreateTableScript = (data) => {
 		data.jsonSchema
 	];
 
-	const keyspace = getKeyspaceStatement(data.containerData);
-
 	let udtTypeMap = getUdtMap(dataSources);
 
 	let UDT = getUdtScripts(containerName, dataSources, udtTypeMap)
@@ -32,7 +30,6 @@ const getCreateTableScript = (data) => {
 	const UDA = getUserDefinedAggregations(retrieveUDA(data.containerData));
 
 	const cqlScript = getScript([
-		keyspace,
 		UDF,
 		UDA,
 		...UDT,
@@ -55,5 +52,5 @@ const getUserDefinedAggregations = (udaItems) => {
 };
 
 module.exports = {
-    getCreateTableScript
+	getCreateTableScript
 };

@@ -39,10 +39,6 @@ const getCreateTableScript = (data) => {
     return cqlScript;
 }
 
-const getCreateKeyspaceScript = (data) => {
-	return getScript([getKeyspaceStatement(data.containerData)]);
-}
-
 const getScript = (structure) => {
 	return structure.filter(item => item).join('\n\n');
 };
@@ -56,6 +52,5 @@ const getUserDefinedAggregations = (udaItems) => {
 };
 
 module.exports = {
-	getCreateTableScript,
-	getCreateKeyspaceScript
+	getCreateTableScript
 };

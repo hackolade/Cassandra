@@ -293,7 +293,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 const getKeyspaceScript = (child, mode) => {
     let alterTableScript = '';
     const keyspaceData = [child.role];
-    const keyspaceName = child.role.name;
+    const keyspaceName = child.role.code || child.role.name;
     const replicationStrategyProp = retrivePropertyFromConfig(keyspaceData, 0, "replStrategy", "");
     const replicationFactorProp = retrivePropertyFromConfig(keyspaceData, 0, "replFactor", undefined);
     const dataCentersProp = retrivePropertyFromConfig(keyspaceData, 0, "dataCenters", []);

@@ -342,12 +342,12 @@ const getAlterKeyspaceScript = (child, udtMap, data, mode) => {
         alterScript += getAlterKeyspaceScript(child.modified, udtMap, data, 'update');
     }
 
-    if (objectContainsProp(child, 'deleted')) {
-        alterScript += getAlterKeyspaceScript(child.deleted, udtMap, data, 'delete');
-    }
-
     if (objectContainsProp(child, 'added')) {
         alterScript += getAlterKeyspaceScript(child.added, udtMap, data, 'add');
+    }
+
+    if (objectContainsProp(child, 'deleted')) {
+        alterScript += getAlterKeyspaceScript(child.deleted, udtMap, data, 'delete');
     }
 
     if (objectContainsProp(child, 'items')) {
@@ -611,12 +611,12 @@ const getAlterScript = (child, udtMap, data) => {
         alterScript += getAlterScript(child.items, udtMap, data);
     }
 
-    if (objectContainsProp(child, 'containers')) {
-        alterScript += getAlterKeyspaceScript(child.containers, udtMap, data);
-    }
-
     if (objectContainsProp(child, 'entities')) {
         alterScript += getAlterScript(child.entities, udtMap, data);
+    }
+
+    if (objectContainsProp(child, 'containers')) {
+        alterScript += getAlterKeyspaceScript(child.containers, udtMap, data);
     }
 
     if (objectContainsProp(child, 'modelDefinitions')) {

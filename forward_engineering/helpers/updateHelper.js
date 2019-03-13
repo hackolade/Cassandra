@@ -558,8 +558,8 @@ const getAlterModifyScript = (child, udtMap, data) => {
                     script += getRenameType({
                         keySpaceName: bucketName,
                         udtName: udtKey,
-                        oldFieldName: 'udt_field',
-                        newFieldName: 'udt_field1'
+                        oldFieldName: itemOldName,
+                        newFieldName: itemNewName
                     })
                 }
                 return script;

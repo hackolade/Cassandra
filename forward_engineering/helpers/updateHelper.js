@@ -113,6 +113,18 @@ const handleOptions = (generator, itemCompModData, tableName) => {
     return alterTableScript;
 }
 
+const checkIsOldModel = (modelData) => {
+    const modelVersion = modelData.filter(element => {
+        return element.dbVersion;
+    })[0].dbVersion;
+    const majorDigitIndex = modelVersion.search(/\d/);
+
+    if (majorDigitIndex !== -1) {
+        const majorDigit = modelVersion[majorDigitIndex];
+        return majorDigit < 3;
+    }
+}
+
 const handleItem = (item, udtMap, generator, data) => {
     let alterTableScript = '';
 
@@ -120,20 +132,7 @@ const handleItem = (item, udtMap, generator, data) => {
         return alterTableScript;
     }
 
-    let isOldModel = false;
-
-    if (objectContainsProp(data, 'modelData')) {
-        const modelVersion = data.modelData.filter(element => {
-            return element.dbVersion;
-        })[0].dbVersion;
-        const majorDigitIndex = modelVersion.search(/\d/);
-
-        if (majorDigitIndex !== -1) {
-            const majorDigit = modelVersion[majorDigitIndex];
-            isOldModel = majorDigit < 3;
-        }
-    }
-
+    const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
     const itemProperties = item.properties;
 
     alterTableScript += Object.keys(itemProperties)
@@ -527,26 +526,31 @@ const getAlterModifyScript = (child, udtMap, data) => {
         resultScript += Object.keys(fieldsInUDT).reduce((alterNameScript, fieldKey) => {
             const itemOldName = _.get(fieldsInUDT[fieldKey], 'compMod.oldField.name');
             const itemNewName = _.get(fieldsInUDT[fieldKey], 'compMod.newField.name');
-
             const compMod = _.get(fieldsInUDT[fieldKey], 'compMod');
-            const oldField = {oldField: compMod.oldField};
-            const newField = {newField: compMod.newField};
+            const { oldField, newField } = compMod;
 
-            const oldFieldCassandraType = getTypeByData(oldField.oldField, {}, 'newField');
-            const newFieldCassandraType = getTypeByData(newField.newField, {}, 'oldField');
+            const oldFieldCassandraType = getTypeByData(oldField, {}, 'newField');
+            const newFieldCassandraType = getTypeByData(newField, {}, 'oldField');
+            const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
 
             alterNameScript += Object.keys(bucketsWithCurrentDefinition).reduce((script, bucketName) => {
 
                 if (newFieldCassandraType && oldFieldCassandraType && newFieldCassandraType !== oldFieldCassandraType) {
-                    if (fieldTypeCompatible(oldFieldCassandraType, newFieldCassandraType)) {
-                        script += getUpdateType({
-                            keySpace: bucketName,
-                            tableName: udtKey,
-                            columnData: {
-                                name: fieldKey,
-                                type: newFieldCassandraType
-                            }
-                        });
+                    if (isOldModel && fieldTypeCompatible(oldFieldCassandraType, newFieldCassandraType)) {
+                        const bucket = bucketsWithCurrentDefinition[bucketName];
+
+                        script += bucket.reduce((alterTypeScript, tableData) => {
+                            alterTypeScript += getUpdateType({
+                                keySpace: bucketName,
+                                tableName: tableData.code || tableData.collectionName,
+                                columnData: {
+                                    name: fieldKey,
+                                    type: newFieldCassandraType
+                                }
+                            });
+
+                            return alterTypeScript;
+                        }, '');
                     }
                 }
 
@@ -554,8 +558,8 @@ const getAlterModifyScript = (child, udtMap, data) => {
                     script += getRenameType({
                         keySpaceName: bucketName,
                         udtName: udtKey,
-                        oldFieldName: itemOldName,
-                        newFieldName: itemNewName
+                        oldFieldName: 'udt_field',
+                        newFieldName: 'udt_field1'
                     })
                 }
                 return script;

@@ -1,6 +1,4 @@
-const cassandra = require('../../reverse_engineering/cassandraHelper');
-
-const applyToInstance = (connectionInfo, logger, cb) => {
+const applyToInstance = (cassandra) => (connectionInfo, logger) => {
 	const script = connectionInfo.script;
 
 	if (!Array.isArray(connectionInfo.hosts)) {
@@ -87,6 +85,4 @@ const modifyLineError = (error, wholeScript, query) => {
 	return Object.assign({}, error, { message });
 };
 
-module.exports = {
-	applyToInstance
-};
+module.exports = applyToInstance;

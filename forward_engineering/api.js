@@ -7,7 +7,7 @@ const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 const { getAlterScript } = require('./helpers/updateHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
-const { applyToInstance } = require('./helpers/applyToInstance');
+const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
 
 module.exports = {
 	generateScript(data, logger, callback) {
@@ -115,6 +115,14 @@ module.exports = {
 			.catch(error => {
 				callback(error);
 			});
+	},
+
+	testConnection(connectionInfo, logger, callback) {
+		testConnection(connectionInfo)
+			.then(
+				callback,
+				callback
+			);
 	}
 };
 

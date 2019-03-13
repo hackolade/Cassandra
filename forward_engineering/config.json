@@ -6,5 +6,10 @@
 	"level": {
 		"entity": true,
 		"container": true
+	},
+	"applyScriptToInstance": true,
+	"compMode": {
+		"entity": true,
+		"container": false
 	}
 }

@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "author": "Hackolade",
-  "dependencies": {},
+  "dependencies": {
+    "lodash": "^4.17.11"
+  },
   "installed": true
 }

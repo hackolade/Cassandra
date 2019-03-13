@@ -8,6 +8,11 @@ module.exports = {
 	connect: function(connectionInfo, logger, cb){
 		logger.clear();
 		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
+		if (!Array.isArray(connectionInfo.hosts)) {
+			return cb({ message: 'Hosts were not defined' });
+		}
+
 		cassandra.connect(connectionInfo).then(cb, cb);
 	},
 
@@ -57,15 +62,18 @@ module.exports = {
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
 			const tableNames = tables[keyspaceName] || [];
-			let udtHash = [];
 			let udfData = [];
 			
 			cassandra.getUDF(keyspaceName)
 			.then(udf => {
+				logger.progress({ message: 'UDF has loaded', containerName: keyspaceName, entityName: '' });
+
 				udfData = cassandra.handleUDF(udf);
 				return cassandra.getUDA(keyspaceName)
 			})
 			.then(uda => {
+				logger.progress({ message: 'UDA has loaded', containerName: keyspaceName, entityName: '' });
+
 				let udaData = cassandra.handleUDA(uda);
 				pipeline(udaData, udfData);
 			})
@@ -91,41 +99,60 @@ module.exports = {
 							collectionName: tableName,
 							documents: []
 						};
-						let columns = [];
+						const loadProgress = progress.bind(null, logger, keyspaceName, tableName);
+						const exec = (promise, startMessage, finishMessage) => {
+							loadProgress(startMessage);
+							return promise.then(result => {
+								loadProgress(finishMessage);
+
+								return result;
+							});
+						};
 	
-						cassandra.getTableMetadata(keyspaceName, tableName)
-						.then(table => {
-							columns = table.columns;
+						Promise.all([
+							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
+							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings), 'Load records...', 'Records have loaded')
+						]).then(([table, records]) => {
+							logger.progress({ message: 'Meta data has loaded', containerName: keyspaceName, entityName: tableName });
+
 							packageData = cassandra.getPackageData({
 								keyspaceName,
 								table,
 								tableName,
-								udtHash,
 								UDFs,
-								UDAs
+								UDAs,
+								records
 							}, includeEmptyCollection);
+
 							return packageData;
 						})
-						.then(packageData => {
-							return packageData && columns && columns.length ? cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings) : null;
-						})
-						.then(columns => {
-							if (columns) {
-								packageData.documents = columns;
-							}
-							return tableCallback(null, packageData);
-						})
-						.catch(tableCallback);
+						.then(
+							packageData => tableCallback(null, packageData),
+							err => tableCallback(err)
+						);
 					}, (err, res) => {
 						if (err) {
 							logger.log('error', cassandra.prepareError(err), "Error");
 						}
+
 						return keyspaceCallback(err, res)
 					});
 				}
 			};
 		}, (err, res) => {
+			if (!err) {
+				logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
+			}
+
 			return cb(err, res);
 		});
 	}
 };
+
+const progress = (logger, keyspace, table, message) => {
+	logger.progress({
+		containerName: keyspace,
+		entityName: table,
+		message: message
+	});
+}

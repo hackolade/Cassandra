@@ -41,17 +41,17 @@ const getKeyspaceInfo = (keyspace) => {
 	const strategy = metaData.strategy.split('.').slice(-1).pop();
 	let keyspaceInfo = {
 		code: keyspace,
-		durableWrites: metaData.durableWrites,
+		durableWrites: Boolean(metaData.durableWrites),
 		replStrategy: strategy
 	};
 
 	if (strategy === 'SimpleStrategy') {
-		keyspaceInfo.replFactor = metaData.strategyOptions.replication_factor;
+		keyspaceInfo.replFactor = Number(metaData.strategyOptions.replication_factor);
 	} else if (strategy === 'NetworkTopologyStrategy') {
 		keyspaceInfo.dataCenters = Object.keys(metaData.strategyOptions).map(key => {
 			return {
 				dataCenterName: key,
-				replFactorValue: metaData.strategyOptions[key]
+				replFactorValue: Number(metaData.strategyOptions[key])
 			};
 		});
 	}
@@ -89,10 +89,10 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 	return connectionDataItem;
 };
 
-const getTableSchema = (columns, udtHash) => {
+const getTableSchema = (columns, udtHash, sample = {}) => {
 	let schema = {};
 	columns.forEach(column => {
-		const columnType = typesHelper.getColumnType(column, udtHash);
+		const columnType = typesHelper.getColumnType(column, udtHash, sample[column.name]);
 		schema[column.name] = columnType;
 		schema[column.name].code = column.name;
 		schema[column.name].static = column.isStatic;
@@ -142,15 +142,25 @@ const getEntityLevelData = (table, tableName) => {
 	};
 };
 
+const changeQuotes = (str) => {
+	return String(str).replace(/\"/g, '\'');
+};
+
+const getCompaction = (data) => {
+	return Object.assign({}, data.compactionOptions, {
+		class: data.compactionClass
+	});
+};
+
 const getTableOptions = (table) => {
 	const options = [
 		`read_repair_chance = ${table.readRepairChance}`,
 		`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
 		`gc_grace_seconds = ${table.gcGraceSeconds}`,
 		`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
-		`caching = ${table.caching}`,
-		`compaction = ${JSON.stringify(table.compactionOptions)}`,
-		`compression = ${JSON.stringify(table.compression)}`,
+		`caching = ${changeQuotes(table.caching)}`,
+		`compaction = ${changeQuotes(JSON.stringify(getCompaction(table)))}`,
+		`compression = ${changeQuotes(JSON.stringify(table.compression))}`,
 		`default_time_to_live = ${table.defaultTtl}`,
 		`speculative_retry = '${table.speculativeRetry}'`,
 		`min_index_interval = ${table.minIndexInterval}`,
@@ -200,11 +210,12 @@ const handleUdts = (udts) => {
 	if (udts && udts.length) {
 		let schema = { properties: {}};
 
-		udts.forEach(udt => {
-			schema.properties[udt.name] = {
+		udts.forEach(({ udt, sample }) => {
+			const name = udt.type.info.name || udt.name;
+			schema.properties[name] = {
 				type: 'udt',
 				static: udt.isStatic,
-				properties: getTableSchema(udt.type.info.fields).properties
+				properties: getTableSchema(udt.type.info.fields, null, sample).properties
 			};
 		});
 		return schema;
@@ -228,10 +239,12 @@ const getUDA = (keyspace) => {
 	return execute(query);
 };
 
+const removeFrozen = str => str.replace(/frozen\<(.*)\>/i, '$1')
+
 const handleUDF = (udf) => {
 	const udfData = udf.rows.map(item => {
 		const args = item.argument_names.map((name, index) => {
-			return `${name} ${item.argument_types[index] || ''}`;
+			return `${name} ${removeFrozen(item.argument_types[index] || '')}`;
 		}).join(', ');
 
 		const deterministic = item.deterministic ? 'DETERMINISTIC' : '';
@@ -239,7 +252,7 @@ const handleUDF = (udf) => {
 
 		const func = `CREATE OR REPLACE FUNCTION ${item.function_name} ( ${args} )
 			${item.called_on_null_input ? 'CALLED' : 'RETURNS NULL'} ON NULL INPUT
-			RETURNS ${item.return_type}  ${deterministic} ${monotonic}
+			RETURNS ${removeFrozen(item.return_type)}  ${deterministic} ${monotonic}
 			LANGUAGE ${item.language} AS
 			$$ ${item.body} $$ ;`;
 
@@ -253,14 +266,14 @@ const handleUDF = (udf) => {
 
 const handleUDA = (uda) => {
 	const udaData = uda.rows.map(item => {
-		const args = item.argument_types.join(', ');
+		const args = item.argument_types.map(removeFrozen).join(', ');
 		
-		const aggr = `CREATE AGGREGATE  ${item.aggregate_name} (${args})
-			SFUNC ${item.state_func}
-			STYPE ${item.state_type}
-			FINALFUNC ${item.final_func}
-			INITCOND ${item.initcond}
-			${item.deterministic ? 'DETERMINISTIC' : ''};`;
+		const aggr = `CREATE AGGREGATE  ${item.aggregate_name} (${args})` +
+			`\n\t\t\tSFUNC ${item.state_func}` +
+			`\n\t\t\tSTYPE ${removeFrozen(item.state_type)}` +
+			(item.final_func !== null ? `\n\t\t\tFINALFUNC ${item.final_func}` : '') +
+			`\n\t\t\tINITCOND ${item.initcond}` +
+			`${item.deterministic ? '\n\t\t\tDETERMINISTIC' : ''};`;
 
 		return {
 			name: item.aggregate_name,
@@ -274,7 +287,7 @@ const getPackageData = (data, includeEmptyCollection) => {
 	let packageData = {
 		dbName: data.keyspaceName,
 		collectionName: data.tableName,
-		documents: []
+		documents: data.records
 	};
 
 	if (data.table.columns && data.table.columns.length) {
@@ -282,16 +295,106 @@ const getPackageData = (data, includeEmptyCollection) => {
 		packageData.bucketInfo.UDFs = data.UDFs;
 		packageData.bucketInfo.UDAs = data.UDAs;
 		packageData.entityLevel = getEntityLevelData(data.table, data.tableName);
-		
-		const schema = getTableSchema(data.table.columns, data.udtHash);
+		const udtHash = [];
+		const mergedDocument = mergeDocuments(data.records);
+		const schema = getTableSchema(data.table.columns, udtHash, mergedDocument);
 		packageData.validation = {
 			jsonSchema: schema
 		};
-		packageData.modelDefinitions = handleUdts(data.udtHash);
+		packageData.documentTemplate = mergedDocument;
+		packageData.modelDefinitions = handleUdts(udtHash);
 	} else if (!includeEmptyCollection) {
 		packageData = null;
 	}
 	return packageData;
+};
+const mergeDocuments = (documents) => {
+	const split = (arr, f) => {
+		return arr.reduce((result, item) => {
+			if (f(item)) {
+				return [
+					result[0].concat([ item ]),
+					result[1]
+				];
+			} else {
+				return [
+					result[0],
+					result[1].concat([ item ])
+				];
+			}
+		}, [[], []]);
+	};
+	const uniqByType = (arr) => {
+		const hash = {};
+
+		return arr.reduce((result, item) => {
+			if (!hash[typeof item]) {
+				hash[typeof item] = true;
+
+				return result.concat([item]);
+			} else {
+				return result;
+			}
+		}, []);
+	};
+	const mergeByType = (arr) => {
+		const [arrays, noArrays] = split(arr, Array.isArray);
+		const [objects, rest] = split(noArrays, isObject);
+		const scalars = uniqByType(rest);
+		const mergedObject = objects.reduce(merge, {});
+		const result = scalars.concat(arrays.reduce(merge, []));
+
+		if (Object.keys(mergedObject).length) {
+			return result.concat([mergedObject]);
+		}
+
+		return result;
+	};
+	const isObject = (obj) => obj && typeof obj === 'object' && !Array.isArray(obj);
+	const mergeArray = (arr1, arr2) => {
+		const arr = arr1.concat(arr2);
+		if (!arr.length) {
+			return [];
+		}
+
+		return mergeByType(arr);
+	};
+	const mergeObjects = (obj1, obj2) => {
+		return Object.keys(obj1).concat(Object.keys(obj2)).reduce((result, key) => {
+			return Object.assign({}, result, {
+				[key]: merge(obj1[key], obj2[key])
+			});
+		}, {});
+	};
+	const merge = (doc1, doc2) => {
+		if (Array.isArray(doc1) && Array.isArray(doc2)) {
+			return mergeArray(doc1, doc2);
+		} else if (isObject(doc1) && isObject(doc2)) {
+			return mergeObjects(doc1, doc2);
+		} else if (Array.isArray(doc1)) {
+			return merge(doc1, []);
+		} else if (Array.isArray(doc2)) {
+			return merge([], doc2);
+		} else if (isObject(doc1)) {
+			return merge(doc1, {});
+		} else if (isObject(doc2)) {
+			return merge({}, doc2);
+		} else if (doc1 !== undefined) {
+			return doc1;
+		} else if (doc2 !== undefined) {
+			return doc2;
+		}
+	};
+
+	if (!Array.isArray(documents) || !documents.length) {
+		return {};
+	}
+	
+	try {
+		return JSON.parse(JSON.stringify(documents)).reduce(merge, {});
+	} catch (e) {
+		return {};
+	}
 };
 
 const prepareError = (error) => {
@@ -311,6 +414,59 @@ const getSampleDocSize = (count, recordSamplingSettings) => {
 	return (recordSamplingSettings.active === 'absolute')
 		? recordSamplingSettings.absolute.value
 			: Math.round( count/100 * per);
+};
+
+const splitScriptByQueries = (script) => {
+	const findFunctionStatements = (script) => {
+		return (script.match(/\$\$([\s\S]+?)\$\$/g) || [])
+			.map(item => item.trim().replace(/(^\$\$|\$\$$)/g, ''));
+	};
+	const getPlaceholder = (n) => `\$__HACKOLADE__PLACEHOLDER_${n}__\$`;
+	const functionStatements = findFunctionStatements(script);
+
+	const queries = functionStatements.reduce((script, func, i) => {
+		return script.replace(func, getPlaceholder(i));
+	}, script)
+		.split(';')
+		.map(query => query.trim())
+		.filter(Boolean);
+
+	return functionStatements.reduce((queries, func, i) => {
+		return queries.map(query => query.replace(getPlaceholder(i), func));
+	}, queries);
+};
+
+const batch = (script, progress) => {
+	const queries = splitScriptByQueries(script);
+
+	const totalQueries = queries.length;
+	let currentQuery = 0;
+
+	return promiseSeriesAll(
+		queries.map(query => () => state.client.execute(query)),
+		(result) => {
+			const query = queries[currentQuery];
+
+			progress(query, result, currentQuery, totalQueries);
+
+			currentQuery++;
+		}
+	).then(
+		result => result,
+		error => Promise.reject({ error, query: queries[currentQuery] })
+	);
+};
+
+const promiseSeriesAll = (promises, callback) => {
+	if (!promises.length) {
+		return Promise.resolve();
+	}
+
+	return promises[0]().then(result => {
+		callback(result);
+
+		return promiseSeriesAll(promises.slice(1), callback);
+	});
 };
 
 module.exports = {
@@ -333,5 +489,6 @@ module.exports = {
 	handleUDA,
 	getPackageData,
 	prepareError,
-	filterKeyspaces
+	filterKeyspaces,
+	batch
 };

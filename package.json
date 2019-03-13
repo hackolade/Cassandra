@@ -1,11 +1,11 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.22",
-	"versionDate": "2019-02-06",
+	"version": "0.1.23",
+	"versionDate": "2019-03-13",
 	"author": "hackolade",
 	"engines": {
 		"hackolade": "2.1.x",
-		"hackoladePlugin": "1.1.0"
+		"hackoladePlugin": "1.2.0"
 	},
 	"contributes": {
 		"target": {

@@ -268,7 +268,7 @@ const handleUDA = (uda) => {
 	const udaData = uda.rows.map(item => {
 		const args = item.argument_types.map(removeFrozen).join(', ');
 		
-		const aggr = `CREATE AGGREGATE  ${item.aggregate_name} (${args})` +
+		const aggr = `CREATE OR REPLACE AGGREGATE ${item.aggregate_name} (${args})` +
 			`\n\t\t\tSFUNC ${item.state_func}` +
 			`\n\t\t\tSTYPE ${removeFrozen(item.state_type)}` +
 			(item.final_func !== null ? `\n\t\t\tFINALFUNC ${item.final_func}` : '') +

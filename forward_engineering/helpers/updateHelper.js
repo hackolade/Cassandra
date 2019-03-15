@@ -770,13 +770,13 @@ const sortScript = (scriptData) => {
 
     let sortedScripts = [];
     const udtFilter = (key, script) => script[key] && script.udtName;
-    const keyspaсeFilter = (key, script) => script[key] && _.isString(script.keySpaces) && !script.name;
+    const keyspaceFilter = (key, script) => script[key] && _.isString(script.keySpaces) && !script.name;
     const tableFilter = (key, script) => script[key] && _.isString(script.keySpaces) && script.name;
     const fieldFilter = (key, script) => script[key];
 
-    const { scripts: createKeyspacesScripts, filteredScripts: scriptsWithoutCreateKeyspace } = filter('added', scriptData, keyspaсeFilter);
-    const { scripts: deleteKeyspaceScripts, filteredScripts: scriptsWithoutDropKeyspace } = filter('deleted', scriptsWithoutCreateKeyspace, keyspaсeFilter);
-    const { scripts: modifyKeyspacesScripts, filteredScripts: scriptsWithoutModifyKeyspace } = filter('modified', scriptsWithoutDropKeyspace, keyspaсeFilter);
+    const { scripts: createKeyspacesScripts, filteredScripts: scriptsWithoutCreateKeyspace } = filter('added', scriptData, keyspaceFilter);
+    const { scripts: deleteKeyspaceScripts, filteredScripts: scriptsWithoutDropKeyspace } = filter('deleted', scriptsWithoutCreateKeyspace, keyspaceFilter);
+    const { scripts: modifyKeyspacesScripts, filteredScripts: scriptsWithoutModifyKeyspace } = filter('modified', scriptsWithoutDropKeyspace, keyspaceFilter);
     const { scripts: createTablesScripts, filteredScripts: scriptsWithoutCreateTable } = filter('added', scriptsWithoutModifyKeyspace, tableFilter);
     const { scripts: deleteTablesScripts, filteredScripts: scriptsWithoutDropTable } = filter('deleted', scriptsWithoutCreateTable, tableFilter);
     const { scripts: modifyTablesScripts, filteredScripts: scriptsWithoutModifyTable } = filter('modified', scriptsWithoutDropTable, tableFilter);

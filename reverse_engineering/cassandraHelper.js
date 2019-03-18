@@ -62,8 +62,36 @@ const getKeyspacesNames = () => {
 	return Object.keys(state.client.metadata.keyspaces);
 };
 
+const isOldVersion = () => {
+	const hosts = _.get(state, 'client.hosts._items');
+
+	if (!hosts) {
+		return false;
+	}
+	
+	const host = hosts[Object.keys(hosts)[0]];
+
+	if (!host) {
+		return false;
+	}
+
+	const version = host.getCassandraVersion();
+
+	if (!version.length) {
+		return false;
+	}
+
+	const majorDigit = _.get(version, '[0]');
+
+    return majorDigit < 3;
+};
+
 const getTablesNames = (keyspace) => {
-	const query = `SELECT table_name FROM system_schema.tables WHERE keyspace_name='${keyspace}'`;
+	const oldSelectTableNamePrefix = 'SELECT columnfamily_name FROM system.schema_columnfamilies';
+	const newSelectTableNamePrefix = 'SELECT table_name FROM system_schema.tables';
+	const query = isOldVersion() ? `${oldSelectTableNamePrefix} WHERE keyspace_name ='${keyspace}'` : 
+		`${newSelectTableNamePrefix} WHERE keyspace_name ='${keyspace}'`;
+
 	return execute(query);
 };
 
@@ -490,5 +518,6 @@ module.exports = {
 	getPackageData,
 	prepareError,
 	filterKeyspaces,
-	batch
+	batch,
+	isOldVersion
 };

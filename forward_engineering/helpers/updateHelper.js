@@ -306,6 +306,15 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
                 return alterTableScript;
             }
             let columnType = getTypeByData(tableProperties[columnName], udtMap, columnName);
+            
+            if (tableProperties[columnName].$ref && !columnType) {
+                columnType = _.last(tableProperties[columnName].$ref.split('/'));
+            }
+
+            if (!columnType) {
+                return alterTableScript;
+            }
+
             let keyspaceName;
 
             if (itemCompModData && itemCompModData.keyspaceName) {
@@ -451,7 +460,7 @@ const getAlterAddUdtScript = (child, udtMap, data) => {
                         return alterScript;
                     }
 
-                    alterScript += `"${currentPropKey}" ${getTypeByData(propertiesCopy[currentPropKey], udtMap)} \n`;
+                    alterScript += ` "${currentPropKey}" ${getTypeByData(propertiesCopy[currentPropKey], udtMap)} \n`;
 
                     return alterScript;
                 }, '');

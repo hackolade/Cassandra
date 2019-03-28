@@ -40,6 +40,9 @@
 		},
 		"set<map>": {
 			"childValueType": "map"
+		},
+		"set<udt>": {
+			"childValueType": "udt"
 		}
 	}
 }

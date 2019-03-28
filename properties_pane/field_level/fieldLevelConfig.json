@@ -742,7 +742,8 @@ making sure that you maintain a proper JSON format.
 					"set<set>",
 					"set<list>",
 					"set<map>",
-					"set<tuple>"
+					"set<tuple>",
+					"set<udt>"
 				]
 			},
 			{
@@ -822,7 +823,8 @@ making sure that you maintain a proper JSON format.
 					"list<set>",
 					"list<list>",
 					"list<map>",
-					"list<tuple>"
+					"list<tuple>",
+					"list<udt>"
 				]
 			},
 			{
@@ -959,7 +961,8 @@ making sure that you maintain a proper JSON format.
 					"map<set>",
 					"map<list>",
 					"map<map>",
-					"map<tuple>"
+					"map<tuple>",
+					"map<udt>"
 				]
 			},
 			{

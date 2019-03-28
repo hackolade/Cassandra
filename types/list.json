@@ -40,6 +40,9 @@
 		},
 		"list<map>": {
 			"childValueType": "map"
+		},
+		"list<udt>": {
+			"childValueType": "udt"
 		}
 	}
 }

@@ -40,7 +40,9 @@ module.exports = {
 
 				async.map(keyspaces, (keyspace, next) => {
 					cassandra.getTablesNames(keyspace).then(tablesData => {
-						const tableNames = tablesData.rows.map(table => table.table_name);
+						const table_name_selector = cassandra.isOldVersion() ? 'columnfamily_name' : 'table_name';
+						const tableNames = tablesData.rows.map(table => table[table_name_selector]);
+						
 						return next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames)); 
 					}).catch(next);
 				}, (err, result) => {

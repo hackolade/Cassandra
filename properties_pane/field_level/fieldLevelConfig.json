@@ -1194,7 +1194,14 @@ making sure that you maintain a proper JSON format.
 			"pattern",
 			"default",
 			"enum",
-			"sample",
+			{
+				"propertyName": "Sample",
+				"propertyKeyword": "sample",
+				"shouldValidate": true,
+				"propertyTooltip": "",
+				"propertyType": "text",
+				"regex": "[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}"
+			},
 			"comments"
 		],   
 		"timeuuid": [

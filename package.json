@@ -26,7 +26,8 @@
 			"disableMultipleTypes": true,
 			"disableReverseEngineering": false,
 			"disableChoices": true,
-			"enableJsonType": true
+			"enableJsonType": true,
+			"enableArrayItemName": true
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

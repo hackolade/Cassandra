@@ -1,9 +1,11 @@
+const _ = require('lodash');
 const types = require('cassandra-driver').types;
 const defaultData = require('../properties_pane/defaultData.json');
 const abbrHash = {
 	numeric: 'num',
 	char: 'str',
-	timestamp: 'st'
+	timestamp: 'ts',
+	reference: 'udt'
 };
 const defaultColumnName = defaultData.field.name;
 
@@ -22,7 +24,9 @@ const getColumnType = (column, udtHash, sample) => {
 };
 
 const getRef = (column) => {
-	const name = column.type.info.name || column.name;
+	const name = _.get(column, 'type.info.name', 
+		_.get(column, 'info.name', column.name)
+	);
 
 	return { type: 'reference', $ref: name };
 };
@@ -136,7 +140,7 @@ const getSubType = (type, subType) => {
 
 const getProperties = (valueData, sample, udtHash) => {
 	if (!sample || typeof sample !== 'object') {
-		return getDefaultProperties(valueData);
+		return getDefaultProperties(valueData, udtHash);
 	}
 
 	return Object.keys(sample).reduce((result, propertyName) => {
@@ -146,11 +150,12 @@ const getProperties = (valueData, sample, udtHash) => {
 	}, {});
 };
 
-const getDefaultProperties = (valueData) => {
-	const handledValueData = getColumnType(valueData);
+const getDefaultProperties = (valueData, udtHash) => {
+	const handledValueData = getColumnType(valueData, udtHash);
+	const name = handledValueData.$ref || defaultColumnName;
 
 	return {
-		[defaultColumnName]: handledValueData
+		[name]: handledValueData
 	};
 };
 
@@ -206,7 +211,7 @@ const isTypeEqual = (value, valueData) => {
 
 const getItems = (valueData, sample, udtHash) => {
 	if (!Array.isArray(sample)) {
-		return getDefaultItems(valueData);
+		return getDefaultItems(valueData, udtHash);
 	}
 
 	return sample.map(item => {
@@ -214,16 +219,21 @@ const getItems = (valueData, sample, udtHash) => {
 	});
 };
 
-const getDefaultItems = (valueData) => {
-	const handledValueData = getColumnType(valueData);
+const getDefaultItems = (valueData, udtHash) => {
+	const handledValueData = getColumnType(valueData, udtHash);
 
 	return [handledValueData];
 };
 
 const getChildTypeByProperties = (properties) => {
 	const key = Object.keys(properties).pop();
+	const type = (properties[key] || {}).type;
 
-	return (properties[key] || {}).type || 'text';
+	if (type) {
+		return type;
+	} else {
+		return 'text';
+	}
 };
 
 module.exports = {

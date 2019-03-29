@@ -164,11 +164,11 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 		();
 };
 
-const getUDTHandler = (type, udtTypeMap) => {
+const getUDTHandler = (type, udtTypeMap, parentIsFrozen) => {
 	return () => {
 		const data = (udtTypeMap[type] || {});
 
-		if (data.frozen) {
+		if (data.frozen && !parentIsFrozen) {
 			return getFrozen(data.name);
 		} else {
 			return data.name;
@@ -197,7 +197,7 @@ const getNestedTypeByData = (propertyData, isNeedToBeFrozen, udtTypeMap, propert
 	const freezingType = (
 		getStructuralTypeHandler(type, false, udtTypeMap)
 		||
-		getUDTHandler(type, udtTypeMap)
+		getUDTHandler(type, udtTypeMap, isNeedToBeFrozen)
 	)(propertyData, propertyName);
 
 	return (isNeedToBeFrozen) ? getFrozen(freezingType) : freezingType;

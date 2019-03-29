@@ -22,6 +22,10 @@ const setFrozenForAllUdt = (udtTypeMap) => {
 };
 
 const getName = (name, property) => {
+	if (typeof name === 'number' && property.name) {
+		return property.name;
+	}
+
 	return property.code || name;
 };
 

@@ -239,11 +239,13 @@ const handleUdts = (udts) => {
 		let schema = { properties: {}};
 
 		udts.forEach(({ udt, sample }) => {
-			const name = udt.type.info.name || udt.name;
+			const info = _.get(udt, 'type.info', _.get(udt, 'info'), {});
+			const name = info.name || udt.name;
+			const fields = info.fields || [];
 			schema.properties[name] = {
 				type: 'udt',
 				static: udt.isStatic,
-				properties: getTableSchema(udt.type.info.fields, null, sample).properties
+				properties: getTableSchema(fields, null, sample).properties
 			};
 		});
 		return schema;

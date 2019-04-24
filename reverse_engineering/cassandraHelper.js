@@ -1,9 +1,37 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
 const _ = require('lodash');
+const fs = require('fs');
 
 var state = {
 	client: null
+};
+
+const getSslOptions = (info) => {
+	const readFile = (filePath) => filePath ? fs.readFileSync(filePath) : '';
+	const add = (key, value, obj) => !value ? obj : Object.assign({}, obj, {
+		[key]: value
+	});
+	if (!info.ssl) {
+		return {};
+	}
+
+	const host = _.get(info, 'hosts[0].host', '');
+	const ca = readFile(info.sslCaFile);
+	const cert = readFile(info.sslCertFile);
+	const key = readFile(info.sslKeyFile);
+
+	const sslOptions = _.flow([
+		add.bind(null, 'ca', ca),
+		add.bind(null, 'cert', cert),
+		add.bind(null, 'key', key),
+		add.bind(null, 'host', host),
+	])({
+		rejectUnauthorized: true,
+		host
+	});
+
+	return { sslOptions };
 };
 
 const connect = (info) => {
@@ -13,13 +41,13 @@ const connect = (info) => {
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
 		const readTimeout = 60 * 1000;
-		state.client = new cassandra.Client({
+		state.client = new cassandra.Client(Object.assign({
 			contactPoints,
 			authProvider,
 			socketOptions: {
 				readTimeout
 			}
-		});
+		}, getSslOptions(info)));
 	}
 	
 	return state.client.connect();

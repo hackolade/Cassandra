@@ -1,7 +1,7 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.27",
-	"versionDate": "2019-04-03",
+	"version": "0.1.29",
+	"versionDate": "2019-05-16",
 	"author": "hackolade",
 	"engines": {
 		"hackolade": "2.1.x",
@@ -24,7 +24,7 @@
 			"disablePatternField": false,
 			"enableForwardEngineering": true,
 			"disableMultipleTypes": true,
-			"disableReverseEngineering": false,
+			"enableReverseEngineering": true,
 			"disableChoices": true,
 			"enableJsonType": true,
 			"enableArrayItemName": true

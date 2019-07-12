@@ -7,47 +7,101 @@ var state = {
 	client: null
 };
 
-const getSslOptions = (info) => {
+const requireKeyStore = (app) => new Promise((resolve, reject) => {
+	return app.require('java-ssl', (err, Keystore) => {
+		if (err) {
+			reject(err);
+		} else {
+			resolve(Keystore);
+		}
+	});
+});
+
+const getCertificatesFromFiles = (info) => {
 	const readFile = (filePath) => filePath ? fs.readFileSync(filePath) : '';
+	
+	try {
+		const ca = readFile(info.sslCaFile);
+		const cert = readFile(info.sslCertFile);
+		const key = readFile(info.sslKeyFile);
+	
+		return Promise.resolve({
+			ca, cert, key
+		});
+	} catch (e) {
+		return Promise.reject(e);
+	}
+};
+
+const getCertificatesFromKeystore = (info, app) => {
+	return requireKeyStore(app).then((Keystore) => {
+		const store = Keystore(info.keystore, info.keystorepass);
+		const ca = store.getCert(info.alias);
+		const key = store.getPrivateKey(info.alias);
+	
+		return {
+			cert: ca,
+			key,
+			ca,
+		};
+	});
+};
+
+const getSslOptions = (info, app) => {
 	const add = (key, value, obj) => !value ? obj : Object.assign({}, obj, {
 		[key]: value
 	});
 	if (!info.ssl) {
-		return {};
+		return Promise.resolve({});
 	}
 
 	const host = _.get(info, 'hosts[0].host', '');
-	const ca = readFile(info.sslCaFile);
-	const cert = readFile(info.sslCertFile);
-	const key = readFile(info.sslKeyFile);
+	let sslPromise;
 
-	const sslOptions = _.flow([
-		add.bind(null, 'ca', ca),
-		add.bind(null, 'cert', cert),
-		add.bind(null, 'key', key),
-		add.bind(null, 'host', host),
-	])({
-		rejectUnauthorized: true,
-		host
+	if (info.ssl === 'jks') {
+		sslPromise = getCertificatesFromKeystore(info, app);
+	} else {
+		sslPromise = getCertificatesFromFiles(info);
+	}
+
+	return sslPromise.then(ssl => {
+		const sslOptions = _.flow([
+			add.bind(null, 'ca', ssl.ca),
+			add.bind(null, 'cert', ssl.cert),
+			add.bind(null, 'key', ssl.key),
+			add.bind(null, 'host', host),
+		])({
+			rejectUnauthorized: true,
+			host
+		});
+	
+		return { sslOptions };
 	});
-
-	return { sslOptions };
 };
 
-const connect = (info) => {
+const connect = (app) => (info) => {
 	if (!state.client) {
 		const username = info.user;
 		const password = info.password;
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
 		const readTimeout = 60 * 1000;
-		state.client = new cassandra.Client(Object.assign({
-			contactPoints,
-			authProvider,
-			socketOptions: {
-				readTimeout
-			}
-		}, getSslOptions(info)));
+		
+		return getSslOptions(info, app)
+			.then(sslOptions => {
+				return new cassandra.Client(Object.assign({
+					contactPoints,
+					authProvider,
+					socketOptions: {
+						readTimeout
+					}
+				}, sslOptions));
+			})
+			.then((client) => {
+				state.client = client;
+
+				return state.client.connect();
+			});
 	}
 	
 	return state.client.connect();
@@ -456,6 +510,10 @@ const mergeDocuments = (documents) => {
 };
 
 const prepareError = (error) => {
+	if (!(error instanceof Error)) {
+		return error;
+	}
+
 	return {
 		message: error.message,
 		stack: error.stack

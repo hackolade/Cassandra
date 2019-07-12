@@ -5,7 +5,7 @@ const cassandra = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 
 module.exports = {
-	connect: function(connectionInfo, logger, cb){
+	connect: function(connectionInfo, logger, cb, app){
 		logger.clear();
 		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 
@@ -13,7 +13,11 @@ module.exports = {
 			return cb({ message: 'Hosts were not defined' });
 		}
 
-		cassandra.connect(connectionInfo).then(cb, cb);
+		cassandra.connect(app)(connectionInfo)
+			.then(cb, (error) => {
+				logger.log('error', error, 'Connection error');
+				cb(error);
+			});
 	},
 
 	disconnect: function(connectionInfo, cb){
@@ -21,17 +25,18 @@ module.exports = {
 		cb();
 	},
 
-	testConnection: function(connectionInfo, logger, cb){
+	testConnection: function(connectionInfo, logger, cb, app){
 		this.connect(connectionInfo, logger, (error) => {
 			this.disconnect(connectionInfo, () => {});
-			return cb(error);
-		});
+
+			return cb(cassandra.prepareError(error));
+		}, app);
 	},
 
-	getDbCollectionsNames: function(connectionInfo, logger, cb) {
+	getDbCollectionsNames: function(connectionInfo, logger, cb, app) {
 		const { includeSystemCollection } = connectionInfo;
 
-		cassandra.connect(connectionInfo).then(() => {
+		cassandra.connect(app)(connectionInfo).then(() => {
 				let keyspaces = cassandra.getKeyspacesNames();
 
 				if (!includeSystemCollection) {
@@ -49,7 +54,8 @@ module.exports = {
 					return cb(err, result);
 				});
 			}).catch((error) => {
-				return cb(error || 'error');
+				logger.log('error', error);
+				return cb(cassandra.prepareError(error) || 'error');
 			});
 	},
 

@@ -54,11 +54,25 @@
 				"inputKeyword": "password",
 				"inputType": "password",
 				"isHiddenKey": true
-			},
+			}
+		]	
+	}, {
+		"lowerTab": "SSL",
+		"structure": [
 			{
-				"inputLabel": "Use SSL",
+				"inputLabel": "SSL Type",
 				"inputKeyword": "ssl",
-				"inputType": "checkbox"
+				"inputType": "select",
+				"options": [{
+					"label": "None",
+					"value": false
+				}, {
+					"label": "Certificates",
+					"value": true
+				}, {
+					"label": "Java Keystore",
+					"value": "jks"
+				}]
 			},
 			{
 				"inputLabel": "Certificate Authority",
@@ -95,7 +109,39 @@
 					"key": "ssl",
 					"value": true
 				}
+			},
+			{
+				"inputLabel": "Keystore",
+				"inputKeyword": "keystore",
+				"inputType": "file",
+				"inputPlaceholder": "Kyestore File",
+				"extensions": ["*"],
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Password",
+				"inputKeyword": "keystorepass",
+				"inputType": "password",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Alias Name",
+				"inputKeyword": "alias",
+				"inputType": "text",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
 			}
-		]	
+		]
 	}
 ]

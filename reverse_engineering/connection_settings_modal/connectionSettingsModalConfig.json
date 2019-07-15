@@ -83,7 +83,7 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssl",
-					"value": true
+					"value": [true, "true"]
 				}
 			},
 			{
@@ -95,7 +95,7 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssl",
-					"value": true
+					"value": [true, "true"]
 				}
 			},
 			{
@@ -107,7 +107,7 @@
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssl",
-					"value": true
+					"value": [true, "true"]
 				}
 			},
 			{

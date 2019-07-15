@@ -47,11 +47,13 @@ const getCertificatesFromKeystore = (info, app) => {
 	});
 };
 
+const isSsl = (ssl) => ssl && ssl !== 'false';
+
 const getSslOptions = (info, app) => {
 	const add = (key, value, obj) => !value ? obj : Object.assign({}, obj, {
 		[key]: value
 	});
-	if (!info.ssl) {
+	if (!isSsl(info.ssl)) {
 		return Promise.resolve({});
 	}
 

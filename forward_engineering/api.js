@@ -104,11 +104,11 @@ module.exports = {
 		}
 	},
 
-	applyToInstance(connectionInfo, logger, callback) {
+	applyToInstance(connectionInfo, logger, callback, app) {
 		logger.clear();
 		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 
-		applyToInstance(connectionInfo, logger)
+		applyToInstance(connectionInfo, logger, app)
 			.then(result => {
 				callback(null, result);
 			})
@@ -117,8 +117,8 @@ module.exports = {
 			});
 	},
 
-	testConnection(connectionInfo, logger, callback) {
-		testConnection(connectionInfo)
+	testConnection(connectionInfo, logger, callback, app) {
+		testConnection(connectionInfo, app)
 			.then(
 				callback,
 				callback

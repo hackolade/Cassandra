@@ -1,11 +1,11 @@
-const applyToInstance = (cassandra) => (connectionInfo, logger) => {
+const applyToInstance = (cassandra) => (connectionInfo, logger, app) => {
 	const script = connectionInfo.script;
 
 	if (!Array.isArray(connectionInfo.hosts)) {
 		return Promise.reject({ message: 'Hosts were not defined' });
 	}
 
-	return cassandra.connect(connectionInfo)
+	return cassandra.connect(app)(connectionInfo)
 		.then(() => {
 			logger.log('info', {
 				message: 'Applying cassandra script has been started'
@@ -55,7 +55,7 @@ const applyToInstance = (cassandra) => (connectionInfo, logger) => {
 		.catch(err => {
 			cassandra.close();
 
-			return Promise.reject(err);
+			return Promise.reject(cassandra.prepareError(err));
 		});
 };
 

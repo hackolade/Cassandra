@@ -54,11 +54,25 @@
 				"inputKeyword": "password",
 				"inputType": "password",
 				"isHiddenKey": true
-			},
+			}
+		]	
+	}, {
+		"lowerTab": "SSL",
+		"structure": [
 			{
-				"inputLabel": "Use SSL",
+				"inputLabel": "SSL Type",
 				"inputKeyword": "ssl",
-				"inputType": "checkbox"
+				"inputType": "select",
+				"options": [{
+					"label": "None",
+					"value": false
+				}, {
+					"label": "Java Keystore",
+					"value": "jks"
+				}, {
+					"label": "Certificates",
+					"value": true
+				}]
 			},
 			{
 				"inputLabel": "Certificate Authority",
@@ -66,10 +80,9 @@
 				"inputType": "file",
 				"inputPlaceholder": "Certificate Authority",
 				"extensions": ["pem", "crt", "key"],
-				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssl",
-					"value": true
+					"value": [true, "true"]
 				}
 			},
 			{
@@ -78,10 +91,9 @@
 				"inputType": "file",
 				"inputPlaceholder": "Client Certificate",
 				"extensions": ["pem", "crt", "key"],
-				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssl",
-					"value": true
+					"value": [true, "true"]
 				}
 			},
 			{
@@ -90,12 +102,42 @@
 				"inputType": "file",
 				"inputPlaceholder": "Client Private Key",
 				"extensions": ["pem", "crt", "key"],
+				"dependency": {
+					"key": "ssl",
+					"value": [true, "true"]
+				}
+			},
+			{
+				"inputLabel": "Keystore",
+				"inputKeyword": "keystore",
+				"inputType": "file",
+				"inputPlaceholder": "Keystore path and filename",
+				"extensions": ["*"],
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Keystore password",
+				"inputKeyword": "keystorepass",
+				"inputType": "password",
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "ssl",
-					"value": true
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Alias Name",
+				"inputKeyword": "alias",
+				"inputType": "text",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
 				}
 			}
-		]	
+		]
 	}
 ]

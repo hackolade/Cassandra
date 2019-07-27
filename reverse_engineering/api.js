@@ -3,12 +3,10 @@
 const async = require('async');
 const cassandra = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
+const logHelper = require('./logHelper');
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
-		logger.clear();
-		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
-
 		if (!Array.isArray(connectionInfo.hosts)) {
 			return cb({ message: 'Hosts were not defined' });
 		}
@@ -26,7 +24,15 @@ module.exports = {
 	},
 
 	testConnection: function(connectionInfo, logger, cb, app){
+		logInfo('Test connection', connectionInfo, logger);
+
 		this.connect(connectionInfo, logger, (error) => {
+			if (error) {
+				logger.log('info', 'Connection failed', 'Test connection');
+			} else {
+				logger.log('info', 'Connection successful', 'Test connection');
+			}
+
 			this.disconnect(connectionInfo, () => {});
 
 			return cb(cassandra.prepareError(error));
@@ -34,6 +40,7 @@ module.exports = {
 	},
 
 	getDbCollectionsNames: function(connectionInfo, logger, cb, app) {
+		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
 
 		cassandra.connect(app)(connectionInfo).then(() => {
@@ -54,14 +61,13 @@ module.exports = {
 					return cb(err, result);
 				});
 			}).catch((error) => {
-				logger.log('error', error);
+				logger.log('error', error, 'Retrieving keyspaces and tables information');
 				return cb(cassandra.prepareError(error) || 'error');
 			});
 	},
 
 	getDbCollectionsData: function(data, logger, cb){
-		logger.clear();
-		logger.log('info', data, 'connectionInfo', data.hiddenKeys);
+		logInfo('Retrieving schema', data, logger);
 	
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;
@@ -140,7 +146,7 @@ module.exports = {
 						);
 					}, (err, res) => {
 						if (err) {
-							logger.log('error', cassandra.prepareError(err), "Error");
+							logger.log('error', cassandra.prepareError(err), "Retrieving schema");
 						}
 
 						return keyspaceCallback(err, res)
@@ -155,6 +161,12 @@ module.exports = {
 			return cb(err, res);
 		});
 	}
+};
+
+const logInfo = (step, connectionInfo, logger) => {
+	logger.clear();
+	logger.log('info', logHelper.getSystemInfo(connectionInfo.appVersion), step);
+	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 };
 
 const progress = (logger, keyspace, table, message) => {

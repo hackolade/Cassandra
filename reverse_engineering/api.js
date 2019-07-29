@@ -67,7 +67,7 @@ module.exports = {
 	},
 
 	getDbCollectionsData: function(data, logger, cb){
-		logInfo('Retrieving schema', data, logger);
+		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 	
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;

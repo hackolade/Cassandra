@@ -6,15 +6,16 @@ const GROUP = 'group';
 const BLOCK = 'block';
 
 const getStringStart = str => str === '' ? '\nWITH' : 'AND';
+const changeQuotes = str => String(str || '').replace(/[\"\`]/g, '\'');
 
 const transformOptionToString = (option) => {
 	switch (option['propertyType']) {
-		case TEXT: return `${option['propertyKeyword']} = \'${option.value}\'`;
+		case TEXT: return `${option['propertyKeyword']} = '${option.value}'`;
 		case BLOCK: return transformBlockOptionToString(option);
 		case CHECKBOX: return transformBooleanOptionToString(option);
 		case GROUP: return transformGroupOptionsToString(option);
-		case NUMERIC:
-		case DETAILS:return `${option['propertyKeyword']} = ${option.value}`;
+		case NUMERIC: 
+		case DETAILS: return `${option['propertyKeyword']} = ${option.value}`;
 		default: return null;
 	}
 };
@@ -22,6 +23,10 @@ const transformOptionToString = (option) => {
 const transformBlockOptionToString = option => {
 	if (option['propertyKeyword'] === 'clustering') {
 		return transformClusteringOptionToString(option);
+	}
+
+	if (option['propertyKeyword'] === 'caching') {
+		return transformCachingOptionToString(option);
 	}
 
 	return null;
@@ -67,6 +72,35 @@ const transformClusteringOptionToString = option => {
 
 	const order = option.value['descending_order'] ? 'DESC' : 'ASC';
 	return `CLUSTERING ORDER BY (${columnName} ${order})`;
+}
+
+const transformCachingOptionToString = option => {
+	const validateKeys = value => allowedValues.includes(value) ? value : null;
+	const validateRows = value => {
+		if (allowedValues.includes(value)) {
+			return value;
+		}
+
+		if (!isNaN(value)) {
+			return Number(value);
+		}
+
+		return null;
+	};
+	const createValueObject = (keys, rows) => Object.assign(
+		{},
+		keys && { keys },
+		rows && { rows_per_partition: rows }
+	);
+	const allowedValues = ['ALL', 'NONE'];
+	const keys = validateKeys(option.value['keys']);
+	const rows = validateRows(option.value['rows_per_partition']);
+
+	if (!keys && !rows) {
+		return null;
+	}
+
+	return `caching = ${JSON.stringify(createValueObject(keys, rows))}`;
 }
 
 const generateOptionsStringReducer = (str, option) => {

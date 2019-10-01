@@ -217,14 +217,6 @@ making sure that you maintain a proper JSON format.
 						"step": 0.01
 					},
 					{
-						"propertyName": "Caching",
-						"propertyKeyword": "caching",
-						"propertyType": "details",
-						"template": "textarea",
-						"valueType": "string",
-						"markdown": false
-					},
-					{
 						"propertyName": "Compression",
 						"propertyKeyword": "compression",
 						"propertyType": "details",
@@ -251,10 +243,26 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "checkbox"
 					},
 					{
-						"propertyName": "Clustering",
+						"propertyName": "Caching",
+						"propertyKeyword": "caching",
 						"propertyType": "block",
+						"structure": [
+							{
+								"propertyName": "Keys",
+								"propertyKeyword": "keys",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Rows per partition",
+								"propertyKeyword": "rows_per_partition",
+								"propertyType": "text"
+							}
+						]
+					},
+					{
+						"propertyName": "Clustering",
 						"propertyKeyword": "clustering",
-						"propertyTooltip": "",
+						"propertyType": "block",
 						"structure": [
 							{
 								"propertyName": "Column name",

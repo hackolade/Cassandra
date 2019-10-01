@@ -9,6 +9,8 @@ const {
 } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
+const { getEntityLevelConfig } = require('./generalHelper');
+const { parseTableOptions } = require('./parseTableOptions');
 
 module.exports = {
 	getTableStatement({
@@ -40,7 +42,7 @@ module.exports = {
 			tableName,
 			getColumnDefinition(tableData.properties || {}, udtTypeMap),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableComment, tableOptions)
+			getOptions(tableOptions, tableComment)
 		);
 	}
 };
@@ -99,53 +101,25 @@ const getClusteringKeys = (clusteringKeysHash) => {
 	}
 };
 
-const getOptions = (clusteringKeys, clusteringKeysHash, id, comment, tableOptions) => {
-	const changeQuotes = (str) => String(str || '').replace(/[\"\`]/g, '\'');
-	const getClusteringOrder = (clusteringKeys, clusteringKeysHash) => {
-		const order = (order) => (order === 'ascending') ? 'ASC' : 'DESC'; 
-		const orderString = clusteringKeys.map(key => {
-			const name = clusteringKeysHash[key.keyId];
-
-			if (name) {
-				return `"${name}" ${order(key.type)}`;
-			}
-		}).filter(key => key).join(', ');
-
-		if (orderString) {
-			return `CLUSTERING ORDER BY (${orderString})`;
-		} else {
-			return false;
-		}
-	};
-	const parseTableOptions = (tableOptions) => (tableOptions || "")
-		.replace(/;$/, "")
-		.split('AND')
-		.map(option => String(option || '').trim())
-		.map(changeQuotes)
-		.filter(option => option);
-
-	let options = [];
-	const clusteringOrder = getClusteringOrder(clusteringKeys, clusteringKeysHash);
-	const hasId = id && !/id\=/gi.test(tableOptions);
-	const hasComment = comment && !/comments\=/gi.test(tableOptions);
-
-	if (clusteringOrder) {
-		options.push(clusteringOrder);
+const seedOptionsWithValues = (options, valueObject) => options.map(option => {
+	const value = valueObject[option['propertyKeyword']];
+	if (!value) {
+		return option;
 	}
 
-	if (hasId) {
-		options.push(`ID='${id}'`);
-	}
+	return Object.assign({}, option, { value });
+});
 
-	if (hasComment) {
-		options.push(`comment='${comment}'`);
-	}
+const getOptionsFromTab = config => {
+	const optionsBlock = config.structure.find(prop => prop.propertyName === 'Options');
+	return optionsBlock.structure;
+}
 
-	options = options.concat(parseTableOptions(tableOptions));
 
-	if (options.length) {
-		return `\nWITH ${ options.join("\n" + tab("AND ")) }`;
-	} else {
-		return "";
-	}
+const getOptions = (tableOptions, comment) => {
+	const [detailsTab] = getEntityLevelConfig();
+	const configOptions = getOptionsFromTab(detailsTab);
+	const optionsWithValues = seedOptionsWithValues(configOptions, tableOptions);
+
+	return parseTableOptions(optionsWithValues, comment);
 };

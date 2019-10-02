@@ -10,7 +10,7 @@ const {
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
 const { getEntityLevelConfig } = require('./generalHelper');
-const { parseTableOptions } = require('./parseTableOptions');
+const { parseTableOptions, addId, addClustering } = require('./parseTableOptions');
 
 module.exports = {
 	getTableStatement({
@@ -42,7 +42,7 @@ module.exports = {
 			tableName,
 			getColumnDefinition(tableData.properties || {}, udtTypeMap),
 			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(tableOptions, tableComment)
+			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableOptions, tableComment)
 		);
 	}
 };
@@ -115,11 +115,14 @@ const getOptionsFromTab = config => {
 	return optionsBlock.structure;
 }
 
-
-const getOptions = (tableOptions, comment) => {
+const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment) => {
 	const [detailsTab] = getEntityLevelConfig();
 	const configOptions = getOptionsFromTab(detailsTab);
 	const optionsWithValues = seedOptionsWithValues(configOptions, tableOptions);
+	const optionsString = parseTableOptions(optionsWithValues, comment);
 
-	return parseTableOptions(optionsWithValues, comment);
+	return addId(
+		tableId,
+		addClustering(clusteringKeys, clusteringKeysHash, optionsString)
+	);
 };

@@ -146,18 +146,13 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"structure": [
 					{
-						"propertyName": "ID",
-						"propertyKeyword": "ID",
-						"propertyType": "text"
-					},
-					{
 						"propertyName": "Speculative retry",
-						"propertyKeyword": "speculative_retry",
+						"propertyKeyword": "speculativeRetry",
 						"propertyType": "text"
 					},
 					{
 						"propertyName": "Bloom filter fp chance",
-						"propertyKeyword": "bloom_filter_fp_chance",
+						"propertyKeyword": "bloomFilterFalsePositiveChance",
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
@@ -166,7 +161,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Dclocal read repair chance",
-						"propertyKeyword": "dclocal_read_repair_chance",
+						"propertyKeyword": "localReadRepairChance",
 						"propertyTooltip": "Dclocal read repair chance",
 						"propertyType": "numeric",
 						"valueType": "number",
@@ -176,7 +171,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Default time to live",
-						"propertyKeyword": "default_time_to_live",
+						"propertyKeyword": "defaultTtl",
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
@@ -184,32 +179,45 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Gc grace seconds",
-						"propertyKeyword": "gc_grace_seconds",
+						"propertyKeyword": "gcGraceSeconds",
 						"propertyType": "numeric",
-						"valueType": "number"
+						"valueType": "number",
+						"minValue": 0
+					},
+					{
+						"propertyName": "Crc check chance",
+						"propertyKeyword": "crcCheckChance",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 1,
+						"step": 0.1
 					},
 					{
 						"propertyName": "Memtable flush period in ms",
-						"propertyKeyword": "memtable_flush_period_in_ms",
+						"propertyKeyword": "memtableFlushPeriod",
 						"propertyTooltip": "Memtable flush period in ms",
 						"propertyType": "numeric",
-						"valueType": "number"
+						"valueType": "number",
+						"minValue": 0
 					},
 					{
 						"propertyName": "Min index interval",
-						"propertyKeyword": "min_index_interval",
+						"propertyKeyword": "minIndexInterval",
 						"propertyType": "numeric",
-						"valueType": "number"
+						"valueType": "number",
+						"minValue": 1
 					},
 					{
 						"propertyName": "Max index interval",
-						"propertyKeyword": "max_index_interval",
+						"propertyKeyword": "maxIndexInterval",
 						"propertyType": "numeric",
-						"valueType": "number"
+						"valueType": "number",
+						"minValue": 1
 					},
 					{
 						"propertyName": "Read repair chance",
-						"propertyKeyword": "read_repair_chance",
+						"propertyKeyword": "readRepairChance",
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0,
@@ -239,7 +247,7 @@ making sure that you maintain a proper JSON format.
 					},
 					{
 						"propertyName": "Compact storage",
-						"propertyKeyword": "compact_storage",
+						"propertyKeyword": "compactStorage",
 						"propertyType": "checkbox"
 					},
 					{
@@ -254,33 +262,15 @@ making sure that you maintain a proper JSON format.
 							},
 							{
 								"propertyName": "Rows per partition",
-								"propertyKeyword": "rows_per_partition",
+								"propertyKeyword": "rowsPerPartition",
 								"propertyType": "text"
 							}
 						]
 					},
 					{
-						"propertyName": "Clustering",
-						"propertyKeyword": "clustering",
-						"propertyType": "block",
-						"structure": [
-							{
-								"propertyName": "Column name",
-								"propertyKeyword": "column_name",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "Descending order",
-								"propertyKeyword": "descending_order",
-								"propertyType": "checkbox"
-							}
-						]
-					},
-					{
-						"propertyName": "Props with nested",
+						"propertyName": "Other properties",
 						"propertyType": "group",
-						"propertyKeyword": "nested_property",
-						"propertyTooltip": "property with nested properties",
+						"propertyKeyword": "otherProperties",
 						"structure": [
 							{
 								"propertyName": "name",

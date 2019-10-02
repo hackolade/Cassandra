@@ -1,22 +1,14 @@
-const CLUSTERING = 'clustering';
 const COMPACTION = 'compaction';
 const CACHING = 'caching';
-const specialOptions = [CACHING, COMPACTION, CLUSTERING];
+const specialOptions = [CACHING, COMPACTION];
 
 const handleSpecialOption = (optionName, tableMeta) => {
 	switch (optionName) {
-		case CLUSTERING: return handleClusteringOption(tableMeta);
 		case COMPACTION: return handleCompactionOption(tableMeta);
 		case CACHING: return handleCashingOption(tableMeta);
 		default: return null;
 	}
 };
-
-const handleClusteringOption = tableMeta => {
-	const { compactionClass, compactionOptions } = tableMeta;
-	const valueObj = Object.assign({}, { class: compactionClass }, compactionOptions);
-	return JSON.stringify(valueObj);
-}
 
 const handleCompactionOption = tableMeta => {
 	const { compactionClass, compactionOptions } = tableMeta;

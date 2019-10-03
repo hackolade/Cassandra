@@ -1,14 +1,21 @@
 const COMPACTION = 'compaction';
+const COMPRESSION = 'compression';
 const CACHING = 'caching';
-const specialOptions = [CACHING, COMPACTION];
+const specialOptions = [CACHING, COMPACTION, COMPRESSION];
 
 const handleSpecialOption = (optionName, tableMeta) => {
 	switch (optionName) {
 		case COMPACTION: return handleCompactionOption(tableMeta);
 		case CACHING: return handleCashingOption(tableMeta);
+		case COMPRESSION: return handleCompressionOption(tableMeta);
 		default: return null;
 	}
 };
+
+const handleCompressionOption = tableMeta => {
+	const { compression } = tableMeta;
+	return JSON.stringify(compression);
+}
 
 const handleCompactionOption = tableMeta => {
 	const { compactionClass, compactionOptions } = tableMeta;

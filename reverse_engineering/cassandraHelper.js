@@ -2,6 +2,8 @@ const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
 const _ = require('lodash');
 const fs = require('fs');
+const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
+const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
 
 var state = {
 	client: null
@@ -264,22 +266,15 @@ const getCompaction = (data) => {
 	});
 };
 
+const getOptionsFromTab = config => {
+	const optionsBlock = config.structure.find(prop => prop.propertyName === 'Options');
+	return optionsBlock.structure;
+}
+
 const getTableOptions = (table) => {
-	const options = [
-		`read_repair_chance = ${table.readRepairChance}`,
-		`dclocal_read_repair_chance = ${table.localReadRepairChance}`,
-		`gc_grace_seconds = ${table.gcGraceSeconds}`,
-		`bloom_filter_fp_chance = ${table.bloomFilterFalsePositiveChance}`,
-		`caching = ${changeQuotes(table.caching)}`,
-		`compaction = ${changeQuotes(JSON.stringify(getCompaction(table)))}`,
-		`compression = ${changeQuotes(JSON.stringify(table.compression))}`,
-		`default_time_to_live = ${table.defaultTtl}`,
-		`speculative_retry = '${table.speculativeRetry}'`,
-		`min_index_interval = ${table.minIndexInterval}`,
-		`max_index_interval = ${table.maxIndexInterval}`,
-		`crc_check_chance = ${table.crcCheckChance}`
-	];
-	return options.join('\nAND ');
+	const [detailsTab] = getEntityLevelConfig();
+	const configOptions = getOptionsFromTab(detailsTab);
+	return createTableOptionsFromMeta(table, configOptions);
 };
 
 const getKeyOrder = (order) => {

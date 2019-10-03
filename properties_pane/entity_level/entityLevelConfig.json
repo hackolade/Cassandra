@@ -141,12 +141,153 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Options",
+				"propertyType": "block",
 				"propertyKeyword": "tableOptions",
-				"propertyTooltip": "Table options separated by 'AND'",
-				"propertyType": "details",
-				"template": "textarea",
-				"valueType": "string",
-				"markdown": false
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Speculative retry",
+						"propertyKeyword": "speculativeRetry",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Bloom filter fp chance",
+						"propertyKeyword": "bloomFilterFalsePositiveChance",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 1,
+						"step": 0.01
+					},
+					{
+						"propertyName": "Dclocal read repair chance",
+						"propertyKeyword": "localReadRepairChance",
+						"propertyTooltip": "Dclocal read repair chance",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 1,
+						"step": 0.01
+					},
+					{
+						"propertyName": "Default time to live",
+						"propertyKeyword": "defaultTtl",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 630720000
+					},
+					{
+						"propertyName": "Gc grace seconds",
+						"propertyKeyword": "gcGraceSeconds",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0
+					},
+					{
+						"propertyName": "Crc check chance",
+						"propertyKeyword": "crcCheckChance",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 1,
+						"step": 0.1
+					},
+					{
+						"propertyName": "Memtable flush period in ms",
+						"propertyKeyword": "memtableFlushPeriod",
+						"propertyTooltip": "Memtable flush period in ms",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0
+					},
+					{
+						"propertyName": "Min index interval",
+						"propertyKeyword": "minIndexInterval",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 1
+					},
+					{
+						"propertyName": "Max index interval",
+						"propertyKeyword": "maxIndexInterval",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 1
+					},
+					{
+						"propertyName": "Read repair chance",
+						"propertyKeyword": "readRepairChance",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 1,
+						"step": 0.01
+					},
+					{
+						"propertyName": "Compression",
+						"propertyKeyword": "compression",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string",
+						"markdown": false
+					},
+					{
+						"propertyName": "Compaction",
+						"propertyKeyword": "compaction",
+						"propertyType": "details",
+						"template": "textarea",
+						"valueType": "string",
+						"markdown": false
+					},
+					{
+						"propertyName": "CDC log",
+						"propertyKeyword": "cdc",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Compact storage",
+						"propertyKeyword": "compactStorage",
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Caching",
+						"propertyKeyword": "caching",
+						"propertyType": "block",
+						"structure": [
+							{
+								"propertyName": "Keys",
+								"propertyKeyword": "keys",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Rows per partition",
+								"propertyKeyword": "rowsPerPartition",
+								"propertyType": "text"
+							}
+						]
+					},
+					{
+						"propertyName": "Other properties",
+						"propertyType": "group",
+						"propertyKeyword": "otherProperties",
+						"structure": [
+							{
+								"propertyName": "name",
+								"propertyKeyword": "name",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "value",
+								"propertyKeyword": "value",
+								"propertyType": "details",
+								"template": "textarea",
+								"valueType": "string",
+								"markdown": false
+							}
+						]
+					}
+				]
 			},
 			{
 				"propertyName": "Comments",

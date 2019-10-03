@@ -48,6 +48,7 @@ const cacheResult = (method) => {
 };
 
 const getFieldLevelConfig = cacheResult(() => getConfig(path.join("properties_pane", "field_level", "fieldLevelConfig.json")));
+const entityLevelConfig = cacheResult(() => getConfig(path.join("properties_pane", "entity_level", "entityLevelConfig.json")));
 
 const getTypesConfig = cacheResult(() => {
 	const getName = typeFile => typeFile.replace(/\.json/, "");
@@ -62,6 +63,7 @@ const getTypesConfig = cacheResult(() => {
 });
 
 const getTypeConfig = (type) => getTypesConfig()[type];
+const getEntityLevelConfig = () => entityLevelConfig();
 
 const getFieldConfig = (type, property) => {
 	const fieldLevelConfig = getFieldLevelConfig().structure;
@@ -130,5 +132,6 @@ module.exports = {
 	getTypeConfig,
 	getNameWithKeyspace,
 	eachField,
-	canTypeHaveSubtype
+	canTypeHaveSubtype,
+	getEntityLevelConfig,
 };

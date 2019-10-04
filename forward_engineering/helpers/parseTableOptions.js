@@ -139,7 +139,7 @@ const transformCachingOption = option => {
 }
 
 const generateOptionsStringReducer = (str, option) => {
-	if (!option.value) {
+	if (!option.value && typeof option.value !== 'number') {
 		return str;
 	}
 

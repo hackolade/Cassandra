@@ -103,7 +103,7 @@ const getClusteringKeys = (clusteringKeysHash) => {
 
 const seedOptionsWithValues = (options, valueObject) => options.map(option => {
 	const value = valueObject[option['propertyKeyword']];
-	if (!value) {
+	if (!value && typeof value !== 'number') {
 		return option;
 	}
 

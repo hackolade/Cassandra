@@ -119,10 +119,10 @@ const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, c
 	const [detailsTab] = getEntityLevelConfig();
 	const configOptions = getOptionsFromTab(detailsTab);
 	const optionsWithValues = seedOptionsWithValues(configOptions, tableOptions);
-	const optionsString = parseTableOptions(optionsWithValues, comment);
-
-	return addId(
+	const optionsString = addId(
 		tableId,
-		addClustering(clusteringKeys, clusteringKeysHash, optionsString)
+		addClustering(clusteringKeys, clusteringKeysHash, parseTableOptions(optionsWithValues, comment))
 	);
+
+	return optionsString ? optionsString.replace(/\n$/, '') : '';
 };

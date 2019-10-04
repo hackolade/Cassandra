@@ -7,7 +7,7 @@ const OTHER = 'otherProperties';
 const CACHING = 'caching';
 const specialOptions = [CACHING, OTHER];
 
-const getStringStart = str => str === '' ? '\nWITH' : 'AND';
+const getStringStart = str => str === '' ? '\nWITH' : '  AND';
 const changeQuotes = str => String(str || '').replace(/[\"\`]/g, '\'');
 
 const tableOptionsHashMap = {
@@ -86,7 +86,7 @@ const transformOtherOptions = option => {
 				return optionString;
 			}
 
-			const start = optionString === '' ? '' : 'AND';
+			const start = optionString === '' ? '' : '  AND';
 			return optionString.concat(`${start} ${name} = '${value}'\n`);
 		}, '')
 		.replace(/\n$/, '');

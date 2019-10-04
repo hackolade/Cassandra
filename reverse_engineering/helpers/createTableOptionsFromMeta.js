@@ -3,6 +3,7 @@ const COMPRESSION = 'compression';
 const CACHING = 'caching';
 const specialOptions = [CACHING, COMPACTION, COMPRESSION];
 
+const changeQuotes = str => String(str || '').replace(/[\"\`]/g, '\'');
 const handleSpecialOption = (optionName, tableMeta) => {
 	switch (optionName) {
 		case COMPACTION: return handleCompactionOption(tableMeta);
@@ -14,13 +15,13 @@ const handleSpecialOption = (optionName, tableMeta) => {
 
 const handleCompressionOption = tableMeta => {
 	const { compression } = tableMeta;
-	return JSON.stringify(compression);
+	return changeQuotes(JSON.stringify(compression));
 }
 
 const handleCompactionOption = tableMeta => {
 	const { compactionClass, compactionOptions } = tableMeta;
 	const valueObj = Object.assign({}, { class: compactionClass }, compactionOptions);
-	return JSON.stringify(valueObj);
+	return changeQuotes(JSON.stringify(valueObj));
 }
 
 const handleCashingOption = tableMeta => {

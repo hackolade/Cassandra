@@ -10,42 +10,7 @@ const {
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
 const { getEntityLevelConfig } = require('./generalHelper');
-const { parseTableOptions, addId, addClustering } = require('./parseTableOptions');
-
-module.exports = {
-	getTableStatement({
-		tableData,
-		tableMetaData,
-		dataSources,
-		keyspaceMetaData,
-		udtTypeMap
-	}) {
-		const keyspaceName = retrieveContainerName(keyspaceMetaData);
-		const tableName = retrieveEntityName(tableMetaData);
-		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
-		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
-		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
-		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
-		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "tableOptions", "");
-
-		const partitionKeysHash = getNamesByIds(
-			partitionKeys.map(key => key.keyId),
-			dataSources
-		);
-		const clusteringKeysHash = getNamesByIds(
-			clusteringKeys.map(key => key.keyId),
-			dataSources
-		);
-
-		return getCreateTableStatement(
-			keyspaceName,
-			tableName,
-			getColumnDefinition(tableData.properties || {}, udtTypeMap),
-			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableOptions, tableComment)
-		);
-	}
-};
+const { parseToString, addId, addClustering } = require('./tableOptionService/parseToString');
 
 const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options) => {
 	const items = [];
@@ -103,7 +68,7 @@ const getClusteringKeys = (clusteringKeysHash) => {
 
 const seedOptionsWithValues = (options, valueObject) => options.map(option => {
 	const value = valueObject[option['propertyKeyword']];
-	if (!value && typeof value !== 'number') {
+	if (value === undefined) {
 		return option;
 	}
 
@@ -115,14 +80,54 @@ const getOptionsFromTab = config => {
 	return optionsBlock.structure;
 }
 
-const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment) => {
+const mergeValuesWithConfigOptions = values => {
 	const [detailsTab] = getEntityLevelConfig();
 	const configOptions = getOptionsFromTab(detailsTab);
-	const optionsWithValues = seedOptionsWithValues(configOptions, tableOptions);
+	return seedOptionsWithValues(configOptions, values);
+}
+
+const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment) => {
+	const optionsWithValues = mergeValuesWithConfigOptions(tableOptions);
 	const optionsString = addId(
 		tableId,
-		addClustering(clusteringKeys, clusteringKeysHash, parseTableOptions(optionsWithValues, comment))
+		addClustering(clusteringKeys, clusteringKeysHash, parseToString(optionsWithValues, comment))
 	);
 
 	return optionsString ? optionsString.replace(/\n$/, '') : '';
+};
+
+module.exports = {
+	getTableStatement({
+		tableData,
+		tableMetaData,
+		dataSources,
+		keyspaceMetaData,
+		udtTypeMap
+	}) {
+		const keyspaceName = retrieveContainerName(keyspaceMetaData);
+		const tableName = retrieveEntityName(tableMetaData);
+		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
+		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
+		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
+		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
+		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "tableOptions", "");
+
+		const partitionKeysHash = getNamesByIds(
+			partitionKeys.map(key => key.keyId),
+			dataSources
+		);
+		const clusteringKeysHash = getNamesByIds(
+			clusteringKeys.map(key => key.keyId),
+			dataSources
+		);
+
+		return getCreateTableStatement(
+			keyspaceName,
+			tableName,
+			getColumnDefinition(tableData.properties || {}, udtTypeMap),
+			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
+			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableOptions, tableComment)
+		);
+	},
+	mergeValuesWithConfigOptions,
 };

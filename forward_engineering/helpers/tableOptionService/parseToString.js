@@ -186,7 +186,7 @@ const addClustering = (clusteringKeys, clusteringKeysHash, options) => {
 }
 
 module.exports = {
-	parseTableOptions(options, comment) {
+	parseToString(options, comment) {
 		const optionString = options.reduce(generateOptionsStringReducer, '');
 		const optionsWithComment = addCommentToOptionString(optionString, comment);
 		return optionsWithComment;

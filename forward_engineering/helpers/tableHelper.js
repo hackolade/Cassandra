@@ -87,7 +87,7 @@ const mergeValuesWithConfigOptions = values => {
 }
 
 const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment) => {
-	const optionsWithValues = mergeValuesWithConfig(tableOptions);
+	const optionsWithValues = mergeValuesWithConfigOptions(tableOptions);
 	const optionsString = addId(
 		tableId,
 		addClustering(clusteringKeys, clusteringKeysHash, parseToString(optionsWithValues, comment))

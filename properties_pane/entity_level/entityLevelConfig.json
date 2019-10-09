@@ -146,11 +146,6 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"structure": [
 					{
-						"propertyName": "Speculative retry",
-						"propertyKeyword": "speculativeRetry",
-						"propertyType": "text"
-					},
-					{
 						"propertyName": "Bloom filter fp chance",
 						"propertyKeyword": "bloomFilterFalsePositiveChance",
 						"propertyType": "numeric",
@@ -158,6 +153,28 @@ making sure that you maintain a proper JSON format.
 						"minValue": 0,
 						"maxValue": 1,
 						"step": 0.01
+					},
+					{
+						"propertyName": "Caching",
+						"propertyKeyword": "caching",
+						"propertyType": "block",
+						"structure": [
+							{
+								"propertyName": "Keys",
+								"propertyKeyword": "keys",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "Rows per partition",
+								"propertyKeyword": "rowsPerPartition",
+								"propertyType": "text"
+							}
+						]
+					},
+					{
+						"propertyName": "CDC log",
+						"propertyKeyword": "cdc",
+						"propertyType": "checkbox"
 					},
 					{
 						"propertyName": "Dclocal read repair chance",
@@ -183,15 +200,6 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "numeric",
 						"valueType": "number",
 						"minValue": 0
-					},
-					{
-						"propertyName": "Crc check chance",
-						"propertyKeyword": "crcCheckChance",
-						"propertyType": "numeric",
-						"valueType": "number",
-						"minValue": 0,
-						"maxValue": 1,
-						"step": 0.1
 					},
 					{
 						"propertyName": "Memtable flush period in ms",
@@ -225,6 +233,20 @@ making sure that you maintain a proper JSON format.
 						"step": 0.01
 					},
 					{
+						"propertyName": "Speculative retry",
+						"propertyKeyword": "speculativeRetry",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Crc check chance",
+						"propertyKeyword": "crcCheckChance",
+						"propertyType": "numeric",
+						"valueType": "number",
+						"minValue": 0,
+						"maxValue": 1,
+						"step": 0.1
+					},
+					{
 						"propertyName": "Compression",
 						"propertyKeyword": "compression",
 						"propertyType": "details",
@@ -241,31 +263,9 @@ making sure that you maintain a proper JSON format.
 						"markdown": false
 					},
 					{
-						"propertyName": "CDC log",
-						"propertyKeyword": "cdc",
-						"propertyType": "checkbox"
-					},
-					{
 						"propertyName": "Compact storage",
 						"propertyKeyword": "compactStorage",
 						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Caching",
-						"propertyKeyword": "caching",
-						"propertyType": "block",
-						"structure": [
-							{
-								"propertyName": "Keys",
-								"propertyKeyword": "keys",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "Rows per partition",
-								"propertyKeyword": "rowsPerPartition",
-								"propertyType": "text"
-							}
-						]
 					},
 					{
 						"propertyName": "Other properties",

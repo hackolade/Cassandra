@@ -25,20 +25,24 @@ const optionDefaultValues = {
 const isDiff = (oldValue, value, optionName) => {
 	switch(optionName) {
 		case COMPRESSION:
-		case COMPACTION: return diffParsedJsonString(oldValue, value);
-		case CACHING: return diffCaching(oldValue, value);
+		case COMPACTION: return isDiffParsedJsonString(oldValue, value);
+		case CACHING: return isDiffCaching(oldValue, value);
 		default: return oldValue !== value;
 	}
 };
 
-const diffParsedJsonString = (oldValue, value) => {
+const isDiffParsedJsonString = (oldValue, value) => {
+	if (oldValue === '' || value === '') {
+		return oldValue !== value;
+	}
+
 	const jsonOld = JSON.parse(oldValue.replace(/[\'']/g, '\"'));
 	const jsonNew = JSON.parse(value.replace(/[\'']/g, '\"'));
 
 	return !_.isEqual(jsonOld, jsonNew);
 };
 
-const diffCaching = (oldValue, value) => {
+const isDiffCaching = (oldValue, value) => {
 	const jsonOld = Object.assign({}, oldValue, { id: null });
 	const jsonNew = Object.assign({}, value, { id: null });
 

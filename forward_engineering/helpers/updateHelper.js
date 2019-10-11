@@ -174,8 +174,9 @@ const handleItem = (item, udtMap, generator, data) => {
             const option = handleOptions(generator, itemCompModData, tableName);
 
             if (option) {
+                const optionAddingScript = `${alterTablePrefix(tableName, keyspaceName)}\n${option};`;
                 alterTableScript = alterTableScript.concat([{
-                    script: option,
+                    script: optionAddingScript,
                     added: false,
                     deleted: false,
                     modified: true,

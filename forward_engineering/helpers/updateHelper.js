@@ -1,7 +1,9 @@
 const { getTypeByData } = require('./typeHelper');
 const { getReplication, getDurableWrites } = require('./keyspaceHelper');
 const { tab, retrivePropertyFromConfig } = require('./generalHelper');
-const { getTableStatement } = require('./tableHelper');
+const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
+const { getDiff } = require('./tableOptionService/getDiff');
+const { parseToString } = require('./tableOptionService/parseToString');
 const _ = require('lodash');
 
 const typesCompatibility = {
@@ -22,29 +24,13 @@ const getUpdate = updateData => getDelete(updateData) + getAdd(updateData);
 const objectContainsProp = (object, key) => object[key] ? true : false;
 const getAnd = data => ` AND ${data.key} = '${data.value}'`;
 const getDeleteTable = deleteData => { return deleteData.keySpace ? `DROP TABLE "${deleteData.keySpace}"."${deleteData.tableName}";\n\n` : `DROP TABLE "${deleteData.tableName}";\n\n` };
+const isCommentNew = comment => comment && comment.new !== comment.old;
 const getChangeOption = changeData => {
-    const newOptions = getComparedOptions(changeData.options.new.split("\nAND "), changeData.options.old.split("\nAND "));
-    let alterTableScript = '';
-
-    if (changeData.comment && changeData.comment.new !== changeData.comment.old) {
-        alterTableScript += `${alterTablePrefix(changeData.tableName, changeData.keySpace)} WITH comment = '${changeData.comment ? changeData.comment.new : changeData.comment.old}'`;
-    } else if (newOptions.length) {
-        alterTableScript += `${alterTablePrefix(changeData.tableName, changeData.keySpace)} WITH ${firstKey} = '${firstValue}'`;
-    } else {
-        return alterTableScript;
-    }
-
-    if (!newOptions.length) {
-        return alterTableScript += ';\n\n';
-    }
-
-    alterTableScript += '\n' + newOptions.map((element) => {
-        const key = Object.keys(element)[0];
-        const value = element[key];
-        return getAnd({ key, value });
-    }).join('\n');
-
-    return alterTableScript += ';\n\n';
+    const optionsDiff = getDiff(changeData.options.new, changeData.options.old);
+    const configOptionsWithValues = mergeValuesWithConfigOptions(optionsDiff);
+    return isCommentNew(changeData.comment)
+        ? parseToString(configOptionsWithValues, changeData.comment.new)
+        : parseToString(configOptionsWithValues);
 };
 const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n`;
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE "${keySpaceName}"`;
@@ -188,8 +174,9 @@ const handleItem = (item, udtMap, generator, data) => {
             const option = handleOptions(generator, itemCompModData, tableName);
 
             if (option) {
+                const optionAddingScript = `${alterTablePrefix(tableName, keyspaceName)}\n${option};`;
                 alterTableScript = alterTableScript.concat([{
-                    script: option,
+                    script: optionAddingScript,
                     added: false,
                     deleted: false,
                     modified: true,

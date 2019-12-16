@@ -127,13 +127,13 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Partition key",
 				"propertyKeyword": "compositePartitionKey",
 				"propertyType": "primaryKeySetter",
-				"abbr": "PK"
+				"abbr": "pk,PK"
 			}, 
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"propertyType": "primaryKeySetter",
-				"abbr": "CK",
+				"abbr": "pk,CK",
 				"attributeList": [
 					{ "name": "ascending", "abbr": "\u2191" },
 					{ "name": "descending", "abbr": "\u2193" }

@@ -13,6 +13,7 @@
 				"inputLabel": "Cluster type",
 				"inputKeyword": "clusterType",
 				"inputType": "select",
+				"defaultValue": "",
 				"options": [{
 					"label": "Simple",
 					"value": ""

@@ -1,5 +1,6 @@
-const applyToInstance = (cassandra) => (connectionInfo, logger, app) => {
+const applyToInstance = (cassandraHelper) => (connectionInfo, logger, app) => {
 	const script = connectionInfo.script;
+	const cassandra = cassandraHelper(app.require('lodash'));
 
 	return cassandra.connect(app)(connectionInfo)
 		.then(() => {

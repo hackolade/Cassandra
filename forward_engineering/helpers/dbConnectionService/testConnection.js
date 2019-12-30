@@ -1,4 +1,6 @@
-module.exports = (cassandra) => (connectionInfo, app) => {
+module.exports = (cassandraHelper) => (connectionInfo, app) => {
+	const cassandra = cassandraHelper(app.require('lodash'));
+
 	return cassandra.connect(app)(connectionInfo)
 		.then(() => {
 			cassandra.close();

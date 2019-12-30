@@ -32,7 +32,9 @@ const getKeyspaceStatement = (keyspaceData) => {
 	const dataCenters = retrivePropertyFromConfig(keyspaceData, 0, "dataCenters", []);
 	const durableWrites = retrivePropertyFromConfig(keyspaceData, 0, "durableWrites", false);
 
-	if (keyspaceName === "") {
+	if (!keyspaceData[0].addToCqlScript) {
+		return "";
+	} else if (keyspaceName === "") {
 		return "";
 	} else {
 		return getCreateStatement(

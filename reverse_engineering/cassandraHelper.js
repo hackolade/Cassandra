@@ -84,6 +84,20 @@ module.exports = (_) => {
 			return { sslOptions };
 		});
 	};
+
+	const getPolicy = (info) => {
+		if (info.localDataCenter) {
+			return {
+				localDataCenter: info.localDataCenter
+			};
+		} else {
+			return {
+				policies : {
+					loadBalancing : new cassandra.policies.loadBalancing.RoundRobinPolicy()
+				}
+			};
+		}
+	};
 	
 	const getDistributedClient = (app, info) => {
 		if (!Array.isArray(info.hosts)) {
@@ -104,7 +118,7 @@ module.exports = (_) => {
 					socketOptions: {
 						readTimeout
 					}
-				}, sslOptions));
+				}, getPolicy(info), sslOptions));
 			});
 	};
 	

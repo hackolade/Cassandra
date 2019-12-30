@@ -37,6 +37,13 @@
 						}
 					}
 				]
+			},
+			{
+				"inputLabel": "Secure Connect Bundle",
+				"inputKeyword": "secureConnectBundle",
+				"inputType": "file",
+				"inputPlaceholder": "Secure Connect Bundle",
+				"extensions": ["zip"]
 			}
 		]
 	}, {

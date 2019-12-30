@@ -1,10 +1,6 @@
 const applyToInstance = (cassandra) => (connectionInfo, logger, app) => {
 	const script = connectionInfo.script;
 
-	if (!Array.isArray(connectionInfo.hosts)) {
-		return Promise.reject({ message: 'Hosts were not defined' });
-	}
-
 	return cassandra.connect(app)(connectionInfo)
 		.then(() => {
 			logger.log('info', {

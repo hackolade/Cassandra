@@ -1,6 +1,6 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
-const _ = require('lodash');
+let _;
 const fs = require('fs');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
@@ -83,24 +83,56 @@ const getSslOptions = (info, app) => {
 	});
 };
 
+const getDistributedClient = (app, info) => {
+	if (!Array.isArray(info.hosts)) {
+		throw new Error('Hosts were not defined');
+	}
+
+	const username = info.user;
+	const password = info.password;
+	const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
+	const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
+	const readTimeout = 60 * 1000;
+	
+	return getSslOptions(info, app)
+		.then(sslOptions => {
+			return new cassandra.Client(Object.assign({
+				contactPoints,
+				authProvider,
+				socketOptions: {
+					readTimeout
+				}
+			}, sslOptions));
+		});
+};
+
+const getCloudClient = (info) => {
+	const client = new cassandra.Client(Object.assign({
+		cloud: {
+			secureConnectBundle: info.secureConnectBundle
+		},
+		credentials: {
+			username: info.user,
+			password: info.password
+		}
+	}));
+
+	return Promise.resolve(client);
+};
+
+const getClient = (app, info) => {
+	if (fs.existsSync(info.secureConnectBundle)) {
+		return getCloudClient(info);
+	} else {
+		return getDistributedClient(app, info);
+	}
+};
+
 const connect = (app) => (info) => {
+	_ = app.require('lodash');
+
 	if (!state.client) {
-		const username = info.user;
-		const password = info.password;
-		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
-		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-		const readTimeout = 60 * 1000;
-		
-		return getSslOptions(info, app)
-			.then(sslOptions => {
-				return new cassandra.Client(Object.assign({
-					contactPoints,
-					authProvider,
-					socketOptions: {
-						readTimeout
-					}
-				}, sslOptions));
-			})
+		return getClient(app, info)
 			.then((client) => {
 				state.client = client;
 
@@ -206,7 +238,7 @@ const prepareConnectionDataItem = (keyspace, tables) => {
 const getTableSchema = (columns, udtHash, sample = {}) => {
 	let schema = {};
 	columns.forEach(column => {
-		const columnType = typesHelper.getColumnType(column, udtHash, sample[column.name]);
+		const columnType = typesHelper(_).getColumnType(column, udtHash, sample[column.name]);
 		schema[column.name] = columnType;
 		schema[column.name].code = column.name;
 		schema[column.name].static = column.isStatic;

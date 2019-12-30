@@ -1,15 +1,13 @@
 'use strict';
 
-const async = require('async');
+let async;
 const cassandra = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
-		if (!Array.isArray(connectionInfo.hosts)) {
-			return cb({ message: 'Hosts were not defined' });
-		}
+		async = app.require('async');
 
 		cassandra.connect(app)(connectionInfo)
 			.then(cb, (error) => {
@@ -40,6 +38,8 @@ module.exports = {
 	},
 
 	getDbCollectionsNames: function(connectionInfo, logger, cb, app) {
+		async = app.require('async');
+
 		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
 

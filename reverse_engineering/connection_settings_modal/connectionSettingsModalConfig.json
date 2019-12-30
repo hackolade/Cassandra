@@ -55,6 +55,16 @@
 				}
 			},
 			{
+				"inputLabel": "Local Data Center",
+				"inputKeyword": "localDataCenter",
+				"inputType": "text",
+				"description": "Name of data center",
+				"dependency": {
+					"key": "clusterType",
+					"value": ""
+				}
+			},
+			{
 				"inputLabel": "Secure Connect Bundle",
 				"inputKeyword": "secureConnectBundle",
 				"inputType": "file",

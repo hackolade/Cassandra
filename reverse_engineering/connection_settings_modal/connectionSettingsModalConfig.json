@@ -10,6 +10,18 @@
 				
 			},
 			{
+				"inputLabel": "Cluster type",
+				"inputKeyword": "clusterType",
+				"inputType": "select",
+				"options": [{
+					"label": "Simple",
+					"value": ""
+				}, {
+					"label": "Apollo Cloud",
+					"value": "apolloCloud"
+				}]
+			},
+			{
 				"inputLabel": "Hosts",
 				"inputKeyword": "hosts",
 				"inputType": "dynamicListInput",
@@ -36,14 +48,22 @@
 							"regex": "([^\\s])" //not empty
 						}
 					}
-				]
+				],
+				"dependency": {
+					"key": "clusterType",
+					"value": ""
+				}
 			},
 			{
 				"inputLabel": "Secure Connect Bundle",
 				"inputKeyword": "secureConnectBundle",
 				"inputType": "file",
 				"inputPlaceholder": "Secure Connect Bundle",
-				"extensions": ["zip"]
+				"extensions": ["zip"],
+				"dependency": {
+					"key": "clusterType",
+					"value": "apolloCloud"
+				}
 			}
 		]
 	}, {
@@ -65,6 +85,10 @@
 		]	
 	}, {
 		"lowerTab": "SSL",
+		"disable": {
+			"key": "clusterType",
+			"value": "apolloCloud"
+		},
 		"structure": [
 			{
 				"inputLabel": "SSL Type",

@@ -121,7 +121,7 @@ const getCloudClient = (info) => {
 };
 
 const getClient = (app, info) => {
-	if (fs.existsSync(info.secureConnectBundle)) {
+	if (info.clusterType === 'apolloCloud') {
 		return getCloudClient(info);
 	} else {
 		return getDistributedClient(app, info);

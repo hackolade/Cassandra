@@ -10,15 +10,15 @@
 				
 			},
 			{
-				"inputLabel": "Cluster type",
+				"inputLabel": "Installation",
 				"inputKeyword": "clusterType",
 				"inputType": "select",
 				"defaultValue": "",
 				"options": [{
-					"label": "Simple",
+					"label": "Private",
 					"value": ""
 				}, {
-					"label": "Apollo Cloud",
+					"label": "Apollo on Constellation",
 					"value": "apolloCloud"
 				}]
 			},

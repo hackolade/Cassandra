@@ -1,7 +1,5 @@
-module.exports = (cassandra) => (connectionInfo, app) => {
-	if (!Array.isArray(connectionInfo.hosts)) {
-		return Promise.reject({ message: 'Hosts were not defined' });
-	}
+module.exports = (cassandraHelper) => (connectionInfo, app) => {
+	const cassandra = cassandraHelper(app.require('lodash'));
 
 	return cassandra.connect(app)(connectionInfo)
 		.then(() => {

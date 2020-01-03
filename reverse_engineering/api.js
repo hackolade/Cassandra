@@ -1,25 +1,20 @@
 'use strict';
 
-const async = require('async');
-const cassandra = require('./cassandraHelper');
+const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
-		if (!Array.isArray(connectionInfo.hosts)) {
-			return cb({ message: 'Hosts were not defined' });
-		}
-
-		cassandra.connect(app)(connectionInfo)
+		cassandraHelper(app.require('lodash')).connect(app)(connectionInfo)
 			.then(cb, (error) => {
 				logger.log('error', error, 'Connection error');
 				cb(error);
 			});
 	},
 
-	disconnect: function(connectionInfo, cb){
-		cassandra.close();
+	disconnect: function(connectionInfo, cb, app){
+		cassandraHelper(app.require('lodash')).close();
 		cb();
 	},
 
@@ -33,15 +28,18 @@ module.exports = {
 				logger.log('info', 'Connection successful', 'Test connection');
 			}
 
-			this.disconnect(connectionInfo, () => {});
+			this.disconnect(connectionInfo, () => {}, app);
 
-			return cb(cassandra.prepareError(error));
+			return cb(cassandraHelper(app.require('lodash')).prepareError(error));
 		}, app);
 	},
 
 	getDbCollectionsNames: function(connectionInfo, logger, cb, app) {
+		const async = app.require('async');
+
 		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
+		const cassandra = cassandraHelper(app.require('lodash'));
 
 		cassandra.connect(app)(connectionInfo).then(() => {
 				let keyspaces = cassandra.getKeyspacesNames();
@@ -66,7 +64,9 @@ module.exports = {
 			});
 	},
 
-	getDbCollectionsData: function(data, logger, cb){
+	getDbCollectionsData: function(data, logger, cb, app){
+		const async = app.require('async');
+		const cassandra = cassandraHelper(app.require('lodash'));
 		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 	
 		const tables = data.collectionData.collections;

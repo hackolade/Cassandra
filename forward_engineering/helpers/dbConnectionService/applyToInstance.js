@@ -1,9 +1,6 @@
-const applyToInstance = (cassandra) => (connectionInfo, logger, app) => {
+const applyToInstance = (cassandraHelper) => (connectionInfo, logger, app) => {
 	const script = connectionInfo.script;
-
-	if (!Array.isArray(connectionInfo.hosts)) {
-		return Promise.reject({ message: 'Hosts were not defined' });
-	}
+	const cassandra = cassandraHelper(app.require('lodash'));
 
 	return cassandra.connect(app)(connectionInfo)
 		.then(() => {

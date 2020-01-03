@@ -136,7 +136,6 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Replication Strategy",
 				"propertyKeyword": "replStrategy",
 				"shouldValidate": false,
-				"propertyTooltip": "description",
 				"propertyTooltip": "Select from list of options",
 				"propertyType": "select",
 				"options": [
@@ -197,6 +196,12 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "comments",
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Add to CQL Script",
+				"propertyKeyword": "addToCqlScript",
+				"propertyTooltip": "the flag to add \"create keyspace\" statement into CQL script",
+				"propertyType": "checkbox"
 			}
 		],
 		"containerLevelKeys": []

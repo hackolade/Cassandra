@@ -170,7 +170,7 @@ module.exports = (_) => {
 	
 	const getKeyspaceInfo = (keyspace) => {
 		const metaData = getKeyspaceMetaData(keyspace);
-		const strategy = metaData.strategy.split('.').slice(-1).pop();
+		const strategy = _.get(metaData, 'strategy', '').split('.').slice(-1).pop();
 		let keyspaceInfo = {
 			code: keyspace,
 			durableWrites: Boolean(metaData.durableWrites),

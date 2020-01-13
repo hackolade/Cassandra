@@ -93,6 +93,10 @@ module.exports = {
 			})
 			.catch(err => {
 				pipeline([], []);
+			})
+			.catch(err => {
+				logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
+				keyspaceCallback(cassandra.prepareError(err));
 			});
 
 			const pipeline = (UDAs, UDFs) => {

@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{ABC}",
 	"parentType": "string",
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"jsonType": {
 		"order": 1,
 		"name": "text"

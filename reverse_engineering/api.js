@@ -49,12 +49,20 @@ module.exports = {
 				}
 
 				async.map(keyspaces, (keyspace, next) => {
-					cassandra.getTablesNames(keyspace).then(tablesData => {
-						const table_name_selector = cassandra.isOldVersion() ? 'columnfamily_name' : 'table_name';
-						const tableNames = tablesData.rows.map(table => table[table_name_selector]);
-						
-						return next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames)); 
-					}).catch(next);
+					cassandra.getTablesNames(keyspace)
+						.then(tablesData => {
+							const table_name_selector = cassandra.isOldVersion() ? 'columnfamily_name' : 'table_name';
+							const tableNames = tablesData.rows.map(table => table[table_name_selector]);
+
+							return tableNames; 
+						})
+						.then(tableNames => {
+							return cassandra.getViewsNames(keyspace).then(
+								views => next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, views)),
+								() => next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, []))
+							)
+						})
+						.catch(next);
 				}, (err, result) => {
 					return cb(err, result);
 				});
@@ -75,8 +83,12 @@ module.exports = {
 		const recordSamplingSettings = data.recordSamplingSettings;
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
-			const tableNames = tables[keyspaceName] || [];
+			const entityNames = cassandra.splitEntityNames(tables[keyspaceName]);
+			const viewNames = entityNames.views;
+			const tableNames = entityNames.tables;
+
 			let udfData = [];
+			let udaData = [];
 			
 			cassandra.getUDF(keyspaceName)
 			.then(udf => {
@@ -88,18 +100,21 @@ module.exports = {
 			.then(uda => {
 				logger.progress({ message: 'UDA has loaded', containerName: keyspaceName, entityName: '' });
 
-				let udaData = cassandra.handleUDA(uda);
-				pipeline(udaData, udfData);
+				udaData = cassandra.handleUDA(uda);
+
+				return cassandra.getViews(keyspaceName, viewNames);
 			})
-			.catch(err => {
-				pipeline([], []);
+			.then(views => {
+				pipeline(udaData, udfData, views);
+			}, err => {
+				pipeline([], [], []);
 			})
 			.catch(err => {
 				logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
 				keyspaceCallback(cassandra.prepareError(err));
 			});
 
-			const pipeline = (UDAs, UDFs) => {
+			const pipeline = (UDAs, UDFs, views) => {
 				if (!tableNames.length) {
 					let packageData = {
 						dbName: keyspaceName,
@@ -139,7 +154,8 @@ module.exports = {
 								tableName,
 								UDFs,
 								UDAs,
-								records
+								records,
+								views
 							}, includeEmptyCollection);
 
 							return packageData;

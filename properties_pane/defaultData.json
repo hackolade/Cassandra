@@ -31,8 +31,7 @@
 	"relationship": {},
 	"user": {},
 	"view": {
-		"viewOn": "",
-		"pipeline": ""
+		"viewOn": ""
 	},
 	"UDFs": {
 		"name": "New UDF",

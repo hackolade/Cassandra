@@ -227,6 +227,12 @@ module.exports = (_) => {
 		return execute(query);
 	};
 	
+	const getViewsNames = (keyspace) => {
+		const query = `SELECT view_name FROM system_schema.views WHERE keyspace_name ='${keyspace}'`;
+
+		return execute(query).then(viewData => viewData.rows.map(view => view.view_name), ()=>[]);
+	};
+
 	const execute = (query) => {
 		return state.client.execute(query);
 	};
@@ -234,16 +240,27 @@ module.exports = (_) => {
 	const getTableMetadata = (keyspace, table) => {
 		return state.client.metadata.getTable(keyspace, table);
 	};
+
+	const getViews = (keyspace, views) => {
+		return Promise.all(views.map(viewName => state.client.metadata.getMaterializedView(keyspace, viewName)));
+	};
 	
+	const splitEntityNames = names => {
+		const namesByCategory =_.partition(names, isView);
+
+		return { views: namesByCategory[0].map(name => name.slice(0, -4)), tables: namesByCategory[1] };
+	}
+
 	const getColumnInfo = (keyspace, table) => {
 		const query = `SELECT * FROM system_schema.columns WHERE keyspace_name='${keyspace}' AND table_name='${table}';`;
 		return execute(query);
 	};
 	
-	const prepareConnectionDataItem = (keyspace, tables) => {
+	const prepareConnectionDataItem = (keyspace, tables, views) => {
 		const connectionDataItem = {
 			dbName: keyspace,
-			dbCollections: tables
+			dbCollections: tables,
+			views
 		};
 	
 		return connectionDataItem;
@@ -438,11 +455,45 @@ module.exports = (_) => {
 		return udaData;
 	};
 	
+	const getViewsData = (views, tableName, tableSchema) => {
+		return views
+			.filter(viewData => viewData && viewData.tableName === tableName)
+			.map(viewData => ({
+				name: viewData.name,
+				jsonSchema: getViewData(viewData, tableSchema),
+				compositePartitionKey: handlePartitionKeys(viewData.partitionKeys),
+				compositeClusteringKey: handleClusteringKeys(viewData),
+				comments: viewData.comment,
+				tableOptions: getTableOptions(viewData)
+			}));
+	};
+
+	const getViewData = (viewData, parentTableSchema) => {
+		if (_.isEmpty(_.get(viewData, 'columns'))) {
+			return {};
+		}
+		const columns = Object.keys(viewData.columnsByName);
+
+		return { properties: getViewSchema(parentTableSchema, viewData.tableName, columns)}
+	};
+
+	const getViewSchema = (tableSchema, tableName, columns) => {
+		return columns.reduce((schema, name) => {
+			if (!_.get(tableSchema, ['properties', name])) {
+				return schema;
+			}
+
+			return Object.assign({}, schema, {
+				[name]: {$ref: `#collection/definitions/${tableName}/${name}`}
+			});
+		}, {});
+	};
+
 	const getPackageData = (data, includeEmptyCollection) => {
 		let packageData = {
 			dbName: data.keyspaceName,
 			collectionName: data.tableName,
-			documents: data.records
+			documents: data.records,
 		};
 	
 		if (data.table.columns && data.table.columns.length) {
@@ -458,6 +509,9 @@ module.exports = (_) => {
 			};
 			packageData.documentTemplate = mergedDocument;
 			packageData.modelDefinitions = handleUdts(udtHash);
+			if (!_.isEmpty(data.views)) {
+				packageData.views = getViewsData(data.views, data.tableName, schema);
+			}
 		} else if (!includeEmptyCollection) {
 			packageData = null;
 		}
@@ -627,10 +681,13 @@ module.exports = (_) => {
 			return promiseSeriesAll(promises.slice(1), callback);
 		});
 	};
+
+	const isView = name => name.slice(-4) === ' (v)';
 	
 	return {
 		connect,
 		close,
+		execute,
 		getKeyspacesNames,
 		getTablesNames,
 		prepareConnectionDataItem,
@@ -650,6 +707,9 @@ module.exports = (_) => {
 		prepareError,
 		filterKeyspaces,
 		batch,
-		isOldVersion
+		isOldVersion,
+		getViews,
+		getViewsNames,
+		splitEntityNames
 	};
 }

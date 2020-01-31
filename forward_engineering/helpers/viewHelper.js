@@ -18,18 +18,19 @@ const getColumnNames = (collectionRefsDefinitionsMap, columns) => {
 	})).filter(_.identity);
 };
 
-const getWhereStatement = columnsNames => {
+const getWhereStatement = (primaryKeys, columnsNames) => {
 	if (_.isEmpty(columnsNames)) {
 		return '';
 	}
+	return 'WHERE ' + columnsNames
+		.filter(name => !primaryKeys.includes(name))
+		.reduce((statement, name) => {
+			if (!statement) {
+				return `${name} IS NOT NULL`;
+			}
 
-	return 'WHERE ' + columnsNames.reduce((statement, name) => {
-		if (!statement) {
-			return `${name} IS NOT NULL`;
-		}
-
-		return `${statement} AND ${name} IS NOT NULL`;
-	}, '');
+			return `${statement} AND ${name} IS NOT NULL`;
+		}, '');
 };
 
 const getNamesByIds = (collectionRefsDefinitionsMap, ids) => {
@@ -53,6 +54,16 @@ const getClusteringKeyData = (collectionRefsDefinitionsMap, viewData) => {
 	);
 
 	return { clusteringKeys, clusteringKeysHash };
+};
+
+const getPrimaryKeysNames = (collectionRefsDefinitionsMap, viewData) => {
+	const partitionKeys = retrivePropertyFromConfig(viewData, 0, 'compositePartitionKey', []);
+	const partitionKeysHash = getNamesByIds(
+		collectionRefsDefinitionsMap,
+		partitionKeys.map(key => key.keyId)
+	);
+
+	return _.values(partitionKeysHash).filter(_.identity).map(name => `"${name}"`);
 };
 
 const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData) => {
@@ -114,9 +125,10 @@ module.exports = {
 			script.push(`AS SELECT * FROM ${tableName};`);
 		} else {
 			const columnsNames = getColumnNames(collectionRefsDefinitionsMap, columns);
-			script.push(`AS SELECT ${columnsNames.join(', ')}`)
+			script.push(`AS SELECT ${columnsNames.join(', ')}`);
 			script.push(`FROM ${tableName}`);
-			script.push(getWhereStatement(columnsNames));
+			const primaryKeysNames = getPrimaryKeysNames(collectionRefsDefinitionsMap, viewData);
+			script.push(getWhereStatement(primaryKeysNames, columnsNames));
 		}
 
 		if (primaryKeyScript) {

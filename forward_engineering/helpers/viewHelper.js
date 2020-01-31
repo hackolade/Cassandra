@@ -114,10 +114,11 @@ module.exports = {
 			script.push(`AS SELECT * FROM ${tableName};`);
 		} else {
 			const columnsNames = getColumnNames(collectionRefsDefinitionsMap, columns);
-			script.push(`AS SELECT ${columnsNames.join(', ')}`);
+			script.push(`AS SELECT ${columnsNames.join(', ')}`)
+			script.push(`FROM ${tableName}`);
 			script.push(getWhereStatement(columnsNames));
 		}
-		
+
 		if (primaryKeyScript) {
 			script.push(primaryKeyScript);
 		}

@@ -17,7 +17,20 @@
 		"tableOptions": {}
 	},
 	"field": {
-		"name": "New column"
+		"name": "New column",
+		"hackoladeMeta": {
+			"value": {},
+			"valueDependencies": [{
+				"value": {
+					"disableAppend": true
+				},
+				"dependency": {
+					"level": "parent",
+					"key": "viewOn",
+					"exists": true
+				}
+			}]
+		}
 	},
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"

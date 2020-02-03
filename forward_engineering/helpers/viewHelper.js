@@ -139,6 +139,6 @@ module.exports = {
 			script.push(optionsScript);
 		}
 		
-		return script.join('\n  ');
+		return script.join('\n  ') + ';';
 	}
 };

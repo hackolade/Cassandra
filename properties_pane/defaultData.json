@@ -19,15 +19,13 @@
 	"field": {
 		"name": "New column",
 		"hackoladeMeta": {
-			"value": {},
 			"valueDependencies": [{
 				"value": {
 					"disableAppend": true
 				},
 				"dependency": {
-					"level": "parent",
-					"key": "viewOn",
-					"exists": true
+					"key": "refType",
+					"value": "collectionReference"
 				}
 			}]
 		}

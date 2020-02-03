@@ -241,10 +241,26 @@ module.exports = (_) => {
 		return state.client.metadata.getTable(keyspace, table);
 	};
 
-	const getViews = (keyspace, views) => {
-		return Promise.all(views.map(viewName => state.client.metadata.getMaterializedView(keyspace, viewName)));
+	const getViews = (recordSamplingSettings, keyspace, views) => {
+		return Promise.all(views.map(viewName => {
+			return state.client.metadata.getMaterializedView(keyspace, viewName)
+				.then(view => {
+					return getViewDocumentTemplate(recordSamplingSettings, keyspace, viewName)
+						.then(documentTemplate => ({
+							documentTemplate,
+							view
+						}))
+				}, () => ({
+					documentTemplate: {},
+					view: {}
+				}));
+		}));
 	};
-	
+
+	const getViewDocumentTemplate = (recordSamplingSettings, keyspace, viewName) => {
+		return scanRecords(keyspace, viewName, recordSamplingSettings).then(mergeDocuments, () => ({}));
+	};
+
 	const splitEntityNames = names => {
 		const namesByCategory =_.partition(names, isView);
 
@@ -457,15 +473,23 @@ module.exports = (_) => {
 	
 	const getViewsData = (views, tableName, tableSchema) => {
 		return views
-			.filter(viewData => viewData && viewData.tableName === tableName)
-			.map(viewData => ({
-				name: viewData.name,
-				jsonSchema: getViewData(viewData, tableSchema),
-				compositePartitionKey: handlePartitionKeys(viewData.partitionKeys),
-				compositeClusteringKey: handleClusteringKeys(viewData),
-				comments: viewData.comment,
-				tableOptions: getTableOptions(viewData)
-			}));
+			.filter(viewData => _.get(viewData, 'view.tableName') === tableName)
+			.map(viewData => {
+				const view = _.get(viewData, 'view', {});
+				const documentTemplate = Object.keys(_.get(viewData, 'documentTemplate', {}));
+
+				return {
+					name: view.name,
+					jsonSchema: getViewData(view, tableSchema),
+					documentTemplate,
+					data: {
+						compositePartitionKey: handlePartitionKeys(view.partitionKeys),
+						compositeClusteringKey: handleClusteringKeys(view),
+						comments: view.comment,
+						tableOptions: getTableOptions(view)
+					}
+				}
+			});
 	};
 
 	const getViewData = (viewData, parentTableSchema) => {
@@ -687,7 +711,6 @@ module.exports = (_) => {
 	return {
 		connect,
 		close,
-		execute,
 		getKeyspacesNames,
 		getTablesNames,
 		prepareConnectionDataItem,

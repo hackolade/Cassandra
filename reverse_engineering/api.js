@@ -102,7 +102,7 @@ module.exports = {
 
 				udaData = cassandra.handleUDA(uda);
 
-				return cassandra.getViews(keyspaceName, viewNames);
+				return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames);
 			})
 			.then(views => {
 				pipeline(udaData, udfData, views);

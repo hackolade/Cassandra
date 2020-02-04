@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{DRT}",
 	"parentType": "string",
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"sample": "2018-01T15 to 2018-04T15",
 	"defaultValues": {
 		"schemaId": "",

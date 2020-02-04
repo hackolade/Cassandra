@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{dt}",
 	"parentType": "string",
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"sample":"2014-12-03",
 	"defaultValues": {
 		"primaryKey": false,

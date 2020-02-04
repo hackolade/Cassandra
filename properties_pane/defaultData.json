@@ -17,7 +17,18 @@
 		"tableOptions": {}
 	},
 	"field": {
-		"name": "New column"
+		"name": "New column",
+		"hackoladeMeta": {
+			"valueDependencies": [{
+				"value": {
+					"disableAppend": true
+				},
+				"dependency": {
+					"key": "refType",
+					"value": "collectionReference"
+				}
+			}]
+		}
 	},
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"
@@ -31,8 +42,7 @@
 	"relationship": {},
 	"user": {},
 	"view": {
-		"viewOn": "",
-		"pipeline": ""
+		"viewOn": ""
 	},
 	"UDFs": {
 		"name": "New UDF",

@@ -171,12 +171,11 @@ const addId = (tableId, options) => {
 }
 
 const addClustering = (clusteringKeys, clusteringKeysHash, options) => {
-	const nonDefaultClusteringKeys = clusteringKeys.filter(key => key.type !== 'ascending');
-	if (!nonDefaultClusteringKeys.length) {
+	if (!clusteringKeys.length) {
 		return options;
 	}
 
-	const fields = nonDefaultClusteringKeys.map((key) => {
+	const fields = clusteringKeys.map((key) => {
 		const { keyId, type } = key;
 		const fieldName = clusteringKeysHash[keyId];
 		const order = type === 'descending' ? 'DESC' : 'ASC';

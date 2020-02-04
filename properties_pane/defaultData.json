@@ -17,18 +17,7 @@
 		"tableOptions": {}
 	},
 	"field": {
-		"name": "New column",
-		"hackoladeMeta": {
-			"valueDependencies": [{
-				"value": {
-					"disableAppend": true
-				},
-				"dependency": {
-					"key": "refType",
-					"value": "collectionReference"
-				}
-			}]
-		}
+		"name": "New column"
 	},
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"

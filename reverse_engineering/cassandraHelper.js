@@ -394,19 +394,24 @@ module.exports = (_) => {
 	
 	const handleUdts = (udts) => {
 		if (udts && udts.length) {
-			let schema = { properties: {}};
-	
+			let schema = {};
+			let nestedUdts = [];
+
 			udts.forEach(({ udt, sample }) => {
 				const info = _.get(udt, 'type.info', _.get(udt, 'info'), {});
 				const name = info.name || udt.name;
 				const fields = info.fields || [];
-				schema.properties[name] = {
+				schema[name] = {
 					type: 'udt',
 					static: udt.isStatic,
-					properties: getTableSchema(fields, null, sample).properties
+					properties: getTableSchema(fields, nestedUdts, sample).properties
 				};
 			});
-			return schema;
+
+			return {
+				...schema,
+				...handleUdts(nestedUdts) || {}
+			};
 		} else {
 			return null;
 		}
@@ -532,7 +537,10 @@ module.exports = (_) => {
 				jsonSchema: schema
 			};
 			packageData.documentTemplate = mergedDocument;
-			packageData.modelDefinitions = handleUdts(udtHash);
+			packageData.modelDefinitions = {
+				definitions: handleUdts(udtHash)
+			};
+
 			if (!_.isEmpty(data.views)) {
 				packageData.views = getViewsData(data.views, data.tableName, schema);
 			}

@@ -265,26 +265,6 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Compact storage",
 						"propertyKeyword": "compactStorage",
 						"propertyType": "checkbox"
-					},
-					{
-						"propertyName": "Other properties",
-						"propertyType": "group",
-						"propertyKeyword": "otherProperties",
-						"structure": [
-							{
-								"propertyName": "name",
-								"propertyKeyword": "name",
-								"propertyType": "text"
-							},
-							{
-								"propertyName": "value",
-								"propertyKeyword": "value",
-								"propertyType": "details",
-								"template": "textarea",
-								"valueType": "string",
-								"markdown": false
-							}
-						]
 					}
 				]
 			},

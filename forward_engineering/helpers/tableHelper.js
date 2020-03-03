@@ -9,41 +9,8 @@ const {
 } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
-
-module.exports = {
-	getTableStatement({
-		tableData,
-		tableMetaData,
-		dataSources,
-		keyspaceMetaData,
-		udtTypeMap
-	}) {
-		const keyspaceName = retrieveContainerName(keyspaceMetaData);
-		const tableName = retrieveEntityName(tableMetaData);
-		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
-		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
-		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
-		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
-		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "tableOptions", "");
-
-		const partitionKeysHash = getNamesByIds(
-			partitionKeys.map(key => key.keyId),
-			dataSources
-		);
-		const clusteringKeysHash = getNamesByIds(
-			clusteringKeys.map(key => key.keyId),
-			dataSources
-		);
-
-		return getCreateTableStatement(
-			keyspaceName,
-			tableName,
-			getColumnDefinition(tableData.properties || {}, udtTypeMap),
-			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableComment, tableOptions)
-		);
-	}
-};
+const { getEntityLevelConfig } = require('./generalHelper');
+const { parseToString, addId, addClustering } = require('./tableOptionService/parseToString');
 
 const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options) => {
 	const items = [];
@@ -99,51 +66,70 @@ const getClusteringKeys = (clusteringKeysHash) => {
 	}
 };
 
-const getOptions = (clusteringKeys, clusteringKeysHash, id, comment, tableOptions) => {
-	const getClusteringOrder = (clusteringKeys, clusteringKeysHash) => {
-		const order = (order) => (order === 'ascending') ? 'ASC' : 'DESC'; 
-		const orderString = clusteringKeys.map(key => {
-			const name = clusteringKeysHash[key.keyId];
-
-			if (name) {
-				return `"${name}" ${order(key.type)}`;
-			}
-		}).filter(key => key).join(', ');
-
-		if (orderString) {
-			return `CLUSTERING ORDER BY (${orderString})`;
-		} else {
-			return false;
-		}
-	};
-	const parseTableOptions = (tableOptions) => (tableOptions || "")
-		.replace(/;$/, "")
-		.split('AND')
-		.map(option => String(option).trim())
-		.filter(option => option);
-
-	let options = [];
-	const clusteringOrder = getClusteringOrder(clusteringKeys, clusteringKeysHash);
-	const hasId = id && !/id\=/gi.test(tableOptions);
-	const hasComment = comment && !/comments\=/gi.test(tableOptions);
-
-	if (clusteringOrder) {
-		options.push(clusteringOrder);
+const seedOptionsWithValues = (options, valueObject) => options.map(option => {
+	const value = valueObject[option['propertyKeyword']];
+	if (value === undefined) {
+		return option;
 	}
 
-	if (hasId) {
-		options.push(`ID='${id}'`);
-	}
+	return Object.assign({}, option, { value });
+});
 
-	if (hasComment) {
-		options.push(`comment='${comment}'`);
-	}
+const getOptionsFromTab = config => {
+	const optionsBlock = config.structure.find(prop => prop.propertyName === 'Options');
+	return optionsBlock.structure;
+}
 
-	options = options.concat(parseTableOptions(tableOptions));
+const mergeValuesWithConfigOptions = values => {
+	const [detailsTab] = getEntityLevelConfig();
+	const configOptions = getOptionsFromTab(detailsTab);
+	return seedOptionsWithValues(configOptions, values);
+}
 
-	if (options.length) {
-		return `\nWITH ${ options.join("\n" + tab("AND ")) }`;
-	} else {
-		return "";
-	}
+const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment) => {
+	const optionsWithValues = mergeValuesWithConfigOptions(tableOptions);
+	const optionsString = addId(
+		tableId,
+		addClustering(clusteringKeys, clusteringKeysHash, parseToString(optionsWithValues, comment))
+	);
+
+	return optionsString ? optionsString.replace(/\n$/, '') : '';
+};
+
+module.exports = {
+	getOptions,
+	getPrimaryKeyList,
+	getTableStatement({
+		tableData,
+		tableMetaData,
+		dataSources,
+		keyspaceMetaData,
+		udtTypeMap
+	}) {
+		const keyspaceName = retrieveContainerName(keyspaceMetaData);
+		const tableName = retrieveEntityName(tableMetaData);
+		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
+		const clusteringKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositeClusteringKey", []);
+		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
+		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
+		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "tableOptions", "");
+
+		const partitionKeysHash = getNamesByIds(
+			partitionKeys.map(key => key.keyId),
+			dataSources
+		);
+		const clusteringKeysHash = getNamesByIds(
+			clusteringKeys.map(key => key.keyId),
+			dataSources
+		);
+
+		return getCreateTableStatement(
+			keyspaceName,
+			tableName,
+			getColumnDefinition(tableData.properties || {}, udtTypeMap),
+			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
+			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableOptions, tableComment)
+		);
+	},
+	mergeValuesWithConfigOptions,
 };

@@ -1,6 +1,6 @@
 const { tab, retrieveContainerName, retrivePropertyFromConfig } = require('./generalHelper'); 
 
-const getCreateStatement = (name, replication, durableWrites) => `USE "${name}"; \n\nCREATE KEYSPACE IF NOT EXISTS "${name}" \n${tab(replication)}\n${durableWrites};`;
+const getCreateStatement = (name, replication, durableWrites) => `CREATE KEYSPACE IF NOT EXISTS "${name}" \n${tab(replication)}\n${durableWrites}; \n\nUSE "${name}";`;
 
 const getSimpleStrategy = (factor) => `'class' : 'SimpleStrategy',\n'replication_factor' : ${factor}`;
 
@@ -32,7 +32,9 @@ const getKeyspaceStatement = (keyspaceData) => {
 	const dataCenters = retrivePropertyFromConfig(keyspaceData, 0, "dataCenters", []);
 	const durableWrites = retrivePropertyFromConfig(keyspaceData, 0, "durableWrites", false);
 
-	if (keyspaceName === "") {
+	if (keyspaceData[0] && !keyspaceData[0].addToCqlScript) {
+		return "";
+	} else if (keyspaceName === "") {
 		return "";
 	} else {
 		return getCreateStatement(
@@ -44,5 +46,7 @@ const getKeyspaceStatement = (keyspaceData) => {
 };
 
 module.exports = {
-	getKeyspaceStatement
+	getKeyspaceStatement,
+	getReplication,
+	getDurableWrites
 };

@@ -7,13 +7,14 @@
 	"container": {
 		"name": "New keyspace",
 		"indexes": [],
-		"replStrategy": "SimpleStrategy"
+		"replStrategy": "SimpleStrategy",
+		"addToCqlScript": true
 	},
 	"collection": {
 		"collectionName": "New table",
 		"collectionUsers": [],
 		"collation": {},
-		"tableOptions": ""
+		"tableOptions": {}
 	},
 	"field": {
 		"name": "New column"
@@ -30,8 +31,7 @@
 	"relationship": {},
 	"user": {},
 	"view": {
-		"viewOn": "",
-		"pipeline": ""
+		"viewOn": ""
 	},
 	"UDFs": {
 		"name": "New UDF",

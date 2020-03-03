@@ -4,9 +4,7 @@
   "description": "",
   "author": "Hackolade",
   "dependencies": {
-    "async": "^2.6.0",
-    "cassandra-driver": "^3.5.0",
-    "lodash": "^4.17.5"
+    "cassandra-driver": "^4.3.1"
   },
   "systemKeyspaces": [
     "cfs",
@@ -24,7 +22,9 @@
     "system_auth",
     "system_distributed",
     "system_schema",
-    "system_traces"
+    "system_traces",
+    "system_views",
+    "system_virtual_schema"
   ],
-  "installed": false
+  "installed": true
 }

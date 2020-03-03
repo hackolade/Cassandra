@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{...}",
 	"parentType": "array",
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"subtype": "set<str>",
 		"dependencies": [],
@@ -40,6 +41,9 @@
 		},
 		"set<map>": {
 			"childValueType": "map"
+		},
+		"set<udt>": {
+			"childValueType": "udt"
 		}
 	}
 }

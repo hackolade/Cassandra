@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{DEST}",
 	"parentType": "binary",
 	"useSample": false,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"primaryKey": false
 	}

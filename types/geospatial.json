@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{geo}",
 	"parentType": "array",
 	"useSample": false,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"required": false,
 		"primaryKey": false,

@@ -4,12 +4,14 @@
 	"dtdAbbreviation": "{...}",
 	"parentType": "document",
 	"useSample": false,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],
 		"minProperties": "",
 		"maxProperties": "",
+		"frozen": true,
 		"additionalProperties": false
 	}
 }

@@ -4,8 +4,7 @@
   "description": "",
   "author": "Hackolade",
   "dependencies": {
-    "fs": "0.0.1-security",
-    "path": "0.12.7"
+    "lodash": "^4.17.15"
   },
-  "installed": false
+  "installed": true
 }

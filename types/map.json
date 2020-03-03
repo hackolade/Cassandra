@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{...}",
 	"parentType": "document",
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"subtype": "map<str>",
 		"keyType": "char",
@@ -42,6 +43,9 @@
 		},
 		"map<map>": {
 			"childValueType": "map"
+		},
+		"map<udt>": {
+			"childValueType": "udt"
 		}
 	},
 	"keyTypes": {

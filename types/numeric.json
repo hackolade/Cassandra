@@ -5,6 +5,7 @@
 	"parentType": "numeric",
 	"sample": 15,
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"defaultValues": {
 		"unit": "",
 		"minimum": "",

@@ -41,7 +41,7 @@ module.exports = {
 		const { includeSystemCollection } = connectionInfo;
 		const cassandra = cassandraHelper(app.require('lodash'));
 
-		cassandra.connect(app)(connectionInfo).then(() => {
+		cassandra.connect(app, logger)(connectionInfo).then(() => {
 				let keyspaces = cassandra.getKeyspacesNames();
 
 				if (!includeSystemCollection) {

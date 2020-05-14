@@ -151,7 +151,9 @@ module.exports = (_) => {
 					state.client = client;
 
 					client.on('log', (type, name, info, furtherInfo) => {
-						logger.log('info', { message: '[' + type + '] ' + name + ': ' + info + '. ' + furtherInfo }, 'Cassandra Info');
+						if (logger) {
+							logger.log('info', { message: '[' + type + '] ' + name + ': ' + info + '. ' + furtherInfo }, 'Cassandra Info');
+						}
 					});
 	
 					return state.client.connect();

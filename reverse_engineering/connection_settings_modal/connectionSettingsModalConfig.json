@@ -18,7 +18,7 @@
 					"label": "Private",
 					"value": ""
 				}, {
-					"label": "Apollo on Constellation",
+					"label": "Datastax Astra",
 					"value": "apolloCloud"
 				}]
 			},

@@ -144,11 +144,15 @@ module.exports = (_) => {
 		}
 	};
 	
-	const connect = (app) => (info) => {
+	const connect = (app, logger) => (info) => {
 		if (!state.client) {
 			return getClient(app, info)
 				.then((client) => {
 					state.client = client;
+
+					client.on('log', (type, name, info, furtherInfo) => {
+						logger.log('info', { message: '[' + type + '] ' + name + ': ' + info + '. ' + furtherInfo }, 'Cassandra Info');
+					});
 	
 					return state.client.connect();
 				});

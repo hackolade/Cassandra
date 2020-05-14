@@ -28,7 +28,7 @@ module.exports = (_) => {
 			_.get(column, 'info.name', column.name)
 		);
 
-		return { type: 'reference', $ref: name };
+		return { type: 'reference', $ref: `#/definitions/${name}`, refName: name };
 	};
 
 	const getType = (cassandraType, column, sample, udtHash) => {
@@ -152,10 +152,10 @@ module.exports = (_) => {
 
 	const getDefaultProperties = (valueData, udtHash) => {
 		const handledValueData = getColumnType(valueData, udtHash);
-		const name = handledValueData.$ref || defaultColumnName;
+		const name = handledValueData.refName || defaultColumnName;
 
 		return {
-			[name]: handledValueData
+			[name]: _.omit(handledValueData, 'refName')
 		};
 	};
 

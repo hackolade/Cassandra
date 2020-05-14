@@ -4,6 +4,7 @@
 	"dtdAbbreviation": "{dur}",
 	"parentType": "string",
 	"useSample": true,
+	"hiddenOnEntity": "view",
 	"sample": "89h4m48s",
 	"defaultValues": {
 		"primaryKey": false,

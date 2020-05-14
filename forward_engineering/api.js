@@ -6,6 +6,7 @@ const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 const { getAlterScript } = require('./helpers/updateHelper');
+const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
 
@@ -31,6 +32,20 @@ module.exports = {
 				callback({ message: e.message, stack: e.stack });
 			}, 150);
 		}
+	},
+
+	generateViewScript(data, logger, callback) {
+		const viewSchema = JSON.parse(data.jsonSchema || '{}');
+
+		const script = getViewScript({
+			schema: viewSchema,
+			viewData: data.viewData,
+			entityData: data.entityData,
+			containerData: data.containerData,
+			collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap
+		});
+
+		callback(null, script)
 	},
 
 	generateContainerScript(data, logger, callback) {
@@ -90,6 +105,18 @@ module.exports = {
 
 					cqlScriptData.push(...internalUdt, table, indexes);
 				});
+
+				cqlScriptData = cqlScriptData.concat(data.views.map(viewId => {
+					const viewSchema = JSON.parse(data.jsonSchema[viewId] || '{}');
+
+					return getViewScript({
+						schema: viewSchema,
+						viewData: data.viewData[viewId],
+						entityData: data.entityData[viewSchema.viewOn],
+						containerData: data.containerData,
+						collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap
+					})
+				}));
 
 				cqlScriptData.push(UDF, UDA);
 

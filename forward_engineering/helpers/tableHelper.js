@@ -97,6 +97,8 @@ const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, c
 };
 
 module.exports = {
+	getOptions,
+	getPrimaryKeyList,
 	getTableStatement({
 		tableData,
 		tableMetaData,

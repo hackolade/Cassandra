@@ -1,7 +1,7 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.36",
-	"versionDate": "2020-01-03",
+	"version": "0.1.42",
+	"versionDate": "2020-04-27",
 	"author": "hackolade",
 	"engines": {
 		"hackolade": "3.4.12",
@@ -20,6 +20,7 @@
 			]
 		},
 		"features": {
+			"views": true,
 			"nestedCollections": false,
 			"disablePatternField": false,
 			"enableForwardEngineering": true,

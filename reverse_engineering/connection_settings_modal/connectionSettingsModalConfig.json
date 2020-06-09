@@ -75,6 +75,17 @@
 					"key": "clusterType",
 					"value": "apolloCloud"
 				}
+			},
+			{
+				"inputLabel": "Request timeout (ms)",
+				"inputKeyword": "requestTimeout",
+				"inputType": "text",
+				"inputPlaceholder": "60 000",
+				"description": "Default: 60 sec",
+				"dependency": {
+					"key": "clusterType",
+					"value": ""
+				}
 			}
 		]
 	}, {

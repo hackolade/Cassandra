@@ -99,6 +99,21 @@ module.exports = (_) => {
 		}
 	};
 	
+	const validateRequestTimeout = (timeout) => {
+		const DEFAULT_TIMEOUT = 60 * 1000;
+		timeout = Number(timeout);
+
+		if (isNaN(timeout)) {
+			return DEFAULT_TIMEOUT;
+		}
+
+		if (timeout <= 0) {
+			return DEFAULT_TIMEOUT;
+		}
+
+		return timeout;
+	};
+
 	const getDistributedClient = (app, info) => {
 		if (!Array.isArray(info.hosts)) {
 			throw new Error('Hosts were not defined');
@@ -108,7 +123,7 @@ module.exports = (_) => {
 		const password = info.password;
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-		const readTimeout = 60 * 1000;
+		const readTimeout = validateRequestTimeout(info.requestTimeout);
 		
 		return getSslOptions(info, app)
 			.then(sslOptions => {

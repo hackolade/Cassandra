@@ -138,6 +138,8 @@ module.exports = (_) => {
 	};
 	
 	const getCloudClient = (info) => {
+		const readTimeout = validateRequestTimeout(info.requestTimeout);
+
 		const client = new cassandra.Client(Object.assign({
 			cloud: {
 				secureConnectBundle: info.secureConnectBundle
@@ -145,6 +147,9 @@ module.exports = (_) => {
 			credentials: {
 				username: info.user,
 				password: info.password
+			},
+			socketOptions: {
+				readTimeout
 			}
 		}));
 	

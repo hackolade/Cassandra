@@ -18,7 +18,7 @@
 					"label": "Private",
 					"value": ""
 				}, {
-					"label": "Apollo on Constellation",
+					"label": "DataStax Astra",
 					"value": "apolloCloud"
 				}]
 			},
@@ -179,6 +179,17 @@
 					"key": "ssl",
 					"value": "jks"
 				}
+			}
+		]
+	}, {
+		"lowerTab": "Advanced",
+		"structure": [
+			{
+				"inputLabel": "Request timeout (ms)",
+				"inputKeyword": "requestTimeout",
+				"inputType": "text",
+				"inputPlaceholder": "60000",
+				"description": "Default: 60 sec (60k ms)"
 			}
 		]
 	}

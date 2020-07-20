@@ -6,7 +6,7 @@ const logHelper = require('./logHelper');
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
-		cassandraHelper(app.require('lodash')).connect(app)(connectionInfo)
+		cassandraHelper(app.require('lodash')).connect(app, logger)(connectionInfo)
 			.then(cb, (error) => {
 				logger.log('error', error, 'Connection error');
 				cb(error);
@@ -41,7 +41,7 @@ module.exports = {
 		const { includeSystemCollection } = connectionInfo;
 		const cassandra = cassandraHelper(app.require('lodash'));
 
-		cassandra.connect(app)(connectionInfo).then(() => {
+		cassandra.connect(app, logger)(connectionInfo).then(() => {
 				let keyspaces = cassandra.getKeyspacesNames();
 
 				if (!includeSystemCollection) {

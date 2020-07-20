@@ -99,6 +99,21 @@ module.exports = (_) => {
 		}
 	};
 	
+	const validateRequestTimeout = (timeout) => {
+		const DEFAULT_TIMEOUT = 60 * 1000;
+		timeout = Number(timeout);
+
+		if (isNaN(timeout)) {
+			return DEFAULT_TIMEOUT;
+		}
+
+		if (timeout <= 0) {
+			return DEFAULT_TIMEOUT;
+		}
+
+		return timeout;
+	};
+
 	const getDistributedClient = (app, info) => {
 		if (!Array.isArray(info.hosts)) {
 			throw new Error('Hosts were not defined');
@@ -108,7 +123,7 @@ module.exports = (_) => {
 		const password = info.password;
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-		const readTimeout = 60 * 1000;
+		const readTimeout = validateRequestTimeout(info.requestTimeout);
 		
 		return getSslOptions(info, app)
 			.then(sslOptions => {
@@ -123,6 +138,8 @@ module.exports = (_) => {
 	};
 	
 	const getCloudClient = (info) => {
+		const readTimeout = validateRequestTimeout(info.requestTimeout);
+
 		const client = new cassandra.Client(Object.assign({
 			cloud: {
 				secureConnectBundle: info.secureConnectBundle
@@ -130,6 +147,9 @@ module.exports = (_) => {
 			credentials: {
 				username: info.user,
 				password: info.password
+			},
+			socketOptions: {
+				readTimeout
 			}
 		}));
 	
@@ -144,11 +164,17 @@ module.exports = (_) => {
 		}
 	};
 	
-	const connect = (app) => (info) => {
+	const connect = (app, logger) => (info) => {
 		if (!state.client) {
 			return getClient(app, info)
 				.then((client) => {
 					state.client = client;
+
+					client.on('log', (type, name, info, furtherInfo) => {
+						if (logger) {
+							logger.log('info', { message: '[' + type + '] ' + name + ': ' + info + '. ' + furtherInfo }, 'Cassandra Info');
+						}
+					});
 	
 					return state.client.connect();
 				});

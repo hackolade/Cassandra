@@ -14,5 +14,8 @@
 		"comments":"",
 		"pattern":"",
 		"format": ""
+	},
+	"descriptor": {
+		"format": "YYYY-MM-DD"
 	}
 }

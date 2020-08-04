@@ -4,7 +4,10 @@ const { tab, retrivePropertyFromConfig } = require('./generalHelper');
 const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
-const _ = require('lodash');
+const { dependencies } = require('./appDependencies');
+let _;
+
+const setDependencies = ({ lodash }) => _ = lodash;
 
 const typesCompatibility = {
     blob: ['ascii', 'bigint', 'boolean', 'decimal', 'double', 'float', 'inet', 'int', 'timestamp', 'timeuuid', 'uuid', 'varchar', 'varint'],
@@ -743,6 +746,7 @@ const mergeArrays = (first, sec) => {
 }
 
 const getAlterScript = (child, udtMap, data) => {
+    setDependencies(dependencies);
     let scriptData = getAlterTableScript(child, udtMap, data);
     scriptData = sortScript(scriptData);
     const finalScript = scriptData.join('');

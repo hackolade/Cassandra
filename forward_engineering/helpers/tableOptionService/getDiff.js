@@ -1,10 +1,12 @@
-const _ = require('lodash');
-
+let _;
+const { dependencies } = require('../appDependencies');
 const CACHING = 'caching';
 const COMPACTION = 'compaction';
 const COMPRESSION = 'compression';
 const ID = 'id';
 const REDUNDANT_OPTIONS = [ID];
+
+const setDependencies = ({ lodash }) => _ = lodash;
 
 const optionDefaultValues = {
 	localReadRepairChance: 0,
@@ -78,6 +80,7 @@ const getDefaultOptionsByName = optionNames => {
 
 module.exports = {
 	getDiff(newOptions, oldOptions) {
+		setDependencies(dependencies);
 		const modifiedAndNewOptions = getModifiedAndNewOptions(newOptions, oldOptions);
 		const deletedOptionNames = getDeletedOptions(newOptions, oldOptions);
 		return Object.assign({}, modifiedAndNewOptions, getDefaultOptionsByName(deletedOptionNames));

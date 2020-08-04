@@ -1,8 +1,11 @@
 'use strict'
 
-const _ = require('lodash');
+let _;
+const { dependencies } = require('./appDependencies');
 const { retrieveContainerName, retrieveEntityName, retrivePropertyFromConfig } = require('./generalHelper');
 const { getOptions, getPrimaryKeyList } = require('./tableHelper');
+
+const setDependencies = ({ lodash }) => _ = lodash;
 
 const getColumnNames = (collectionRefsDefinitionsMap, columns) => {
 	return _.uniq(Object.keys(columns).map(name => {
@@ -106,6 +109,7 @@ module.exports = {
 		containerData,
 		collectionRefsDefinitionsMap
 	}) {
+		setDependencies(dependencies);
 		let script = [];
 		const columns = schema.properties || {};
 		const view = _.first(viewData) || {};

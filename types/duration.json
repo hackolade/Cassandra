@@ -14,5 +14,8 @@
 		"pattern": "",
 		"comments":"",
 		"format": ""
+	},
+	"descriptor": {
+		"format": "PnYnMnDTnHnMnS"
 	}
 }

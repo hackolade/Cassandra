@@ -7,8 +7,7 @@
 	"container": {
 		"name": "New keyspace",
 		"indexes": [],
-		"replStrategy": "SimpleStrategy",
-		"addToCqlScript": true
+		"replStrategy": "SimpleStrategy"
 	},
 	"collection": {
 		"collectionName": "New table",

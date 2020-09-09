@@ -125,12 +125,6 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "text"
 			},
 			{
-				"propertyName": "Activated",
-				"propertyKeyword": "isActivated",
-				"propertyTooltip": "the flag to add \"create keyspace\" statement into CQL script",
-				"propertyType": "checkbox"
-			},
-			{
 				"propertyName": "Description",
 				"propertyKeyword": "description",
 				"shouldValidate": false,
@@ -202,6 +196,12 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "comments",
 				"propertyType": "details",
 				"template": "textarea"
+			},
+			{
+				"propertyName": "Add to CQL Script",
+				"propertyKeyword": "addToCqlScript",
+				"propertyTooltip": "the flag to add \"create keyspace\" statement into CQL script",
+				"propertyType": "checkbox"
 			}
 		],
 		"containerLevelKeys": []

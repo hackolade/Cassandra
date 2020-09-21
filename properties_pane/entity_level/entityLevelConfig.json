@@ -121,7 +121,8 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Technical name",
 				"propertyKeyword": "code",
-				"propertyType": "text"
+				"propertyType": "text",
+				"regex": "^[a-z_0-9]{0,48}$"
 			},
 			{
 				"propertyName": "Partition key",

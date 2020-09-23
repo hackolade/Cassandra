@@ -2,7 +2,8 @@
 
 let _;
 const { dependencies } = require('./appDependencies');
-const { retrieveContainerName, retrieveEntityName, retrivePropertyFromConfig } = require('./generalHelper');
+const { commentDeactivatedStatement } = require('./commentsHelper');
+const { retrieveContainerName, retrieveEntityName, retrivePropertyFromConfig, retrieveIsItemActivated } = require('./generalHelper');
 const { getOptions, getPrimaryKeyList } = require('./tableHelper');
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -69,7 +70,7 @@ const getPrimaryKeysNames = (collectionRefsDefinitionsMap, viewData) => {
 	return _.values(partitionKeysHash).filter(_.identity).map(name => `"${name}"`);
 };
 
-const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData) => {
+const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData, isParentActivated) => {
 	const partitionKeys = retrivePropertyFromConfig(viewData, 0, 'compositePartitionKey', []);
 	const partitionKeysHash = getNamesByIds(
 		collectionRefsDefinitionsMap,
@@ -77,7 +78,7 @@ const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData) => {
 	);
 	const clusteringKeyData = getClusteringKeyData(collectionRefsDefinitionsMap, viewData);
 
-	const keysList = getPrimaryKeyList(partitionKeysHash, clusteringKeyData.clusteringKeysHash);
+	const keysList = getPrimaryKeyList(partitionKeysHash, clusteringKeyData.clusteringKeysHash, isParentActivated);
 	if (!keysList) {
 		return '';
 	}
@@ -107,7 +108,8 @@ module.exports = {
 		viewData,
 		entityData,
 		containerData,
-		collectionRefsDefinitionsMap
+		collectionRefsDefinitionsMap,
+		isKeyspaceActivated
 	}) {
 		setDependencies(dependencies);
 		let script = [];
@@ -119,8 +121,11 @@ module.exports = {
 		const tableName = bucketName ? `"${bucketName}"."${entityName}"` : `"${entityName}"`;
 		const viewName = view.code || view.name;
 		const name = bucketName ? `"${bucketName}"."${viewName}"` : `"${viewName}"`;
+		
+		const isViewActivated = retrieveIsItemActivated(entityData) && retrieveIsItemActivated(viewData);
+		const isViewChildrenActivated = isKeyspaceActivated && isViewActivated;
 
-		const primaryKeyScript = getPrimaryKeyScript(collectionRefsDefinitionsMap, viewData);
+		const primaryKeyScript = getPrimaryKeyScript(collectionRefsDefinitionsMap, viewData, isViewChildrenActivated);
 		const optionsScript = getOptionsScript(collectionRefsDefinitionsMap, viewData);
 
 		script.push(`CREATE MATERIALIZED VIEW IF NOT EXISTS ${name}`);
@@ -143,6 +148,10 @@ module.exports = {
 			script.push(optionsScript);
 		}
 		
-		return script.join('\n  ') + ';';
+		return commentDeactivatedStatement(
+			script.join('\n  ') + ';',
+			isViewActivated,
+			isKeyspaceActivated
+		);
 	}
 };

@@ -5,12 +5,18 @@ const {
 	retrieveContainerName,
 	retrieveEntityName,
 	retrivePropertyFromConfig,
-	getTableNameStatement
+	getTableNameStatement,
+	commentDeactivatedStatement
 } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
 const { getEntityLevelConfig } = require('./generalHelper');
 const { parseToString, addId, addClustering } = require('./tableOptionService/parseToString');
+const { inlineComment } = require('./commentsHelper');
+const { dependencies } = require('./appDependencies');
+let _;
+
+const setDependencies = ({ lodash }) => _ = lodash;
 
 const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options) => {
 	const items = [];
@@ -28,9 +34,9 @@ const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, prim
 	`)${options};`;
 };
 
-const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash) => {
-	const partitionKeys = getPartitionKeys(partitionKeysHash);
-	const clusteringKeys = getClusteringKeys(clusteringKeysHash);
+const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActivated) => {
+	const partitionKeys = getPartitionKeys(partitionKeysHash, isParentActivated);
+	const clusteringKeys = getClusteringKeys(clusteringKeysHash, isParentActivated);
 	const keys = [];
 
 	if (partitionKeys) {
@@ -44,11 +50,11 @@ const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash) => {
 	return keys.join(', ');
 };
 
-const getPartitionKeys = (partitionKeysHash) => {
+const getPartitionKeys = (partitionKeysHash, isParentActivated) => {
 	const keysIds = Object.keys(partitionKeysHash);
 
 	if (keysIds.length) {
-		const keysString = `"${keysIds.map(id => partitionKeysHash[id]).join('", "')}"`;
+		const keysString = commentDeactivatedKeys(keysIds, partitionKeysHash, isParentActivated);
 
 		return (keysIds.length > 1) ? `(${keysString})` : keysString;
 	} else {
@@ -56,11 +62,11 @@ const getPartitionKeys = (partitionKeysHash) => {
 	}
 };
 
-const getClusteringKeys = (clusteringKeysHash) => {
+const getClusteringKeys = (clusteringKeysHash, isParentActivated) => {
 	const keysIds = Object.keys(clusteringKeysHash);
 
 	if (keysIds.length) {
-		return `"${keysIds.map(id => clusteringKeysHash[id]).join('", "')}"`;
+		return commentDeactivatedKeys(keysIds, clusteringKeysHash, isParentActivated);
 	} else {
 		return "";
 	}
@@ -86,15 +92,31 @@ const mergeValuesWithConfigOptions = values => {
 	return seedOptionsWithValues(configOptions, values);
 }
 
-const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment) => {
+const getOptions = (clusteringKeys, clusteringKeysHash, tableId, tableOptions, comment, isParentActivated) => {
 	const optionsWithValues = mergeValuesWithConfigOptions(tableOptions);
 	const optionsString = addId(
 		tableId,
-		addClustering(clusteringKeys, clusteringKeysHash, parseToString(optionsWithValues, comment))
+		addClustering(clusteringKeys, clusteringKeysHash, parseToString(optionsWithValues, comment), isParentActivated)
 	);
 
 	return optionsString ? optionsString.replace(/\n$/, '') : '';
 };
+
+const commentDeactivatedKeys = (keysIds, keysHash, isParentActivated) => {
+	const joinKeys = keys => keys.map(id => keysHash[id].name).join('", "');
+	
+	if (!isParentActivated) {
+		return `"${joinKeys(keysIds)}"`;
+	}
+
+	const [activatedKeys, deactivatedKeys] = _.partition(keysIds, id => keysHash[id].isActivated !== false);
+	if (deactivatedKeys.length === 0) {
+		return `"${joinKeys(activatedKeys)}"`;
+	} else if (activatedKeys.length === 0) {
+		return `"${joinKeys(deactivatedKeys)}"`;
+	}
+	return `"${joinKeys(activatedKeys)}" ${inlineComment(`, "${joinKeys(deactivatedKeys)}"`)}`;
+}
 
 module.exports = {
 	getOptions,
@@ -104,8 +126,11 @@ module.exports = {
 		tableMetaData,
 		dataSources,
 		keyspaceMetaData,
-		udtTypeMap
+		udtTypeMap,
+		isKeyspaceActivated
 	}) {
+		setDependencies(dependencies);
+
 		const keyspaceName = retrieveContainerName(keyspaceMetaData);
 		const tableName = retrieveEntityName(tableMetaData);
 		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);
@@ -113,6 +138,8 @@ module.exports = {
 		const tableId = retrivePropertyFromConfig(tableMetaData, 0, "schemaId", "");
 		const tableComment = retrivePropertyFromConfig(tableMetaData, 0, "comments", "");
 		const tableOptions = retrivePropertyFromConfig(tableMetaData, 0, "tableOptions", "");
+		const isTableActivated = retrivePropertyFromConfig(tableMetaData, 0, "isActivated", false);
+		const isTableChildrenActivated = isKeyspaceActivated && isTableActivated;
 
 		const partitionKeysHash = getNamesByIds(
 			partitionKeys.map(key => key.keyId),
@@ -122,13 +149,34 @@ module.exports = {
 			clusteringKeys.map(key => key.keyId),
 			dataSources
 		);
-
-		return getCreateTableStatement(
+		
+		const createTableStatement = getCreateTableStatement(
 			keyspaceName,
 			tableName,
-			getColumnDefinition(tableData.properties || {}, udtTypeMap),
-			getPrimaryKeyList(partitionKeysHash, clusteringKeysHash),
-			getOptions(clusteringKeys, clusteringKeysHash, tableId, tableOptions, tableComment)
+			getColumnDefinition(
+				tableData.properties || {},
+				udtTypeMap,
+				isTableChildrenActivated
+			),
+			getPrimaryKeyList(
+				partitionKeysHash,
+				clusteringKeysHash,
+				isTableChildrenActivated
+			),
+			getOptions(
+				clusteringKeys,
+				clusteringKeysHash,
+				tableId,
+				tableOptions,
+				tableComment,
+				isTableChildrenActivated
+			)
+		);
+
+		return commentDeactivatedStatement(
+			createTableStatement,
+			isTableActivated,
+			isKeyspaceActivated
 		);
 	},
 	mergeValuesWithConfigOptions,

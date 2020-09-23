@@ -29,7 +29,8 @@
 			"enableReverseEngineering": true,
 			"disableChoices": true,
 			"enableJsonType": true,
-			"enableArrayItemName": true
+			"enableArrayItemName": true,
+			"FEScriptCommentsSupported": true
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

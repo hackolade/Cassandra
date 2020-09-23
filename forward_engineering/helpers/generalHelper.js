@@ -119,6 +119,25 @@ const canTypeHaveSubtype = (type, subtype) => {
 	return hasSubtype;
 };
 
+const commentDeactivatedStatement = (statement, isActivated = true, isParentActivated = true, useMultiLineComment = true) => {
+	if (isActivated || !isParentActivated || !statement) {
+		return statement;
+	}
+	const insertBeforeEachLine = (statement, insertValue = '-- ') =>
+		statement
+			.split('\n')
+			.map((line) => `${insertValue}${line}`)
+			.join('\n');
+	
+	const multiLineComment = (statement) => {
+		return `/*\n${insertBeforeEachLine(statement, '  ')}\n*/`;
+	}
+
+	return useMultiLineComment ? multiLineComment(statement) : insertBeforeEachLine(statement);
+}
+
+const retrieveIsItemActivated = (itemConfig) => retrivePropertyFromConfig(itemConfig, 0, "isActivated", false);
+
 module.exports = {
 	tab,
 	retrieveContainerName,
@@ -134,4 +153,6 @@ module.exports = {
 	eachField,
 	canTypeHaveSubtype,
 	getEntityLevelConfig,
+	commentDeactivatedStatement,
+	retrieveIsItemActivated
 };

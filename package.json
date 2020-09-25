@@ -1,7 +1,7 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.49",
-	"versionDate": "2020-09-10",
+	"version": "0.1.50",
+	"versionDate": "2020-09-25",
 	"author": "hackolade",
 	"engines": {
 		"hackolade": "3.4.12",
@@ -29,7 +29,8 @@
 			"enableReverseEngineering": true,
 			"disableChoices": true,
 			"enableJsonType": true,
-			"enableArrayItemName": true
+			"enableArrayItemName": true,
+			"FEScriptCommentsSupported": true
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

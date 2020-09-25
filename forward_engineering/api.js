@@ -32,9 +32,8 @@ module.exports = {
 			if (data.isUpdateScript) {
 				callback(null, getAlterScript(data.jsonSchema, data.udtTypeMap, data));
 			} else {
-				const isKeyspaceActivated = retrieveIsItemActivated(data.containerData);
-				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, isKeyspaceActivated)}`;
-				callback(null, commentDeactivatedStatement(script, isKeyspaceActivated));
+				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, true)}`;
+				callback(null, script);
 			}
 		} catch (e) {
 			logger.log('error', { message: e.message, stack: e.stack }, 'Cassandra Forward-Engineering Error');

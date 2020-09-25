@@ -136,7 +136,7 @@ const commentDeactivatedStatement = (statement, isActivated = true, isParentActi
 	return useMultiLineComment ? multiLineComment(statement) : insertBeforeEachLine(statement);
 }
 
-const retrieveIsItemActivated = (itemConfig) => retrivePropertyFromConfig(itemConfig, 0, "isActivated", false);
+const retrieveIsItemActivated = (itemConfig) => retrivePropertyFromConfig(itemConfig, 0, "isActivated", true);
 
 module.exports = {
 	tab,

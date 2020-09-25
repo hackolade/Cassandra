@@ -109,7 +109,7 @@ module.exports = {
 		entityData,
 		containerData,
 		collectionRefsDefinitionsMap,
-		isKeyspaceActivated
+		isKeyspaceActivated = true
 	}) {
 		setDependencies(dependencies);
 		let script = [];

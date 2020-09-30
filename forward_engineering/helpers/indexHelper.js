@@ -24,7 +24,7 @@ const getIndexes = (indexes, dataSources, tableName, keyspaceName, isTableActiva
 };
 
 const getIndex = (name, keyspaceName, tableName, indexColumnStatement) => (
-	`CREATE INDEX IF NOT EXISTS "${name}"\n${tab(`ON ${getTableNameStatement(keyspaceName, tableName)} (${indexColumnStatement});`)}`	
+	`CREATE INDEX IF NOT EXISTS ${name ? `"${name}"` : ``}\n${tab(`ON ${getTableNameStatement(keyspaceName, tableName)} (${indexColumnStatement});`)}`	
 );
 
 const getIndexColumnStatement = (key, dataSources) => {

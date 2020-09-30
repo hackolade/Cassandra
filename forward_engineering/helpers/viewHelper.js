@@ -44,7 +44,7 @@ const getNamesByIds = (collectionRefsDefinitionsMap, ids) => {
 			return hash;
 		}
 		return Object.assign({}, hash, {
-			[id]: name
+			[id]: { name: name }
 		});
 	}, {});
 };
@@ -67,7 +67,7 @@ const getPrimaryKeysNames = (collectionRefsDefinitionsMap, viewData) => {
 		partitionKeys.map(key => key.keyId)
 	);
 
-	return _.values(partitionKeysHash).filter(_.identity).map(name => `"${name}"`);
+	return _.values(partitionKeysHash).filter(_.identity).map(field => `"${field.name}"`);
 };
 
 const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData, isParentActivated) => {

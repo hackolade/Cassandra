@@ -47,7 +47,7 @@ const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActiva
 		keys.push(clusteringKeys);
 	}
 
-	return keys.join(', ');
+	return keys.join(clusteringKeys.startsWith('/*') ? ' ' : ', ');
 };
 
 const getPartitionKeys = (partitionKeysHash, isParentActivated) => {
@@ -113,7 +113,7 @@ const commentDeactivatedKeys = (keysIds, keysHash, isParentActivated) => {
 	if (deactivatedKeys.length === 0) {
 		return `"${joinKeys(activatedKeys)}"`;
 	} else if (activatedKeys.length === 0) {
-		return `"${joinKeys(deactivatedKeys)}"`;
+		return `${inlineComment(`"${joinKeys(deactivatedKeys)}"`)}`;
 	}
 	return `"${joinKeys(activatedKeys)}" ${inlineComment(`, "${joinKeys(deactivatedKeys)}"`)}`;
 }

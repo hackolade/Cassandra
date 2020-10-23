@@ -47,7 +47,7 @@ const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActiva
 		keys.push(clusteringKeys);
 	}
 
-	return keys.join(clusteringKeys.startsWith('/*') ? ' ' : ', ');
+	return keys.join(clusteringKeys.startsWith('/*') || partitionKeys.endsWith('*/') ? ' ' : ', ');
 };
 
 const getPartitionKeys = (partitionKeysHash, isParentActivated) => {

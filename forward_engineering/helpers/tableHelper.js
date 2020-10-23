@@ -35,6 +35,8 @@ const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, prim
 };
 
 const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActivated) => {
+	setDependencies(dependencies);
+
 	const partitionKeys = getPartitionKeys(partitionKeysHash, isParentActivated);
 	const clusteringKeys = getClusteringKeys(clusteringKeysHash, isParentActivated);
 	const keys = [];

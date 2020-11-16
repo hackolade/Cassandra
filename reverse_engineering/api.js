@@ -3,6 +3,26 @@
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
+const commandsHelper = require('./commandsHelper');
+const fs = require('fs');
+const antlr4 = require('antlr4');
+const CqlLexer = require('./lib/CqlLexer.js');
+const CqlParser = require('./lib/CqlParser.js');
+const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
+
+
+const handleFileData = filePath => {
+	return new Promise((resolve, reject) => {
+
+		fs.readFile(filePath, 'utf-8', (err, content) => {
+			if(err) {
+				reject(err);
+			} else {
+				resolve(content);
+			}
+		});
+	});
+};
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
@@ -11,6 +31,25 @@ module.exports = {
 				logger.log('error', error, 'Connection error');
 				cb(error);
 			});
+	},
+
+	reFromFile: async (data, logger, callback) => {
+		try {
+			const input = await handleFileData(data.filePath);
+			const chars = new antlr4.InputStream(input);
+			const lexer = new CqlLexer.CqlLexer(chars);
+
+			const tokens = new antlr4.CommonTokenStream(lexer);
+			const parser = new CqlParser.CqlParser(tokens);
+			const tree = parser.cqls();
+
+			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
+
+			const result = commandsHelper.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
+			callback(null, result, {}, [], 'multipleSchema');
+		} catch(err) {
+			callback(err);
+		}
 	},
 
 	disconnect: function(connectionInfo, cb, app){

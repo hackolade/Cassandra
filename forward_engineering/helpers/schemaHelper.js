@@ -28,33 +28,33 @@ const getPathById = (schema, id, path) => {
 	}
 };
 
-const getRootItemNameById = (id, properties) => {
+const getRootItemMetadataById = (id, properties) => {
 	const propertyName = Object.keys(properties).find(propertyName => (properties[propertyName].GUID === id));
 
 	if (properties[propertyName] && properties[propertyName].code) {
-		return properties[propertyName].code;
+		return { name: properties[propertyName].code, isActivated: properties[propertyName].isActivated };
 	}
 
-	return propertyName;
+	return { name: propertyName, isActivated: properties[propertyName] && properties[propertyName].isActivated };
 };
 
-const findFieldNameById = (id, source) => {
+const findFieldMetadataById = (id, source) => {
 	let path = getPathById(source, id, []);
 
 	if (path) {
-		return getRootItemNameById(path[0], source.properties);
+		return getRootItemMetadataById(path[0], source.properties);
 	} else {
-		return "";
+		return { name: "" };
 	}
 };
 
-const getNamesByIds = (ids, sources) => {
+const getAttributesDataByIds = (ids, sources) => {
 	return ids.reduce((hash, id) => {
 		for (let i = 0; i < sources.length; i++) {
-			const name = findFieldNameById(id, sources[i]);
+			const { name, isActivated } = findFieldMetadataById(id, sources[i]);
 
 			if (name) {
-				return Object.assign({}, hash, { [id]: name });
+				return Object.assign({}, hash, { [id]: { name, isActivated }});
 			}
 		}
 
@@ -64,5 +64,5 @@ const getNamesByIds = (ids, sources) => {
 
 module.exports = {
 	getPathById,
-	getNamesByIds
+	getNamesByIds: getAttributesDataByIds
 };

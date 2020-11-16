@@ -16,5 +16,10 @@
 		"pattern": "",
 		"comments":"",
 		"format": ""
-	}
+	},
+	"descriptor": [{
+		"format": "hh:mm:ss"
+	}, {
+		"format": "hh:mm:ss.nnn"
+	}]
 }

@@ -1,9 +1,10 @@
 'use strict'
 
 const { getTypeByData } = require('./typeHelper');
+const { commentDeactivatedStatement } = require('./generalHelper');
 
 module.exports = {
-	getColumnDefinition(properties, udtTypeMap = {}) {
+	getColumnDefinition(properties, udtTypeMap = {}, isParentActivated = false) {
 		return Object.keys(properties).map(name => {
 			const data = properties[name];
 			const typeDefinition = getTypeDefinition(data, udtTypeMap, name);
@@ -11,7 +12,17 @@ module.exports = {
 			if (typeDefinition === undefined) {
 				return '';
 			} else {
-				return getColumn(data.code || name, typeDefinition, isStatic(data));
+				const columnStatement = getColumn(
+					data.code || name,
+					typeDefinition,
+					isStatic(data)
+				);
+				return commentDeactivatedStatement(
+					columnStatement,
+					data.isActivated,
+					isParentActivated,
+					false
+				);
 			}
 		}).filter(column => column).join(',\n');
 	}

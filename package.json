@@ -30,7 +30,10 @@
 			"disableChoices": true,
 			"enableJsonType": true,
 			"enableArrayItemName": true,
-			"FEScriptCommentsSupported": true
+			"FEScriptCommentsSupported": true,
+			"relationships": {
+                		"compositeRelationships": true
+            		}
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

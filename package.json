@@ -32,8 +32,9 @@
 			"enableArrayItemName": true,
 			"FEScriptCommentsSupported": true,
 			"relationships": {
-				"compositeRelationships": true,
-				"disableCompositeRelationshipsIsParentFieldPrimaryValidation": true
+				"compositeRelationships": {
+					"allowRelationshipsForNonPrimaryKey": true
+				}
 			}
 		}
 	},

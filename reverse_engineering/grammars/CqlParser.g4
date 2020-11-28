@@ -146,7 +146,7 @@ createTrigger
    ;
 
 createMaterializedView
-   : kwCreate kwMaterialized kwView ifNotExist? (keyspace DOT)? materializedView kwAs kwSelect columnList kwFrom (keyspace DOT)? table materializedViewWhere kwPrimary kwKey syntaxBracketLr columnList syntaxBracketRr (kwWith materializedViewOptions)?
+   : kwCreate kwMaterialized kwView ifNotExist? (keyspace DOT)? materializedView kwAs kwSelect columnList kwFrom (keyspace DOT)? table materializedViewWhere (primaryKeyElement)? (kwWith materializedViewOptions)?
    ;
 
 materializedViewWhere
@@ -163,8 +163,6 @@ columnNotNull
 
 materializedViewOptions
    : tableOptions
-   | tableOptions kwAnd clusteringOrder
-   | clusteringOrder
    ;
 
 createKeyspace
@@ -256,7 +254,7 @@ alterTypeRenameItem
    ;
 
 alterTypeAdd
-   : kwAdd column dataType (syntaxComma column dataType)*
+   : kwAdd typeMemberColumnList
    ;
 
 alterTypeAlterType
@@ -386,7 +384,7 @@ tableOptionItem
    ;
 
 tableOptionName
-   : OBJECT_NAME
+   : id
    ;
 
 tableOptionValue
@@ -506,7 +504,7 @@ createIndex
    ;
 
 indexName
-   : OBJECT_NAME
+   : id
    | stringLiteral
    ;
 
@@ -518,15 +516,15 @@ indexColumnSpec
    ;
 
 indexKeysSpec
-   : kwKeys syntaxBracketLr OBJECT_NAME syntaxBracketRr
+   : kwKeys syntaxBracketLr column syntaxBracketRr
    ;
 
 indexEntriesSSpec
-   : kwEntries syntaxBracketLr OBJECT_NAME syntaxBracketRr
+   : kwEntries syntaxBracketLr column syntaxBracketRr
    ;
 
 indexFullSpec
-   : kwFull syntaxBracketLr OBJECT_NAME syntaxBracketRr
+   : kwFull syntaxBracketLr column syntaxBracketRr
    ;
 
 deleteStatement
@@ -538,8 +536,8 @@ deleteColumnList
    ;
 
 deleteColumnItem
-   : OBJECT_NAME
-   | OBJECT_NAME LS_BRACKET (stringLiteral | decimalLiteral) RS_BRACKET
+   : id
+   | id LS_BRACKET (stringLiteral | decimalLiteral) RS_BRACKET
    ;
 
 update
@@ -555,7 +553,7 @@ ifConditionList
    ;
 
 ifCondition
-   : OBJECT_NAME OPERATOR_EQ constant
+   : id OPERATOR_EQ constant
    ;
 
 assignments
@@ -563,15 +561,15 @@ assignments
    ;
 
 assignmentElement
-   : OBJECT_NAME OPERATOR_EQ (constant | assignmentMap | assignmentSet | assignmentList)
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) decimalLiteral
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentSet
-   | OBJECT_NAME OPERATOR_EQ assignmentSet (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentMap
-   | OBJECT_NAME OPERATOR_EQ assignmentMap (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME OPERATOR_EQ OBJECT_NAME (PLUS | MINUS) assignmentList
-   | OBJECT_NAME OPERATOR_EQ assignmentList (PLUS | MINUS) OBJECT_NAME
-   | OBJECT_NAME syntaxBracketLs decimalLiteral syntaxBracketRs OPERATOR_EQ constant
+   : id OPERATOR_EQ (constant | assignmentMap | assignmentSet | assignmentList)
+   | id OPERATOR_EQ id (PLUS | MINUS) decimalLiteral
+   | id OPERATOR_EQ id (PLUS | MINUS) assignmentSet
+   | id OPERATOR_EQ assignmentSet (PLUS | MINUS) id
+   | id OPERATOR_EQ id (PLUS | MINUS) assignmentMap
+   | id OPERATOR_EQ assignmentMap (PLUS | MINUS) id
+   | id OPERATOR_EQ id (PLUS | MINUS) assignmentList
+   | id OPERATOR_EQ assignmentList (PLUS | MINUS) id
+   | id syntaxBracketLs decimalLiteral syntaxBracketRs OPERATOR_EQ constant
    ;
 
 assignmentSet
@@ -666,8 +664,8 @@ fromSpec
    ;
 
 fromSpecElement
-   : OBJECT_NAME
-   | OBJECT_NAME '.' OBJECT_NAME
+   : id
+   | id '.' id
    ;
 
 orderSpec
@@ -675,7 +673,7 @@ orderSpec
    ;
 
 orderSpecElement
-   : OBJECT_NAME (kwAsc | kwDesc)?
+   : id (kwAsc | kwDesc)?
    ;
 
 whereSpec
@@ -691,9 +689,9 @@ selectElements
    ;
 
 selectElement
-   : OBJECT_NAME '.' '*'
-   | OBJECT_NAME (kwAs OBJECT_NAME)?
-   | functionCall (kwAs OBJECT_NAME)?
+   : id '.' '*'
+   | id (kwAs id)?
+   | functionCall (kwAs id)?
    ;
 
 relationElements
@@ -701,32 +699,32 @@ relationElements
    ;
 
 relationElement
-   : OBJECT_NAME (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
-   | OBJECT_NAME '.' OBJECT_NAME (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
+   : id (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
+   | id '.' id (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
    | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) constant
    | functionCall (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) functionCall
-   | OBJECT_NAME kwIn '(' functionArgs? ')'
-   | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' kwIn '(' assignmentTuple (syntaxComma assignmentTuple)* ')'
-   | '(' OBJECT_NAME (syntaxComma OBJECT_NAME)* ')' (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) ( assignmentTuple (syntaxComma assignmentTuple)* )
+   | id kwIn '(' functionArgs? ')'
+   | '(' id (syntaxComma id)* ')' kwIn '(' assignmentTuple (syntaxComma assignmentTuple)* ')'
+   | '(' id (syntaxComma id)* ')' (OPERATOR_EQ | OPERATOR_LT | OPERATOR_GT | OPERATOR_LTE | OPERATOR_GTE) ( assignmentTuple (syntaxComma assignmentTuple)* )
    | relalationContainsKey
    | relalationContains
    ;
 
 relalationContains
-   : OBJECT_NAME kwContains constant
+   : id kwContains constant
    ;
 
 relalationContainsKey
-   : OBJECT_NAME (kwContains kwKey) constant
+   : id (kwContains kwKey) constant
    ;
 
 functionCall
-   : OBJECT_NAME '(' STAR ')'
-   | OBJECT_NAME '(' functionArgs? ')'
+   : id '(' STAR ')'
+   | id '(' functionArgs? ')'
    ;
 
 functionArgs
-   : (constant | OBJECT_NAME | functionCall) (syntaxComma (constant | OBJECT_NAME | functionCall))*
+   : (constant | id | functionCall) (syntaxComma (constant | id | functionCall))*
    ;
 
 constant
@@ -763,18 +761,18 @@ hexadecimalLiteral
    ;
 
 keyspace
-   : OBJECT_NAME
-   | DQUOTE OBJECT_NAME DQUOTE
+   : id
+   | DQUOTE id DQUOTE
    ;
 
 table
-   : OBJECT_NAME
-   | DQUOTE OBJECT_NAME DQUOTE
+   : id
+   | DQUOTE id DQUOTE
    ;
 
 column
-   : OBJECT_NAME
-   | DQUOTE OBJECT_NAME DQUOTE
+   : id
+   | DQUOTE id DQUOTE
    ;
 
 dataType
@@ -782,7 +780,7 @@ dataType
    ;
 
 dataTypeName
-   : OBJECT_NAME
+   : id
    | K_TIMESTAMP
    | K_SET
    | K_ASCII
@@ -821,11 +819,11 @@ orderDirection
    ;
 
 role
-   : OBJECT_NAME
+   : id
    ;
 
 trigger
-   : OBJECT_NAME
+   : id
    ;
 
 triggerClass
@@ -833,27 +831,27 @@ triggerClass
    ;
 
 materializedView
-   : OBJECT_NAME
+   : id
    ;
 
 type
-   : OBJECT_NAME
+   : id
    ;
 
 aggregate
-   : OBJECT_NAME
+   : id
    ;
 
 functionStatement
-   : OBJECT_NAME
+   : id
    ;
 
 language
-   : OBJECT_NAME
+   : id
    ;
 
 user
-   : OBJECT_NAME
+   : id
    ;
 
 password
@@ -861,7 +859,7 @@ password
    ;
 
 hashKey
-   : OBJECT_NAME
+   : id
    ;
 
 param
@@ -869,7 +867,7 @@ param
    ;
 
 paramName
-   : OBJECT_NAME
+   : id
    ;
 
 kwAdd
@@ -1305,3 +1303,148 @@ syntaxComma
 syntaxColon
    : COLON
    ;
+
+id
+   : OBJECT_NAME |
+   K_ADD
+   K_AGGREGATE |
+   K_ALL |
+   K_ALLOW |
+   K_ALTER |
+   K_AND |
+   K_ANY |
+   K_APPLY |
+   K_AS |
+   K_ASC |
+   K_AUTHORIZE |
+   K_BATCH |
+   K_BEGIN |
+   K_BY |
+   K_CALLED |
+   K_CLUSTERING |
+   K_COLUMNFAMILY |
+   K_COMPACT |
+   K_CONSISTENCY |
+   K_CONTAINS |
+   K_CREATE |
+   K_CUSTOM |
+   K_DELETE |
+   K_DESC |
+   K_DESCRIBE |
+   K_DISTINCT |
+   K_DROP |
+   K_DURABLE_WRITES |
+   K_EACH_QUORUM |
+   K_ENTRIES |
+   K_EXECUTE |
+   K_EXISTS |
+   K_FALSE |
+   K_FILTERING |
+   K_FINALFUNC |
+   K_FROM |
+   K_FULL |
+   K_FUNCTION |
+   K_FUNCTIONS |
+   K_GRANT |
+   K_IF |
+   K_IN |
+   K_INDEX |
+   K_INFINITY |
+   K_INITCOND |
+   K_INPUT |
+   K_INSERT |
+   K_INTO |
+   K_IS |
+   K_JSON |
+   K_KEY |
+   K_KEYS |
+   K_KEYSPACE |
+   K_KEYSPACES |
+   K_LANGUAGE |
+   K_LEVEL |
+   K_LIMIT |
+   K_LOCAL_ONE |
+   K_LOCAL_QUORUM |
+   K_LOGGED |
+   K_LOGIN |
+   K_MATERIALIZED |
+   K_MODIFY |
+   K_NAN |
+   K_NORECURSIVE |
+   K_NOSUPERUSER |
+   K_NOT |
+   K_NULL |
+   K_OF |
+   K_ON |
+   K_ONE |
+   K_OPTIONS |
+   K_OR |
+   K_ORDER |
+   K_PARTITION |
+   K_PASSWORD |
+   K_PER |
+   K_PERMISSION |
+   K_PERMISSIONS |
+   K_PRIMARY |
+   K_QUORUM |
+   K_RENAME |
+   K_REPLACE |
+   K_REPLICATION |
+   K_RETURNS |
+   K_REVOKE |
+   K_ROLE |
+   K_ROLES |
+   K_SCHEMA |
+   K_SELECT |
+   K_SET |
+   K_SFUNC |
+   K_STATIC |
+   K_STORAGE |
+   K_STYPE |
+   K_SUPERUSER |
+   K_TABLE |
+   K_THREE |
+   K_TIMESTAMP |
+   K_TO |
+   K_TOKEN |
+   K_TRIGGER |
+   K_TRUE |
+   K_TRUNCATE |
+   K_TTL |
+   K_TWO |
+   K_TYPE |
+   K_UNLOGGED |
+   K_UPDATE |
+   K_USE |
+   K_USER |
+   K_USING |
+   K_UUID |
+   K_VALUES |
+   K_VIEW |
+   K_WHERE |
+   K_WITH |
+   K_WRITETIME |
+   K_ASCII |
+   K_BIGINT |
+   K_BLOB |
+   K_BOOLEAN |
+   K_COUNTER |
+   K_DATE |
+   K_DECIMAL |
+   K_DOUBLE |
+   K_FLOAT |
+   K_FROZEN |
+   K_INET |
+   K_INT |
+   K_LIST |
+   K_MAP |
+   K_SMALLINT |
+   K_TEXT |
+   K_TIMEUUID |
+   K_TIME |
+   K_TINYINT |
+   K_TUPLE |
+   K_VARCHAR |
+   K_VARINT |
+   K_USERS
+;

@@ -3,11 +3,11 @@
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
-const commandsHelper = require('./commandsHelper');
+const commandsService = require('./commandsService');
 const fs = require('fs');
 const antlr4 = require('antlr4');
-const CqlLexer = require('./lib/CqlLexer.js');
-const CqlParser = require('./lib/CqlParser.js');
+const CqlLexer = require('./parser/CqlLexer.js');
+const CqlParser = require('./parser/CqlParser.js');
 const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
 
 
@@ -45,7 +45,7 @@ module.exports = {
 
 			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
 
-			const result = commandsHelper.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
+			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
 			callback(null, result, {}, [], 'multipleSchema');
 		} catch(err) {
 			callback(err);

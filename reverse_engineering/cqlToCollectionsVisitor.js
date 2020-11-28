@@ -1,5 +1,5 @@
-const { CqlParserVisitor } = require('./lib/CqlParserVisitor');
-const { CqlParser } = require('./lib/CqlParser');
+const { CqlParserVisitor } = require('./parser/CqlParserVisitor');
+const { CqlParser } = require('./parser/CqlParser');
 const { 
 	CREATE_COLLECTION_COMMAND,
 	REMOVE_COLLECTION_COMMAND,
@@ -10,8 +10,13 @@ const {
 	ADD_FIELDS_TO_COLLECTION_COMMAND,
 	RENAME_FIELD_COMMAND,
 	CREATE_VIEW_COMMAND,
-	ADD_BUCKET_DATA_COMMAND
-} = require('./commandsHelper');
+	ADD_BUCKET_DATA_COMMAND,
+	ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+	UPDATE_BUCKET_COMMAND,
+	UPDATE_ENTITY_LEVEL_DATA_COMMAND,
+	UPDATE_VIEW_LEVEL_DATA_COMMAND,
+	ADD_FIELDS_TO_DEFINITION_COMMAND,
+} = require('./commandsService');
 
 const ALLOWED_COMMANDS = [
 	CqlParser.RULE_createTable,
@@ -24,6 +29,10 @@ const ALLOWED_COMMANDS = [
 	CqlParser.RULE_use,
 	CqlParser.RULE_createFunction,
 	CqlParser.RULE_createAggregate,
+	CqlParser.RULE_alterKeyspace,
+	CqlParser.RULE_alterMaterializedView,
+	CqlParser.RULE_createIndex,
+	CqlParser.RULE_alterType
 ];
 
 const DEFAULT_TYPE = { type: 'char' };
@@ -38,10 +47,10 @@ class Visitor extends CqlParserVisitor {
 
 	visitCreateTable(ctx) {
 		const { properties, keyData } = this.visit(ctx.columnDefinitionList());
-		const collectionName =  getName(ctx.table());
+		const collectionName =  this.visit(ctx.table());
 		const bucketName = this.getKeyspaceName(ctx);
 		const optionsContext = ctx.withElement();
-		const options = optionsContext ? this.visit(optionsContext) : {};
+		const options = optionsContext ? this.visit(optionsContext) : { partitionKey: [], clusteringKey: []};
 		
 		return {
 			type: CREATE_COLLECTION_COMMAND,
@@ -54,8 +63,8 @@ class Visitor extends CqlParserVisitor {
 			},
 			entityLevelData: {
 				tableOptions: options,
-				compositePartitionKey: (keyData.partitionKey || []).map(key => ({ name: key })),
-				compositeClusteringKey: (keyData.clusteringKey || []).map(key => ({ name: key }))
+				compositePartitionKey: keyData.partitionKey,
+				compositeClusteringKey: keyData.clusteringKey,
 			}
 		}
 	}
@@ -63,15 +72,237 @@ class Visitor extends CqlParserVisitor {
 	visitCreateKeyspace(ctx) {
 		const name = this.getKeyspaceName(ctx)
 		const replicationProperties = this.visit(ctx.replicationList());
+		const durableWrites = !!(this.visit(ctx.durableWrites()));
 
 		return {
 			type: CREATE_BUCKET_COMMAND,
 			name,
 			data: {
 				...replicationProperties,
-				durableWrites: Boolean(this.visit(ctx.durableWrites()))
+				durableWrites
 			}
 		};
+	}
+
+	visitCreateMaterializedView(ctx) {
+		const name = this.visit(ctx.materializedView());
+		const table = this.visit(ctx.table());
+		const columns = this.visit(ctx.columnList());
+		const optionsContext = ctx.materializedViewOptions();
+		const options = optionsContext ? this.visit(optionsContext) : {};
+		const schema = getViewSchema(table, columns);
+		const keyspace = ctx.keyspace()[0];
+		const bucketName = keyspace ? this.visit(keyspace) : '';
+		const primaryKeyContext = ctx.primaryKeyElement();
+		const keyData = primaryKeyContext ? this.visit(primaryKeyContext) : { partitionKey: [], clusteringKey: [] };
+		
+		return {
+			type: CREATE_VIEW_COMMAND,
+			name,
+			bucketName,
+			collectionName: table,
+			jsonSchema: { properties: schema },
+			data: {
+				tableOptions: options,
+				compositePartitionKey: keyData.partitionKey,
+				compositeClusteringKey: keyData.clusteringKey
+			}
+		};
+	}
+
+	visitCreateIndex(ctx) {
+		const keyspace = this.getKeyspaceName(ctx);
+		const column = this.visit(ctx.indexColumnSpec());
+		const nameContext = ctx.indexName();
+		const name = nameContext ? this.visit(nameContext) : '';
+		
+		return {
+			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+			bucketName: keyspace,
+			collectionName: this.visit(ctx.table()),
+			name,
+			column
+		};
+	}
+
+	visitCreateType(ctx) {
+		const name = this.visit(ctx.type());
+		const properties = listToJson(this.visit(ctx.typeMemberColumnList()))
+	
+		return {
+			type: CREATE_DEFINITION_COMMAND,
+			name,
+			properties
+		}
+	}
+
+	visitCreateAggregate(ctx) {
+		const keyspace = this.getKeyspaceName(ctx);
+		const name = this.visit(ctx.aggregate());
+		const [ sFunc, finalFunc ] = this.visit(ctx.functionStatement());
+		const fullName = keyspace ? `${keyspace}.${name}` : name;
+		const initCond = this.visit(ctx.initCondDefinition());
+
+		const [ argType, sType ] = ctx.dataType().map(context => context.getText());
+
+		let statement = 'CREATE';
+		if (ctx.orReplace()) {
+			statement += ' OR REPLACE';
+		}
+		statement += ` AGGREGATE`
+		if (ctx.ifNotExist()) {
+			statement += ' IF NOT EXIST';
+		}
+		statement += ` ${fullName} (${argType})\n\tSFUNC ${sFunc}\n\tSTYPE ${sType}\n\tFINALFUNC ${finalFunc}\n\tINITCOND ${initCond};`;
+
+		return {
+			type: ADD_BUCKET_DATA_COMMAND,
+			bucketName: keyspace,
+			key: 'UDAs',
+			data: {
+				name,
+				storedProcFunction: statement,
+			}
+		};
+	}
+
+	visitCreateFunction(ctx) {
+		const keyspace = this.getKeyspaceName(ctx);
+		const name = this.visit(ctx.functionStatement());
+		const fullName = keyspace ? `${keyspace}.${name}` : name;
+		const body = this.visit(ctx.codeBlock());
+		const language = this.visit(ctx.language());
+		const params = this.visit(ctx.paramList());
+		const returnMode = this.visit(ctx.returnMode());
+
+		const returnsType = ctx.dataType().getText();
+
+		let statement = 'CREATE';
+		if (ctx.orReplace()) {
+			statement += ' OR REPLACE';
+		}
+		statement += ` FUNCTION`
+		if (ctx.ifNotExist()) {
+			statement += ' IF NOT EXIST';
+		}
+		statement += ` ${fullName} ${params}\n\t${returnMode}\n\tRETURNS ${returnsType}\n\tLANGUAGE ${language} AS\n\t${body};`;
+
+		return {
+			type: ADD_BUCKET_DATA_COMMAND,
+			bucketName: keyspace,
+			key: 'UDFs',
+			data: {
+				name,
+				storedProcFunction: statement,
+			}
+		};
+	}
+
+	visitUse(ctx) {
+		return {
+			type: USE_BUCKET_COMMAND,
+			bucketName: this.getKeyspaceName(ctx)
+		}
+	}
+
+	visitAlterTable(ctx) {
+		const bucketName =this.getKeyspaceName(ctx);
+		const operationContext = ctx.alterTableOperation();
+		const alterTableAdd = operationContext.alterTableAdd();
+		const alterTableRename = operationContext.alterTableRename();
+		const alterTableUpdateOptions = operationContext.alterTableWith();
+		const collectionName = this.visit(ctx.table());
+
+		if (alterTableAdd) {
+			return {
+				type: ADD_FIELDS_TO_COLLECTION_COMMAND,
+				collectionName,
+				bucketName,
+				data: listToJson(this.visit(alterTableAdd.alterTableColumnDefinition()))
+			};
+		}
+
+		if (alterTableRename) {
+			const [column1, column2] = alterTableRename.column();
+
+			return {
+				type: RENAME_FIELD_COMMAND,
+				collectionName,
+				bucketName,
+				nameFrom: this.visit(column1),
+				nameTo: this.visit(column2) 
+			}
+		}
+
+
+		if (alterTableUpdateOptions) {
+			const tableOptions = this.visit(alterTableUpdateOptions.tableOptions());
+
+			return {
+				type: UPDATE_ENTITY_LEVEL_DATA_COMMAND,
+				collectionName,
+				bucketName,
+				data: {
+					tableOptions
+				}
+			}
+		}
+	}
+
+	visitAlterKeyspace(ctx) {
+		return {
+			...this.visitCreateKeyspace(ctx),
+			type: UPDATE_BUCKET_COMMAND
+		};
+	}
+
+	visitAlterMaterializedView(ctx) {
+		const name = this.visit(ctx.materializedView());
+		const optionsContext = ctx.materializedViewOptions();
+		const options = optionsContext ? this.visit(optionsContext) : {};
+		const keyspace = this.getKeyspaceName(ctx);
+		const bucketName = keyspace ? this.visit(keyspace) : '';
+		
+		return {
+			type: UPDATE_VIEW_LEVEL_DATA_COMMAND,
+			name,
+			bucketName,
+			data: {
+				tableOptions: options
+			}
+		};
+	}
+
+	visitAlterType(ctx) {
+		const name = this.visit(ctx.type());
+		const bucketName = this.getKeyspaceName(ctx);
+		const operationContext = ctx.alterTypeOperation();
+		const alterTypeAdd = operationContext.alterTypeAdd();
+
+		if (alterTypeAdd) {
+			return {
+				type: ADD_FIELDS_TO_DEFINITION_COMMAND,
+				name,
+				bucketName,
+				data: listToJson(this.visit(ctx.typeMemberColumnList()))
+			};
+		}
+		
+	}
+
+	visitDropTable(ctx) {
+		return {
+			type: REMOVE_COLLECTION_COMMAND,
+			bucketName: this.getKeyspaceName(ctx),
+			collectionName: this.visit(ctx.table())
+		}
+	}
+
+	visitDropKeyspace(ctx) {
+		return {
+			type: REMOVE_BUCKET_COMMAND,
+			bucketName: this.getKeyspaceName(ctx)
+		}
 	}
 
 	visitDurableWrites(ctx) {
@@ -109,154 +340,39 @@ class Visitor extends CqlParserVisitor {
 		return { [targetKey] : targetValue };
 	}
 
-	visitCreateType(ctx) {
-		const name = this.visit(ctx.type());
-		const properties = listToJson(this.visit(ctx.typeMemberColumnList()))
-	
-		return {
-		  type: CREATE_DEFINITION_COMMAND,
-		  name,
-		  properties
-		}
+	visitIndexColumnSpec(ctx) {
+		const columnContext = ctx.column();
+		const keysContext = ctx.indexKeysSpec();
+		const entriesContext = ctx.indexEntriesSSpec();
+		const fullContext = ctx.indexFullSpec();
+		const context = columnContext || keysContext || entriesContext || fullContext;
+
+		return this.visit(context);
 	}
 
-	visitAlterTable(ctx) {
-		const bucketName =this.getKeyspaceName(ctx);
-		const alterTableAdd = ctx.alterTableOperation().alterTableAdd();
-		const alterTableRename = ctx.alterTableOperation().alterTableRename();
-		if (alterTableAdd) {
-			return {
-				type: ADD_FIELDS_TO_COLLECTION_COMMAND,
-				collectionName: this.visit(ctx.table()),
-				bucketName,
-				data: listToJson(this.visit(alterTableAdd.alterTableColumnDefinition()))
-			};
-		}
-
-		if (alterTableRename) {
-			const [column1, column2] = alterTableRename.column();
-			
-			return {
-				type: RENAME_FIELD_COMMAND,
-				collectionName: this.visit(ctx.table()),
-				bucketName,
-				nameFrom: this.visit(column1),
-				nameTo: this.visit(column2) 
-			}
-		}
-	
-		return;
+	visitIndexKeysSpec(ctx) {
+		return this.visit(ctx.column());
 	}
 
-	visitDropKeyspace(ctx) {
-		return {
-		  type: REMOVE_BUCKET_COMMAND,
-		  bucketName: this.getKeyspaceName(ctx)
-		}
+	visitIndexEntriesSSpec(ctx) {
+		return this.visit(ctx.column());
 	}
 
-	visitDropTable(ctx) {
-		return {
-		  type: REMOVE_COLLECTION_COMMAND,
-		  bucketName: this.getKeyspaceName(ctx),
-		  collectionName: this.visit(ctx.table())
-		}
+	visitIndexFullSpec(ctx) {
+		return this.visit(ctx.column());
 	}
 
-	visitUse(ctx) {
-		return {
-		  type: USE_BUCKET_COMMAND,
-		  bucketName: this.getKeyspaceName(ctx)
-		}
+	visitColumnList(ctx) {
+		return this.visit(ctx.column());
+	} 
+
+	visitMaterializedViewOptions(ctx) {
+		return this.visit(ctx.tableOptions());
 	}
-
-	visitCreateMaterializedView(ctx) {
-		const name = this.visit(ctx.materializedView());
-		const table = this.visit(ctx.table());
-		const columns = this.visit(ctx.columnList()[0]).filter(Boolean);
-		const schema = getViewSchema(table, columns);
-		const keyspace = ctx.keyspace()[0];
-		const bucketName = keyspace ? this.visit(keyspace) : '';
-		
-		return {
-		  type: CREATE_VIEW_COMMAND,
-		  name,
-		  bucketName,
-		  collectionName: table,
-		  jsonSchema: { properties: schema }
-		};
-	}
-
-	visitCreateAggregate(ctx) {
-		const keyspace = this.getKeyspaceName(ctx);
-		const name = this.visit(ctx.aggregate());
-		const [ sFunc, finalFunc ] = this.visit(ctx.functionStatement());
-		const fullName = keyspace ? `${keyspace}.${name}` : name;
-		const initCond = this.visit(ctx.initCondDefinition());
-
-		const [ argType, sType ] = ctx.dataType().map(context => context.getText());
-
-		let statement = 'CREATE';
-		if (ctx.orReplace()) {
-			statement += ' OR REPLACE';
-		}
-		statement += ` AGGREGATE`
-		if (ctx.ifNotExist()) {
-			statement += ' IF NOT EXIST';
-		}
-		statement += ` ${fullName} (${argType})\n\tSFUNC ${sFunc}\n\tSTYPE ${sType}\n\tFINALFUNC ${finalFunc}\n\tINITCOND ${initCond};`;
-
-		return {
-			type: ADD_BUCKET_DATA_COMMAND,
-			bucketName: keyspace,
-			key: 'UDAs',
-			data: {
-				name,
-				storedProcFunction: statement,
-			}
-		};
-	}
-
-	visitCreateFunction(ctx) {
-		 const keyspace = this.getKeyspaceName(ctx);
-		  const name = this.visit(ctx.functionStatement());
-		  const fullName = keyspace ? `${keyspace}.${name}` : name;
-		  const body = this.visit(ctx.codeBlock());
-		  const language = this.visit(ctx.language());
-		  const params = this.visit(ctx.paramList());
-		  const returnMode = this.visit(ctx.returnMode());
-
-		  const returnsType = ctx.dataType().getText();
-
-		  let statement = 'CREATE';
-		  if (ctx.orReplace()) {
-			  statement += ' OR REPLACE';
-		  }
-		  statement += ` FUNCTION`
-		  if (ctx.ifNotExist()) {
-			  statement += ' IF NOT EXIST';
-		  }
-		  statement += ` ${fullName} ${params}\n\t${returnMode}\n\tRETURNS ${returnsType}\n\tLANGUAGE ${language} AS\n\t${body};`;
-
-		  return {
-			  type: ADD_BUCKET_DATA_COMMAND,
-			  bucketName: keyspace,
-			  key: 'UDFs',
-			  data: {
-				  name,
-				  storedProcFunction: statement,
-			  }
-		  };
-	}
-
 
 	visitReturnMode(ctx) {
 		const start = ctx.kwCalled() ? 'CALLED' : 'RETURNS NULL';
 		return `${start} ON NULL INPUT`;
-	}
-
-	visitInitCondDefinition(ctx) {
-		  return getName(ctx);
 	}
 
 	visitParamList(ctx) {
@@ -269,85 +385,100 @@ class Visitor extends CqlParserVisitor {
 	}
 
 	visitParam(ctx) {
-		  const name = this.visit(ctx.paramName());
-		  const type = ctx.dataType().getText();
-		  return `${name} ${type}`;
+		const name = this.visit(ctx.paramName());
+		const type = ctx.dataType().getText();
+
+		return `${name} ${type}`;
 	}
 
 	visitTableOptions(ctx) {
 		return this.visit(ctx.tableOptionItem()).filter(Boolean).reduce((options, data) => {
-			const key = tableOptionsHashMap[data.key.toLowerCase()];
-			if (!key) {
-				return options;
+			const key = tableOptionsHashMap[data.key.toLowerCase()] || data.key.toLowerCase();
+			if (key === 'caching') {
+				return {
+					...options,
+					[key]: getCachingOptionValue(data.value)
+				}
 			}
+
+			const value = isNaN(data.value) ? removeQuotes(data.value || '') : Number(data.value);
+
 			return {
 				...options,
-				[key]: removeQuotes(data.value || '')
+				[key]: value
 			}
 		}, {});
 	}
 
 	visitTableOptionItem(ctx) {
 		if (ctx.clusteringOrder()) {
-		  return;
+			return;
 		}
+
+		const valueContext = ctx.tableOptionValue() || ctx.optionHash();
 
 		return {
-		  key: ctx.tableOptionName().getText(),
-		  value: ctx.tableOptionValue() ? ctx.tableOptionValue().getText() : ctx.optionHash().getText()
-		}
+			key: ctx.tableOptionName().getText(),
+			value: valueContext.getText()
+		};
 	}
-
 
 	visitDataType(ctx) {
 		const type = this.visit(ctx.dataTypeName());
+		const COMPLEX_TYPES = ['map', 'tuple', 'list', 'set'];
 		const hackoladeType = getTargetType(type);
 		
 		const typeDescription = ctx.dataTypeDefinition();
-		if (hackoladeType) {
-			const isComplexType = ['map', 'tuple', 'list', 'set'].includes(hackoladeType.type);
-			if (!isComplexType) {
-				return hackoladeType
-			}
-			const [ description1, description2 ] = typeDescription ? this.visit(typeDescription) : [ DEFAULT_TYPE, DEFAULT_TYPE ];
-
-			if (hackoladeType === 'map') {
+		if (!hackoladeType) {
+			if (isFrozen(type)) {
 				return {
-					...hackoladeType,
-					subtype: `map<${description2.type || ''}>`
+					...this.visit(typeDescription)[0],
+					frozen: true,
 				}
 			}
 
 			return {
+				type: 'reference',
+				$ref: '#/definitions/'+ type
+			};
+		}
+
+		const isComplexType = COMPLEX_TYPES.includes(hackoladeType.type);
+		if (!isComplexType) {
+			return hackoladeType
+		}
+
+		const [ description1, description2 ] = typeDescription ? this.visit(typeDescription) : [ DEFAULT_TYPE, DEFAULT_TYPE ];
+
+		if (hackoladeType === 'map') {
+			return {
 				...hackoladeType,
-				subtype: `${hackoladeType.type}<${description1.type || ''}>`,
-				items: description1
+				subtype: `map<${description2.type || ''}>`
 			}
 		}
 
-		const isFrozen = type.toUpperCase() === 'FROZEN';
-		if (isFrozen) {
-		  return {
-			...this.visit(typeDescription)[0],
-			frozen: true,
-		  }
-		} else {
-		  return {
-			type: 'reference',
-			frozen: isFrozen,
-			$ref: '#/definitions/'+ type
-		  }
+		return {
+			...hackoladeType,
+			subtype: `${hackoladeType.type}<${description1.type || ''}>`,
+			items: description1
 		}
 	}
 
 	visitColumnDefinitionList(ctx) {
 		const primaryKeyContext = ctx.primaryKeyElement();
-		const keyData = primaryKeyContext ? this.visit(primaryKeyContext) : {};
+		const keyData = primaryKeyContext ? this.visit(primaryKeyContext) : { partitionKey: [], clusteringKey: []};
 		const columns = this.visit(ctx.columnDefinition());
+		const primaryKeysFromColumns = columns.filter(column => column.isPrimaryKey).map(column => ({ name: column.name }));
 
 		return {
-		  properties: Object.assign(...columns),
-		  keyData
+			properties: columns.reduce((properties, column) => ({
+				...properties,
+				[column.name]: column.type
+			}), {}),
+			keyData: {
+				...keyData,
+				partitionKey: [ ...keyData.partitionKey, ...primaryKeysFromColumns]
+			}
 		};
 	}
 
@@ -356,21 +487,60 @@ class Visitor extends CqlParserVisitor {
 	}
 
 	visitPrimaryKeyElement(ctx) {
-		return this.visit(ctx.primaryKeyDefinition())[0];
+		const keyData = this.visit(ctx.primaryKeyDefinition())[0];
+
+		return {
+			partitionKey: keyData.partitionKey.map(key => ({ name: key })),
+			clusteringKey: keyData.clusteringKey.map(key => ({ name: key })),
+		}
+	}
+
+	visitSinglePrimaryKey(ctx) {
+		return {
+			partitionKey: [this.visit(ctx.column())],
+			clusteringKey: []
+		}
 	}
 
 	visitCompoundKey(ctx) {
-		const partitionKey = this.visit(ctx.partitionKey());
-		const clusteringKey = this.visit(ctx.clusteringKeyList())[0];
+		const partitionKey =  [ this.visit(ctx.partitionKey()) ];
+		const clusteringKey = this.visit(ctx.clusteringKeyList());
 
 		return {
-		  partitionKey, clusteringKey
+		 	partitionKey, clusteringKey
+		}
+	}
+
+	visitCompositeKey(ctx) {
+		const partitionKey = this.visit(ctx.partitionKeyList());
+		const clusteringKey = this.visit(ctx.clusteringKeyList());
+
+		return {
+		 	 partitionKey, clusteringKey
 		}
 	}
 
 	visitColumnDefinition(ctx) {
 		const name = this.visit(ctx.column());
-		return { [name]: this.visit(ctx.dataType()) };
+		const isPrimaryKey = !!ctx.primaryKeyColumn();
+
+		return { name, type: this.visit(ctx.dataType()), isPrimaryKey };
+	}
+
+	visitPartitionKeyList(ctx) {
+		return this.visit(ctx.partitionKey());
+	}
+
+	visitClusteringKeyList(ctx) {
+		return this.visit(ctx.clusteringKey());
+	}
+
+	visitPartitionKey(ctx) {
+		return this.visit(ctx.column());
+	}
+
+	visitClusteringKey(ctx) {
+		return this.visit(ctx.column());
 	}
 
 	visitCodeBlock(ctx) {
@@ -390,6 +560,10 @@ class Visitor extends CqlParserVisitor {
 	}
 
 	visitParamName(ctx) {
+		return getName(ctx);
+	}
+
+	visitInitCondDefinition(ctx) {
 		return getName(ctx);
 	}
 
@@ -429,7 +603,7 @@ class Visitor extends CqlParserVisitor {
 		return getName(ctx);
 	}
 
-	visitCreateRole(ctx) {
+	visitIndexName(ctx) {
 		return getName(ctx);
 	}
 
@@ -454,6 +628,7 @@ const getName = context => {
 	}
 	return removeQuotes(context.getText());
 }
+
 const removeQuotes = string => string.replace(/^(['"])(.*)\1$/, '$2');
 
 const listToJson = list => list.filter(Boolean).reduce((properties, data, index) => {
@@ -465,6 +640,8 @@ const listToJson = list => list.filter(Boolean).reduce((properties, data, index)
 }, []).reduce((properties, item) => ({
 	...properties, [item.key]: item.value || DEFAULT_TYPE
 }), {});
+
+const isFrozen = type => type.toUpperCase() === 'FROZEN';
 
 const getTargetType = (type) => {
 	type = (type || '').toLowerCase();
@@ -516,6 +693,9 @@ const getTargetType = (type) => {
 };
 
 const tableOptionsHashMap = {
+	'caching': 'caching',
+	'compression': 'compression',
+	'compaction': 'compaction',
 	'dclocal_read_repair_chance': 'localReadRepairChance',
 	'read_repair_chance': 'readRepairChance',
 	'gc_grace_seconds': 'gcGraceSeconds',
@@ -536,5 +716,13 @@ const getViewSchema = (tableName, columns) => {
 		});
 	}, {});
 };
+
+const getCachingOptionValue = value => {
+	try {
+		return JSON.parse(value.replace(/'/g, '"'));
+	} catch (err) {
+		return {};
+	}
+}
 
 module.exports = Visitor;

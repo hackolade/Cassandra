@@ -48,7 +48,10 @@ module.exports = {
 			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
 			callback(null, result, {}, [], 'multipleSchema');
 		} catch(err) {
-			callback(err);
+			const { error, title, name } = err;
+			const handledError = handleErrorObject(error || err, title || name);
+			logger.log('error', handledError, title);
+			callback(handledError);
 		}
 	},
 
@@ -235,3 +238,9 @@ const progress = (logger, keyspace, table, message) => {
 		message: message
 	});
 }
+
+const handleErrorObject = (error, title) => {
+	const errorProperties = Object.getOwnPropertyNames(error).reduce((accumulator, key) => ({ ...accumulator, [key]: error[key] }), {});
+
+	return { title , ...errorProperties };
+};

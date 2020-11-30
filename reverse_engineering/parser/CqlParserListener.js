@@ -1055,6 +1055,15 @@ CqlParserListener.prototype.exitAssignmentMap = function(ctx) {
 };
 
 
+// Enter a parse tree produced by CqlParser#assignmentMapExpression.
+CqlParserListener.prototype.enterAssignmentMapExpression = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#assignmentMapExpression.
+CqlParserListener.prototype.exitAssignmentMapExpression = function(ctx) {
+};
+
+
 // Enter a parse tree produced by CqlParser#assignmentList.
 CqlParserListener.prototype.enterAssignmentList = function(ctx) {
 };

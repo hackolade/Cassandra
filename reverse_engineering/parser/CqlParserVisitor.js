@@ -708,6 +708,12 @@ CqlParserVisitor.prototype.visitAssignmentMap = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#assignmentMapExpression.
+CqlParserVisitor.prototype.visitAssignmentMapExpression = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#assignmentList.
 CqlParserVisitor.prototype.visitAssignmentList = function(ctx) {
   return this.visitChildren(ctx);

@@ -174,7 +174,7 @@ createFunction
    ;
 
 codeBlock
-   : CODE_BLOCK
+   : CODE_BLOCK | STRING_LITERAL
    ;
 
 paramList
@@ -573,20 +573,24 @@ assignmentElement
    ;
 
 assignmentSet
-   : syntaxBracketLc (constant (syntaxComma constant)*)?  syntaxBracketRc
+   : syntaxBracketLc (constant (syntaxComma expression)*)?  syntaxBracketRc
    ;
 
 assignmentMap
-   : syntaxBracketLc (constant syntaxColon constant) (constant syntaxColon constant)* syntaxBracketRc
+   : syntaxBracketLc (constant syntaxColon expression) (syntaxComma constant syntaxColon expression)* syntaxBracketRc
+   ;
+
+assignmentMapExpression
+   : syntaxBracketLc expression (syntaxComma expression)* syntaxBracketRc
    ;
 
 assignmentList
-   : syntaxBracketLs constant (syntaxComma constant)* syntaxBracketRs
+   : syntaxBracketLs constant (syntaxComma expression)* syntaxBracketRs
    ;
 
 assignmentTuple
    : syntaxBracketLr (
-         constant ((syntaxComma constant)* | (syntaxComma assignmentTuple)*) |
+         expression ((syntaxComma expression)* | (syntaxComma assignmentTuple)*) |
          assignmentTuple (syntaxComma assignmentTuple)*
      ) syntaxBracketRr
    ;
@@ -645,6 +649,7 @@ expression
    | assignmentSet
    | assignmentList
    | assignmentTuple
+   | assignmentMapExpression
    ;
 
 select
@@ -736,6 +741,7 @@ constant
    | booleanLiteral
    | codeBlock
    | kwNull
+   | id
    ;
 
 decimalLiteral
@@ -781,6 +787,7 @@ dataType
 
 dataTypeName
    : id
+   | STRING_LITERAL
    | K_TIMESTAMP
    | K_SET
    | K_ASCII

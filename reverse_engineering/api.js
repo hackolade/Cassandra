@@ -3,6 +3,26 @@
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
+const commandsService = require('./commandsService');
+const fs = require('fs');
+const antlr4 = require('antlr4');
+const CqlLexer = require('./parser/CqlLexer.js');
+const CqlParser = require('./parser/CqlParser.js');
+const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
+
+
+const handleFileData = filePath => {
+	return new Promise((resolve, reject) => {
+
+		fs.readFile(filePath, 'utf-8', (err, content) => {
+			if(err) {
+				reject(err);
+			} else {
+				resolve(content);
+			}
+		});
+	});
+};
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
@@ -11,6 +31,28 @@ module.exports = {
 				logger.log('error', error, 'Connection error');
 				cb(error);
 			});
+	},
+
+	reFromFile: async (data, logger, callback) => {
+		try {
+			const input = await handleFileData(data.filePath);
+			const chars = new antlr4.InputStream(input);
+			const lexer = new CqlLexer.CqlLexer(chars);
+
+			const tokens = new antlr4.CommonTokenStream(lexer);
+			const parser = new CqlParser.CqlParser(tokens);
+			const tree = parser.cqls();
+
+			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
+
+			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
+			callback(null, result, {}, [], 'multipleSchema');
+		} catch(err) {
+			const { error, title, name } = err;
+			const handledError = handleErrorObject(error || err, title || name);
+			logger.log('error', handledError, title);
+			callback(handledError);
+		}
 	},
 
 	disconnect: function(connectionInfo, cb, app){
@@ -196,3 +238,9 @@ const progress = (logger, keyspace, table, message) => {
 		message: message
 	});
 }
+
+const handleErrorObject = (error, title) => {
+	const errorProperties = Object.getOwnPropertyNames(error).reduce((accumulator, key) => ({ ...accumulator, [key]: error[key] }), {});
+
+	return { title , ...errorProperties };
+};

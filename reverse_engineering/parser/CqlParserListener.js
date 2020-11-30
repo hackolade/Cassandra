@@ -2216,6 +2216,33 @@ CqlParserListener.prototype.exitKwRole = function(ctx) {
 };
 
 
+// Enter a parse tree produced by CqlParser#kwInternal.
+CqlParserListener.prototype.enterKwInternal = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwInternal.
+CqlParserListener.prototype.exitKwInternal = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwLdap.
+CqlParserListener.prototype.enterKwLdap = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwLdap.
+CqlParserListener.prototype.exitKwLdap = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwScheme.
+CqlParserListener.prototype.enterKwScheme = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwScheme.
+CqlParserListener.prototype.exitKwScheme = function(ctx) {
+};
+
+
 // Enter a parse tree produced by CqlParser#kwRoles.
 CqlParserListener.prototype.enterKwRoles = function(ctx) {
 };

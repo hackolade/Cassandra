@@ -644,7 +644,7 @@ const listToJson = list => list.filter(Boolean).reduce((properties, data, index)
 const isFrozen = type => type.toUpperCase() === 'FROZEN';
 
 const getTargetType = (type) => {
-	type = (type || '').toLowerCase();
+	type = removeQuotes((type || '').toLowerCase());
 	switch(type) {
 		case "smallint":
 		case "tinyint":
@@ -668,13 +668,23 @@ const getTargetType = (type) => {
 			mode: type
 		  };
 		case "duration":
+			return {
+				type: "duration"
+			}
+		case "pointtype":
+		case "linestringtype":
+		case "polygontype":
 		  return {
-			type: "char"
+			type: "geospatial"
 		  };
+		case "daterangetype":
+			return {
+				type: "DateRangeType"
+			}
 		case "boolean":
-		  return {
-			type: 'bool'
-		  };
+			return {
+				type: 'bool'
+			};
 		case "timestamp":
 		case "timeuuid":
 		case "blob":

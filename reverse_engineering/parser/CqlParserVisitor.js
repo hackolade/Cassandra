@@ -1482,6 +1482,24 @@ CqlParserVisitor.prototype.visitKwRole = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#kwInternal.
+CqlParserVisitor.prototype.visitKwInternal = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwLdap.
+CqlParserVisitor.prototype.visitKwLdap = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwScheme.
+CqlParserVisitor.prototype.visitKwScheme = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#kwRoles.
 CqlParserVisitor.prototype.visitKwRoles = function(ctx) {
   return this.visitChildren(ctx);

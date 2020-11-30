@@ -546,9 +546,20 @@ K_ROLE
    : R O L E | 'ROLE'
    ;
 
-
 K_ROLES
    : R O L E S | 'ROLES'
+   ;
+
+K_INTERNAL
+   : I N T E R N A L | 'INTERNAL'
+   ;
+
+K_LDAP
+   : L D A P | 'LDAP'
+   ;
+
+K_SCHEME
+   : S C E M E | 'SCHEME'
    ;
 
 

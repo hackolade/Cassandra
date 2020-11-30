@@ -123,6 +123,7 @@ resource
    | (kwTable)? (keyspace DOT)? table
    | kwAll kwRoles
    | kwRole role
+   | (kwInternal|kwLdap) kwScheme
    ;
 
 createUser
@@ -1159,6 +1160,18 @@ kwReturns
 
 kwRole
    : K_ROLE
+   ;
+
+kwInternal
+   : K_INTERNAL
+   ;
+
+kwLdap
+   : K_LDAP
+   ;
+
+kwScheme
+   : K_SCHEME
    ;
 
 kwRoles

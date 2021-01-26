@@ -191,7 +191,7 @@ module.exports = {
 							loadProgress('Meta data has loaded');
 
 							packageData = cassandra.getPackageData({
-								records: cassandra.filterNullItems(records),
+								records: cassandra.filterNullItems(JSON.parse(JSON.stringify(records))),
 								keyspaceName,
 								table,
 								tableName,

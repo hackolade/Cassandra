@@ -311,7 +311,7 @@ module.exports = (_) => {
 	const getTableSchema = (columns, udtHash, sample = {}) => {
 		let schema = {};
 		columns.forEach(column => {
-			const columnType = typesHelper(_).getColumnType(column, udtHash, sample[column.name]);
+			const columnType = typesHelper(_).getColumnType(column, udtHash, sample ? sample[column.name] : undefined);
 			schema[column.name] = columnType;
 			schema[column.name].code = column.name;
 			schema[column.name].static = column.isStatic;
@@ -742,6 +742,29 @@ module.exports = (_) => {
 
 	const isView = name => name.slice(-4) === ' (v)';
 	
+	const filterNullItems = (doc) => {
+		if (doc === null) {
+			return undefined;
+		} else if (Array.isArray(doc)) {
+			return doc.map(filterNullItems).filter(item => item !== undefined);
+		} else if (typeof doc === 'object') {
+			return Object.keys(doc).reduce((result, key) => {
+				const item = filterNullItems(doc[key]);
+				
+				if (item === undefined) {
+					return result;
+				}
+
+				return {
+					...result,
+					[key]: item,
+				};
+			}, {});
+		} else {
+			return doc;
+		}
+	};
+
 	return {
 		connect,
 		close,
@@ -767,6 +790,7 @@ module.exports = (_) => {
 		isOldVersion,
 		getViews,
 		getViewsNames,
-		splitEntityNames
+		splitEntityNames,
+		filterNullItems
 	};
 }

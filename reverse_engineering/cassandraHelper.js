@@ -311,7 +311,7 @@ module.exports = (_) => {
 	const getTableSchema = (columns, udtHash, sample = {}) => {
 		let schema = {};
 		columns.forEach(column => {
-			const columnType = typesHelper(_).getColumnType(column, udtHash, sample[column.name]);
+			const columnType = typesHelper(_).getColumnType(column, udtHash, sample ? sample[column.name] : null);
 			schema[column.name] = columnType;
 			schema[column.name].code = column.name;
 			schema[column.name].static = column.isStatic;

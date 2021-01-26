@@ -191,12 +191,12 @@ module.exports = {
 							loadProgress('Meta data has loaded');
 
 							packageData = cassandra.getPackageData({
+								records: cassandra.filterNullItems(records),
 								keyspaceName,
 								table,
 								tableName,
 								UDFs,
 								UDAs,
-								records,
 								views
 							}, includeEmptyCollection);
 

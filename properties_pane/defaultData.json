@@ -1,7 +1,7 @@
 {
 	"model": {
 		"modelName": "New model",
-		"dbVersion": "3.1.x",
+		"dbVersion": "3.x",
 		"dbVendor": "Cassandra"
 	},
 	"container": {

@@ -3,6 +3,26 @@
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
+const commandsService = require('./commandsService');
+const fs = require('fs');
+const antlr4 = require('antlr4');
+const CqlLexer = require('./parser/CqlLexer.js');
+const CqlParser = require('./parser/CqlParser.js');
+const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
+
+
+const handleFileData = filePath => {
+	return new Promise((resolve, reject) => {
+
+		fs.readFile(filePath, 'utf-8', (err, content) => {
+			if(err) {
+				reject(err);
+			} else {
+				resolve(content);
+			}
+		});
+	});
+};
 
 module.exports = {
 	connect: function(connectionInfo, logger, cb, app){
@@ -11,6 +31,28 @@ module.exports = {
 				logger.log('error', error, 'Connection error');
 				cb(error);
 			});
+	},
+
+	reFromFile: async (data, logger, callback) => {
+		try {
+			const input = await handleFileData(data.filePath);
+			const chars = new antlr4.InputStream(input);
+			const lexer = new CqlLexer.CqlLexer(chars);
+
+			const tokens = new antlr4.CommonTokenStream(lexer);
+			const parser = new CqlParser.CqlParser(tokens);
+			const tree = parser.cqls();
+
+			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
+
+			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
+			callback(null, result, {}, [], 'multipleSchema');
+		} catch(err) {
+			const { error, title, name } = err;
+			const handledError = handleErrorObject(error || err, title || name);
+			logger.log('error', handledError, title);
+			callback(handledError);
+		}
 	},
 
 	disconnect: function(connectionInfo, cb, app){
@@ -92,13 +134,13 @@ module.exports = {
 			
 			cassandra.getUDF(keyspaceName)
 			.then(udf => {
-				logger.progress({ message: 'UDF has loaded', containerName: keyspaceName, entityName: '' });
+				progress(logger, keyspaceName, '', 'UDF has loaded');
 
 				udfData = cassandra.handleUDF(udf);
 				return cassandra.getUDA(keyspaceName)
 			})
 			.then(uda => {
-				logger.progress({ message: 'UDA has loaded', containerName: keyspaceName, entityName: '' });
+				progress(logger, keyspaceName, '', 'UDA has loaded');
 
 				udaData = cassandra.handleUDA(uda);
 
@@ -111,7 +153,7 @@ module.exports = {
 			})
 			.catch(err => {
 				logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
-				keyspaceCallback(cassandra.prepareError(err));
+				keyspaceCallback(err);
 			});
 
 			const pipeline = (UDAs, UDFs, views) => {
@@ -146,7 +188,7 @@ module.exports = {
 							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
 							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings), 'Load records...', 'Records have loaded')
 						]).then(([table, records]) => {
-							logger.progress({ message: 'Meta data has loaded', containerName: keyspaceName, entityName: tableName });
+							loadProgress('Meta data has loaded');
 
 							packageData = cassandra.getPackageData({
 								keyspaceName,
@@ -174,8 +216,12 @@ module.exports = {
 				}
 			};
 		}, (err, res) => {
+			err = cassandra.prepareError(err);
+
 			if (!err) {
 				logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
+			} else {
+				logger.log('error', err, 'Retrieving schema');
 			}
 
 			return cb(err, res);
@@ -195,4 +241,11 @@ const progress = (logger, keyspace, table, message) => {
 		entityName: table,
 		message: message
 	});
+	logger.log('info', { keyspace, table, message }, 'Retrieving schema ...');
 }
+
+const handleErrorObject = (error, title) => {
+	const errorProperties = Object.getOwnPropertyNames(error).reduce((accumulator, key) => ({ ...accumulator, [key]: error[key] }), {});
+
+	return { title , ...errorProperties };
+};

@@ -1,3 +1,9 @@
+const { inlineComment } = require("../commentsHelper");
+const { dependencies } = require('../appDependencies');
+let _;
+
+const setDependencies = ({ lodash }) => _ = lodash;
+
 const NUMERIC = 'numeric';
 const TEXT = 'text';
 const DETAILS = 'details';
@@ -170,17 +176,38 @@ const addId = (tableId, options) => {
 	return options.concat(`${start} ID = '${tableId}'\n`);
 }
 
-const addClustering = (clusteringKeys, clusteringKeysHash, options) => {
+const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActivated) => {
+	setDependencies(dependencies);
+
 	if (!clusteringKeys.length) {
 		return options;
 	}
+	const mapKeys = keys => {
+		return keys.map((key) => {
+			const { keyId, type } = key;
+			const { name } = clusteringKeysHash[keyId];
+			const order = type === 'descending' ? 'DESC' : 'ASC';
+			return `"${name}" ${order}`;
+		});
+	};
 
-	const fields = clusteringKeys.map((key) => {
-		const { keyId, type } = key;
-		const fieldName = clusteringKeysHash[keyId];
-		const order = type === 'descending' ? 'DESC' : 'ASC';
-		return `"${fieldName}" ${order}`;
-	}).join(', ');
+	let [activatedKeys, deactivatedKeys] = _.partition(
+		clusteringKeys,
+		({ keyId }) => clusteringKeysHash[keyId].isActivated !== false
+	);
+	activatedKeys = mapKeys(activatedKeys);
+	deactivatedKeys = mapKeys(deactivatedKeys);
+	let fields;
+	if (!isParentActivated) {
+		fields = mapKeys(clusteringKeys).join(', ');
+	} else if (deactivatedKeys.length === 0) {
+		fields = activatedKeys.join(', ');
+	} else if (activatedKeys.length === 0) {
+		fields = inlineComment(deactivatedKeys.join(', '));
+	} else {
+		fields = `${activatedKeys.join(', ')} ${inlineComment(`, ${deactivatedKeys.join(', ')}`)}`;
+	}
+
 	const start = getStringStart(options);
 	return options.concat(`${start} CLUSTERING ORDER BY (${fields})\n`);
 }

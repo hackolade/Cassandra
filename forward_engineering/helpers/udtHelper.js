@@ -3,11 +3,11 @@
 const { tab, getNameWithKeyspace, eachField } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 
-const getUdtScripts = (keyspaceName, sources, udtMap) => {
+const getUdtScripts = (keyspaceName, sources, udtMap, isParentActivated) => {
 	const copyUdtTypeMap = setFrozenForAllUdt(udtMap);
 
 	return sources.reduce((definitions, source) => {
-		const udts = getAllUdt(source, copyUdtTypeMap).map(({ name, definition }) => {
+		const udts = getAllUdt(source, copyUdtTypeMap, isParentActivated).map(({ name, definition }) => {
 			return getCreateTypeStatement(keyspaceName, name, definition);
 		});
 
@@ -50,14 +50,14 @@ const getUdtMap = (udtSources) => {
 	}, {});
 };
 
-const getAllUdt = (jsonSchema, udtTypeMap) => {
+const getAllUdt = (jsonSchema, udtTypeMap, isParentActivated) => {
 	const udts = [];
 
 	eachField(jsonSchema, (field, fieldName) => {
 		if (field.type === 'udt' && field.properties) {
 			udts.push({
 				name: getName(fieldName, field),
-				definition: getColumnDefinition(field.properties, udtTypeMap)
+				definition: getColumnDefinition(field.properties, udtTypeMap, isParentActivated)
 			});
 		}
 

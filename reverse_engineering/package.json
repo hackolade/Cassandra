@@ -4,6 +4,7 @@
   "description": "",
   "author": "Hackolade",
   "dependencies": {
+    "antlr4": "^4.8.0",
     "cassandra-driver": "^4.3.1"
   },
   "systemKeyspaces": [
@@ -26,5 +27,6 @@
     "system_views",
     "system_virtual_schema"
   ],
+  "type": "multi",
   "installed": true
 }

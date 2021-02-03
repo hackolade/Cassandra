@@ -43,6 +43,8 @@ module.exports = {
 			const parser = new CqlParser.CqlParser(tokens);
 			const tree = parser.cqls();
 
+			parser.root();
+
 			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
 
 			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));

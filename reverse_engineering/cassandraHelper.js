@@ -321,29 +321,51 @@ module.exports = (_) => {
 	};
 	
 	const scanRecords = (keyspace, table, recordSamplingSettings) => {
+        return getSizeOfRows(keyspace, table, recordSamplingSettings).then(
+            (size) =>
+                new Promise((resolve, reject) => {
+                    let rows = [];
+
+                    if (!size) {
+                        return resolve(rows);
+                    }
+
+                    const options = { prepare: true, autoPage: true };
+                    const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
+
+                    state.client.eachRow(
+                        selQuery,
+                        [],
+                        options,
+                        function (n, row) {
+                            rows.push(row);
+                        },
+                        (err, rs) => {
+                            return err ? reject(err) : resolve(rows);
+                        }
+                    );
+                })
+        );
+    };
+
+	const getSizeOfRows = (keyspace, table, recordSamplingSettings) => {
+		if(recordSamplingSettings.active === 'absolute') {
+			return Promise.resolve(recordSamplingSettings.absolute.value)
+		}
+
 		const defaultCount = 1000;
-		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}"`;
-		
-		return execute(query)
-		.then(count => new Promise((resolve, reject) => {
+		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT 10000`;
+
+		return execute(query).then(count => {
 			const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);
-			let rows = [];
-	
+
 			if (!rowsCount) {
-				return resolve(rows);
+				return 0;
 			}
-	
-			const size = getSampleDocSize(rowsCount, recordSamplingSettings)
-			const options = { prepare : true , autoPage: true };
-			const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
-			
-			state.client.eachRow(selQuery, [], options, function(n, row) {
-				rows.push(row)
-			}, (err, rs) => {
-				return (err ? reject(err) : resolve(rows))
-			});
-		}));
-	};
+
+			return getSampleDocSize(rowsCount, recordSamplingSettings)
+		})
+	}
 	
 	
 	const getEntityLevelData = (table, tableName) => {

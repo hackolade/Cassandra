@@ -426,6 +426,12 @@ CqlParserVisitor.prototype.visitWithElement = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#clusteringOrderColumns.
+CqlParserVisitor.prototype.visitClusteringOrderColumns = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#clusteringOrder.
 CqlParserVisitor.prototype.visitClusteringOrder = function(ctx) {
   return this.visitChildren(ctx);

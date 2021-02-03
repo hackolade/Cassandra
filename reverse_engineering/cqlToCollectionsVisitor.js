@@ -64,7 +64,7 @@ class Visitor extends CqlParserVisitor {
 			entityLevelData: {
 				tableOptions: options,
 				compositePartitionKey: keyData.partitionKey,
-				compositeClusteringKey: keyData.clusteringKey,
+				compositeClusteringKey: mergeClusteringKeys(options.clusteringKey, keyData.clusteringKey ),
 			}
 		}
 	}
@@ -393,6 +393,13 @@ class Visitor extends CqlParserVisitor {
 
 	visitTableOptions(ctx) {
 		return this.visit(ctx.tableOptionItem()).filter(Boolean).reduce((options, data) => {
+			if(data.key === 'clusteringKey') {
+				return {
+					...options,
+					[data.key]: data.value
+				}
+			}
+
 			const key = tableOptionsHashMap[data.key.toLowerCase()] || data.key.toLowerCase();
 			if (key === 'caching') {
 				return {
@@ -412,7 +419,10 @@ class Visitor extends CqlParserVisitor {
 
 	visitTableOptionItem(ctx) {
 		if (ctx.clusteringOrder()) {
-			return;
+			return {
+				key: 'clusteringKey',
+				value: this.visit(ctx.clusteringOrder()),
+			}
 		}
 
 		const valueContext = ctx.tableOptionValue() || ctx.optionHash();
@@ -421,6 +431,28 @@ class Visitor extends CqlParserVisitor {
 			key: ctx.tableOptionName().getText(),
 			value: valueContext.getText()
 		};
+	}
+
+	visitClusteringOrder(ctx) {
+		return this.visit(ctx.clusteringOrderColumns());
+	}
+
+	visitClusteringOrderColumns(ctx) {
+		const columnsData = {
+		   names: this.visit(ctx.column()),
+		   directions: this.visit(ctx.orderDirection())
+		}
+
+		return columnsData.names.map((columnName, index) => {
+			return {
+				name: columnName,
+				type: getKeyType(columnsData.directions[index]),
+			}
+		})
+	}
+
+	visitOrderDirection(ctx) {
+		return ctx.getText()
 	}
 
 	visitDataType(ctx) {
@@ -490,8 +522,8 @@ class Visitor extends CqlParserVisitor {
 		const keyData = this.visit(ctx.primaryKeyDefinition())[0];
 
 		return {
-			partitionKey: keyData.partitionKey.map(key => ({ name: key })),
-			clusteringKey: keyData.clusteringKey.map(key => ({ name: key })),
+			partitionKey: keyData.partitionKey.map(key => ({ name: key, type: getKeyType()})),
+			clusteringKey: keyData.clusteringKey.map(key => ({ name: key, type: getKeyType() })),
 		}
 	}
 
@@ -516,7 +548,7 @@ class Visitor extends CqlParserVisitor {
 		const clusteringKey = this.visit(ctx.clusteringKeyList());
 
 		return {
-		 	 partitionKey, clusteringKey
+		 	partitionKey, clusteringKey
 		}
 	}
 
@@ -733,6 +765,20 @@ const getCachingOptionValue = value => {
 	} catch (err) {
 		return {};
 	}
+}
+
+const getKeyType = (type) => {
+	if(type === 'DESC') {
+		return 'descending';
+	}
+
+	return 'ascending';
+}
+
+const mergeClusteringKeys = (keysWithDirection = [], keys = []) => {
+	const keysWithDirectionNames = keysWithDirection.map(key => key.name);
+
+	return keys.filter(key => !keysWithDirectionNames.includes(key.name)).concat(keysWithDirection);
 }
 
 module.exports = Visitor;

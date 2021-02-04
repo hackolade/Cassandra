@@ -354,7 +354,7 @@ module.exports = (_) => {
 		}
 
 		const defaultCount = 1000;
-		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT 10000`;
+		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT 100000`;
 
 		return execute(query).then(count => {
 			const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);

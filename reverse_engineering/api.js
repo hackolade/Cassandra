@@ -9,6 +9,7 @@ const antlr4 = require('antlr4');
 const CqlLexer = require('./parser/CqlLexer.js');
 const CqlParser = require('./parser/CqlParser.js');
 const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
+const ExprErrorListener = require('./antlrErrorListener');
 
 
 const handleFileData = filePath => {
@@ -41,11 +42,14 @@ module.exports = {
 
 			const tokens = new antlr4.CommonTokenStream(lexer);
 			const parser = new CqlParser.CqlParser(tokens);
-			const tree = parser.cqls();
+			parser.removeErrorListeners();
+			parser.addErrorListener(new ExprErrorListener());
 
+			const tree = parser.root();
+			const cqlsTree = tree.cqls();
 			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
 
-			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
+			const result = commandsService.convertCommandsToReDocs(cqlsTree.accept(cqlToCollectionsGenerator));
 			callback(null, result, {}, [], 'multipleSchema');
 		} catch(err) {
 			const { error, title, name } = err;

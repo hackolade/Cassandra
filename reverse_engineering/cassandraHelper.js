@@ -354,7 +354,8 @@ module.exports = (_) => {
 		}
 
 		const defaultCount = 1000;
-		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT 100000`;
+		const countQueryLimit = getCountLimit(recordSamplingSettings);
+		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT ${countQueryLimit}`;
 
 		return execute(query).then(count => {
 			const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);
@@ -786,6 +787,13 @@ module.exports = (_) => {
 			return doc;
 		}
 	};
+
+	const getCountLimit = (recordSamplingSettings) => {
+        const per = recordSamplingSettings.relative.value;
+        const max = recordSamplingSettings.isTerminal ? 100000 : 10000;
+
+        return Math.round((max / per) * 100);
+    };
 
 	return {
 		connect,

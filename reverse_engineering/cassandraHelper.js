@@ -348,7 +348,6 @@ module.exports = (_) => {
                             rows.push(row);
                         },
                         (err, rs) => {
-							console.log(rows, err, rs);
                             return err ? reject(err) : resolve(rows);
                         }
                     );

@@ -4,6 +4,7 @@ let _;
 const fs = require('fs');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
+const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 
 var state = {
 	client: null
@@ -85,15 +86,19 @@ module.exports = (_) => {
 		});
 	};
 
-	const getPolicy = (info) => {
+	const getPolicy = (info, logger) => {
 		if (info.localDataCenter) {
 			return {
-				localDataCenter: info.localDataCenter
+				localDataCenter: info.localDataCenter,
+				policies : {
+					retry: new CassandraRetryPolicy(logger)
+				}
 			};
 		} else {
 			return {
 				policies : {
-					loadBalancing : new cassandra.policies.loadBalancing.RoundRobinPolicy()
+					loadBalancing : new cassandra.policies.loadBalancing.RoundRobinPolicy(),
+					retry: new CassandraRetryPolicy(logger)
 				}
 			};
 		}
@@ -114,7 +119,7 @@ module.exports = (_) => {
 		return timeout;
 	};
 
-	const getDistributedClient = (app, info) => {
+	const getDistributedClient = (app, info, logger) => {
 		if (!Array.isArray(info.hosts)) {
 			throw new Error('Hosts were not defined');
 		}
@@ -133,7 +138,7 @@ module.exports = (_) => {
 					socketOptions: {
 						readTimeout
 					}
-				}, getPolicy(info), sslOptions));
+				}, getPolicy(info, logger), sslOptions));
 			});
 	};
 	
@@ -156,17 +161,17 @@ module.exports = (_) => {
 		return Promise.resolve(client);
 	};
 	
-	const getClient = (app, info) => {
+	const getClient = (app, info, logger) => {
 		if (info.clusterType === 'apolloCloud') {
 			return getCloudClient(info);
 		} else {
-			return getDistributedClient(app, info);
+			return getDistributedClient(app, info, logger);
 		}
 	};
 	
 	const connect = (app, logger) => (info) => {
 		if (!state.client) {
-			return getClient(app, info)
+			return getClient(app, info, logger)
 				.then((client) => {
 					state.client = client;
 
@@ -267,11 +272,11 @@ module.exports = (_) => {
 		return state.client.metadata.getTable(keyspace, table);
 	};
 
-	const getViews = (recordSamplingSettings, keyspace, views) => {
+	const getViews = (recordSamplingSettings, keyspace, views, logger) => {
 		return Promise.all(views.map(viewName => {
 			return state.client.metadata.getMaterializedView(keyspace, viewName)
 				.then(view => {
-					return getViewDocumentTemplate(recordSamplingSettings, keyspace, viewName)
+					return getViewDocumentTemplate(recordSamplingSettings, keyspace, viewName, logger)
 						.then(documentTemplate => ({
 							documentTemplate,
 							view
@@ -283,8 +288,8 @@ module.exports = (_) => {
 		}));
 	};
 
-	const getViewDocumentTemplate = (recordSamplingSettings, keyspace, viewName) => {
-		return scanRecords(keyspace, viewName, recordSamplingSettings).then(mergeDocuments, () => ({}));
+	const getViewDocumentTemplate = (recordSamplingSettings, keyspace, viewName, logger) => {
+		return scanRecords(keyspace, viewName, recordSamplingSettings, logger).then(mergeDocuments, () => ({}));
 	};
 
 	const splitEntityNames = names => {
@@ -320,17 +325,19 @@ module.exports = (_) => {
 		return { properties: schema };
 	};
 	
-	const scanRecords = (keyspace, table, recordSamplingSettings) => {
+	const scanRecords = (keyspace, table, recordSamplingSettings, logger) => {
         return getSizeOfRows(keyspace, table, recordSamplingSettings).then(
             (size) =>
                 new Promise((resolve, reject) => {
-                    let rows = [];
+					let rows = [];
+					
+					logger.log('info', { table: `${keyspace}.${table}`, limit: size }, 'Scan records');
 
                     if (!size) {
                         return resolve(rows);
-                    }
+					}
 
-                    const options = { prepare: true, autoPage: true };
+                    const options = { prepare: true, autoPage: true, retry: new CassandraRetryPolicy(logger) };
                     const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
 
                     state.client.eachRow(
@@ -341,6 +348,7 @@ module.exports = (_) => {
                             rows.push(row);
                         },
                         (err, rs) => {
+							console.log(rows, err, rs);
                             return err ? reject(err) : resolve(rows);
                         }
                     );

@@ -148,7 +148,7 @@ module.exports = {
 
 				udaData = cassandra.handleUDA(uda);
 
-				return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames);
+				return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames, logger);
 			})
 			.then(views => {
 				pipeline(udaData, udfData, views);
@@ -190,9 +190,9 @@ module.exports = {
 	
 						Promise.all([
 							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
-							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings), 'Load records...', 'Records have loaded')
+							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings, logger), 'Load records...', 'Records have loaded')
 						]).then(([table, records]) => {
-							loadProgress('Meta data has loaded');
+							loadProgress('Records and Meta data have loaded');
 
 							packageData = cassandra.getPackageData({
 								records: cassandra.filterNullItems(JSON.parse(JSON.stringify(records))),
@@ -208,7 +208,7 @@ module.exports = {
 						})
 						.then(
 							packageData => tableCallback(null, packageData),
-							err => tableCallback(err)
+							err => tableCallback({...err, table: tableName})
 						);
 					}, (err, res) => {
 						if (err) {

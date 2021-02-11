@@ -17,7 +17,8 @@ class CassandraRetryPolicy extends cassandra.policies.retry.RetryPolicy {
                     exception: 'Read timeout',
                     respondedNodes: received,
                     needNodesForSuccess: blockFor,
-                    info,
+                    query: info.query,
+                    nbRetry: info.nbRetry,
                     isLastTry: currentRetry > totalRetry,
                 },
                 'Retry policy info'
@@ -37,7 +38,8 @@ class CassandraRetryPolicy extends cassandra.policies.retry.RetryPolicy {
                 'info',
                 {
                     exception: 'Unavailable',
-                    info,
+                    query: info.query,
+                    nbRetry: info.nbRetry,
                     isLastTry: info.nbRetry > 0,
                 },
                 'Retry policy info'
@@ -58,7 +60,8 @@ class CassandraRetryPolicy extends cassandra.policies.retry.RetryPolicy {
                 'info',
                 {
                     exception: 'Request error',
-                    info,
+                    query: info.query,
+                    nbRetry: info.nbRetry,
                     error: { ...err },
                 },
                 'Retry policy info'

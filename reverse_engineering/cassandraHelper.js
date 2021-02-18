@@ -104,19 +104,22 @@ module.exports = (_) => {
 		}
 	};
 	
-	const validateRequestTimeout = (timeout) => {
+	const validateRequestTimeout = (timeout, applicationQueryRequestTimeout) => {
 		const DEFAULT_TIMEOUT = 60 * 1000;
-		timeout = Number(timeout);
+		const connectionTimeout = Number(timeout);
+		const queryRequestTimeout = Number(applicationQueryRequestTimeout);
 
-		if (isNaN(timeout)) {
+		const requestTimeout = isNaN(connectionTimeout) ? queryRequestTimeout : connectionTimeout;
+
+		if (isNaN(requestTimeout)) {
 			return DEFAULT_TIMEOUT;
 		}
 
-		if (timeout <= 0) {
+		if (requestTimeout <= 0) {
 			return DEFAULT_TIMEOUT;
 		}
 
-		return timeout;
+		return requestTimeout;
 	};
 
 	const getDistributedClient = (app, info, logger) => {
@@ -128,7 +131,7 @@ module.exports = (_) => {
 		const password = info.password;
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-		const readTimeout = validateRequestTimeout(info.requestTimeout);
+		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 		
 		return getSslOptions(info, app)
 			.then(sslOptions => {
@@ -143,7 +146,7 @@ module.exports = (_) => {
 	};
 	
 	const getCloudClient = (info) => {
-		const readTimeout = validateRequestTimeout(info.requestTimeout);
+		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 
 		const client = new cassandra.Client(Object.assign({
 			cloud: {

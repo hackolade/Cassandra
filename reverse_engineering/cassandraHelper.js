@@ -41,11 +41,17 @@ module.exports = (_) => {
 	const getCertificatesFromKeystore = (info, app) => {
 		return requireKeyStore(app).then((Keystore) => {
 			const store = Keystore(info.keystore, info.keystorepass);
-			const ca = store.getCert(info.alias);
+			const cert = store.getCert(info.alias);
 			const key = store.getPrivateKey(info.alias);
-		
+			let ca = cert;
+
+			if (info.truststore) {
+				const truststore = Keystore(info.truststore, info.truststorePass || '');
+				ca = truststore.getCert(info.truststoreAlias || info.alias);
+			}
+
 			return {
-				cert: ca,
+				cert,
 				key,
 				ca,
 			};

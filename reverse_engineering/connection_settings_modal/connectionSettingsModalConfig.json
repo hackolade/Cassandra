@@ -179,6 +179,37 @@
 					"key": "ssl",
 					"value": "jks"
 				}
+			},
+			{
+				"inputLabel": "Truststore",
+				"inputKeyword": "truststore",
+				"inputType": "file",
+				"inputPlaceholder": "Truststore path and filename",
+				"extensions": ["*"],
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Truststore password",
+				"inputKeyword": "truststorePass",
+				"inputType": "password",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Truststore alias Name",
+				"inputKeyword": "truststoreAlias",
+				"inputType": "text",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
 			}
 		]
 	}, {

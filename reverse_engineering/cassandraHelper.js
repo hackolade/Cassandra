@@ -38,29 +38,54 @@ module.exports = (_) => {
 		}
 	};
 	
-	const getCertificatesFromKeystore = (info, app) => {
+	const getCertificatesFromKeystore = (info, app, logger) => {
 		return requireKeyStore(app).then((Keystore) => {
-			const store = Keystore(info.keystore, info.keystorepass);
-			const cert = store.getCert(info.alias);
-			const key = store.getPrivateKey(info.alias);
-			let ca = cert;
+			try {
+				const store = Keystore(info.keystore, info.keystorepass);
+				const cert = store.getCert(info.alias);
+				const key = store.getPrivateKey(info.alias);
+				let ca = cert;
+	
+				logger.log('info', {
+					message: `[info] certificates successfully retrieved from keystore`,
+					certLength: cert.length,
+					pemCertValidity: cert.startsWith('-----BEGIN CERTIFICATE-----\nMII'),
+					pemKeyValidity: key.startsWith('-----BEGIN PRIVATE KEY-----\nMII'),
+				}, 'Keystore Info');
 
-			if (info.truststore) {
-				const truststore = Keystore(info.truststore, info.truststorePass || '');
-				ca = truststore.getCert(info.truststoreAlias || info.alias);
+				if (info.truststore) {
+					const truststore = Keystore(info.truststore, info.truststorePass || '');
+					ca = truststore.getCert(info.truststoreAlias || info.alias);
+
+					logger.log('info', {
+						message: `[info] certificates successfully retrieved from truststore`,
+						certLength: ca.length,
+						pemCertValidity: ca.startsWith('-----BEGIN CERTIFICATE-----\nMII'),
+					}, 'Keystore Info');
+				}
+	
+				return {
+					cert,
+					key,
+					ca,
+				};
+			} catch (error) {
+				if (error.message.includes('java.lang.NullPointerException')) {
+					return Promise.reject({
+						message: 'Please, check the alias name of the provided JKS certificates. Error message: ' + error.message,
+						error: error.message,
+						stack: error.stack,
+					});
+				}
+
+				return Promise.reject(error);
 			}
-
-			return {
-				cert,
-				key,
-				ca,
-			};
 		});
 	};
 	
 	const isSsl = (ssl) => ssl && ssl !== 'false';
 	
-	const getSslOptions = (info, app) => {
+	const getSslOptions = (info, app, logger) => {
 		const add = (key, value, obj) => !value ? obj : Object.assign({}, obj, {
 			[key]: value
 		});
@@ -72,7 +97,7 @@ module.exports = (_) => {
 		let sslPromise;
 	
 		if (info.ssl === 'jks') {
-			sslPromise = getCertificatesFromKeystore(info, app);
+			sslPromise = getCertificatesFromKeystore(info, app, logger);
 		} else {
 			sslPromise = getCertificatesFromFiles(info);
 		}
@@ -139,7 +164,7 @@ module.exports = (_) => {
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 		
-		return getSslOptions(info, app)
+		return getSslOptions(info, app, logger)
 			.then(sslOptions => {
 				return new cassandra.Client(Object.assign({
 					contactPoints,

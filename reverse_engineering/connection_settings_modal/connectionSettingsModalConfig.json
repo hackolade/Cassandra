@@ -210,6 +210,15 @@
 					"key": "ssl",
 					"value": "jks"
 				}
+			},
+			{
+				"inputLabel": "Disable strict SSL",
+				"inputKeyword": "disableStrictSsl",
+				"inputType": "checkbox",
+				"dependency": {
+					"key": "ssl",
+					"value":  [true, "true", "jks"]
+				}
 			}
 		]
 	}, {

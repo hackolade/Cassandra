@@ -161,7 +161,7 @@ module.exports = (_) => {
 				add.bind(null, 'key', ssl.key),
 				add.bind(null, 'host', host),
 			])({
-				rejectUnauthorized: true,
+				rejectUnauthorized: !info.disableStrictSsl,
 				host
 			});
 		

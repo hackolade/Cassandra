@@ -84,6 +84,19 @@ module.exports = (_) => {
 
 				return Promise.reject(error);
 			}
+		}).catch(error => {
+			logger.log('error', {
+				message: error.message,
+				stack: error.stack,
+			}, 'Initialization java-ssl failed');
+
+			const certs = analyzeJks(info, logger);
+
+			if (Object.keys(certs).length === 0) {
+				return Promise.reject(error);
+			}
+
+			return certs;
 		});
 	};
 

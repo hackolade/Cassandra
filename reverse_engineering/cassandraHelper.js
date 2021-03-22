@@ -606,7 +606,7 @@ module.exports = (_) => {
 	
 			return {
 				name: item.function_name,
-				storedProcFunction: func
+				functionBody: func
 			};
 		});
 		return udfData;

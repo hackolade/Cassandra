@@ -232,7 +232,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Description",
-					"propertyKeyword": "storedProcDescription",
+					"propertyKeyword": "functionDescription",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
 					"propertyType": "details",
@@ -240,7 +240,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Function",
-					"propertyKeyword": "storedProcFunction",
+					"propertyKeyword": "functionBody",
 					"shouldValidate": false,
 					"propertyTooltip": "description",
 					"propertyType": "details",
@@ -249,7 +249,7 @@ making sure that you maintain a proper JSON format.
 				},
 				{
 					"propertyName": "Comments",
-					"propertyKeyword": "storedProcComments",
+					"propertyKeyword": "functionComments",
 					"shouldValidate": false,
 					"propertyTooltip": "comments",
 					"propertyType": "details",

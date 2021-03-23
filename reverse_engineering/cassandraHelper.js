@@ -2,12 +2,14 @@ const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
 let _;
 const fs = require('fs');
+const ssh = require('tunnel-ssh');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 
 var state = {
-	client: null
+	client: null,
+	sshTunnel: null,
 };
 
 module.exports = (_) => {
@@ -267,10 +269,68 @@ module.exports = (_) => {
 			return getDistributedClient(app, info, logger);
 		}
 	};
-	
+
+	const getSshConfig = (info) => {
+		if (!Array.isArray(info.hosts)) {
+			throw new Error('Hosts were not defined');
+		}
+
+		const host = info.hosts[0];
+		const config = {
+			username: info.ssh_user,
+			host: info.ssh_host,
+			port: info.ssh_port,
+			dstHost: host.host,
+			dstPort: host.port,
+			localHost: '127.0.0.1',
+			localPort: host.port,
+			keepAlive: true
+		};
+
+		if (info.ssh_method === 'privateKey') {
+			return Object.assign({}, config, {
+				privateKey: fs.readFileSync(info.ssh_key_file),
+				passphrase: info.ssh_key_passphrase
+			});
+		} else {
+			return Object.assign({}, config, {
+				password: info.ssh_password
+			});
+		}
+	};
+
+	const connectViaSsh = (info) => new Promise((resolve, reject) => {
+		if (!info.ssh) {
+			return resolve({
+				tunnel: null,
+				info
+			});
+		}
+		
+		ssh(getSshConfig(info), (err, tunnel) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve({
+					tunnel,
+					info: Object.assign({}, info, {
+						hosts: info.hosts.map(host => ({
+							...host,
+							host: '127.0.0.1'
+						})),
+					})
+				});
+			}
+		});
+	});
+
 	const connect = (app, logger) => (info) => {
 		if (!state.client) {
-			return getClient(app, info, logger)
+			return connectViaSsh(info).then(({ info, tunnel }) => {
+				state.sshTunnel = tunnel;
+
+				return getClient(app, info, logger);
+			})
 				.then((client) => {
 					state.client = client;
 
@@ -291,6 +351,11 @@ module.exports = (_) => {
 		if (state.client) {
 			state.client.shutdown();
 			state.client = null;
+		}
+
+		if (state.sshTunnel) {
+			state.sshTunnel.close();
+			state.sshTunnel = null;
 		}
 	};
 	

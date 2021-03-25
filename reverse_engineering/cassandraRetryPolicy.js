@@ -29,7 +29,7 @@ class CassandraRetryPolicy extends cassandra.policies.retry.RetryPolicy {
             return this.rethrowResult();
         }
 
-        return this.retryResult(0x00);
+        return this.retryResult(cassandra.types.consistencies.one);
     }
 
     onUnavailable(info, consistency, received, blockFor, isDataPresent) {

@@ -193,7 +193,7 @@ class Visitor extends CqlParserVisitor {
 			key: 'UDFs',
 			data: {
 				name,
-				storedProcFunction: statement,
+				functionBody: statement,
 			}
 		};
 	}

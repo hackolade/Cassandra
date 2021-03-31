@@ -105,24 +105,30 @@ module.exports = (_) => {
 	const analyzeJks = (info, logger) => {
 		try {
 			const jksJs = require('jks-js');
-			const keystore = jksJs.toPem(
-				fs.readFileSync(info.keystore),
-				info.keystorepass
-			);
-
-			Object.keys(keystore).forEach(alias => {
-				logger.log('info', {
-					type: 'keystore',
-					certLength: _.get(keystore, `[${alias}].cert.length`),
-					keyLength: _.get(keystore, `[${alias}].key.length`),
-					countOfCerts: (_.get(keystore, `[${alias}].cert`, '').match(/-----BEGIN CERTIFICATE-----/ig) || []).length,
-					alias,
-				}, 'jks analyze');
-			});
+			let keystore; 
+			
+			if (fs.existsSync(info.keystore)) {
+				keystore = jksJs.toPem(
+					fs.readFileSync(info.keystore),
+					info.keystorepass
+				);
+	
+				Object.keys(keystore).forEach(alias => {
+					logger.log('info', {
+						type: 'keystore',
+						certLength: _.get(keystore, `[${alias}].cert.length`),
+						keyLength: _.get(keystore, `[${alias}].key.length`),
+						countOfCerts: (_.get(keystore, `[${alias}].cert`, '').match(/-----BEGIN CERTIFICATE-----/ig) || []).length,
+						alias,
+					}, 'jks analyze');
+				});
+			} else {
+				logger.log('info', `[info] keystore file not found ${info.keystore}`, 'jks analyze');
+			}
 
 			let truststore;
 
-			if (info.truststore) {
+			if (fs.existsSync(info.truststore)) {
 				truststore = jksJs.toPem(
 					fs.readFileSync(info.truststore),
 					info.truststorePass
@@ -136,6 +142,8 @@ module.exports = (_) => {
 						alias,
 					}, 'jks analyze');
 				});
+			} else {
+				logger.log('info', `[info] truststore file not found ${info.truststore}`, 'jks analyze');
 			}
 
 			return {

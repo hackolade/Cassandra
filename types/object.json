@@ -1,0 +1,33 @@
+{
+	"name": "object",
+	"parentType": "document",
+	"structureType": true,
+	"defaultValues": {
+		"subtype": "object",
+		"properties": []
+	},
+	"subtypes": {
+		"object": {
+			"childValueType": [
+				"char",
+				"numeric",
+				"bool",
+				"blob",
+				"DseExecutorStateType",
+				"timestamp",
+				"date",
+				"time",
+				"duration",
+				"DateRangeType",
+				"set",
+				"list",
+				"map",
+				"tuple",
+				"geospatial",
+				"uuid",
+				"timeuuid",
+				"udt"
+			]
+		}
+	}
+}

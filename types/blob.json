@@ -7,6 +7,7 @@
 	"hiddenOnEntity": "view",
 	"jsonType": {
 		"order": 2,
+		"jsonRoot": true,
 		"name": "blob"
 	},
 	"defaultValues": {

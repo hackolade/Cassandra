@@ -135,7 +135,29 @@ making sure that you maintain a proper JSON format.
 					"inet"
 				],
 				"data": "options",
-				"valueType": "string"
+				"valueType": "string",
+				"cleanDependency": true
+			},
+			{
+				"propertyName": "JSON Type",
+				"propertyKeyword": "physicalType",
+				"propertyType": "select",
+				"hidden": true
+			},
+			{
+				"propertyName": "JSON Types",
+				"propertyKeyword": "subtype",
+				"propertyType": "select",
+				"options": [
+					{ "name": " ", "value": "string" },
+					{ "name": "object", "value": "object" },
+					{ "name": "array", "value": "array" }
+				],
+				"defaultValue": "string",
+				"dependency": {
+					"key": "mode",
+					"value": "text"
+				}
 			},
 			{
 				"propertyName": "Required",
@@ -355,6 +377,30 @@ making sure that you maintain a proper JSON format.
 			"refPath",
 			"description",
 			"type",
+			{
+				"propertyName": "JSON Type",
+				"propertyKeyword": "physicalType",
+				"propertyType": "select",
+				"hidden": true
+			},
+			{
+				"propertyName": "mode",
+				"propertyKeyword": "mode",
+				"propertyType": "text",
+				"defaultValue": "blb",
+				"hidden": true
+			},
+			{
+				"propertyName": "JSON Types",
+				"propertyKeyword": "subtype",
+				"propertyType": "select",
+				"options": [
+					{ "name": " ", "value": "blb" },
+					{ "name": "object", "value": "object" },
+					{ "name": "array", "value": "array" }
+				],
+				"defaultValue": "blb"
+			},
 			"dependencies",
 			{
 				"propertyName": "Required",

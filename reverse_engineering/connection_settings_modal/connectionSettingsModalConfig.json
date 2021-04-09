@@ -60,6 +60,7 @@
 				"inputKeyword": "localDataCenter",
 				"inputType": "text",
 				"description": "Name of data center",
+				"inputPlaceholder": "for Cassandra 4.0 and higher",
 				"dependency": {
 					"key": "clusterType",
 					"value": ""

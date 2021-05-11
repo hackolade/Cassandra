@@ -9,6 +9,7 @@ const antlr4 = require('antlr4');
 const CqlLexer = require('./parser/CqlLexer.js');
 const CqlParser = require('./parser/CqlParser.js');
 const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
+const ExprErrorListener = require('./antlrErrorListener');
 
 
 const handleFileData = filePath => {
@@ -41,11 +42,14 @@ module.exports = {
 
 			const tokens = new antlr4.CommonTokenStream(lexer);
 			const parser = new CqlParser.CqlParser(tokens);
-			const tree = parser.cqls();
+			parser.removeErrorListeners();
+			parser.addErrorListener(new ExprErrorListener());
 
+			const tree = parser.root();
+			const cqlsTree = tree.cqls();
 			const cqlToCollectionsGenerator = new cqlToCollectionsVisitor();
 
-			const result = commandsService.convertCommandsToReDocs(tree.accept(cqlToCollectionsGenerator));
+			const result = commandsService.convertCommandsToReDocs(cqlsTree.accept(cqlToCollectionsGenerator));
 			callback(null, result, {}, [], 'multipleSchema');
 		} catch(err) {
 			const { error, title, name } = err;
@@ -122,7 +126,7 @@ module.exports = {
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;
 		const includeEmptyCollection = data.includeEmptyCollection;
-		const recordSamplingSettings = data.recordSamplingSettings;
+		const recordSamplingSettings = { ...data.recordSamplingSettings, isTerminal: data.isTerminal };
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
 			const entityNames = cassandra.splitEntityNames(tables[keyspaceName]);
@@ -134,17 +138,17 @@ module.exports = {
 			
 			cassandra.getUDF(keyspaceName)
 			.then(udf => {
-				logger.progress({ message: 'UDF has loaded', containerName: keyspaceName, entityName: '' });
+				progress(logger, keyspaceName, '', 'UDF has loaded');
 
 				udfData = cassandra.handleUDF(udf);
 				return cassandra.getUDA(keyspaceName)
 			})
 			.then(uda => {
-				logger.progress({ message: 'UDA has loaded', containerName: keyspaceName, entityName: '' });
+				progress(logger, keyspaceName, '', 'UDA has loaded');
 
 				udaData = cassandra.handleUDA(uda);
 
-				return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames);
+				return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames, logger);
 			})
 			.then(views => {
 				pipeline(udaData, udfData, views);
@@ -153,7 +157,7 @@ module.exports = {
 			})
 			.catch(err => {
 				logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
-				keyspaceCallback(cassandra.prepareError(err));
+				keyspaceCallback(err);
 			});
 
 			const pipeline = (UDAs, UDFs, views) => {
@@ -186,17 +190,17 @@ module.exports = {
 	
 						Promise.all([
 							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
-							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings), 'Load records...', 'Records have loaded')
+							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings, logger), 'Load records...', 'Records have loaded')
 						]).then(([table, records]) => {
-							logger.progress({ message: 'Meta data has loaded', containerName: keyspaceName, entityName: tableName });
+							loadProgress('Records and Meta data have loaded');
 
 							packageData = cassandra.getPackageData({
+								records: cassandra.filterNullItems(JSON.parse(JSON.stringify(records))),
 								keyspaceName,
 								table,
 								tableName,
 								UDFs,
 								UDAs,
-								records,
 								views
 							}, includeEmptyCollection);
 
@@ -204,7 +208,7 @@ module.exports = {
 						})
 						.then(
 							packageData => tableCallback(null, packageData),
-							err => tableCallback(err)
+							err => tableCallback({...err, table: tableName})
 						);
 					}, (err, res) => {
 						if (err) {
@@ -216,8 +220,12 @@ module.exports = {
 				}
 			};
 		}, (err, res) => {
+			err = cassandra.prepareError(err);
+
 			if (!err) {
 				logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
+			} else {
+				logger.log('error', err, 'Retrieving schema');
 			}
 
 			return cb(err, res);
@@ -237,6 +245,7 @@ const progress = (logger, keyspace, table, message) => {
 		entityName: table,
 		message: message
 	});
+	logger.log('info', { keyspace, table, message }, 'Retrieving schema ...');
 }
 
 const handleErrorObject = (error, title) => {

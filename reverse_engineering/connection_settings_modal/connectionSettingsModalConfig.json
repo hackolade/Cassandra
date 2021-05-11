@@ -60,6 +60,7 @@
 				"inputKeyword": "localDataCenter",
 				"inputType": "text",
 				"description": "Name of data center",
+				"inputPlaceholder": "for Cassandra 4.0 and higher",
 				"dependency": {
 					"key": "clusterType",
 					"value": ""
@@ -178,6 +179,150 @@
 				"dependency": {
 					"key": "ssl",
 					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Truststore",
+				"inputKeyword": "truststore",
+				"inputType": "file",
+				"inputPlaceholder": "Truststore path and filename",
+				"extensions": ["*"],
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Truststore password",
+				"inputKeyword": "truststorePass",
+				"inputType": "password",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Truststore alias Name",
+				"inputKeyword": "truststoreAlias",
+				"inputType": "text",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssl",
+					"value": "jks"
+				}
+			},
+			{
+				"inputLabel": "Disable strict SSL",
+				"inputKeyword": "disableStrictSsl",
+				"inputType": "checkbox",
+				"dependency": {
+					"key": "ssl",
+					"value":  [true, "true", "jks"]
+				}
+			}
+		]
+	},
+	{
+		"tab": "SSH",
+		"structure": [
+			{
+				"inputLabel": "Use SSH Tunnel",
+				"inputKeyword": "ssh",
+				"inputType": "checkbox",
+				"defaultValue": false
+			},
+			{
+				"inputLabel": "SSH Address",
+				"inputKeyword": "ssh_host",
+				"inputType": "text",
+				"inputPlaceholder": "SSH Address",
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "Port",
+				"inputKeyword": "ssh_port",
+				"inputType": "numeric",
+				"inputPlaceholder": "Port",
+				"defaultValue": 22,
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "SSH User Name",
+				"inputKeyword": "ssh_user",
+				"inputType": "text",
+				"inputPlaceholder": "SSH User Name",
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "SSH Auth Method",
+				"inputKeyword": "ssh_method",
+				"inputType": "select",
+				"options": [{
+					"value": "privateKey", 
+					"label": "Private Key"
+				}, {
+					"value": "password",
+					"label": "Password"
+				}],
+				"disable": {
+					"key": "ssh",
+					"value": false
+				},
+				"defaultValue": "privateKey"
+			},
+			{
+				"inputLabel": "Private Key",
+				"inputKeyword": "ssh_key_file",
+				"inputType": "file",
+				"inputPlaceholder": "Private Key",
+				"extensions": ["*"],
+				"dependency": {
+					"key": "ssh_method",
+					"value": ["privateKey", ""]
+				},
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "Passphrase",
+				"inputKeyword": "ssh_key_passphrase",
+				"inputType": "password",
+				"inputPlaceholder": "Passphrase",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssh_method",
+					"value": ["privateKey", ""]
+				},
+				"disable": {
+					"key": "ssh",
+					"value": false
+				}
+			},
+			{
+				"inputLabel": "Client key password",
+				"inputKeyword": "ssh_password",
+				"inputType": "password",
+				"inputPlaceholder": "Password",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "ssh_method",
+					"value": ["password", ""]
+				},
+				"disable": {
+					"key": "ssh",
+					"value": false
 				}
 			}
 		]

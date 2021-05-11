@@ -632,6 +632,15 @@ CqlParserListener.prototype.exitWithElement = function(ctx) {
 };
 
 
+// Enter a parse tree produced by CqlParser#clusteringOrderColumns.
+CqlParserListener.prototype.enterClusteringOrderColumns = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#clusteringOrderColumns.
+CqlParserListener.prototype.exitClusteringOrderColumns = function(ctx) {
+};
+
+
 // Enter a parse tree produced by CqlParser#clusteringOrder.
 CqlParserListener.prototype.enterClusteringOrder = function(ctx) {
 };

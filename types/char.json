@@ -7,7 +7,12 @@
 	"hiddenOnEntity": "view",
 	"jsonType": {
 		"order": 1,
-		"name": "text"
+		"name": "text",
+		"jsonRoot": true,
+		"source": {
+			"key": "mode",
+			"value": "text"
+		}
 	},
 	"default": true,
 	"defaultValues": {
@@ -24,6 +29,34 @@
 		"enum": [],
 		"sample":"",
 		"comments":"",
-		"mode": "text"
+		"mode": "text",
+		"subtype": "string"
+	},
+	"subtypes": {
+		"object": {
+			"parentType": "jsonObject",
+			"childValueType": [
+				"jsonString",
+				"jsonNumber",
+				"jsonObject",
+				"jsonArray",
+				"jsonBoolean",
+				"jsonNull"
+			]
+		},
+		"array": {
+			"parentType": "jsonArray",
+			"childValueType": [
+				"jsonString",
+				"jsonNumber",
+				"jsonObject",
+				"jsonArray",
+				"jsonBoolean",
+				"jsonNull"
+			]
+		},
+		"string": {
+			"parentType": "string"
+		}
 	}
 }

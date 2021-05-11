@@ -1,10 +1,10 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.54",
-	"versionDate": "2020-10-23",
+	"version": "0.1.74",
+	"versionDate": "2021-04-09",
 	"author": "hackolade",
 	"engines": {
-		"hackolade": "3.4.12",
+		"hackolade": "4.3.16",
 		"hackoladePlugin": "1.2.0"
 	},
 	"contributes": {
@@ -30,7 +30,12 @@
 			"disableChoices": true,
 			"enableJsonType": true,
 			"enableArrayItemName": true,
-			"FEScriptCommentsSupported": true
+			"FEScriptCommentsSupported": true,
+			"relationships": {
+				"compositeRelationships": {
+					"allowRelationshipsForNonPrimaryKey": true
+				}
+			}
 		}
 	},
 	"description": "Hackolade plugin for Cassandra Datastax"

@@ -370,8 +370,12 @@ withElement
    : kwWith tableOptions?
    ;
 
+clusteringOrderColumns
+   : column orderDirection? (syntaxComma column orderDirection?)*
+   ;
+   
 clusteringOrder
-   : kwClustering kwOrder kwBy syntaxBracketLr column orderDirection? syntaxBracketRr
+   : kwClustering kwOrder kwBy syntaxBracketLr clusteringOrderColumns syntaxBracketRr
    ;
 
 tableOptions

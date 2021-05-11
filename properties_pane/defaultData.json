@@ -17,7 +17,25 @@
 		"tableOptions": {}
 	},
 	"field": {
-		"name": "New column"
+		"name": "New column",
+		"subtype": {
+			"valueDependencies": [
+				{
+					"value": "object",
+					"dependency": {
+						"key": "type",
+						"value": "jsonObject"
+					}
+				},
+				{
+					"value": "array",
+					"dependency": {
+						"key": "type",
+						"value": "jsonArray"
+					}
+				}
+			]
+		}
 	},
 	"patternField": {
 		"name": "^[a-zA-Z0-9_.-]+$"

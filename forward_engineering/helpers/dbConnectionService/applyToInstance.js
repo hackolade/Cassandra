@@ -27,7 +27,7 @@ const applyToInstance = (cassandraHelper) => (connectionInfo, logger, app) => {
 
 			cassandra.close();
 
-			return {};
+			return;
 		}, (commonError) => {
 			if (!commonError.query) {
 				return Promise.reject(commonError);

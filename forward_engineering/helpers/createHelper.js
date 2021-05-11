@@ -48,7 +48,7 @@ const getScript = (structure) => {
 };
 
 const getUserDefinedFunctions = (udfItems) => {
-	return udfItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
+	return udfItems.map(item => item.functionBody).filter(item => item).join('\n');
 };
 
 const getUserDefinedAggregations = (udaItems) => {

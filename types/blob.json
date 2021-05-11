@@ -6,9 +6,40 @@
 	"useSample": false,
 	"hiddenOnEntity": "view",
 	"jsonType": {
-		"order": 2
+		"order": 2,
+		"jsonRoot": true,
+		"name": "blob"
 	},
 	"defaultValues": {
-		"primaryKey": false
+		"primaryKey": false,
+		"mode": "blb",
+		"subtype": "blb"
+	},
+	"subtypes": {
+		"object": {
+			"parentType": "jsonObject",
+			"childValueType": [
+				"jsonString",
+				"jsonNumber",
+				"jsonObject",
+				"jsonArray",
+				"jsonBoolean",
+				"jsonNull"
+			]
+		},
+		"array": {
+			"parentType": "jsonArray",
+			"childValueType": [
+				"jsonString",
+				"jsonNumber",
+				"jsonObject",
+				"jsonArray",
+				"jsonBoolean",
+				"jsonNull"
+			]
+		},
+		"blb": {
+			"parentType": "binary"
+		}
 	}
 }

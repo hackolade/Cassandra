@@ -2,11 +2,14 @@ const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
 let _;
 const fs = require('fs');
+const ssh = require('tunnel-ssh');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
+const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 
 var state = {
-	client: null
+	client: null,
+	sshTunnel: null,
 };
 
 module.exports = (_) => {
@@ -37,23 +40,127 @@ module.exports = (_) => {
 		}
 	};
 	
-	const getCertificatesFromKeystore = (info, app) => {
+	const getCertificatesFromKeystore = (info, app, logger) => {
 		return requireKeyStore(app).then((Keystore) => {
-			const store = Keystore(info.keystore, info.keystorepass);
-			const ca = store.getCert(info.alias);
-			const key = store.getPrivateKey(info.alias);
-		
-			return {
-				cert: ca,
-				key,
-				ca,
-			};
+			try {
+				const store = Keystore(info.keystore, info.keystorepass);
+				const cert = (store.getCert(info.alias) || '').replace(/\s*-----END CERTIFICATE-----$/, '\n-----END CERTIFICATE-----');
+				const key = store.getPrivateKey(info.alias);
+				let ca = cert;
+	
+				logger.log('info', {
+					message: `[info] certificates successfully retrieved from keystore`,
+					certLength: cert.length,
+					keyLength: key.length,
+					pemCertValidity: cert.startsWith('-----BEGIN CERTIFICATE-----\nMII'),
+					pemKeyValidity: key.startsWith('-----BEGIN PRIVATE KEY-----\nMII'),
+					countOfCerts: (cert.match(/-----BEGIN CERTIFICATE-----/ig) || []).length,
+				}, 'Keystore Info');
+
+				if (info.truststore) {
+					const truststore = Keystore(info.truststore, info.truststorePass || '');
+					ca = (truststore.getCert(info.truststoreAlias || info.alias) || '').replace(/\s*-----END CERTIFICATE-----$/, '\n-----END CERTIFICATE-----');
+
+					logger.log('info', {
+						message: `[info] certificates successfully retrieved from truststore`,
+						certLength: ca.length,
+						pemCertValidity: ca.startsWith('-----BEGIN CERTIFICATE-----\nMII'),
+						countOfCerts: (ca.match(/-----BEGIN CERTIFICATE-----/ig) || []).length,
+					}, 'Keystore Info');
+				}
+	
+				return {
+					cert,
+					key,
+					ca,
+					...analyzeJks(info, logger)
+				};
+			} catch (error) {
+				if (error.message.includes('java.lang.NullPointerException')) {
+					return Promise.reject({
+						message: 'Please, check the alias name of the provided JKS certificates. Error message: ' + error.message,
+						error: error.message,
+						stack: error.stack,
+					});
+				}
+
+				return Promise.reject(error);
+			}
+		}).catch(error => {
+			logger.log('error', {
+				message: error.message,
+				stack: error.stack,
+			}, 'Initialization java-ssl failed');
+
+			const certs = analyzeJks(info, logger);
+
+			if (Object.keys(certs).length === 0) {
+				return Promise.reject(error);
+			}
+
+			return certs;
 		});
+	};
+
+	const analyzeJks = (info, logger) => {
+		try {
+			const jksJs = require('jks-js');
+			let keystore; 
+			
+			if (fs.existsSync(info.keystore)) {
+				keystore = jksJs.toPem(
+					fs.readFileSync(info.keystore),
+					info.keystorepass
+				);
+	
+				Object.keys(keystore).forEach(alias => {
+					logger.log('info', {
+						type: 'keystore',
+						certLength: _.get(keystore, `[${alias}].cert.length`),
+						keyLength: _.get(keystore, `[${alias}].key.length`),
+						countOfCerts: (_.get(keystore, `[${alias}].cert`, '').match(/-----BEGIN CERTIFICATE-----/ig) || []).length,
+						alias,
+					}, 'jks analyze');
+				});
+			} else {
+				logger.log('info', `[info] keystore file not found ${info.keystore}`, 'jks analyze');
+			}
+
+			let truststore;
+
+			if (fs.existsSync(info.truststore)) {
+				truststore = jksJs.toPem(
+					fs.readFileSync(info.truststore),
+					info.truststorePass
+				);
+	
+				Object.keys(truststore).forEach(alias => {
+					logger.log('info', {
+						type: 'truststore',
+						certLength: _.get(truststore, `[${alias}].ca.length`),
+						countOfCerts: (_.get(truststore, `[${alias}].ca`, '').match(/-----BEGIN CERTIFICATE-----/ig) || []).length,
+						alias,
+					}, 'jks analyze');
+				});
+			} else {
+				logger.log('info', `[info] truststore file not found ${info.truststore}`, 'jks analyze');
+			}
+
+			return {
+				cert: _.get(keystore, `[${info.alias}].cert`),
+				key: _.get(keystore, `[${info.alias}].key`),
+				ca: _.get(truststore, `[${info.truststoreAlias || info.alias}].ca`) || _.get(keystore, `[${info.alias}].cert`),
+			};
+		} catch (error) {
+			logger.log('info', `[info] issue with jks-js. Message: ${error.message}`, 'jks analyze');
+			
+			return {};
+		}
 	};
 	
 	const isSsl = (ssl) => ssl && ssl !== 'false';
 	
-	const getSslOptions = (info, app) => {
+	const getSslOptions = (info, app, logger) => {
 		const add = (key, value, obj) => !value ? obj : Object.assign({}, obj, {
 			[key]: value
 		});
@@ -65,7 +172,7 @@ module.exports = (_) => {
 		let sslPromise;
 	
 		if (info.ssl === 'jks') {
-			sslPromise = getCertificatesFromKeystore(info, app);
+			sslPromise = getCertificatesFromKeystore(info, app, logger);
 		} else {
 			sslPromise = getCertificatesFromFiles(info);
 		}
@@ -77,7 +184,7 @@ module.exports = (_) => {
 				add.bind(null, 'key', ssl.key),
 				add.bind(null, 'host', host),
 			])({
-				rejectUnauthorized: true,
+				rejectUnauthorized: !info.disableStrictSsl,
 				host
 			});
 		
@@ -85,36 +192,43 @@ module.exports = (_) => {
 		});
 	};
 
-	const getPolicy = (info) => {
+	const getPolicy = (info, logger) => {
 		if (info.localDataCenter) {
 			return {
-				localDataCenter: info.localDataCenter
+				localDataCenter: info.localDataCenter,
+				policies : {
+					retry: new CassandraRetryPolicy(logger)
+				}
 			};
 		} else {
 			return {
 				policies : {
-					loadBalancing : new cassandra.policies.loadBalancing.RoundRobinPolicy()
+					loadBalancing : new cassandra.policies.loadBalancing.RoundRobinPolicy(),
+					retry: new CassandraRetryPolicy(logger)
 				}
 			};
 		}
 	};
 	
-	const validateRequestTimeout = (timeout) => {
+	const validateRequestTimeout = (timeout, applicationQueryRequestTimeout) => {
 		const DEFAULT_TIMEOUT = 60 * 1000;
-		timeout = Number(timeout);
+		const connectionTimeout = Number(timeout);
+		const queryRequestTimeout = Number(applicationQueryRequestTimeout);
 
-		if (isNaN(timeout)) {
+		const requestTimeout = isNaN(connectionTimeout) ? queryRequestTimeout : connectionTimeout;
+
+		if (isNaN(requestTimeout)) {
 			return DEFAULT_TIMEOUT;
 		}
 
-		if (timeout <= 0) {
+		if (requestTimeout <= 0) {
 			return DEFAULT_TIMEOUT;
 		}
 
-		return timeout;
+		return requestTimeout;
 	};
 
-	const getDistributedClient = (app, info) => {
+	const getDistributedClient = (app, info, logger) => {
 		if (!Array.isArray(info.hosts)) {
 			throw new Error('Hosts were not defined');
 		}
@@ -123,9 +237,9 @@ module.exports = (_) => {
 		const password = info.password;
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
-		const readTimeout = validateRequestTimeout(info.requestTimeout);
+		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 		
-		return getSslOptions(info, app)
+		return getSslOptions(info, app, logger)
 			.then(sslOptions => {
 				return new cassandra.Client(Object.assign({
 					contactPoints,
@@ -133,12 +247,12 @@ module.exports = (_) => {
 					socketOptions: {
 						readTimeout
 					}
-				}, getPolicy(info), sslOptions));
+				}, getPolicy(info, logger), sslOptions));
 			});
 	};
 	
 	const getCloudClient = (info) => {
-		const readTimeout = validateRequestTimeout(info.requestTimeout);
+		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 
 		const client = new cassandra.Client(Object.assign({
 			cloud: {
@@ -156,17 +270,75 @@ module.exports = (_) => {
 		return Promise.resolve(client);
 	};
 	
-	const getClient = (app, info) => {
+	const getClient = (app, info, logger) => {
 		if (info.clusterType === 'apolloCloud') {
 			return getCloudClient(info);
 		} else {
-			return getDistributedClient(app, info);
+			return getDistributedClient(app, info, logger);
 		}
 	};
-	
+
+	const getSshConfig = (info) => {
+		if (!Array.isArray(info.hosts)) {
+			throw new Error('Hosts were not defined');
+		}
+
+		const host = info.hosts[0];
+		const config = {
+			username: info.ssh_user,
+			host: info.ssh_host,
+			port: info.ssh_port,
+			dstHost: host.host,
+			dstPort: host.port,
+			localHost: '127.0.0.1',
+			localPort: host.port,
+			keepAlive: true
+		};
+
+		if (info.ssh_method === 'privateKey') {
+			return Object.assign({}, config, {
+				privateKey: fs.readFileSync(info.ssh_key_file),
+				passphrase: info.ssh_key_passphrase
+			});
+		} else {
+			return Object.assign({}, config, {
+				password: info.ssh_password
+			});
+		}
+	};
+
+	const connectViaSsh = (info) => new Promise((resolve, reject) => {
+		if (!info.ssh) {
+			return resolve({
+				tunnel: null,
+				info
+			});
+		}
+		
+		ssh(getSshConfig(info), (err, tunnel) => {
+			if (err) {
+				reject(err);
+			} else {
+				resolve({
+					tunnel,
+					info: Object.assign({}, info, {
+						hosts: info.hosts.map(host => ({
+							...host,
+							host: '127.0.0.1'
+						})),
+					})
+				});
+			}
+		});
+	});
+
 	const connect = (app, logger) => (info) => {
 		if (!state.client) {
-			return getClient(app, info)
+			return connectViaSsh(info).then(({ info, tunnel }) => {
+				state.sshTunnel = tunnel;
+
+				return getClient(app, info, logger);
+			})
 				.then((client) => {
 					state.client = client;
 
@@ -187,6 +359,11 @@ module.exports = (_) => {
 		if (state.client) {
 			state.client.shutdown();
 			state.client = null;
+		}
+
+		if (state.sshTunnel) {
+			state.sshTunnel.close();
+			state.sshTunnel = null;
 		}
 	};
 	
@@ -267,11 +444,11 @@ module.exports = (_) => {
 		return state.client.metadata.getTable(keyspace, table);
 	};
 
-	const getViews = (recordSamplingSettings, keyspace, views) => {
+	const getViews = (recordSamplingSettings, keyspace, views, logger) => {
 		return Promise.all(views.map(viewName => {
 			return state.client.metadata.getMaterializedView(keyspace, viewName)
 				.then(view => {
-					return getViewDocumentTemplate(recordSamplingSettings, keyspace, viewName)
+					return getViewDocumentTemplate(recordSamplingSettings, keyspace, viewName, logger)
 						.then(documentTemplate => ({
 							documentTemplate,
 							view
@@ -283,8 +460,8 @@ module.exports = (_) => {
 		}));
 	};
 
-	const getViewDocumentTemplate = (recordSamplingSettings, keyspace, viewName) => {
-		return scanRecords(keyspace, viewName, recordSamplingSettings).then(mergeDocuments, () => ({}));
+	const getViewDocumentTemplate = (recordSamplingSettings, keyspace, viewName, logger) => {
+		return scanRecords(keyspace, viewName, recordSamplingSettings, logger).then(mergeDocuments, () => ({}));
 	};
 
 	const splitEntityNames = names => {
@@ -311,7 +488,7 @@ module.exports = (_) => {
 	const getTableSchema = (columns, udtHash, sample = {}) => {
 		let schema = {};
 		columns.forEach(column => {
-			const columnType = typesHelper(_).getColumnType(column, udtHash, sample[column.name]);
+			const columnType = typesHelper(_).getColumnType(column, udtHash, sample ? sample[column.name] : undefined);
 			schema[column.name] = columnType;
 			schema[column.name].code = column.name;
 			schema[column.name].static = column.isStatic;
@@ -320,30 +497,55 @@ module.exports = (_) => {
 		return { properties: schema };
 	};
 	
-	const scanRecords = (keyspace, table, recordSamplingSettings) => {
+	const scanRecords = (keyspace, table, recordSamplingSettings, logger) => {
+        return getSizeOfRows(keyspace, table, recordSamplingSettings).then(
+            (size) =>
+                new Promise((resolve, reject) => {
+					let rows = [];
+					
+					logger.log('info', { table: `${keyspace}.${table}`, limit: size }, 'Scan records');
+
+                    if (!size) {
+                        return resolve(rows);
+					}
+
+                    const options = { prepare: true, autoPage: true, retry: new CassandraRetryPolicy(logger) };
+                    const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
+
+                    state.client.eachRow(
+                        selQuery,
+                        [],
+                        options,
+                        function (n, row) {
+                            rows.push(row);
+                        },
+                        (err, rs) => {
+                            return err ? reject(err) : resolve(rows);
+                        }
+                    );
+                })
+        );
+    };
+
+	const getSizeOfRows = (keyspace, table, recordSamplingSettings) => {
+		if(recordSamplingSettings.active === 'absolute') {
+			return Promise.resolve(recordSamplingSettings.absolute.value)
+		}
+
 		const defaultCount = 1000;
-		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}"`;
-		
-		return execute(query)
-		.then(count => new Promise((resolve, reject) => {
+		const countQueryLimit = getCountLimit(recordSamplingSettings);
+		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT ${countQueryLimit}`;
+
+		return execute(query).then(count => {
 			const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);
-			let rows = [];
-	
+
 			if (!rowsCount) {
-				return resolve(rows);
+				return 0;
 			}
-	
-			const size = getSampleDocSize(rowsCount, recordSamplingSettings)
-			const options = { prepare : true , autoPage: true };
-			const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
-			
-			state.client.eachRow(selQuery, [], options, function(n, row) {
-				rows.push(row)
-			}, (err, rs) => {
-				return (err ? reject(err) : resolve(rows))
-			});
-		}));
-	};
+
+			return getSampleDocSize(rowsCount, recordSamplingSettings)
+		})
+	}
 	
 	
 	const getEntityLevelData = (table, tableName) => {
@@ -477,7 +679,7 @@ module.exports = (_) => {
 	
 			return {
 				name: item.function_name,
-				storedProcFunction: func
+				functionBody: func
 			};
 		});
 		return udfData;
@@ -742,6 +944,36 @@ module.exports = (_) => {
 
 	const isView = name => name.slice(-4) === ' (v)';
 	
+	const filterNullItems = (doc) => {
+		if (doc === null) {
+			return undefined;
+		} else if (Array.isArray(doc)) {
+			return doc.map(filterNullItems).filter(item => item !== undefined);
+		} else if (typeof doc === 'object') {
+			return Object.keys(doc).reduce((result, key) => {
+				const item = filterNullItems(doc[key]);
+				
+				if (item === undefined) {
+					return result;
+				}
+
+				return {
+					...result,
+					[key]: item,
+				};
+			}, {});
+		} else {
+			return doc;
+		}
+	};
+
+	const getCountLimit = (recordSamplingSettings) => {
+        const per = recordSamplingSettings.relative.value;
+        const max = recordSamplingSettings.isTerminal ? 100000 : 10000;
+
+        return Math.round((max / per) * 100);
+    };
+
 	return {
 		connect,
 		close,
@@ -767,6 +999,7 @@ module.exports = (_) => {
 		isOldVersion,
 		getViews,
 		getViewsNames,
-		splitEntityNames
+		splitEntityNames,
+		filterNullItems
 	};
 }

@@ -400,7 +400,7 @@ class Visitor extends CqlParserVisitor {
 				}
 			}
 
-			const key = tableOptionsHashMap[data.key.toLowerCase()] || data.key.toLowerCase();
+			const key = tableOptionsHashMap[data.key.toLowerCase()];
 			if (key === 'caching') {
 				return {
 					...options,
@@ -409,6 +409,19 @@ class Visitor extends CqlParserVisitor {
 			}
 
 			const value = isNaN(data.value) ? removeQuotes(data.value || '') : Number(data.value);
+			if (!key) {
+				const otherProperties = options.otherProperties || [];
+				return {
+					...options,
+					otherProperties: [
+						...otherProperties,
+						{
+							name: data.key,
+							value
+						},
+					], 
+				}
+			}
 
 			return {
 				...options,
@@ -761,7 +774,21 @@ const getViewSchema = (tableName, columns) => {
 
 const getCachingOptionValue = value => {
 	try {
-		return JSON.parse(value.replace(/'/g, '"'));
+		const data = JSON.parse(value.replace(/'/g, '"'));
+		return Object.keys(data).reduce((options, name) => {
+			const key = name.toLowerCase();
+			if (key === 'rows_per_partition') {
+				return {
+					...options,
+					rowsPerPartition: data[name]
+				}
+			}
+
+			return {
+				...options,
+				[key]: data[name]
+			}
+		}, {});
 	} catch (err) {
 		return {};
 	}

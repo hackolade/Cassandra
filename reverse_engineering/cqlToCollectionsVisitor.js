@@ -51,6 +51,8 @@ class Visitor extends CqlParserVisitor {
 		const bucketName = this.getKeyspaceName(ctx);
 		const optionsContext = ctx.withElement();
 		const options = optionsContext ? this.visit(optionsContext) : { partitionKey: [], clusteringKey: []};
+		const comments = removeQuotes(options?.comment || '');
+		delete options?.comment;
 		
 		return {
 			type: CREATE_COLLECTION_COMMAND,
@@ -62,6 +64,7 @@ class Visitor extends CqlParserVisitor {
 				properties,
 			},
 			entityLevelData: {
+				comments,
 				tableOptions: options,
 				compositePartitionKey: keyData.partitionKey,
 				compositeClusteringKey: mergeClusteringKeys(options.clusteringKey, keyData.clusteringKey ),
@@ -90,6 +93,8 @@ class Visitor extends CqlParserVisitor {
 		const columns = this.visit(ctx.columnList());
 		const optionsContext = ctx.materializedViewOptions();
 		const options = optionsContext ? this.visit(optionsContext) : {};
+		const comments = removeQuotes(options?.comment || '');
+		delete options?.comment;
 		const schema = getViewSchema(table, columns);
 		const keyspace = ctx.keyspace()[0];
 		const bucketName = keyspace ? this.visit(keyspace) : '';
@@ -103,6 +108,7 @@ class Visitor extends CqlParserVisitor {
 			collectionName: table,
 			jsonSchema: { properties: schema },
 			data: {
+				comments,
 				tableOptions: options,
 				compositePartitionKey: keyData.partitionKey,
 				compositeClusteringKey: keyData.clusteringKey
@@ -674,7 +680,7 @@ const getName = context => {
 	return removeQuotes(context.getText());
 }
 
-const removeQuotes = string => string.replace(/^(['"])(.*)\1$/, '$2');
+const removeQuotes = string => string.replace(/^(['"])([\s\S]*)\1$/m, '$2');
 
 const listToJson = list => list.filter(Boolean).reduce((properties, data, index) => {
 	if (index % 2 === 0) {
@@ -748,6 +754,7 @@ const getTargetType = (type) => {
 };
 
 const tableOptionsHashMap = {
+	'comment': 'comment',
 	'caching': 'caching',
 	'compression': 'compression',
 	'compaction': 'compaction',

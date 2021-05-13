@@ -395,6 +395,7 @@ tableOptionName
 tableOptionValue
    : stringLiteral
    | floatLiteral
+   | id
    ;
 
 optionHash

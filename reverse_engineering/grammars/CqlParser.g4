@@ -444,11 +444,11 @@ singlePrimaryKey
    ;
 
 compoundKey
-   : partitionKey (syntaxComma clusteringKeyList)
+   : partitionKey (syntaxComma clusteringKeyList)?
    ;
 
 compositeKey
-   : syntaxBracketLr partitionKeyList syntaxBracketRr (syntaxComma clusteringKeyList)
+   : syntaxBracketLr partitionKeyList syntaxBracketRr (syntaxComma clusteringKeyList)?
    ;
 
 partitionKeyList

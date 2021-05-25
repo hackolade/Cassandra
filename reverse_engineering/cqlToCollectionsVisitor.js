@@ -555,7 +555,8 @@ class Visitor extends CqlParserVisitor {
 
 	visitCompoundKey(ctx) {
 		const partitionKey =  [ this.visit(ctx.partitionKey()) ];
-		const clusteringKey = this.visit(ctx.clusteringKeyList());
+		const clusteringKeyList = ctx.clusteringKeyList();
+		const clusteringKey = clusteringKeyList ? this.visit(clusteringKeyList) : [];
 
 		return {
 		 	partitionKey, clusteringKey
@@ -564,7 +565,8 @@ class Visitor extends CqlParserVisitor {
 
 	visitCompositeKey(ctx) {
 		const partitionKey = this.visit(ctx.partitionKeyList());
-		const clusteringKey = this.visit(ctx.clusteringKeyList());
+		const clusteringKeyList = ctx.clusteringKeyList();
+		const clusteringKey = clusteringKeyList ? this.visit(clusteringKeyList) : [];
 
 		return {
 		 	partitionKey, clusteringKey

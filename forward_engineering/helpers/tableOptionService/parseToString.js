@@ -178,28 +178,29 @@ const addId = (tableId, options) => {
 
 const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActivated) => {
 	setDependencies(dependencies);
-
-	if (!clusteringKeys.length) {
+	const validClusteredKeys = clusteringKeys.filter(key => clusteringKeysHash[key && key.keyId]);
+	if (!validClusteredKeys.length) {
 		return options;
 	}
 	const mapKeys = keys => {
-		return keys.map((key) => {
-			const { keyId, type } = key;
-			const { name } = clusteringKeysHash[keyId];
-			const order = type === 'descending' ? 'DESC' : 'ASC';
-			return `"${name}" ${order}`;
-		});
+		return keys
+			.map((key) => {
+				const { keyId, type } = key;
+				const { name } = clusteringKeysHash[keyId];
+				const order = type === 'descending' ? 'DESC' : 'ASC';
+				return `"${name}" ${order}`;
+			});
 	};
 
 	let [activatedKeys, deactivatedKeys] = _.partition(
-		clusteringKeys,
-		({ keyId }) => clusteringKeysHash[keyId].isActivated !== false
+		validClusteredKeys,
+		({ keyId }) => _.get(clusteringKeysHash, `${keyId}.isActivated`) !== false
 	);
 	activatedKeys = mapKeys(activatedKeys);
 	deactivatedKeys = mapKeys(deactivatedKeys);
 	let fields;
 	if (!isParentActivated) {
-		fields = mapKeys(clusteringKeys).join(', ');
+		fields = mapKeys(validClusteredKeys).join(', ');
 	} else if (deactivatedKeys.length === 0) {
 		fields = activatedKeys.join(', ');
 	} else if (activatedKeys.length === 0) {

@@ -4,9 +4,11 @@
   "description": "",
   "author": "Hackolade",
   "dependencies": {
+    "@astrajs/rest": "^0.1.0",
     "antlr4": "^4.8.0",
     "cassandra-driver": "^4.3.1",
     "jks-js": "^1.0.0",
+    "node-fetch": "^2.6.1",
     "tunnel-ssh": "^4.1.4"
   },
   "systemKeyspaces": [

@@ -65,8 +65,9 @@
 		"udfFunction": "",
 		"udfComments": ""
 	},
-	"SecIdxs": {
-		"name": "New Secondary Index",
+	"SecIndxs": {
+		"name": "New Index",
+		"indexType": "Secondary",
 		"SecIndxKey": "",
 		"SecIndxID": "",
 		"SecIndxDescription": "",

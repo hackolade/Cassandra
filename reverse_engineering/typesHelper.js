@@ -236,5 +236,38 @@ module.exports = (_) => {
 		}
 	};
 
-    return { getColumnType };
+	const getTypeCode = (type) =>  {
+		const types = {
+			custom : 0x0000,
+			ascii : 0x0001,
+			bigint : 0x0002,
+			blob : 0x0003,
+			boolean : 0x0004,
+			counter : 0x0005,
+			decimal : 0x0006,
+			double : 0x0007,
+			float : 0x0008,
+			int : 0x0009,
+			text : 0x000a,
+			timestamp : 0x000b,
+			uuid : 0x000c,
+			varchar : 0x000d,
+			varint : 0x000e,
+			timeuuid : 0x000f,
+			inet : 0x0010,
+			date : 0x0011,
+			time : 0x0012,
+			smallint : 0x0013,
+			tinyint : 0x0014,
+			list : 0x0020,
+			map : 0x0021,
+			set : 0x0022,
+			udt : 0x0030,
+			tuple : 0x0031,
+		}
+		return types[type];
+		
+	  }
+
+    return { getColumnType, getTypeCode};
 };

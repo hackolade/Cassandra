@@ -86,22 +86,14 @@ module.exports = {
 		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
 		const cassandra = cassandraHelper(app.require('lodash'));
-
-		cassandra.connect(app, logger)(connectionInfo).then(() => {
-				let keyspaces = cassandra.getKeyspacesNames();
-
+		cassandra.connect(app, logger)(connectionInfo).then(async () => {
+				let keyspaces = await cassandra.getKeyspacesNames();
 				if (!includeSystemCollection) {
 					keyspaces = cassandra.filterKeyspaces(keyspaces, systemKeyspaces);
 				}
 
 				async.map(keyspaces, (keyspace, next) => {
 					cassandra.getTablesNames(keyspace)
-						.then(tablesData => {
-							const table_name_selector = cassandra.isOldVersion() ? 'columnfamily_name' : 'table_name';
-							const tableNames = tablesData.rows.map(table => table[table_name_selector]);
-
-							return tableNames; 
-						})
 						.then(tableNames => {
 							return cassandra.getViewsNames(keyspace).then(
 								views => next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, views)),

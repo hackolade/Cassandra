@@ -167,8 +167,14 @@ module.exports = {
 	},
 
 	applyToInstance(connectionInfo, logger, callback, app) {
+		let _ = app.require('lodash');
 		logger.clear();
 		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
+		if(connectionInfo.clusterType === 'datastaxAstraToken'){
+			callback({ message: "Apply to instance using Astra token-based authorization is not supported" });
+		}
+		
 
 		applyToInstance(connectionInfo, logger, app)
 			.then(result => {

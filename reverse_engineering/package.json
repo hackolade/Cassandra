@@ -29,7 +29,9 @@
     "system_schema",
     "system_traces",
     "system_views",
-    "system_virtual_schema"
+    "system_virtual_schema",
+    "datastax_sla",
+    "data_endpoint_auth"
   ],
   "type": "multi",
   "installed": true

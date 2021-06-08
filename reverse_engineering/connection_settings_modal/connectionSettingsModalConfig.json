@@ -20,6 +20,9 @@
 				}, {
 					"label": "DataStax Astra",
 					"value": "apolloCloud"
+				}, {
+					"label": "DataStax Astra token",
+					"value": "datastaxAstraToken"
 				}]
 			},
 			{
@@ -75,6 +78,24 @@
 				"dependency": {
 					"key": "clusterType",
 					"value": "apolloCloud"
+				}
+			},
+			{
+				"inputLabel": "Astra database id",
+				"inputKeyword": "databaseId",
+				"inputType": "text",
+				"dependency": {
+					"key": "clusterType",
+					"value": "datastaxAstraToken"
+				}
+			},
+			{
+				"inputLabel": "Astra database region",
+				"inputKeyword": "region",
+				"inputType": "text",
+				"dependency": {
+					"key": "clusterType",
+					"value": "datastaxAstraToken"
 				}
 			}
 		]

@@ -3,13 +3,17 @@ const typesHelper = require('./typesHelper');
 let _;
 const fs = require('fs');
 const ssh = require('tunnel-ssh');
+const fetch = require('node-fetch');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
-const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
+const { getEntityLevelConfig} = require('../forward_engineering/helpers/generalHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
+const { createClient } = require("@astrajs/rest");
+const astraTokenClientHelper = require('./helpers/astraTokenClientHelper');
 
 var state = {
 	client: null,
 	sshTunnel: null,
+	astraTokenClient: null
 };
 
 module.exports = (_) => {
@@ -209,6 +213,32 @@ module.exports = (_) => {
 			};
 		}
 	};
+
+	const getAstraToken = (info) => {
+		const query = `https://${info.databaseId}-${info.region}.apps.astra.datastax.com/api/rest/v1/auth`
+		const options = {
+			'method': 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify({
+				"username": `${info.user}`,
+				"password": `${info.password}`
+			})
+		}
+		return fetch(query, options).then(response => {
+			if (response.ok) {
+				return response.text()
+			}
+			throw {
+				message: response.statusText, code: response.status, description: body
+			};
+		})
+		.then(body => {
+			body = JSON.parse(body);
+			return body.authToken;
+		}).catch(e => {
+			return Promise.reject(e);
+		});
+	}
 	
 	const validateRequestTimeout = (timeout, applicationQueryRequestTimeout) => {
 		const DEFAULT_TIMEOUT = 60 * 1000;
@@ -272,10 +302,9 @@ module.exports = (_) => {
 	
 	const getClient = (app, info, logger) => {
 		if (info.clusterType === 'apolloCloud') {
-			return getCloudClient(info);
-		} else {
-			return getDistributedClient(app, info, logger);
+		return getCloudClient(info);
 		}
+		return getDistributedClient(app, info, logger);
 	};
 
 	const getSshConfig = (info) => {
@@ -333,6 +362,24 @@ module.exports = (_) => {
 	});
 
 	const connect = (app, logger) => (info) => {
+		if(info.clusterType === 'datastaxAstraToken'){
+			return connectWithAstraToken(app, logger, info);
+		}
+		return connectWithClient(app, logger, info)
+	};
+
+	const connectWithAstraToken = async (app, logger, info) => {
+		const token = await getAstraToken(info);
+		const astraTokenClient = await createClient({
+			astraDatabaseId: info.databaseId,
+			astraDatabaseRegion: info.region,
+			applicationToken: token,
+		});
+		state.astraTokenClient = astraTokenClient;
+		return Promise.resolve();
+	}
+
+	const connectWithClient = (app, logger, info) => {
 		if (!state.client) {
 			return connectViaSsh(info).then(({ info, tunnel }) => {
 				state.sshTunnel = tunnel;
@@ -365,17 +412,30 @@ module.exports = (_) => {
 			state.sshTunnel.close();
 			state.sshTunnel = null;
 		}
+
+		state.astraTokenClient = null;
+		astraTokenClientHelper.clearState();
 	};
 	
 	const getKeyspaceMetaData = (keyspace) => {
 		return state.client.metadata.keyspaces[keyspace];
 	};
 	
-	const getKeyspaceInfo = (keyspace) => {
-		const metaData = getKeyspaceMetaData(keyspace);
+	const getKeyspaceInfo = (keyspaceName) => {
+		if(state.astraTokenClient){
+			const keyspace = astraTokenClientHelper.getKeyspaceInfo(keyspaceName)
+			return {
+				code: keyspaceName,
+				durableWrites: true,
+				replStrategy: 'NetworkTopologyStrategy',
+				dataCenters: keyspace.datacenters.map( datacenter => ({name: datacenter.name,replFactorValue: datacenter.replicas}))
+			};
+			
+		}
+		const metaData = getKeyspaceMetaData(keyspaceName);
 		const strategy = _.get(metaData, 'strategy', '').split('.').slice(-1).pop();
 		let keyspaceInfo = {
-			code: keyspace,
+			code: keyspaceName,
 			durableWrites: Boolean(metaData.durableWrites),
 			replStrategy: strategy
 		};
@@ -393,7 +453,10 @@ module.exports = (_) => {
 		return keyspaceInfo;
 	};
 	
-	const getKeyspacesNames = () => {
+	const getKeyspacesNames = async () => {
+		if(state.astraTokenClient){
+			return await astraTokenClientHelper.getKeyspacesNames(state.astraTokenClient);
+		}
 		return Object.keys(state.client.metadata.keyspaces);
 	};
 	
@@ -421,16 +484,24 @@ module.exports = (_) => {
 		return majorDigit < 3;
 	};
 	
-	const getTablesNames = (keyspace) => {
+	const getTablesNames = async (keyspace) => {
+		if(state.astraTokenClient){
+			return astraTokenClientHelper.getTableNames(state.astraTokenClient, keyspace);
+		}
 		const oldSelectTableNamePrefix = 'SELECT columnfamily_name FROM system.schema_columnfamilies';
-		const newSelectTableNamePrefix = 'SELECT table_name FROM system_schema.tables';
+		const newSelectTableNamePrefix = 'SELECT table_name, keyspace_name FROM system_schema.tables';
 		const query = isOldVersion() ? `${oldSelectTableNamePrefix} WHERE keyspace_name ='${keyspace}'` : 
 			`${newSelectTableNamePrefix} WHERE keyspace_name ='${keyspace}'`;
-	
-		return execute(query);
+		const tablesData = await execute(query);
+		const table_name_selector = isOldVersion() ? 'columnfamily_name' : 'table_name';
+		return tablesData.rows.map(table => table[table_name_selector]);
 	};
 	
 	const getViewsNames = (keyspace) => {
+		if(state.astraTokenClient){
+			return Promise.resolve([]);
+		}
+
 		const query = `SELECT view_name FROM system_schema.views WHERE keyspace_name ='${keyspace}'`;
 
 		return execute(query).then(viewData => viewData.rows.map(view => view.view_name), ()=>[]);
@@ -441,10 +512,17 @@ module.exports = (_) => {
 	};
 	
 	const getTableMetadata = (keyspace, table) => {
+		if(state.astraTokenClient){
+			return astraTokenClientHelper.getTableMetadata(state.astraTokenClient, keyspace, table);
+		}
 		return state.client.metadata.getTable(keyspace, table);
 	};
 
 	const getViews = (recordSamplingSettings, keyspace, views, logger) => {
+		if(state.astraTokenClient){
+			return Promise.resolve([]);
+		}
+
 		return Promise.all(views.map(viewName => {
 			return state.client.metadata.getMaterializedView(keyspace, viewName)
 				.then(view => {
@@ -492,12 +570,15 @@ module.exports = (_) => {
 			schema[column.name] = columnType;
 			schema[column.name].code = column.name;
 			schema[column.name].static = column.isStatic;
-			schema[column.name].frozen = column.type.options.frozen;
+			schema[column.name].frozen = _.get(column,"type.options.frozen", false);
 		});
 		return { properties: schema };
 	};
 	
 	const scanRecords = (keyspace, table, recordSamplingSettings, logger) => {
+		if(state.astraTokenClient){
+			return Promise.resolve([]);
+		}
         return getSizeOfRows(keyspace, table, recordSamplingSettings).then(
             (size) =>
                 new Promise((resolve, reject) => {
@@ -579,6 +660,9 @@ module.exports = (_) => {
 	}
 	
 	const getTableOptions = (table) => {
+		if(state.astraTokenClient){
+			return {};
+		}
 		const [detailsTab] = getEntityLevelConfig();
 		const configOptions = getOptionsFromTab(detailsTab);
 		return createTableOptionsFromMeta(table, configOptions);
@@ -651,11 +735,17 @@ module.exports = (_) => {
 	};
 	
 	const getUDF = (keyspace) => {
+		if(state.astraTokenClient){
+			return Promise.resolve([]);
+		}
 		const query = `SELECT * FROM system_schema.functions WHERE keyspace_name='${keyspace}'`;
 		return execute(query);
 	};
 	
 	const getUDA = (keyspace) => {
+		if(state.astraTokenClient){
+			return Promise.resolve([]);
+		}
 		const query = `SELECT * FROM system_schema.aggregates WHERE keyspace_name='${keyspace}'`;
 		return execute(query);
 	};

@@ -21,7 +21,25 @@ const retrieveEntityName = (entityConfig) => retrivePropertyFromConfig(
 );
 const retrieveUDF = (containerConfig) => retrivePropertyFromConfig(containerConfig, 1, "UDFs", []);
 const retrieveUDA = (containerConfig) => retrivePropertyFromConfig(containerConfig, 2, "UDAs", []);
-const retrieveIndexes = (entityConfig) => retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []);
+const retrieveIndexes = (entityConfig) => {
+	const indexTab = entityConfig[1];
+
+	if (!indexTab.searchIndex) {
+		return {
+			indexes: retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []),
+		};
+	}
+	
+	return {
+		searchIndex: {
+			indexType: 'search',
+			columns: indexTab.searchIndexColumns,
+			config: indexTab.searchIndexConfig,
+			profiles: [indexTab.searchIndexProfiles].filter(Boolean),
+			options: indexTab.searchIndexOptions,
+		},
+	};
+};
 const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
 const getNameWithKeyspace = (keyspaceName, name) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}${name}`;
 
@@ -136,7 +154,15 @@ const commentDeactivatedStatement = (statement, isActivated = true, isParentActi
 	return useMultiLineComment ? multiLineComment(statement) : insertBeforeEachLine(statement);
 }
 
-const retrieveIsItemActivated = (itemConfig) => retrivePropertyFromConfig(itemConfig, 0, "isActivated", true);
+const retrieveIsItemActivated = (itemConfig) => {
+	const value = retrivePropertyFromConfig(itemConfig, 0, "isActivated");
+
+	if (value === undefined) {
+		return true;
+	}
+
+	return value;
+};
 
 module.exports = {
 	tab,

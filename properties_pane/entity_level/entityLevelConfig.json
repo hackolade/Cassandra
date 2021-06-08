@@ -417,7 +417,10 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "Key",
 						"propertyKeyword": "key",
 						"propertyType": "fieldList",
-						"template": "orderedList"
+						"template": "orderedList",
+						"templateOptions": {
+							"maxFields": 1
+						}
 					},
 					{
 						"propertyName": "copyField",
@@ -441,7 +444,8 @@ making sure that you maintain a proper JSON format.
 						"propertyName": "indexed",
 						"propertyKeyword": "indexed",
 						"propertyType": "checkbox",
-						"propertyTooltip": "include the specified fields in the index."
+						"propertyTooltip": "include the specified fields in the index.",
+						"defaultValue": true
 					}
 				]
 			},

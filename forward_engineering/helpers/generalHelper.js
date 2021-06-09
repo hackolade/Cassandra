@@ -23,22 +23,21 @@ const retrieveUDF = (containerConfig) => retrivePropertyFromConfig(containerConf
 const retrieveUDA = (containerConfig) => retrivePropertyFromConfig(containerConfig, 2, "UDAs", []);
 const retrieveIndexes = (entityConfig) => {
 	const indexTab = entityConfig[1];
+	const result = {
+		indexes: retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []),
+	};
 
-	if (!indexTab.searchIndex) {
-		return {
-			indexes: retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []),
-		};
-	}
-	
-	return {
-		searchIndex: {
+	if (indexTab.searchIndex) {
+		result.searchIndex = {
 			indexType: 'search',
 			columns: indexTab.searchIndexColumns,
 			config: indexTab.searchIndexConfig,
 			profiles: [indexTab.searchIndexProfiles].filter(Boolean),
 			options: indexTab.searchIndexOptions,
-		},
-	};
+		};
+	}
+
+	return result;
 };
 const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
 const getNameWithKeyspace = (keyspaceName, name) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}${name}`;

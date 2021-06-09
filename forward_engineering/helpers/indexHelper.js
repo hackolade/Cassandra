@@ -56,7 +56,7 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 		return [];
 	}
 
-	const columns = uniqueByName(searchIndex.columns.map(column => ({
+	const columns = uniqueByName(searchIndex.columns.filter(column => Array.isArray(column.key) && column.key.length).map(column => ({
 		...column,
 		name: getIndexColumnStatement(column.key[0], dataSources),
 		isActivated: isIndexColumnKeyActivated(column.key[0], dataSources),
@@ -222,10 +222,10 @@ const getSearchIndexColumnStatements = (columns, isParentActivated) => {
 	return others;
 };
 
-const getSearchIndexConfig = (config) => {
+const getSearchIndexConfig = (config = {}) => {
 	const result = [];
 
-	if (config.autoCommitTime !== 10000) {
+	if (config.autoCommitTime && config.autoCommitTime !== 10000) {
 		result.push(`autoCommitTime: ${config.autoCommitTime}`);
 	}
 
@@ -241,11 +241,11 @@ const getSearchIndexConfig = (config) => {
 		result.push(`directoryFactory: '${config.directoryFactory}'`);
 	}
 
-	if (config.filterCacheLowWaterMark !== 1024) {
+	if (config.filterCacheLowWaterMark && config.filterCacheLowWaterMark !== 1024) {
 		result.push(`filterCacheLowWaterMark: ${config.filterCacheLowWaterMark}`);
 	}
 
-	if (config.filterCacheHighWaterMark !== 2048) {
+	if (config.filterCacheHighWaterMark && config.filterCacheHighWaterMark !== 2048) {
 		result.push(`filterCacheHighWaterMark: ${config.filterCacheHighWaterMark}`);
 	}
 
@@ -254,7 +254,7 @@ const getSearchIndexConfig = (config) => {
 		result.push(`mergeMaxMergeCount: ${config.mergeMaxMergeCount}`);
 	}
 
-	if (config.ramBufferSize !== 512) {
+	if (config.ramBufferSize && config.ramBufferSize !== 512) {
 		result.push(`ramBufferSize: ${config.ramBufferSize}`);
 	}
 
@@ -269,7 +269,7 @@ const getSearchIndexConfig = (config) => {
 	return `{\n${tab(result.join(',\n'))}\n}`;
 };
 
-const getSearchIndexOptions = (options) => {
+const getSearchIndexOptions = (options = {}) => {
 	const result = [];
 
 	if (options.recovery) {

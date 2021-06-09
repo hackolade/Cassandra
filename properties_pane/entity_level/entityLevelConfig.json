@@ -305,25 +305,10 @@ making sure that you maintain a proper JSON format.
 		"lowerTab": "Indexes",
 		"structure": [
 			{
-				"propertyName": "Search index",
-				"propertyType": "checkbox",
-				"propertyKeyword": "searchIndex"
-			},
-			{
-				"propertyName": "Index",
+				"propertyName": "Indexes",
 				"propertyType": "group",
 				"propertyKeyword": "SecIndxs",
 				"propertyTooltip": "",
-				"dependency": {
-					"type": "or",
-					"values": [{
-						"key": "searchIndex",
-						"value": false
-					}, {
-						"key": "searchIndex",
-						"exist": false
-					}]
-				},
 				"structure": [
 					{
 						"propertyName": "Name",
@@ -402,6 +387,16 @@ making sure that you maintain a proper JSON format.
 						"template": "textarea"
 					}
 				]
+			},
+			{
+				"propertyName": "Search Index",
+				"propertyKeyword": "searchIndexDivider",
+				"propertyType": "empty"
+			},
+			{
+				"propertyName": "Enable",
+				"propertyType": "checkbox",
+				"propertyKeyword": "searchIndex"
 			},
 			{
 				"propertyName": "Columns",

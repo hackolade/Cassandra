@@ -90,15 +90,15 @@
 					"label": "Credentials",
 					"value": "credentials"
 				}, {
-					"label": "Token based",
+					"label": "Token-based",
 					"value": "tokenBased"
 				}]
 			},
 			{
-				"inputLabel": "User Name",
+				"inputLabel": "Username",
 				"inputKeyword": "user",
 				"inputType": "text",
-				"inputPlaceholder": "User Name",
+				"inputPlaceholder": "Username",
 				"dependency": {
 					"key": "authType",
 					"value": "credentials"
@@ -108,6 +108,7 @@
 				"inputLabel": "Password",
 				"inputKeyword": "password",
 				"inputType": "password",
+				"inputPlaceholder": "pwd",
 				"isHiddenKey": true,
 				"dependency": {
 					"key": "authType",
@@ -120,6 +121,7 @@
 				"inputKeyword": "astraToken",
 				"inputType": "password",
 				"isHiddenKey": true,
+				"inputPlaceholder": "AstraCS:xyz...",
 				"dependency": {
 					"key": "authType",
 					"value": "tokenBased"

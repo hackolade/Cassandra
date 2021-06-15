@@ -233,10 +233,10 @@ module.exports = (_) => {
 		if (!Array.isArray(info.hosts)) {
 			throw new Error('Hosts were not defined');
 		}
-	
-		const username = info.user;
-		const password = info.password;
-		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
+		const credentials = info.authType === 'tokenBased' ? 
+		{username: 'token', password: info.astraToken} : 
+		{username: info.user, password: info.password};
+		const authProvider = new cassandra.auth.PlainTextAuthProvider(credentials.username, credentials.password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 		
@@ -254,15 +254,15 @@ module.exports = (_) => {
 	
 	const getCloudClient = (info) => {
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
+		const credentials = info.authType === 'tokenBased' ? 
+			{username: 'token', password: info.astraToken} : 
+			{username: info.user, password: info.password};
 
 		const client = new cassandra.Client(Object.assign({
 			cloud: {
 				secureConnectBundle: info.secureConnectBundle
 			},
-			credentials: {
-				username: info.user,
-				password: info.password
-			},
+			credentials,
 			socketOptions: {
 				readTimeout
 			}

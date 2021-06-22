@@ -12,6 +12,7 @@ const RENAME_FIELD_COMMAND = 'renameField';
 const CREATE_VIEW_COMMAND = 'createView';
 const ADD_BUCKET_DATA_COMMAND = 'addBucketData';
 const ADD_COLLECTION_LEVEL_INDEX_COMMAND = 'addCollectionLevelIndex';
+const ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND = 'addCollectionLevelSearchIndex'
 const UPDATE_ENTITY_LEVEL_DATA_COMMAND = 'updateEntityLevelData';
 const UPDATE_VIEW_LEVEL_DATA_COMMAND = 'updateViewLevelData';
 const ADD_FIELDS_TO_DEFINITION_COMMAND = 'addFieldsToDefinition'
@@ -254,7 +255,9 @@ const addIndexToCollection = (entitiesData, statementData) => {
         ...entityLevelData.SecIndxs || [],
         {
             name: statementData.name,
-            SecIndxKey: [statementData.column]
+            SecIndxKey: [{name: statementData.column, type: statementData.columnType}],
+            indexType: statementData.indexType,
+            customOptions: statementData.customOptions
         }
     ];
 
@@ -264,7 +267,30 @@ const addIndexToCollection = (entitiesData, statementData) => {
             ...entity,
             entityLevelData: {
                 ...entityLevelData,
-                SecIndxs: indexes
+                SecIndxs: indexes,
+                searchIndex: true
+            }
+        })
+    };
+};
+
+const addSearchIndexToCollection = (entitiesData, statementData) => {
+    const { entities } = entitiesData;
+    const bucket = commandsHelper.getCurrentBucket(entitiesData, statementData);
+    const entityIndex = commandsHelper.findEntityIndex(entities, bucket, statementData.collectionName);
+    if (entityIndex === -1) {
+        return entitiesData;
+    }
+    const entity = entities[entityIndex];
+    const entityLevelData = entity.entityLevelData || {};
+
+    return {
+        ...entitiesData,
+        entities: commandsHelper.set(entities, entityIndex, {
+            ...entity,
+            entityLevelData: {
+                ...entityLevelData,
+                ...statementData
             }
         })
     };
@@ -345,6 +371,7 @@ const commandActionsMap = {
     [CREATE_VIEW_COMMAND]: createView,
     [ADD_BUCKET_DATA_COMMAND]: addDataToBucket,
     [ADD_COLLECTION_LEVEL_INDEX_COMMAND]: addIndexToCollection,
+    [ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND]: addSearchIndexToCollection,
     [ADD_FIELDS_TO_DEFINITION_COMMAND]: addFieldsToDefinition,
 };
 
@@ -363,6 +390,7 @@ module.exports = {
     ADD_BUCKET_DATA_COMMAND,
     UPDATE_BUCKET_COMMAND,
     ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+    ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND,
     UPDATE_ENTITY_LEVEL_DATA_COMMAND,
     UPDATE_VIEW_LEVEL_DATA_COMMAND,
     ADD_FIELDS_TO_DEFINITION_COMMAND,

@@ -53,6 +53,7 @@ cql
    | createAggregate
    | createFunction
    | createIndex
+   | createSearchIndex
    | createKeyspace
    | createMaterializedView
    | createRole
@@ -398,6 +399,18 @@ tableOptionValue
    | id
    ;
 
+optionHash
+   : syntaxBracketLc optionHashItem (syntaxComma optionHashItem)* syntaxBracketRc
+   ;
+
+optionHashItem
+   : optionHashKey COLON optionHashValue
+   ;
+
+optionHashKey
+   : stringLiteral
+   ;
+
 optionHashValue
    : stringLiteral
    | floatLiteral
@@ -497,6 +510,51 @@ createIndex
    : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr #secondaryIndex
    | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing kwStorageAttachedIndex (kwWith kwOptions OPERATOR_EQ LC_BRACKET kwCaseSensitive COLON caseSensitiveOption=booleanLiteral COMMA kwNormalize COLON normalizeOption=booleanLiteral COMMA kwAscii COLON asciiOption=booleanLiteral RC_BRACKET)? #customIndex
    ;
+
+createSearchIndex
+   : kwCreate kwSearch kwIndex ifNotExist? kwOn (keyspace DOT)? table ( K_WITH (kwColumns searchIndexColumnList)? (kwAnd? kwProfiles searchIndexProfiles)? (kwAnd? searchIndexConfigs)? (kwAnd? searchIndexOptions)?)?
+   ;
+
+searchIndexConfigs
+   : kwConfig LC_BRACKET (kwAutoCommitTime COLON autoCommitTimeConfig=decimalLiteral)? 
+                           (syntaxComma? kwDefaultQueryField COLON defaultQueryFieldConfig=stringLiteral)? 
+                           (syntaxComma? kwDirectoryFactory COLON directoryFactoryConfig=directoryFactory)? 
+                           (syntaxComma? kwFilterCacheLowWaterMark COLON filterCacheLowWaterMarkConfig=decimalLiteral)? 
+                           (syntaxComma? kwFilterCacheHighWaterMark COLON filterCacheHighWaterMarkConfig=decimalLiteral)?
+                           (syntaxComma? kwDirectoryFactoryClass COLON directoryFactoryClassConfig=stringLiteral)? 
+                           (syntaxComma? kwMergeMaxThreadCount COLON mergeMaxThreadCountConfig=decimalLiteral)? 
+                           (syntaxComma? kwMergeMaxMergeCount COLON mergeMaxMergeCountConfig=decimalLiteral)? 
+                           (syntaxComma? kwRamBufferSize COLON ramBufferSizeConfig=decimalLiteral)? 
+                           (syntaxComma? kwRealtime COLON realtimeConfig=booleanLiteral)? 
+                           RC_BRACKET
+   ;
+
+directoryFactory
+   : kwStandard
+   | kwEncrypted
+   ;
+
+searchIndexOptions
+   : kwOptions LC_BRACKET (kwRecovery COLON recoveryOption=booleanLiteral)? 
+                           (syntaxComma? kwReindex COLON reindexOption=booleanLiteral)? 
+                           (syntaxComma? kwLenient COLON lenientOption=booleanLiteral)? 
+                           RC_BRACKET
+   ;
+
+searchIndexProfiles
+   : kwSpaceSavingAll
+   | kwSpaceSavingNoJoin
+   | kwSpaceSavingSlowTriePrecision
+   ;
+
+searchIndexColumnList
+   : searchIndexColumn (syntaxComma searchIndexColumn)*
+   ;
+
+searchIndexColumn
+   : column  (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)?  RC_BRACKET)?
+   ;
+   
 
 indexName
    : id
@@ -1033,6 +1091,11 @@ kwCustom
    : K_CUSTOM
    ;
 
+
+kwSearch
+   : K_SEARCH
+   ;
+
 kwAscii
    : K_ASCII
    ;
@@ -1043,6 +1106,106 @@ kwNormalize
 
 kwStorageAttachedIndex
    : K_STORAGE_ATTACHED_INDEX
+   ;
+
+kwSpaceSavingNoJoin
+   : K_SPACE_SAVING_NO_JOIN
+   ;
+
+kwSpaceSavingAll
+   : K_SPACE_SAVING_ALL
+   ;
+
+kwSpaceSavingSlowTriePrecision
+   : K_SPACE_SAVING_SLOW_TRIE_PRECISION
+   ;
+
+kwCopyField
+   : K_COPY_FIELD
+   ;
+
+kwDocValues
+   : K_DOC_VALUES
+   ;
+
+kwExcluded
+   : K_EXCLUDED
+   ;
+
+kwIndexed
+   : K_INDEXED
+   ;
+
+kwColumns
+   : K_COLUMNS
+   ;
+
+kwProfiles
+   : K_PROFILES
+   ;
+
+kwConfig
+   : K_CONFIG
+   ;
+
+kwAutoCommitTime
+   : K_AUTOCOMMIT_TIME
+   ;
+
+kwDefaultQueryField
+   : K_DEFAULT_QUERY_FIELD
+   ;
+
+kwDirectoryFactory
+   : K_DIRECTORY_FACTORY
+   ;
+
+kwFilterCacheLowWaterMark
+   : K_FILTER_CACHE_LOW_WATERMARK
+   ;
+
+kwFilterCacheHighWaterMark
+   : K_FILTER_CACHE_HIGH_WATERMARK
+   ;
+
+kwDirectoryFactoryClass
+   : K_DIRECTORY_FACTORY_CLASS
+   ;
+
+kwMergeMaxThreadCount
+   : K_MERGE_MAX_THREAD_COUNT
+   ;
+
+kwMergeMaxMergeCount
+   : K_MERGE_MAX_MERGE_COUNT
+   ;
+
+kwRamBufferSize
+   : K_RAM_BUFFER_SIZE
+   ;
+
+kwRealtime
+   : K_REALTIME
+   ;
+
+kwRecovery
+   : K_RECOVERY
+   ;
+
+kwReindex
+   : K_REINDEX
+   ;
+
+kwLenient
+   : K_LENIENT
+   ;
+
+kwStandard
+   : K_STANDARD
+   ;
+
+kwEncrypted
+   : K_ENCRYPTED
    ;
 
 kwCaseSensitive

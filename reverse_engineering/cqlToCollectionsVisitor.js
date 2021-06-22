@@ -12,6 +12,7 @@ const {
 	CREATE_VIEW_COMMAND,
 	ADD_BUCKET_DATA_COMMAND,
 	ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+	ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND,
 	UPDATE_BUCKET_COMMAND,
 	UPDATE_ENTITY_LEVEL_DATA_COMMAND,
 	UPDATE_VIEW_LEVEL_DATA_COMMAND,
@@ -32,6 +33,7 @@ const ALLOWED_COMMANDS = [
 	CqlParser.RULE_alterKeyspace,
 	CqlParser.RULE_alterMaterializedView,
 	CqlParser.RULE_createIndex,
+	CqlParser.RULE_createSearchIndex,
 	CqlParser.RULE_alterType
 ];
 
@@ -151,6 +153,64 @@ class Visitor extends CqlParserVisitor {
 			indexType: 'custom',
 			customOptions
 		};
+	}
+
+	visitCreateSearchIndex(ctx){
+		return {
+			type: ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND,
+			bucketName: this.getKeyspaceName(ctx),
+			collectionName: this.visit(ctx.table()),
+			searchIndex: true,
+			searchIndexColumns: this.visitIfExists(ctx,'searchIndexColumnList'),
+			searchIndexProfiles: this.visitIfExists(ctx, 'searchIndexProfiles'),
+			searchIndexConfig: this.visitIfExists(ctx, 'searchIndexConfigs'),
+			searchIndexOptions: this.visitIfExists(ctx, 'searchIndexOptions')
+		};
+	}
+
+	visitSearchIndexOptions(ctx){
+		return {
+			recovery: ctx.recoveryOption ? ctx.recoveryOption.getText().toLowerCase() === `true`: false,
+			reindex: ctx.reindexOption ? ctx.reindexOption.getText().toLowerCase() === `true`: false,
+			lenient: ctx.lenientOption ? ctx.lenientOption.getText().toLowerCase() === `true`: false
+		}
+	}
+
+	visitSearchIndexConfigs(ctx){
+		return {
+			autoCommitTime: ctx.autoCommitTimeConfig ? ctx.autoCommitTimeConfig.getText(): 1000,
+			defaultQueryField: ctx.defaultQueryFieldConfig ? removeQuotes(ctx.defaultQueryFieldConfig.getText()): '',
+			directoryFactory: ctx.directoryFactoryConfig ? removeQuotes(ctx.directoryFactoryConfig.getText()): '',
+			filterCacheLowWaterMark: ctx.filterCacheLowWaterMarkConfig ? ctx.filterCacheLowWaterMarkConfig.getText() : 1024,
+			filterCacheHighWaterMark: ctx.filterCacheHighWaterMarkConfig ? ctx.filterCacheHighWaterMarkConfig.getText() : 2048,
+			directoryFactoryClass: ctx.directoryFactoryClassConfig ? removeQuotes(ctx.directoryFactoryClassConfig.getText()) : '',
+			mergeMaxThreadCount: ctx.mergeMaxThreadCountConfig ? ctx.mergeMaxThreadCountConfig.getText(): '',
+			mergeMaxMergeCount: ctx.mergeMaxMergeCountConfig ? ctx.mergeMaxMergeCountConfig.getText() : '',
+			ramBufferSize: ctx.ramBufferSizeConfig ? ctx.ramBufferSizeConfig.getText() : 512,
+			realtime: ctx.realtimeConfig ? ctx.realtimeConfig.getText().toLowerCase() === `true` : false	
+		}
+	}
+	
+	visitSearchIndexProfiles(ctx){
+		return ctx.getText()
+	}
+	
+	visitSearchIndexColumnList(ctx){
+		return this.visit(ctx.searchIndexColumn())
+	}
+
+	visitSearchIndexColumn(ctx){
+		const copyField = ctx.copyFieldOption ? ctx.copyFieldOption.getText().toLowerCase() === `true` : false;
+		const docValues = ctx.docValuesOption ? ctx.docValuesOption.getText().toLowerCase() === `true` : false;
+		const excluded = ctx.excludedOption ? ctx.excludedOption.getText().toLowerCase() === `true` : false;
+		const indexed = ctx.indexedOption ? ctx.indexedOption.getText().toLowerCase() === `true` : false;
+		return {
+			key: ctx.column().getText(),
+			copyField,
+			docValues,
+			excluded,
+			indexed
+		}
 	}
 
 	visitCreateType(ctx) {
@@ -717,6 +777,14 @@ class Visitor extends CqlParserVisitor {
 		const keyspaceContext = ctx.keyspace();
 
 		return keyspaceContext ? this.visit(keyspaceContext) : '';
+	}
+
+	visitIfExists(ctx, funcName, defaultValue) {
+		try {
+			return this.visit(ctx[funcName]());
+		} catch (e) {
+			return defaultValue;
+		}
 	}
 }
 

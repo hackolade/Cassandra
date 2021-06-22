@@ -624,6 +624,48 @@ CqlParserVisitor.prototype.visitCustomIndex = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#createSearchIndex.
+CqlParserVisitor.prototype.visitCreateSearchIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexConfigs.
+CqlParserVisitor.prototype.visitSearchIndexConfigs = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#directoryFactory.
+CqlParserVisitor.prototype.visitDirectoryFactory = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexOptions.
+CqlParserVisitor.prototype.visitSearchIndexOptions = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexProfiles.
+CqlParserVisitor.prototype.visitSearchIndexProfiles = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexColumnList.
+CqlParserVisitor.prototype.visitSearchIndexColumnList = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexColumn.
+CqlParserVisitor.prototype.visitSearchIndexColumn = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#indexName.
 CqlParserVisitor.prototype.visitIndexName = function(ctx) {
   return this.visitChildren(ctx);
@@ -1308,6 +1350,12 @@ CqlParserVisitor.prototype.visitKwCustom = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#kwSearch.
+CqlParserVisitor.prototype.visitKwSearch = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#kwAscii.
 CqlParserVisitor.prototype.visitKwAscii = function(ctx) {
   return this.visitChildren(ctx);
@@ -1322,6 +1370,156 @@ CqlParserVisitor.prototype.visitKwNormalize = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwStorageAttachedIndex.
 CqlParserVisitor.prototype.visitKwStorageAttachedIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
+CqlParserVisitor.prototype.visitKwSpaceSavingNoJoin = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwSpaceSavingAll.
+CqlParserVisitor.prototype.visitKwSpaceSavingAll = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
+CqlParserVisitor.prototype.visitKwSpaceSavingSlowTriePrecision = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwCopyField.
+CqlParserVisitor.prototype.visitKwCopyField = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwDocValues.
+CqlParserVisitor.prototype.visitKwDocValues = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwExcluded.
+CqlParserVisitor.prototype.visitKwExcluded = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwIndexed.
+CqlParserVisitor.prototype.visitKwIndexed = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwColumns.
+CqlParserVisitor.prototype.visitKwColumns = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwProfiles.
+CqlParserVisitor.prototype.visitKwProfiles = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwConfig.
+CqlParserVisitor.prototype.visitKwConfig = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwAutoCommitTime.
+CqlParserVisitor.prototype.visitKwAutoCommitTime = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwDefaultQueryField.
+CqlParserVisitor.prototype.visitKwDefaultQueryField = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwDirectoryFactory.
+CqlParserVisitor.prototype.visitKwDirectoryFactory = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwFilterCacheLowWaterMark.
+CqlParserVisitor.prototype.visitKwFilterCacheLowWaterMark = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwFilterCacheHighWaterMark.
+CqlParserVisitor.prototype.visitKwFilterCacheHighWaterMark = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwDirectoryFactoryClass.
+CqlParserVisitor.prototype.visitKwDirectoryFactoryClass = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwMergeMaxThreadCount.
+CqlParserVisitor.prototype.visitKwMergeMaxThreadCount = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwMergeMaxMergeCount.
+CqlParserVisitor.prototype.visitKwMergeMaxMergeCount = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwRamBufferSize.
+CqlParserVisitor.prototype.visitKwRamBufferSize = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwRealtime.
+CqlParserVisitor.prototype.visitKwRealtime = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwRecovery.
+CqlParserVisitor.prototype.visitKwRecovery = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwReindex.
+CqlParserVisitor.prototype.visitKwReindex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwLenient.
+CqlParserVisitor.prototype.visitKwLenient = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwStandard.
+CqlParserVisitor.prototype.visitKwStandard = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwEncrypted.
+CqlParserVisitor.prototype.visitKwEncrypted = function(ctx) {
   return this.visitChildren(ctx);
 };
 

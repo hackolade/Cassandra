@@ -486,12 +486,6 @@ making sure that you maintain a proper JSON format.
 						"propertyTooltip": "Name of the field"
 					},
 					{
-						"propertyName": "directoryFactoryClass",
-						"propertyKeyword": "directoryFactoryClass",
-						"propertyType": "text",
-						"propertyTooltip": "Specifies the fully-qualified name of the directory factory. Use in place of the directoryFactory option for directory factories other than the standard or encrypted directory factory."
-					},
-					{
 						"propertyName": "directoryFactory",
 						"propertyKeyword": "directoryFactory",
 						"propertyType": "select",
@@ -517,6 +511,12 @@ making sure that you maintain a proper JSON format.
 						"valueType": "integer",
 						"allowNegative": false,
 						"defaultValue": 2048
+					},
+					{
+						"propertyName": "directoryFactoryClass",
+						"propertyKeyword": "directoryFactoryClass",
+						"propertyType": "text",
+						"propertyTooltip": "Specifies the fully-qualified name of the directory factory. Use in place of the directoryFactory option for directory factories other than the standard or encrypted directory factory."
 					},
 					{
 						"propertyName": "mergeMaxThreadCount",

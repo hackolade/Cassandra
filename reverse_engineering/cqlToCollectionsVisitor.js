@@ -116,18 +116,40 @@ class Visitor extends CqlParserVisitor {
 		};
 	}
 
-	visitCreateIndex(ctx) {
+	visitSecondaryIndex(ctx) {
 		const keyspace = this.getKeyspaceName(ctx);
 		const column = this.visit(ctx.indexColumnSpec());
 		const nameContext = ctx.indexName();
 		const name = nameContext ? this.visit(nameContext) : '';
-		
 		return {
 			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
 			bucketName: keyspace,
 			collectionName: this.visit(ctx.table()),
 			name,
-			column
+			column: column.name,
+			columnType: column.type
+		};
+	}
+
+	visitCustomIndex(ctx) {
+		const keyspace = this.getKeyspaceName(ctx);
+		const column = this.visit(ctx.indexColumnSpec());
+		const nameContext = ctx.indexName();
+		const name = nameContext ? this.visit(nameContext) : '';
+		const customOptions = {
+			case_sensitive: ctx.caseSensitiveOption ? ctx.caseSensitiveOption.getText().toLowerCase() === `'true'` : false,
+			normalize: ctx.normalizeOption ? ctx.normalizeOption.getText().toLowerCase() === `'true'` : false	,
+			ascii: ctx.asciiOption ? ctx.asciiOption.getText().toLowerCase() === `'true'` : false	
+		}
+		return {
+			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+			bucketName: keyspace,
+			collectionName: this.visit(ctx.table()),
+			name,
+			column: column.name,
+			columnType: column.type,
+			indexType: 'custom',
+			customOptions
 		};
 	}
 
@@ -347,25 +369,48 @@ class Visitor extends CqlParserVisitor {
 	}
 
 	visitIndexColumnSpec(ctx) {
-		const columnContext = ctx.column();
+		if(ctx.column()){
+			return {
+				name: this.visit(ctx.column()),
+				type: ''
+			};
+		}
 		const keysContext = ctx.indexKeysSpec();
 		const entriesContext = ctx.indexEntriesSSpec();
 		const fullContext = ctx.indexFullSpec();
-		const context = columnContext || keysContext || entriesContext || fullContext;
+		const valuesContext = ctx.indexValuesSpec();
+
+		const context = keysContext || entriesContext || fullContext || valuesContext;
 
 		return this.visit(context);
 	}
 
 	visitIndexKeysSpec(ctx) {
-		return this.visit(ctx.column());
+		return {
+			name: this.visit(ctx.column()),
+			type: 'keys'
+		};
 	}
 
 	visitIndexEntriesSSpec(ctx) {
-		return this.visit(ctx.column());
+		return {
+			name: this.visit(ctx.column()),
+			type: 'entries'
+		};
 	}
 
 	visitIndexFullSpec(ctx) {
-		return this.visit(ctx.column());
+		return {
+			name: this.visit(ctx.column()),
+			type: 'full'
+		};
+	}
+
+	visitIndexValuesSpec(ctx) {
+		return {
+			name: this.visit(ctx.column()),
+			type: 'values'
+		};
 	}
 
 	visitColumnList(ctx) {

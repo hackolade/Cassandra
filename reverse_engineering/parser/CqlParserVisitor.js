@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.8
+// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -612,8 +612,14 @@ CqlParserVisitor.prototype.visitTruncate = function(ctx) {
 };
 
 
-// Visit a parse tree produced by CqlParser#createIndex.
-CqlParserVisitor.prototype.visitCreateIndex = function(ctx) {
+// Visit a parse tree produced by CqlParser#secondaryIndex.
+CqlParserVisitor.prototype.visitSecondaryIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#customIndex.
+CqlParserVisitor.prototype.visitCustomIndex = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -644,6 +650,12 @@ CqlParserVisitor.prototype.visitIndexEntriesSSpec = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#indexFullSpec.
 CqlParserVisitor.prototype.visitIndexFullSpec = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#indexValuesSpec.
+CqlParserVisitor.prototype.visitIndexValuesSpec = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -1286,6 +1298,36 @@ CqlParserVisitor.prototype.visitKwIn = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwIndex.
 CqlParserVisitor.prototype.visitKwIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwCustom.
+CqlParserVisitor.prototype.visitKwCustom = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwAscii.
+CqlParserVisitor.prototype.visitKwAscii = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwNormalize.
+CqlParserVisitor.prototype.visitKwNormalize = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwStorageAttachedIndex.
+CqlParserVisitor.prototype.visitKwStorageAttachedIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwCaseSensitive.
+CqlParserVisitor.prototype.visitKwCaseSensitive = function(ctx) {
   return this.visitChildren(ctx);
 };
 

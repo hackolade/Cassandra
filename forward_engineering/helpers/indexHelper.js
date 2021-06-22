@@ -118,6 +118,10 @@ const wrapKey = (column, type) => {
 		return `ENTRIES(${column})`;
 	}
 
+	if (type === 'full') {
+		return `FULL(${column})`;
+	}
+
 	return column;
 };
 

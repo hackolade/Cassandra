@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.8
+// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -911,12 +911,21 @@ CqlParserListener.prototype.exitTruncate = function(ctx) {
 };
 
 
-// Enter a parse tree produced by CqlParser#createIndex.
-CqlParserListener.prototype.enterCreateIndex = function(ctx) {
+// Enter a parse tree produced by CqlParser#secondaryIndex.
+CqlParserListener.prototype.enterSecondaryIndex = function(ctx) {
 };
 
-// Exit a parse tree produced by CqlParser#createIndex.
-CqlParserListener.prototype.exitCreateIndex = function(ctx) {
+// Exit a parse tree produced by CqlParser#secondaryIndex.
+CqlParserListener.prototype.exitSecondaryIndex = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#customIndex.
+CqlParserListener.prototype.enterCustomIndex = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#customIndex.
+CqlParserListener.prototype.exitCustomIndex = function(ctx) {
 };
 
 
@@ -962,6 +971,15 @@ CqlParserListener.prototype.enterIndexFullSpec = function(ctx) {
 
 // Exit a parse tree produced by CqlParser#indexFullSpec.
 CqlParserListener.prototype.exitIndexFullSpec = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#indexValuesSpec.
+CqlParserListener.prototype.enterIndexValuesSpec = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#indexValuesSpec.
+CqlParserListener.prototype.exitIndexValuesSpec = function(ctx) {
 };
 
 
@@ -1925,6 +1943,51 @@ CqlParserListener.prototype.enterKwIndex = function(ctx) {
 
 // Exit a parse tree produced by CqlParser#kwIndex.
 CqlParserListener.prototype.exitKwIndex = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwCustom.
+CqlParserListener.prototype.enterKwCustom = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwCustom.
+CqlParserListener.prototype.exitKwCustom = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwAscii.
+CqlParserListener.prototype.enterKwAscii = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwAscii.
+CqlParserListener.prototype.exitKwAscii = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwNormalize.
+CqlParserListener.prototype.enterKwNormalize = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwNormalize.
+CqlParserListener.prototype.exitKwNormalize = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwStorageAttachedIndex.
+CqlParserListener.prototype.enterKwStorageAttachedIndex = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwStorageAttachedIndex.
+CqlParserListener.prototype.exitKwStorageAttachedIndex = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwCaseSensitive.
+CqlParserListener.prototype.enterKwCaseSensitive = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwCaseSensitive.
+CqlParserListener.prototype.exitKwCaseSensitive = function(ctx) {
 };
 
 

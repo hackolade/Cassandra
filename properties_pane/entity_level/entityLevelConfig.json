@@ -335,7 +335,8 @@ making sure that you maintain a proper JSON format.
 							"",
 							"keys",
 							"values",
-							"entries"
+							"entries",
+							"full"
 						],
 						"templateOptions": {
 							"maxFields": 1

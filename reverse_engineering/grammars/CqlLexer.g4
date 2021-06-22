@@ -274,7 +274,7 @@ K_EXISTS
 
 
 K_FALSE
-   : F A L S E | 'FALSE'
+   : F A L S E | 'FALSE' | SQUOTE F A L S E SQUOTE
    ;
 
 
@@ -634,7 +634,7 @@ K_TRIGGER
 
 
 K_TRUE
-   : T R U E | 'TRUE'
+   : T R U E | 'TRUE' | SQUOTE T R U E SQUOTE
    ;
 
 
@@ -715,8 +715,20 @@ K_WRITETIME
 
 K_ASCII
    : A S C I I
+   | SQUOTE A S C I I SQUOTE
    ;
 
+K_CASE_SENITIVE
+   : SQUOTE C A S E '_' S E N S I T I V E SQUOTE
+   ;
+
+K_NORMALIZE
+   : SQUOTE N O R M A L I Z E SQUOTE
+   ;
+
+K_STORAGE_ATTACHED_INDEX
+   : SQUOTE S T O R A G E A T T A C H E D I N D E X SQUOTE
+   ;
 
 K_BIGINT
    : B I G I N T

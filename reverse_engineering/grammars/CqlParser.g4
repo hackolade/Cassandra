@@ -398,18 +398,6 @@ tableOptionValue
    | id
    ;
 
-optionHash
-   : syntaxBracketLc optionHashItem (syntaxComma optionHashItem)* syntaxBracketRc
-   ;
-
-optionHashItem
-   : optionHashKey COLON optionHashValue
-   ;
-
-optionHashKey
-   : stringLiteral
-   ;
-
 optionHashValue
    : stringLiteral
    | floatLiteral
@@ -506,7 +494,8 @@ truncate
    ;
 
 createIndex
-   : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr
+   : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr #secondaryIndex
+   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing kwStorageAttachedIndex (kwWith kwOptions OPERATOR_EQ LC_BRACKET kwCaseSensitive COLON caseSensitiveOption=booleanLiteral COMMA kwNormalize COLON normalizeOption=booleanLiteral COMMA kwAscii COLON asciiOption=booleanLiteral RC_BRACKET)? #customIndex
    ;
 
 indexName
@@ -519,6 +508,7 @@ indexColumnSpec
    | indexKeysSpec
    | indexEntriesSSpec
    | indexFullSpec
+   | indexValuesSpec
    ;
 
 indexKeysSpec
@@ -531,6 +521,10 @@ indexEntriesSSpec
 
 indexFullSpec
    : kwFull syntaxBracketLr column syntaxBracketRr
+   ;
+
+indexValuesSpec
+   : kwValues syntaxBracketLr column syntaxBracketRr
    ;
 
 deleteStatement
@@ -1034,6 +1028,26 @@ kwIn
 kwIndex
    : K_INDEX
    ;
+
+kwCustom
+   : K_CUSTOM
+   ;
+
+kwAscii
+   : K_ASCII
+   ;
+
+kwNormalize
+   : K_NORMALIZE
+   ;
+
+kwStorageAttachedIndex
+   : K_STORAGE_ATTACHED_INDEX
+   ;
+
+kwCaseSensitive
+   : K_CASE_SENITIVE
+   ;   
 
 kwInitcond
    : K_INITCOND

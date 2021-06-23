@@ -552,7 +552,8 @@ searchIndexColumnList
    ;
 
 searchIndexColumn
-   : column  (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)?  RC_BRACKET)?
+   : column (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)?  RC_BRACKET)?
+   | star=STAR (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)?  RC_BRACKET)?
    ;
    
 

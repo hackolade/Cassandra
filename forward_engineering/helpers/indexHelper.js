@@ -153,8 +153,8 @@ const getCustomOptions = (options) => {
 		return result;
 	}
 
-	if (!options.case_sensitive) {
-		result.case_sensitive = 'false';
+	if (options.case_sensitive) {
+		result.case_sensitive = 'true';
 	}
 
 	if (options.normalize) {

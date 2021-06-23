@@ -248,7 +248,7 @@ const addIndexToCollection = (entitiesData, statementData) => {
     if (entityIndex === -1) {
         return entitiesData;
     }
-
+    
     const entity = entities[entityIndex];
     const entityLevelData = entity.entityLevelData || {};
     const indexes = [
@@ -275,6 +275,7 @@ const addIndexToCollection = (entitiesData, statementData) => {
 };
 
 const addSearchIndexToCollection = (entitiesData, statementData) => {
+    let indexData = {...statementData}
     const { entities } = entitiesData;
     const bucket = commandsHelper.getCurrentBucket(entitiesData, statementData);
     const entityIndex = commandsHelper.findEntityIndex(entities, bucket, statementData.collectionName);
@@ -283,6 +284,12 @@ const addSearchIndexToCollection = (entitiesData, statementData) => {
     }
     const entity = entities[entityIndex];
     const entityLevelData = entity.entityLevelData || {};
+    if(indexData.searchIndexColumns.length ===  1 && indexData.searchIndexColumns[0].key[0] === '*'){
+        const indexColumnOptions = indexData.searchIndexColumns[0];
+        const entityColumnsNames = Object.keys(entity.schema.properties)
+        const indexColumns = entityColumnsNames.map(colName => ({...indexColumnOptions, ...{key: [colName], }}))
+        indexData = { ...indexData, searchIndexColumns: indexColumns }
+    }
 
     return {
         ...entitiesData,
@@ -290,7 +297,7 @@ const addSearchIndexToCollection = (entitiesData, statementData) => {
             ...entity,
             entityLevelData: {
                 ...entityLevelData,
-                ...statementData
+                ...indexData
             }
         })
     };

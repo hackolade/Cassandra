@@ -200,12 +200,18 @@ class Visitor extends CqlParserVisitor {
 	}
 
 	visitSearchIndexColumn(ctx){
+		let key;
+		if(ctx.star){
+			key  = '*'
+		}else{
+			key  = ctx.column().getText()
+		}
 		const copyField = ctx.copyFieldOption ? ctx.copyFieldOption.getText().toLowerCase() === `true` : false;
 		const docValues = ctx.docValuesOption ? ctx.docValuesOption.getText().toLowerCase() === `true` : false;
 		const excluded = ctx.excludedOption ? ctx.excludedOption.getText().toLowerCase() === `true` : false;
 		const indexed = ctx.indexedOption ? ctx.indexedOption.getText().toLowerCase() === `true` : false;
 		return {
-			key: ctx.column().getText(),
+			key:[key],
 			copyField,
 			docValues,
 			excluded,

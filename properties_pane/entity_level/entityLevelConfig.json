@@ -397,7 +397,15 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Enable",
 				"propertyType": "checkbox",
-				"propertyKeyword": "searchIndex"
+				"propertyKeyword": "searchIndex",
+				"dependency":{
+					"type": "not",
+					"values": {
+						"level": "parent",
+						"key": "dbVersion",
+						"value": "Astra DB"
+					}
+				}
 			},
 			{
 				"propertyName": "Columns",

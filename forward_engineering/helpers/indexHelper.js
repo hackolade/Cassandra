@@ -4,11 +4,11 @@ const { commentDeactivatedStatement, inlineComment } = require('./commentsHelper
 const { tab, getTableNameStatement } = require('./generalHelper');
 const { getNamesByIds } = require('./schemaHelper');
 
-const getIndexes = (indexData, dataSources, tableName, keyspaceName, isTableActivated, isKeyspaceActivated) => {
+const getIndexes = (indexData, dataSources, tableName, keyspaceName, isTableActivated, isKeyspaceActivated, dbVersion) => {
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const isParentActivated = isTableActivated && isKeyspaceActivated;
 	const generalIndexes = getGeneralIndexes(tableNameStatement, dataSources, indexData.indexes);
-	const searchIndex = getSearchIndexStatement(tableNameStatement, dataSources, isParentActivated, indexData.searchIndex);	
+	const searchIndex = dbVersion === 'Astra DB' ? [] : getSearchIndexStatement(tableNameStatement, dataSources, isParentActivated, indexData.searchIndex);	
 	
 	const indexStatements = [...generalIndexes, ...searchIndex].map(index => {
 		return commentDeactivatedStatement(

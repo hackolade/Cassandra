@@ -17,7 +17,8 @@
 				"4.x",
 				"DSE 4.x",
 				"DSE 5.x",
-				"DSE 6.x"
+				"DSE 6.x",
+				"Astra DB"
 			]
 		},
 		"features": {

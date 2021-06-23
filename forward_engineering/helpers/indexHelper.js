@@ -237,10 +237,6 @@ const getSearchIndexConfig = (config = {}) => {
 		result.push(`defaultQueryField: '${config.defaultQueryField}'`);
 	}
 
-	if (config.directoryFactoryClass) {
-		result.push(`directoryFactoryClass: '${config.directoryFactoryClass}'`);
-	}
-
 	if (config.directoryFactory) {
 		result.push(`directoryFactory: '${config.directoryFactory}'`);
 	}
@@ -251,6 +247,10 @@ const getSearchIndexConfig = (config = {}) => {
 
 	if (config.filterCacheHighWaterMark && config.filterCacheHighWaterMark !== 2048) {
 		result.push(`filterCacheHighWaterMark: ${config.filterCacheHighWaterMark}`);
+	}
+
+	if (config.directoryFactoryClass) {
+		result.push(`directoryFactoryClass: '${config.directoryFactoryClass}'`);
 	}
 
 	if (config.mergeMaxThreadCount && config.mergeMaxMergeCount) {

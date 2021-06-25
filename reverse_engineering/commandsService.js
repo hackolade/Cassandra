@@ -267,8 +267,7 @@ const addIndexToCollection = (entitiesData, statementData) => {
             ...entity,
             entityLevelData: {
                 ...entityLevelData,
-                SecIndxs: indexes,
-                searchIndex: true
+                SecIndxs: indexes
             }
         })
     };

@@ -413,6 +413,7 @@ optionHashKey
 
 optionHashValue
    : stringLiteral
+   | booleanLiteral
    | floatLiteral
    ;
 

@@ -55,12 +55,15 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 	if (!searchIndex) {
 		return [];
 	}
-
-	const columns = uniqueByName(searchIndex.columns.filter(column => Array.isArray(column.key) && column.key.length).map(column => ({
+	let columns = [];
+	if(searchIndex.columns){
+			columns = uniqueByName(searchIndex.columns.filter(column => Array.isArray(column.key) && column.key.length).map(column => ({
 		...column,
 		name: getIndexColumnStatement(column.key[0], dataSources),
 		isActivated: isIndexColumnKeyActivated(column.key[0], dataSources),
 	})));
+	}
+
 	const activatedColumns = columns.filter(column => column.isActivated);
 	const isActivated = activatedColumns.length > 0;
 	const statement = getSearchIndex({

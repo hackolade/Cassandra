@@ -4,11 +4,11 @@ const { commentDeactivatedStatement, inlineComment } = require('./commentsHelper
 const { tab, getTableNameStatement } = require('./generalHelper');
 const { getNamesByIds } = require('./schemaHelper');
 
-const getIndexes = (indexData, dataSources, tableName, keyspaceName, isTableActivated, isKeyspaceActivated) => {
+const getIndexes = (indexData, dataSources, tableName, keyspaceName, isTableActivated, isKeyspaceActivated, dbVersion) => {
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const isParentActivated = isTableActivated && isKeyspaceActivated;
 	const generalIndexes = getGeneralIndexes(tableNameStatement, dataSources, indexData.indexes);
-	const searchIndex = getSearchIndexStatement(tableNameStatement, dataSources, isParentActivated, indexData.searchIndex);	
+	const searchIndex = dbVersion === 'Astra DB' ? [] : getSearchIndexStatement(tableNameStatement, dataSources, isParentActivated, indexData.searchIndex);	
 	
 	const indexStatements = [...generalIndexes, ...searchIndex].map(index => {
 		return commentDeactivatedStatement(
@@ -55,12 +55,15 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 	if (!searchIndex) {
 		return [];
 	}
-
-	const columns = uniqueByName(searchIndex.columns.filter(column => Array.isArray(column.key) && column.key.length).map(column => ({
+	let columns = [];
+	if(searchIndex.columns){
+			columns = uniqueByName(searchIndex.columns.filter(column => Array.isArray(column.key) && column.key.length).map(column => ({
 		...column,
 		name: getIndexColumnStatement(column.key[0], dataSources),
 		isActivated: isIndexColumnKeyActivated(column.key[0], dataSources),
 	})));
+	}
+
 	const activatedColumns = columns.filter(column => column.isActivated);
 	const isActivated = activatedColumns.length > 0;
 	const statement = getSearchIndex({
@@ -118,6 +121,10 @@ const wrapKey = (column, type) => {
 		return `ENTRIES(${column})`;
 	}
 
+	if (type === 'full') {
+		return `FULL(${column})`;
+	}
+
 	return column;
 };
 
@@ -149,8 +156,8 @@ const getCustomOptions = (options) => {
 		return result;
 	}
 
-	if (!options.case_sensitive) {
-		result.case_sensitive = 'false';
+	if (options.case_sensitive) {
+		result.case_sensitive = 'true';
 	}
 
 	if (options.normalize) {
@@ -233,10 +240,6 @@ const getSearchIndexConfig = (config = {}) => {
 		result.push(`defaultQueryField: '${config.defaultQueryField}'`);
 	}
 
-	if (config.directoryFactoryClass) {
-		result.push(`directoryFactoryClass: '${config.directoryFactoryClass}'`);
-	}
-
 	if (config.directoryFactory) {
 		result.push(`directoryFactory: '${config.directoryFactory}'`);
 	}
@@ -247,6 +250,10 @@ const getSearchIndexConfig = (config = {}) => {
 
 	if (config.filterCacheHighWaterMark && config.filterCacheHighWaterMark !== 2048) {
 		result.push(`filterCacheHighWaterMark: ${config.filterCacheHighWaterMark}`);
+	}
+
+	if (config.directoryFactoryClass) {
+		result.push(`directoryFactoryClass: '${config.directoryFactoryClass}'`);
 	}
 
 	if (config.mergeMaxThreadCount && config.mergeMaxMergeCount) {

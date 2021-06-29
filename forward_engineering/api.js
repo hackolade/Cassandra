@@ -135,6 +135,7 @@ module.exports = {
 						containerName,
 						isEntityActivated,
 						isKeyspaceActivated,
+						data.modelData[0].dbVersion
 					);
 					
 					cqlScriptData.push(...internalUdt, table, indexes);

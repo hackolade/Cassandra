@@ -335,7 +335,8 @@ making sure that you maintain a proper JSON format.
 							"",
 							"keys",
 							"values",
-							"entries"
+							"entries",
+							"full"
 						],
 						"templateOptions": {
 							"maxFields": 1
@@ -391,12 +392,28 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Search Index",
 				"propertyKeyword": "searchIndexDivider",
-				"propertyType": "empty"
+				"propertyType": "empty",
+				"dependency":{
+					"type": "not",
+					"values": {
+						"level": "model",
+						"key": "dbVersion",
+						"value": "Astra DB"
+					}
+				}
 			},
 			{
 				"propertyName": "Enable",
 				"propertyType": "checkbox",
-				"propertyKeyword": "searchIndex"
+				"propertyKeyword": "searchIndex",
+				"dependency":{
+					"type": "not",
+					"values": {
+						"level": "model",
+						"key": "dbVersion",
+						"value": "Astra DB"
+					}
+				}
 			},
 			{
 				"propertyName": "Columns",
@@ -404,8 +421,21 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "searchIndexColumns",
 				"propertyTooltip": "",
 				"dependency": {
-					"key": "searchIndex",
-					"value": true
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
 				"structure": [
 					{
@@ -450,8 +480,21 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "searchIndexProfiles",
 				"propertyTooltip": "",
 				"dependency": {
-					"key": "searchIndex",
-					"value": true
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
 				"options": [
 					"",
@@ -466,8 +509,21 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "searchIndexConfig",
 				"propertyTooltip": "",
 				"dependency": {
-					"key": "searchIndex",
-					"value": true
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
 				"structure": [
 					{
@@ -483,12 +539,6 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "defaultQueryField",
 						"propertyType": "text",
 						"propertyTooltip": "Name of the field"
-					},
-					{
-						"propertyName": "directoryFactoryClass",
-						"propertyKeyword": "directoryFactoryClass",
-						"propertyType": "text",
-						"propertyTooltip": "Specifies the fully-qualified name of the directory factory. Use in place of the directoryFactory option for directory factories other than the standard or encrypted directory factory."
 					},
 					{
 						"propertyName": "directoryFactory",
@@ -516,6 +566,12 @@ making sure that you maintain a proper JSON format.
 						"valueType": "integer",
 						"allowNegative": false,
 						"defaultValue": 2048
+					},
+					{
+						"propertyName": "directoryFactoryClass",
+						"propertyKeyword": "directoryFactoryClass",
+						"propertyType": "text",
+						"propertyTooltip": "Specifies the fully-qualified name of the directory factory. Use in place of the directoryFactory option for directory factories other than the standard or encrypted directory factory."
 					},
 					{
 						"propertyName": "mergeMaxThreadCount",
@@ -554,8 +610,21 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "searchIndexOptions",
 				"propertyTooltip": "",
 				"dependency": {
-					"key": "searchIndex",
-					"value": true
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
 				"structure": [
 					{

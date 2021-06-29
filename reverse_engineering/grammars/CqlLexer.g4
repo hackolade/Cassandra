@@ -222,6 +222,9 @@ K_CUSTOM
    : C U S T O M | 'CUSTOM'
    ;
 
+K_SEARCH
+   : S E A R C H | 'SEARCH'
+   ;
 
 K_DELETE
    : D E L E T E | 'DELETE'
@@ -274,7 +277,7 @@ K_EXISTS
 
 
 K_FALSE
-   : F A L S E | 'FALSE'
+   : F A L S E | 'FALSE' | SQUOTE F A L S E SQUOTE
    ;
 
 
@@ -634,7 +637,7 @@ K_TRIGGER
 
 
 K_TRUE
-   : T R U E | 'TRUE'
+   : T R U E | 'TRUE' | SQUOTE T R U E SQUOTE
    ;
 
 
@@ -715,8 +718,121 @@ K_WRITETIME
 
 K_ASCII
    : A S C I I
+   | SQUOTE A S C I I SQUOTE
    ;
 
+K_CASE_SENITIVE
+   : SQUOTE C A S E '_' S E N S I T I V E SQUOTE
+   ;
+
+K_NORMALIZE
+   : SQUOTE N O R M A L I Z E SQUOTE
+   ;
+
+K_STORAGE_ATTACHED_INDEX
+   : SQUOTE S T O R A G E A T T A C H E D I N D E X SQUOTE
+   ;
+
+K_SPACE_SAVING_NO_JOIN
+   : S P A C E S A V I N G N O J O I N
+   ;
+
+K_SPACE_SAVING_ALL
+   : S P A C E S A V I N G A L L
+   ;
+
+K_SPACE_SAVING_SLOW_TRIE_PRECISION
+   : S P A C E S A V I N G S L O W T R I E P R E C I S I O N
+   ;
+
+K_DOC_VALUES
+   : D O C V A L U E S
+   ;
+
+K_COPY_FIELD
+   : C O P Y F I E L D
+   ;
+
+K_EXCLUDED
+   : E X C L U D E D
+   ;
+
+K_INDEXED
+   : I N D E X E D
+   ;
+
+K_COLUMNS
+   : C O L U M N S
+   ;
+
+K_PROFILES
+   : P R O F I L E S
+   ;
+
+K_CONFIG
+   : C O N F I G
+   ;
+
+
+K_AUTOCOMMIT_TIME
+   : A U T O C O M M I T T I M E
+   ;
+
+K_DEFAULT_QUERY_FIELD
+   : D E F A U L T Q U E R Y F I E L D
+   ;
+
+K_DIRECTORY_FACTORY
+   : D I R E C T O R Y F A C T O R Y
+   ;
+
+K_FILTER_CACHE_LOW_WATERMARK
+   : F I L T E R C A C H E L O W W A T E R M A R K
+   ;
+
+K_FILTER_CACHE_HIGH_WATERMARK
+   : F I L T E R C A C H E H I G H W A T E R M A R K
+   ;
+
+K_DIRECTORY_FACTORY_CLASS
+   : D I R E C T O R Y F A C T O R Y C L A S S
+   ;
+
+K_MERGE_MAX_THREAD_COUNT
+   : M E R G E M A X T H R E A D C O U N T
+   ;
+
+K_MERGE_MAX_MERGE_COUNT
+   : M E R G E M A X M E R G E C O U N T
+   ;
+
+K_RAM_BUFFER_SIZE
+   : R A M B U F F E R S I Z E
+   ;
+
+K_REALTIME
+   : R E A L T I M E
+   ;
+
+K_RECOVERY
+   : R E C O V E R Y
+   ;
+
+K_REINDEX
+   : R E I N D E X
+   ;
+
+K_LENIENT
+   : L E N I E N T
+   ;
+
+K_STANDARD
+   :SQUOTE S T A N D A R D SQUOTE
+   ;
+
+K_ENCRYPTED
+   :SQUOTE E N C R Y P T E D SQUOTE
+   ;
 
 K_BIGINT
    : B I G I N T

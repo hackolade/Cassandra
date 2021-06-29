@@ -77,7 +77,7 @@ class Visitor extends CqlParserVisitor {
 	visitCreateKeyspace(ctx) {
 		const name = this.getKeyspaceName(ctx)
 		const replicationProperties = this.visit(ctx.replicationList());
-		const durableWrites = !!(this.visit(ctx.durableWrites()));
+		const durableWrites = ctx.durableWrites() ? !!(this.visit(ctx.durableWrites())) : true;
 
 		return {
 			type: CREATE_BUCKET_COMMAND,

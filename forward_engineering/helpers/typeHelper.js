@@ -205,7 +205,7 @@ const getNestedTypeByData = (propertyData, isNeedToBeFrozen, udtTypeMap, propert
 
 const getTypeByPropertyData = (propertyData) => {
 	if (propertyData.$ref) {
-		return propertyData.$ref.split('/').pop();
+		return propertyData.$ref.split('/definitions/').pop();
 	} else if (propertyData.type) {
 		return propertyData.type;
 	} else {

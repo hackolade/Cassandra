@@ -2,7 +2,6 @@ const { retrieveContainerName, retrieveEntityName, retrieveUDA, retrieveUDF, ret
 const { getTableStatement } = require('./tableHelper');
 const { getUdtMap, getUdtScripts } = require('./udtHelper');
 const { getIndexes } = require('./indexHelper');
-const { getKeyspaceStatement } = require('./keyspaceHelper');
 
 const getCreateTableScript = (data, isKeyspaceActivated) => {
 	const containerName = retrieveContainerName(data.containerData);
@@ -28,7 +27,7 @@ const getCreateTableScript = (data, isKeyspaceActivated) => {
 		udtTypeMap,
 		isKeyspaceActivated: isEntityChildrenActivated
 	});
-	const indexes = getIndexes(retrieveIndexes(data.entityData), dataSources, entityName, containerName, isEntityChildrenActivated);
+	const indexes = getIndexes(retrieveIndexes(data.entityData), dataSources, entityName, containerName, isEntityActivated, isKeyspaceActivated);
 	const UDF = getUserDefinedFunctions(retrieveUDF(data.containerData));
 	const UDA = getUserDefinedAggregations(retrieveUDA(data.containerData));
 

@@ -190,8 +190,9 @@ module.exports = {
 	
 						Promise.all([
 							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
-							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings, logger), 'Load records...', 'Records have loaded')
-						]).then(([table, records]) => {
+							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings, logger), 'Load records...', 'Records have loaded'),
+							cassandra.describeSearchIndexes(keyspaceName, tableName)
+						]).then(([table, records, searchIndex]) => {
 							loadProgress('Records and Meta data have loaded');
 
 							packageData = cassandra.getPackageData({
@@ -201,7 +202,8 @@ module.exports = {
 								tableName,
 								UDFs,
 								UDAs,
-								views
+								views,
+								searchIndex,
 							}, includeEmptyCollection);
 
 							return packageData;

@@ -25,7 +25,7 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 	return unwindIndexes(indexes).map(index => {
 		let indexStatement;
 
-		const isIndexKeyActivated = isIndexColumnKeyActivated(index.SecIndxKey, dataSources);
+		const isIndexKeyActivated = index.isActivated && isIndexColumnKeyActivated(index.SecIndxKey, dataSources);
 		const columnStatement = getIndexColumnStatement(index.SecIndxKey, dataSources);
 
 		if (index.indexType === 'custom') {

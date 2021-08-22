@@ -6,8 +6,9 @@ const ssh = require('tunnel-ssh');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
+const xmlParser = require('fast-xml-parser');
 
-var state = {
+let state = {
 	client: null,
 	sshTunnel: null,
 };
@@ -232,10 +233,10 @@ module.exports = (_) => {
 		if (!Array.isArray(info.hosts)) {
 			throw new Error('Hosts were not defined');
 		}
-	
-		const username = info.user;
-		const password = info.password;
-		const authProvider = new cassandra.auth.PlainTextAuthProvider(username, password);
+		const credentials = info.authType === 'tokenBased' ? 
+		{username: 'token', password: info.astraToken} : 
+		{username: info.user, password: info.password};
+		const authProvider = new cassandra.auth.PlainTextAuthProvider(credentials.username, credentials.password);
 		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 		
@@ -253,15 +254,15 @@ module.exports = (_) => {
 	
 	const getCloudClient = (info) => {
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
+		const credentials = info.authType === 'tokenBased' ? 
+			{username: 'token', password: info.astraToken} : 
+			{username: info.user, password: info.password};
 
 		const client = new cassandra.Client(Object.assign({
 			cloud: {
 				secureConnectBundle: info.secureConnectBundle
 			},
-			credentials: {
-				username: info.user,
-				password: info.password
-			},
+			credentials,
 			socketOptions: {
 				readTimeout
 			}
@@ -464,6 +465,30 @@ module.exports = (_) => {
 		return scanRecords(keyspace, viewName, recordSamplingSettings, logger).then(mergeDocuments, () => ({}));
 	};
 
+	const describeSearchIndexes = async (keyspaceName, tableName) => {
+		try {
+			const result = await execute(`select resource_name, resource_value from solr_admin.solr_resources where resource_name IN ('schema.xml', 'solrconfig.xml') AND core_name = '${keyspaceName}.${tableName}';`);
+	
+			if (!result.rows.length) {
+				return {};
+			}
+
+			const keyMap = {
+				'schema.xml': 'schema',
+				'solrconfig.xml': 'config', 
+			};
+
+			return result.rows.reduce((result, row) => {
+				return {
+					...result,
+					[keyMap[row.resource_name]]: row.resource_value.toString(),
+				};
+			}, {});
+		} catch (error) {
+			return {};
+		}
+	};
+
 	const splitEntityNames = names => {
 		const namesByCategory =_.partition(names, isView);
 
@@ -548,16 +573,16 @@ module.exports = (_) => {
 	}
 	
 	
-	const getEntityLevelData = (table, tableName) => {
+	const getEntityLevelData = (table, tableName, searchIndex) => {
 		const partitionKeys = handlePartitionKeys(table.partitionKeys);
 		const clusteringKeys = handleClusteringKeys(table);
-		const indexes = handleIndexes(table.indexes);
+		const indexData = handleIndexes(table.indexes, searchIndex);
 	
 		return {
+			...indexData,
 			code: tableName,
 			compositePartitionKey: partitionKeys,
 			compositeClusteringKey: clusteringKeys,
-			SecIndxs: indexes,
 			comments: table.comment,
 			tableOptions: getTableOptions(table)
 		};
@@ -607,17 +632,136 @@ module.exports = (_) => {
 		});
 	};
 	
-	const handleIndexes = (indexes) => {
-		return indexes.map(item => {
+	const handleIndexes = (indexes, searchIndex) => {
+		return {
+			SecIndxs: getGeneralIndexes(indexes),
+			...getSearchIndex(searchIndex),
+		};
+	};
+
+	const getGeneralIndexes = (indexes) => {
+		return indexes.filter(index => !(index.options && index.options['class_name'] === 'com.datastax.bdp.search.solr.Cql3SolrSecondaryIndex')).map(item => {
+			const indexType = item.isCustomKind() ? 'custom' : 'secondary';
+			let customOptions = {};
+
+			if (item.options && indexType === 'custom') {
+				customOptions.case_sensitive = item.options.case_sensitive === 'true';
+				customOptions.normalize = item.options.normalize === 'true';
+				customOptions.ascii = item.options.ascii === 'true';
+			}
+
 			return {
 				name: item.name,
-				SecIndxKey: [getIndexKey(item.target)]
+				SecIndxKey: [getIndexKey(item.target)],
+				customOptions,
+				indexType,
 			};
 		});
 	};
-	
+
+	const getSearchIndexConfig = (config) => {
+		const result = {};
+		const autoCommitTime = _.get(config, 'updateHandler.autoSoftCommit.maxTime');
+		const defaultQueryFieldHandler = _.get(config, 'requestHandler', []).find(handler => handler.lst && handler.lst['@_name'] === 'defaults');
+		const filterCache = _.get(config, 'query.filterCache');
+		const mergeScheduler = _.get(config, 'indexConfig.mergeScheduler.int', []).reduce((result, item) => ({
+			...result,
+			[item['@_name']]: item['#text'],
+		}), {});
+		
+		result.realtime = _.get(config, 'indexConfig.rt', false);
+		result.directoryFactoryClass = _.get(config, 'directoryFactory.@_class');
+		result.directoryFactory = '';
+
+		if (result.directoryFactoryClass === 'solr.EncryptedFSDirectoryFactory') {
+			result.directoryFactory = 'encrypted';
+			result.directoryFactoryClass = '';
+		}
+		if (result.directoryFactoryClass === 'solr.StandardDirectoryFactory') {
+			result.directoryFactory = 'standard';
+			result.directoryFactoryClass = '';
+		}
+
+		if (autoCommitTime) {
+			result.autoCommitTime = autoCommitTime;
+		}
+
+		if (defaultQueryFieldHandler) {
+			result.defaultQueryField = defaultQueryFieldHandler.lst.str['#text'];
+		}
+
+		if (filterCache) {
+			result.filterCacheLowWaterMark = filterCache['@_lowWaterMarkMB'];
+			result.filterCacheHighWaterMark = filterCache['@_highWaterMarkMB'];
+		}
+
+		if (!_.isEmpty(mergeScheduler)) {
+			if (mergeScheduler.maxThreadCount) {
+				result.mergeMaxThreadCount = mergeScheduler.maxThreadCount;
+			}
+			if (mergeScheduler.maxMergeCount) {
+				result.mergeMaxMergeCount = mergeScheduler.maxMergeCount;
+			}
+		}
+
+		return result;
+	};
+
+	const getSearchIndex = (indexData) => {
+		if (_.isEmpty(indexData)) {
+			return {};
+		}
+
+		const schema = xmlParser.parse(indexData['schema'], { parseAttributeValue: true, ignoreAttributes: false }).schema;
+		const config = xmlParser.parse(indexData['config'], { parseAttributeValue: true, ignoreAttributes: false }).config;
+
+		const searchIndexColumns = schema.fields.field.filter(field => (
+			field['@_name'] !== schema.uniqueKey
+			&&
+			field['@_name'] !== '_partitionKey'
+		)).map(field => {
+			return {
+				key: [field['@_name']],
+				indexed: Boolean(field['@_indexed']),
+				docValues: Boolean(field['@_docValues']),
+			};
+		});
+
+		const searchIndexConfig = getSearchIndexConfig(config);
+
+		return {
+			searchIndex: true,
+			searchIndexColumns,
+			searchIndexConfig,
+		};
+	};
+
 	const getIndexKey = (target) => {
-		return target;
+		const isValues = /^values\(([\s\S]+)\)$/i;
+		const isEntries = /^entries\(([\s\S]+)\)$/i;
+		const isKeys = /^keys\(([\s\S]+)\)$/i;
+		let type = '';
+		let name = target;
+
+		if (isValues.test(target)) {
+			type = 'values';
+			name = target.match(isValues)[1];
+		}
+
+		if (isEntries.test(target)) {
+			type = 'entries';
+			name = target.match(isEntries)[1];
+		}
+
+		if (isKeys.test(target)) {
+			type = 'keys';
+			name = target.match(isKeys)[1];
+		}
+
+		return {
+			type,
+			name,
+		};
 	};
 	
 	const handleUdts = (udts) => {
@@ -757,7 +901,7 @@ module.exports = (_) => {
 			packageData.bucketInfo = getKeyspaceInfo(data.keyspaceName);
 			packageData.bucketInfo.UDFs = data.UDFs;
 			packageData.bucketInfo.UDAs = data.UDAs;
-			packageData.entityLevel = getEntityLevelData(data.table, data.tableName);
+			packageData.entityLevel = getEntityLevelData(data.table, data.tableName, data.searchIndex);
 			const udtHash = [];
 			const mergedDocument = mergeDocuments(data.records);
 			const schema = getTableSchema(data.table.columns, udtHash, mergedDocument);
@@ -1000,6 +1144,7 @@ module.exports = (_) => {
 		getViews,
 		getViewsNames,
 		splitEntityNames,
-		filterNullItems
+		filterNullItems,
+		describeSearchIndexes
 	};
 }

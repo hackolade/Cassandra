@@ -1,4 +1,17 @@
 {
-	"unneededFieldProps": ["collectionName", "name", "users", "indexes", "collectionUsers", "additionalProperties", "compositeClusteringKey", "compositePartitionKey", "SecIndxKey", "SecIndxs", "compositeKey"],
-	"removeIfPropsNegative": ["partitionKey", "sortKey"]
+	"unneededFieldProps": [
+		"collectionName",
+		"name",
+		"users",
+		"indexes",
+		"collectionUsers",
+		"additionalProperties",
+		"compositeClusteringKey",
+		"compositePartitionKey",
+		"compositeKey"
+	],
+	"removeIfPropsNegative": [
+		"partitionKey",
+		"sortKey"
+	]
 }

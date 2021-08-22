@@ -12,6 +12,7 @@ const {
 	CREATE_VIEW_COMMAND,
 	ADD_BUCKET_DATA_COMMAND,
 	ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+	ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND,
 	UPDATE_BUCKET_COMMAND,
 	UPDATE_ENTITY_LEVEL_DATA_COMMAND,
 	UPDATE_VIEW_LEVEL_DATA_COMMAND,
@@ -32,6 +33,7 @@ const ALLOWED_COMMANDS = [
 	CqlParser.RULE_alterKeyspace,
 	CqlParser.RULE_alterMaterializedView,
 	CqlParser.RULE_createIndex,
+	CqlParser.RULE_createSearchIndex,
 	CqlParser.RULE_alterType
 ];
 
@@ -51,6 +53,8 @@ class Visitor extends CqlParserVisitor {
 		const bucketName = this.getKeyspaceName(ctx);
 		const optionsContext = ctx.withElement();
 		const options = optionsContext ? this.visit(optionsContext) : { partitionKey: [], clusteringKey: []};
+		const comments = removeQuotes(options?.comment || '');
+		delete options?.comment;
 		
 		return {
 			type: CREATE_COLLECTION_COMMAND,
@@ -62,6 +66,7 @@ class Visitor extends CqlParserVisitor {
 				properties,
 			},
 			entityLevelData: {
+				comments,
 				tableOptions: options,
 				compositePartitionKey: keyData.partitionKey,
 				compositeClusteringKey: mergeClusteringKeys(options.clusteringKey, keyData.clusteringKey ),
@@ -72,7 +77,7 @@ class Visitor extends CqlParserVisitor {
 	visitCreateKeyspace(ctx) {
 		const name = this.getKeyspaceName(ctx)
 		const replicationProperties = this.visit(ctx.replicationList());
-		const durableWrites = !!(this.visit(ctx.durableWrites()));
+		const durableWrites = ctx.durableWrites() ? !!(this.visit(ctx.durableWrites())) : true;
 
 		return {
 			type: CREATE_BUCKET_COMMAND,
@@ -90,6 +95,8 @@ class Visitor extends CqlParserVisitor {
 		const columns = this.visit(ctx.columnList());
 		const optionsContext = ctx.materializedViewOptions();
 		const options = optionsContext ? this.visit(optionsContext) : {};
+		const comments = removeQuotes(options?.comment || '');
+		delete options?.comment;
 		const schema = getViewSchema(table, columns);
 		const keyspace = ctx.keyspace()[0];
 		const bucketName = keyspace ? this.visit(keyspace) : '';
@@ -103,6 +110,7 @@ class Visitor extends CqlParserVisitor {
 			collectionName: table,
 			jsonSchema: { properties: schema },
 			data: {
+				comments,
 				tableOptions: options,
 				compositePartitionKey: keyData.partitionKey,
 				compositeClusteringKey: keyData.clusteringKey
@@ -110,19 +118,105 @@ class Visitor extends CqlParserVisitor {
 		};
 	}
 
-	visitCreateIndex(ctx) {
+	visitSecondaryIndex(ctx) {
 		const keyspace = this.getKeyspaceName(ctx);
 		const column = this.visit(ctx.indexColumnSpec());
 		const nameContext = ctx.indexName();
 		const name = nameContext ? this.visit(nameContext) : '';
-		
 		return {
 			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
 			bucketName: keyspace,
 			collectionName: this.visit(ctx.table()),
 			name,
-			column
+			column: column.name,
+			columnType: column.type
 		};
+	}
+
+	visitCustomIndex(ctx) {
+		const keyspace = this.getKeyspaceName(ctx);
+		const column = this.visit(ctx.indexColumnSpec());
+		const nameContext = ctx.indexName();
+		const name = nameContext ? this.visit(nameContext) : '';
+		const customOptions = {
+			case_sensitive: ctx.caseSensitiveOption ? ctx.caseSensitiveOption.getText().toLowerCase() === `'true'` : false,
+			normalize: ctx.normalizeOption ? ctx.normalizeOption.getText().toLowerCase() === `'true'` : false	,
+			ascii: ctx.asciiOption ? ctx.asciiOption.getText().toLowerCase() === `'true'` : false	
+		}
+		return {
+			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
+			bucketName: keyspace,
+			collectionName: this.visit(ctx.table()),
+			name,
+			column: column.name,
+			columnType: column.type,
+			indexType: 'custom',
+			customOptions
+		};
+	}
+
+	visitCreateSearchIndex(ctx){
+		return {
+			type: ADD_COLLECTION_LEVEL_SEARCH_INDEX_COMMAND,
+			bucketName: this.getKeyspaceName(ctx),
+			collectionName: this.visit(ctx.table()),
+			searchIndex: true,
+			searchIndexColumns: this.visitIfExists(ctx,'searchIndexColumnList'),
+			searchIndexProfiles: this.visitIfExists(ctx, 'searchIndexProfiles'),
+			searchIndexConfig: this.visitIfExists(ctx, 'searchIndexConfigs'),
+			searchIndexOptions: this.visitIfExists(ctx, 'searchIndexOptions')
+		};
+	}
+
+	visitSearchIndexOptions(ctx){
+		return {
+			recovery: ctx.recoveryOption ? ctx.recoveryOption.getText().toLowerCase() === `true`: false,
+			reindex: ctx.reindexOption ? ctx.reindexOption.getText().toLowerCase() === `true`: false,
+			lenient: ctx.lenientOption ? ctx.lenientOption.getText().toLowerCase() === `true`: false
+		}
+	}
+
+	visitSearchIndexConfigs(ctx){
+		return {
+			autoCommitTime: ctx.autoCommitTimeConfig ? ctx.autoCommitTimeConfig.getText(): 1000,
+			defaultQueryField: ctx.defaultQueryFieldConfig ? removeQuotes(ctx.defaultQueryFieldConfig.getText()): '',
+			directoryFactory: ctx.directoryFactoryConfig ? removeQuotes(ctx.directoryFactoryConfig.getText()): '',
+			filterCacheLowWaterMark: ctx.filterCacheLowWaterMarkConfig ? ctx.filterCacheLowWaterMarkConfig.getText() : 1024,
+			filterCacheHighWaterMark: ctx.filterCacheHighWaterMarkConfig ? ctx.filterCacheHighWaterMarkConfig.getText() : 2048,
+			directoryFactoryClass: ctx.directoryFactoryClassConfig ? removeQuotes(ctx.directoryFactoryClassConfig.getText()) : '',
+			mergeMaxThreadCount: ctx.mergeMaxThreadCountConfig ? ctx.mergeMaxThreadCountConfig.getText(): '',
+			mergeMaxMergeCount: ctx.mergeMaxMergeCountConfig ? ctx.mergeMaxMergeCountConfig.getText() : '',
+			ramBufferSize: ctx.ramBufferSizeConfig ? ctx.ramBufferSizeConfig.getText() : 512,
+			realtime: ctx.realtimeConfig ? ctx.realtimeConfig.getText().toLowerCase() === `true` : false	
+		}
+	}
+	
+	visitSearchIndexProfiles(ctx){
+		return ctx.getText()
+	}
+	
+	visitSearchIndexColumnList(ctx){
+		return this.visit(ctx.searchIndexColumn())
+	}
+
+	visitSearchIndexColumn(ctx){
+		let key;
+		if(ctx.star){
+			key  = '*'
+		}else{
+			key  = ctx.column().getText()
+		}
+		const copyField = ctx.copyFieldOption ? ctx.copyFieldOption.getText().toLowerCase() === `true` : false;
+		const docValues = ctx.docValuesOption ? ctx.docValuesOption.getText().toLowerCase() === `true` : false;
+		const excluded = ctx.excludedOption ? ctx.excludedOption.getText().toLowerCase() === `true` : false;
+		const indexed = ctx.indexedOption ? ctx.indexedOption.getText().toLowerCase() === `true` : false;
+		return {
+			key:[key],
+			copyField,
+			docValues,
+			excluded,
+			indexed
+		}
 	}
 
 	visitCreateType(ctx) {
@@ -341,25 +435,48 @@ class Visitor extends CqlParserVisitor {
 	}
 
 	visitIndexColumnSpec(ctx) {
-		const columnContext = ctx.column();
+		if(ctx.column()){
+			return {
+				name: this.visit(ctx.column()),
+				type: ''
+			};
+		}
 		const keysContext = ctx.indexKeysSpec();
 		const entriesContext = ctx.indexEntriesSSpec();
 		const fullContext = ctx.indexFullSpec();
-		const context = columnContext || keysContext || entriesContext || fullContext;
+		const valuesContext = ctx.indexValuesSpec();
+
+		const context = keysContext || entriesContext || fullContext || valuesContext;
 
 		return this.visit(context);
 	}
 
 	visitIndexKeysSpec(ctx) {
-		return this.visit(ctx.column());
+		return {
+			name: this.visit(ctx.column()),
+			type: 'keys'
+		};
 	}
 
 	visitIndexEntriesSSpec(ctx) {
-		return this.visit(ctx.column());
+		return {
+			name: this.visit(ctx.column()),
+			type: 'entries'
+		};
 	}
 
 	visitIndexFullSpec(ctx) {
-		return this.visit(ctx.column());
+		return {
+			name: this.visit(ctx.column()),
+			type: 'full'
+		};
+	}
+
+	visitIndexValuesSpec(ctx) {
+		return {
+			name: this.visit(ctx.column()),
+			type: 'values'
+		};
 	}
 
 	visitColumnList(ctx) {
@@ -400,7 +517,7 @@ class Visitor extends CqlParserVisitor {
 				}
 			}
 
-			const key = tableOptionsHashMap[data.key.toLowerCase()] || data.key.toLowerCase();
+			const key = tableOptionsHashMap[data.key.toLowerCase()];
 			if (key === 'caching') {
 				return {
 					...options,
@@ -409,6 +526,19 @@ class Visitor extends CqlParserVisitor {
 			}
 
 			const value = isNaN(data.value) ? removeQuotes(data.value || '') : Number(data.value);
+			if (!key) {
+				const otherProperties = options.otherProperties || [];
+				return {
+					...options,
+					otherProperties: [
+						...otherProperties,
+						{
+							name: data.key,
+							value
+						},
+					], 
+				}
+			}
 
 			return {
 				...options,
@@ -536,7 +666,8 @@ class Visitor extends CqlParserVisitor {
 
 	visitCompoundKey(ctx) {
 		const partitionKey =  [ this.visit(ctx.partitionKey()) ];
-		const clusteringKey = this.visit(ctx.clusteringKeyList());
+		const clusteringKeyList = ctx.clusteringKeyList();
+		const clusteringKey = clusteringKeyList ? this.visit(clusteringKeyList) : [];
 
 		return {
 		 	partitionKey, clusteringKey
@@ -545,7 +676,8 @@ class Visitor extends CqlParserVisitor {
 
 	visitCompositeKey(ctx) {
 		const partitionKey = this.visit(ctx.partitionKeyList());
-		const clusteringKey = this.visit(ctx.clusteringKeyList());
+		const clusteringKeyList = ctx.clusteringKeyList();
+		const clusteringKey = clusteringKeyList ? this.visit(clusteringKeyList) : [];
 
 		return {
 		 	partitionKey, clusteringKey
@@ -652,6 +784,14 @@ class Visitor extends CqlParserVisitor {
 
 		return keyspaceContext ? this.visit(keyspaceContext) : '';
 	}
+
+	visitIfExists(ctx, funcName, defaultValue) {
+		try {
+			return this.visit(ctx[funcName]());
+		} catch (e) {
+			return defaultValue;
+		}
+	}
 }
 
 const getName = context => {
@@ -661,7 +801,7 @@ const getName = context => {
 	return removeQuotes(context.getText());
 }
 
-const removeQuotes = string => string.replace(/^(['"])(.*)\1$/, '$2');
+const removeQuotes = string => string.replace(/^(['"])([\s\S]*)\1$/m, '$2');
 
 const listToJson = list => list.filter(Boolean).reduce((properties, data, index) => {
 	if (index % 2 === 0) {
@@ -735,6 +875,7 @@ const getTargetType = (type) => {
 };
 
 const tableOptionsHashMap = {
+	'comment': 'comment',
 	'caching': 'caching',
 	'compression': 'compression',
 	'compaction': 'compaction',
@@ -761,7 +902,21 @@ const getViewSchema = (tableName, columns) => {
 
 const getCachingOptionValue = value => {
 	try {
-		return JSON.parse(value.replace(/'/g, '"'));
+		const data = JSON.parse(value.replace(/'/g, '"'));
+		return Object.keys(data).reduce((options, name) => {
+			const key = name.toLowerCase();
+			if (key === 'rows_per_partition') {
+				return {
+					...options,
+					rowsPerPartition: data[name]
+				}
+			}
+
+			return {
+				...options,
+				[key]: data[name]
+			}
+		}, {});
 	} catch (err) {
 		return {};
 	}

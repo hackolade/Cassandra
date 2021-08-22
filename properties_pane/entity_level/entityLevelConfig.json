@@ -302,59 +302,359 @@ making sure that you maintain a proper JSON format.
 		"columnsRatio": [3.7, 5]
 	},
 	{
-		"lowerTab": "Secondary Indexes",
-		"structure": [{
-			"propertyName": "Secondary Index",
-			"propertyType": "group",
-			"propertyKeyword": "SecIndxs",
-			"propertyTooltip": "",
-			"structure": [
-				{
-					"propertyName": "Name",
-					"propertyKeyword": "name",
-					"propertyTooltip": "",
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Key",
-					"propertyKeyword": "SecIndxKey",
-					"propertyType": "fieldList",
-					"template": "orderedList",
-					"attributeList": [
-						"ascending",
-						"descending"
+		"lowerTab": "Indexes",
+		"structure": [
+			{
+				"propertyName": "Indexes",
+				"propertyType": "group",
+				"propertyKeyword": "SecIndxs",
+				"propertyTooltip": "",
+				"structure": [
+					{
+						"propertyName": "Name",
+						"propertyKeyword": "name",
+						"propertyTooltip": "",
+						"propertyType": "text"
+					},
+					{
+						"propertyName": "Activated",
+						"propertyKeyword": "isActivated",
+						"propertyTooltip": "Deactivated item will be not included in FE script",
+						"propertyType": "checkbox",
+						"defaultValue": true
+					},
+					{
+						"propertyName": "Type",
+						"propertyType": "select",
+						"propertyKeyword": "indexType",
+						"defaultValue": "secondary",
+						"options": [
+							{ "name": "Secondary", "value": "secondary" },
+							{ "name": "Custom", "value": "custom" }
+						]
+					},
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "SecIndxKey",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"attributeList": [
+							"",
+							"keys",
+							"values",
+							"entries",
+							"full"
+						],
+						"templateOptions": {
+							"maxFields": 1
+						}
+					},
+					{
+						"propertyName": "Options",
+						"propertyType": "block",
+						"propertyKeyword": "customOptions",
+						"dependency": {
+							"key": "indexType",
+							"value": "custom"
+						},
+						"structure": [
+							{
+								"propertyName": "case_sensitive",
+								"propertyKeyword": "case_sensitive",
+								"propertyType": "checkbox",
+								"propertyTooltip": "Ignore case in matching string values.",
+								"defaultValue": true
+							},
+							{
+								"propertyName": "normalize",
+								"propertyKeyword": "normalize",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, perform Unicode normalization on indexed strings."
+							},
+							{
+								"propertyName": "ascii",
+								"propertyKeyword": "ascii",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, SAI converts alphabetic, numeric, and symbolic characters that are not in the Basic Latin Unicode block (the first 127 ASCII characters) to the ASCII equivalent, if one exists."
+							}
+						]
+					},
+					{
+						"propertyName": "Description",
+						"propertyKeyword": "SecIndxDescription",
+						"propertyTooltip": "description",
+						"propertyType": "details",
+						"template": "textarea"
+					},
+					{
+						"propertyName": "Comments",
+						"propertyKeyword": "SecIndxComments",
+						"shouldValidate": false,
+						"propertyTooltip": "comments",
+						"propertyType": "details",
+						"template": "textarea"
+					}
+				]
+			},
+			{
+				"propertyName": "Search Index",
+				"propertyKeyword": "searchIndexDivider",
+				"propertyType": "empty",
+				"dependency":{
+					"type": "not",
+					"values": {
+						"level": "model",
+						"key": "dbVersion",
+						"value": "Astra DB"
+					}
+				}
+			},
+			{
+				"propertyName": "Enable",
+				"propertyType": "checkbox",
+				"propertyKeyword": "searchIndex",
+				"dependency":{
+					"type": "not",
+					"values": {
+						"level": "model",
+						"key": "dbVersion",
+						"value": "Astra DB"
+					}
+				}
+			},
+			{
+				"propertyName": "Columns",
+				"propertyType": "group",
+				"propertyKeyword": "searchIndexColumns",
+				"propertyTooltip": "",
+				"dependency": {
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
 					]
 				},
-				{
-					"propertyName": "Id",
-					"propertyKeyword": "SecIndxID",
-					"propertyTooltip": "Secondary Index ID",
-					"propertyType": "text"
+				"structure": [
+					{
+						"propertyName": "Key",
+						"propertyKeyword": "key",
+						"propertyType": "fieldList",
+						"template": "orderedList",
+						"templateOptions": {
+							"maxFields": 1
+						}
+					},
+					{
+						"propertyName": "copyField",
+						"propertyKeyword": "copyField",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Set to true to create a new field copied from the specified columns with type StrField. Duplicates the data from the original field into the new field. Use for columns that require both search and faceting."
+					},
+					{
+						"propertyName": "docValues",
+						"propertyKeyword": "docValues",
+						"propertyType": "checkbox",
+						"propertyTooltip": "Creates a forward index on each specified column."
+					},
+					{
+						"propertyName": "excluded",
+						"propertyKeyword": "excluded",
+						"propertyType": "checkbox",
+						"propertyTooltip": "exclude the listed columns and all fields in the columns from the index."
+					},
+					{
+						"propertyName": "indexed",
+						"propertyKeyword": "indexed",
+						"propertyType": "checkbox",
+						"propertyTooltip": "include the specified fields in the index.",
+						"defaultValue": true
+					}
+				]
+			},
+			{
+				"propertyName": "Profiles",
+				"propertyType": "select",
+				"propertyKeyword": "searchIndexProfiles",
+				"propertyTooltip": "",
+				"dependency": {
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
-				{
-					"propertyName": "Description",
-					"propertyKeyword": "SecIndxDescription",
-					"propertyTooltip": "description",
-					"propertyType": "details",
-					"template": "textarea"
+				"options": [
+					"",
+					"spaceSavingAll",
+					"spaceSavingNoJoin",
+					"spaceSavingSlowTriePrecision"
+				]
+			},
+			{
+				"propertyName": "Config",
+				"propertyType": "block",
+				"propertyKeyword": "searchIndexConfig",
+				"propertyTooltip": "",
+				"dependency": {
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
-				{
-					"propertyName": "Function",
-					"propertyKeyword": "SecIndxFunction",
-					"propertyTooltip": "description",
-					"propertyType": "details",
-					"template": "textarea",
-					"markdown": false
+				"structure": [
+					{
+						"propertyName": "autoCommitTime",
+						"propertyKeyword": "autoCommitTime",
+						"propertyType": "numeric",
+						"valueType": "integer",
+						"allowNegative": false,
+						"defaultValue": 10000
+					},
+					{
+						"propertyName": "defaultQueryField",
+						"propertyKeyword": "defaultQueryField",
+						"propertyType": "text",
+						"propertyTooltip": "Name of the field"
+					},
+					{
+						"propertyName": "directoryFactory",
+						"propertyKeyword": "directoryFactory",
+						"propertyType": "select",
+						"propertyTooltip": "Can be used as an alternative to the directoryFactoryClass option",
+						"options": [
+							"",
+							"standard",
+							"encrypted"
+						]
+					},
+					{
+						"propertyName": "filterCacheLowWaterMark",
+						"propertyKeyword": "filterCacheLowWaterMark",
+						"propertyType": "numeric",
+						"valueType": "integer",
+						"allowNegative": false,
+						"defaultValue": 1024
+					},
+					{
+						"propertyName": "filterCacheHighWaterMark",
+						"propertyKeyword": "filterCacheHighWaterMark",
+						"propertyType": "numeric",
+						"valueType": "integer",
+						"allowNegative": false,
+						"defaultValue": 2048
+					},
+					{
+						"propertyName": "directoryFactoryClass",
+						"propertyKeyword": "directoryFactoryClass",
+						"propertyType": "text",
+						"propertyTooltip": "Specifies the fully-qualified name of the directory factory. Use in place of the directoryFactory option for directory factories other than the standard or encrypted directory factory."
+					},
+					{
+						"propertyName": "mergeMaxThreadCount",
+						"propertyKeyword": "mergeMaxThreadCount",
+						"propertyType": "numeric",
+						"valueType": "integer",
+						"allowNegative": false,
+						"propertyTooltip": "Must configure with mergeMaxMergeCount"
+					},
+					{
+						"propertyName": "mergeMaxMergeCount",
+						"propertyKeyword": "mergeMaxMergeCount",
+						"propertyType": "numeric",
+						"valueType": "integer",
+						"allowNegative": false,
+						"propertyTooltip": "Must configure with mergeMaxThreadCount"
+					},
+					{
+						"propertyName": "ramBufferSize",
+						"propertyKeyword": "ramBufferSize",
+						"propertyType": "numeric",
+						"valueType": "integer",
+						"allowNegative": false,
+						"defaultValue": 512
+					},
+					{
+						"propertyName": "realtime",
+						"propertyKeyword": "realtime",
+						"propertyType": "checkbox"
+					}
+				]
+			},
+			{
+				"propertyName": "Options",
+				"propertyType": "block",
+				"propertyKeyword": "searchIndexOptions",
+				"propertyTooltip": "",
+				"dependency": {
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
 				},
-				{
-					"propertyName": "Comments",
-					"propertyKeyword": "SecIndxComments",
-					"shouldValidate": false,
-					"propertyTooltip": "comments",
-					"propertyType": "details",
-					"template": "textarea"
-				}
-			]
-		}]
+				"structure": [
+					{
+						"propertyName": "recovery",
+						"propertyKeyword": "recovery",
+						"propertyType": "checkbox",
+						"propertyTooltip": "if the search core is unable to load due to corrupted index, recovers it by deleting and recreating the index. The deleteAll flag is set based on the recovery flag unless deleteAll is specifically set."
+					},
+					{
+						"propertyName": "reindex",
+						"propertyKeyword": "reindex",
+						"propertyType": "checkbox",
+						"defaultValue": true,
+						"propertyTooltip": "reindexes the data. Keeps the current index (accepting reads) while the new index is building."
+					},
+					{
+						"propertyName": "lenient",
+						"propertyKeyword": "lenient",
+						"propertyType": "checkbox",
+						"propertyTooltip": "The SchemaGenerator silently ignores fields of type SpatialRecursivePrefixTreeFieldType (CQL PointType)."
+					}
+				]
+			}
+		]
 	}
 ]

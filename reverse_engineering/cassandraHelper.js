@@ -1032,6 +1032,10 @@ module.exports = (_) => {
 			? recordSamplingSettings.absolute.value
 				: Math.round( count/100 * per);
 	};
+
+	const cleanOutComments = (script) => {
+		return script.replace(/\/\*([\s\S]+?)\*\//, '');
+	};
 	
 	const splitScriptByQueries = (script) => {
 		const findFunctionStatements = (script) => {
@@ -1039,6 +1043,9 @@ module.exports = (_) => {
 				.map(item => item.trim().replace(/(^\$\$|\$\$$)/g, ''));
 		};
 		const getPlaceholder = (n) => `\$__HACKOLADE__PLACEHOLDER_${n}__\$`;
+		
+		script = cleanOutComments(script);
+
 		const functionStatements = findFunctionStatements(script);
 	
 		const queries = functionStatements.reduce((script, func, i) => {

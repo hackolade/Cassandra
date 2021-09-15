@@ -615,13 +615,13 @@ class Visitor extends CqlParserVisitor {
 		if (hackoladeType === 'map') {
 			return {
 				...hackoladeType,
-				subtype: `map<${description2.type || ''}>`
+				subtype: `map<${complexTypeMapper(description2.type || '')}>`
 			}
 		}
 
 		return {
 			...hackoladeType,
-			subtype: `${hackoladeType.type}<${description1.type || ''}>`,
+			subtype: `${hackoladeType.type}<${complexTypeMapper(description1.type || '')}>`,
 			items: description1
 		}
 	}
@@ -873,6 +873,26 @@ const getTargetType = (type) => {
 		  return;
 	}
 };
+
+const complexTypeMapper = type => {
+	switch(type) {
+		case "number":
+		  return "num";
+		case "char":
+		  return "str";
+		case "timestamp":
+			return "ts";
+		case "blob":
+		case "date":
+		case "tuple":
+		case "list":
+		case "set":
+		case "map":
+		  return type;
+		default:
+		  return "udt";
+	}
+}
 
 const tableOptionsHashMap = {
 	'comment': 'comment',

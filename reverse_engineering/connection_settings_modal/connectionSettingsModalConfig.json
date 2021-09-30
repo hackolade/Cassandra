@@ -82,17 +82,50 @@
 		"lowerTab": "Authentication",
 		"structure": [
 			{
-				"inputLabel": "User Name",
+				"inputLabel": "Authentication type",
+				"inputKeyword": "authType",
+				"inputType": "select",
+				"defaultValue": "credentials",
+				"options": [{
+					"label": "Credentials",
+					"value": "credentials"
+				}, {
+					"label": "Token-based",
+					"value": "tokenBased"
+				}]
+			},
+			{
+				"inputLabel": "Username",
 				"inputKeyword": "user",
 				"inputType": "text",
-				"inputPlaceholder": "User Name"
-				
+				"inputPlaceholder": "Username",
+				"dependency": {
+					"key": "authType",
+					"value": "credentials"
+				}
 			},
 			{
 				"inputLabel": "Password",
 				"inputKeyword": "password",
 				"inputType": "password",
-				"isHiddenKey": true
+				"inputPlaceholder": "pwd",
+				"isHiddenKey": true,
+				"dependency": {
+					"key": "authType",
+					"value": "credentials"
+				}
+			}
+			,
+			{
+				"inputLabel": "Astra token",
+				"inputKeyword": "astraToken",
+				"inputType": "password",
+				"isHiddenKey": true,
+				"inputPlaceholder": "AstraCS:xyz...",
+				"dependency": {
+					"key": "authType",
+					"value": "tokenBased"
+				}
 			}
 		]	
 	}, {

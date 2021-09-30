@@ -1,10 +1,10 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.74",
-	"versionDate": "2021-04-09",
+	"version": "0.1.86",
+	"versionDate": "2021-09-29",
 	"author": "hackolade",
 	"engines": {
-		"hackolade": "4.3.16",
+		"hackolade": "5.1.3",
 		"hackoladePlugin": "1.2.0"
 	},
 	"contributes": {
@@ -17,7 +17,8 @@
 				"4.x",
 				"DSE 4.x",
 				"DSE 5.x",
-				"DSE 6.x"
+				"DSE 6.x",
+				"Astra DB"
 			]
 		},
 		"features": {

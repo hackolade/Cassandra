@@ -308,6 +308,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Indexes",
 				"propertyType": "group",
 				"propertyKeyword": "SecIndxs",
+				"erdIndexAbbr": "2I",
 				"propertyTooltip": "",
 				"structure": [
 					{
@@ -425,6 +426,7 @@ making sure that you maintain a proper JSON format.
 			{
 				"propertyName": "Columns",
 				"propertyType": "group",
+				"erdIndexAbbr": "SI",
 				"propertyKeyword": "searchIndexColumns",
 				"propertyTooltip": "",
 				"dependency": {

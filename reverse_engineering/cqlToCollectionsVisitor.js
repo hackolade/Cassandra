@@ -192,7 +192,21 @@ class Visitor extends CqlParserVisitor {
 	}
 	
 	visitSearchIndexProfiles(ctx){
-		return ctx.getText()
+		let profiles = ctx.getText();
+
+		if (typeof profiles === 'string') {
+			profiles = profiles.split(',').map(item => item.trim());
+		}
+
+		if (profiles.map(item => item.toLowerCase()).includes('spacesavingall')) {
+			return [
+				"spaceSavingNoJoin",
+				"spaceSavingNoTextfield",
+				"spaceSavingSlowTriePrecision"
+			];
+		}
+
+		return profiles;
 	}
 	
 	visitSearchIndexColumnList(ctx){

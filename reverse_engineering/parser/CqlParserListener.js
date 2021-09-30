@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
+// Generated from grammars/CqlParser.g4 by ANTLR 4.8
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -962,6 +962,15 @@ CqlParserListener.prototype.enterSearchIndexOptions = function(ctx) {
 
 // Exit a parse tree produced by CqlParser#searchIndexOptions.
 CqlParserListener.prototype.exitSearchIndexOptions = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#searchIndexProfile.
+CqlParserListener.prototype.enterSearchIndexProfile = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#searchIndexProfile.
+CqlParserListener.prototype.exitSearchIndexProfile = function(ctx) {
 };
 
 
@@ -2078,6 +2087,15 @@ CqlParserListener.prototype.enterKwSpaceSavingSlowTriePrecision = function(ctx) 
 
 // Exit a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
 CqlParserListener.prototype.exitKwSpaceSavingSlowTriePrecision = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
+CqlParserListener.prototype.enterKwSpaceSavingNoTextField = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
+CqlParserListener.prototype.exitKwSpaceSavingNoTextField = function(ctx) {
 };
 
 

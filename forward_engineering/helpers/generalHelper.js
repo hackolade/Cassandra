@@ -32,13 +32,31 @@ const retrieveIndexes = (entityConfig) => {
 			indexType: 'search',
 			columns: indexTab.searchIndexColumns,
 			config: indexTab.searchIndexConfig,
-			profiles: [indexTab.searchIndexProfiles].filter(Boolean),
+			profiles: getIndexProfiles(indexTab.searchIndexProfiles),
 			options: indexTab.searchIndexOptions,
 		};
 	}
 
 	return result;
 };
+const getIndexProfiles = (searchIndexProfiles) => {
+	if (!Array.isArray(searchIndexProfiles)) {
+		return [searchIndexProfiles].filter(Boolean);
+	}
+	
+	const isSpaceSavingAll = [
+		"spaceSavingNoJoin",
+		"spaceSavingNoTextfield",
+		"spaceSavingSlowTriePrecision"
+	].every(item => searchIndexProfiles.includes(item));
+
+	if (isSpaceSavingAll) {
+		return ['spaceSavingAll'];
+	}
+
+	return searchIndexProfiles;
+};
+
 const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
 const getNameWithKeyspace = (keyspaceName, name) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}${name}`;
 

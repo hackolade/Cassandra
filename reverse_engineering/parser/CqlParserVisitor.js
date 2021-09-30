@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
+// Generated from grammars/CqlParser.g4 by ANTLR 4.8
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -644,6 +644,12 @@ CqlParserVisitor.prototype.visitDirectoryFactory = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#searchIndexOptions.
 CqlParserVisitor.prototype.visitSearchIndexOptions = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexProfile.
+CqlParserVisitor.prototype.visitSearchIndexProfile = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -1388,6 +1394,12 @@ CqlParserVisitor.prototype.visitKwSpaceSavingAll = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
 CqlParserVisitor.prototype.visitKwSpaceSavingSlowTriePrecision = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
+CqlParserVisitor.prototype.visitKwSpaceSavingNoTextField = function(ctx) {
   return this.visitChildren(ctx);
 };
 

@@ -542,10 +542,15 @@ searchIndexOptions
                            RC_BRACKET
    ;
 
-searchIndexProfiles
+searchIndexProfile
    : kwSpaceSavingAll
    | kwSpaceSavingNoJoin
    | kwSpaceSavingSlowTriePrecision
+   | kwSpaceSavingNoTextField
+   ;
+
+searchIndexProfiles
+   : searchIndexProfile (syntaxComma searchIndexProfile)*
    ;
 
 searchIndexColumnList
@@ -1120,6 +1125,10 @@ kwSpaceSavingAll
 
 kwSpaceSavingSlowTriePrecision
    : K_SPACE_SAVING_SLOW_TRIE_PRECISION
+   ;
+
+kwSpaceSavingNoTextField
+   : K_SPACE_SAVING_NO_TEXT_FIELD
    ;
 
 kwCopyField

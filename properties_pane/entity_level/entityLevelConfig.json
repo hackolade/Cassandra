@@ -483,7 +483,7 @@ making sure that you maintain a proper JSON format.
 			},
 			{
 				"propertyName": "Profiles",
-				"propertyType": "select",
+				"propertyType": "multipleCheckboxSelect",
 				"propertyKeyword": "searchIndexProfiles",
 				"propertyTooltip": "",
 				"dependency": {
@@ -504,9 +504,8 @@ making sure that you maintain a proper JSON format.
 					]
 				},
 				"options": [
-					"",
-					"spaceSavingAll",
 					"spaceSavingNoJoin",
+					"spaceSavingNoTextfield",
 					"spaceSavingSlowTriePrecision"
 				]
 			},

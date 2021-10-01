@@ -1,7 +1,10 @@
 const applyToInstance = (cassandraHelper) => (connectionInfo, logger, app) => {
-	const script = connectionInfo.script;
+	let script = connectionInfo.script;
+	if(connectionInfo.clusterType){
+		const usePosition = script.indexOf('USE');
+		script = script.substring(usePosition)
+	}
 	const cassandra = cassandraHelper(app.require('lodash'));
-
 	return cassandra.connect(app)(connectionInfo)
 		.then(() => {
 			logger.log('info', {

@@ -53,7 +53,8 @@ module.exports = {
 			viewData: data.viewData,
 			entityData: data.entityData,
 			containerData: data.containerData,
-			collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap
+			collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap,
+			ifNotExist: viewSchema.viewIfNotExist
 		});
 
 		callback(null, script)
@@ -150,7 +151,8 @@ module.exports = {
 						entityData: data.entityData[viewSchema.viewOn],
 						containerData: data.containerData,
 						collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap,
-						isKeyspaceActivated
+						isKeyspaceActivated,
+						ifNotExist: viewSchema.viewIfNotExist
 					})
 				}));
 

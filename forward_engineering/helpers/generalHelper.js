@@ -34,6 +34,7 @@ const retrieveIndexes = (entityConfig) => {
 			config: indexTab.searchIndexConfig,
 			profiles: getIndexProfiles(indexTab.searchIndexProfiles),
 			options: indexTab.searchIndexOptions,
+			ifNotExist: indexTab.searchIndexIfNotExist
 		};
 	}
 

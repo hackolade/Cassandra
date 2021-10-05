@@ -109,7 +109,8 @@ module.exports = {
 		entityData,
 		containerData,
 		collectionRefsDefinitionsMap,
-		isKeyspaceActivated = true
+		isKeyspaceActivated = true,
+		ifNotExist = false
 	}) {
 		setDependencies(dependencies);
 		let script = [];
@@ -127,8 +128,7 @@ module.exports = {
 
 		const primaryKeyScript = getPrimaryKeyScript(collectionRefsDefinitionsMap, viewData, isViewChildrenActivated);
 		const optionsScript = getOptionsScript(collectionRefsDefinitionsMap, viewData);
-
-		script.push(`CREATE MATERIALIZED VIEW IF NOT EXISTS ${name}`);
+		script.push(`CREATE MATERIALIZED VIEW ${ifNotExist? `IF NOT EXISTS `:``}${name}`);
 	
 		if (!columns) {
 			script.push(`AS SELECT * FROM ${tableName};`);

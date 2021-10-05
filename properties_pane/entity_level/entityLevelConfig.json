@@ -141,6 +141,13 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "If not exists",
+				"propertyKeyword": "tableIfNotExist",
+				"propertyTooltip": "If specified, creates the table only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
+				"defaultValue": false,
+				"propertyType": "checkbox"
+			},
+			{
 				"propertyName": "Options",
 				"propertyType": "block",
 				"propertyKeyword": "tableOptions",
@@ -351,6 +358,13 @@ making sure that you maintain a proper JSON format.
 						}
 					},
 					{
+						"propertyName": "If not exists",
+						"propertyKeyword": "indexIfNotExist",
+						"propertyTooltip": "If specified, creates the index only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
+						"defaultValue": false,
+						"propertyType": "checkbox"
+					},
+					{
 						"propertyName": "Options",
 						"propertyType": "block",
 						"propertyKeyword": "customOptions",
@@ -510,6 +524,30 @@ making sure that you maintain a proper JSON format.
 					"spaceSavingNoTextfield",
 					"spaceSavingSlowTriePrecision"
 				]
+			},
+			{
+				"propertyName": "If not exists",
+				"propertyKeyword": "searchIndexIfNotExist",
+				"propertyTooltip": "If specified, creates the search index only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
+				"defaultValue": false,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Config",

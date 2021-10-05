@@ -27,7 +27,6 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 
 		const isIndexKeyActivated = index.isActivated && isIndexColumnKeyActivated(index.SecIndxKey, dataSources);
 		const columnStatement = getIndexColumnStatement(index.SecIndxKey, dataSources);
-
 		if (index.indexType === 'custom') {
 			indexStatement = getCustomIndex({
 				name: index.name,
@@ -35,12 +34,14 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 				column: columnStatement,
 				using: 'StorageAttachedIndex',
 				options: getCustomOptions(index.customOptions),
+				ifNotExist: index.indexIfNotExist
 			});
 		} else {
-			indexStatement = getIndex(
+			indexStatement =  getIndex(
 				index.name,
 				tableNameStatement,
 				columnStatement,
+				index.indexIfNotExist
 			);
 		}
 
@@ -71,6 +72,7 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 		isActivated: isActivated && isParentActivated,
 		index: searchIndex,
 		columns,
+		ifNotExist: searchIndex.ifNotExist
 	});
 
 	return [{
@@ -91,12 +93,12 @@ const uniqueByName = (columns) => {
 	}, []);
 };
 
-const getIndex = (name, tableName, indexColumnStatement) => (
-	`CREATE INDEX IF NOT EXISTS ${name ? `"${name}"` : ``}\n${tab(`ON ${tableName} (${indexColumnStatement});`)}`	
+const getIndex = (name, tableName, indexColumnStatement, ifNotExist) => (
+	`CREATE INDEX ${ifNotExist ? `IF NOT EXISTS ` : ``}${name ? `"${name}"` : ``}\n${tab(`ON ${tableName} (${indexColumnStatement});`)}`	
 );
 
-const getCustomIndex = ({ name, tableName, column, using, options }) => (
-	`CREATE CUSTOM INDEX IF NOT EXISTS ${name ? `"${name}"` : ``}\n` +
+const getCustomIndex = ({ name, tableName, column, using, options, ifNotExist }) => (
+	`CREATE CUSTOM INDEX ${ifNotExist ? `IF NOT EXISTS ` : ``}${name ? `"${name}"` : ``}\n` +
 	`${tab(`ON ${tableName} (${column})`)}\n` +
 	`${tab(`USING '${using || 'StorageAttachedIndex'}'`)}` +
 	`${Object.keys(options).length ? '\n' + tab(`WITH OPTIONS = {\n${tab(serializeOptions(options).join(',\n'))}\n}`) : ''};`	
@@ -171,15 +173,14 @@ const getCustomOptions = (options) => {
 	return result;
 };
 
-const getSearchIndex = ({ tableName, columns, index, isActivated }) => {
+const getSearchIndex = ({ tableName, columns, index, isActivated, ifNotExist }) => {
 	const columnsStatement = getSearchIndexColumnStatements(getSearchIndexColumns(columns), isActivated);
 	const profiles = index.profiles.length ? `\n${tab(`AND PROFILES ${index.profiles.join(', ')}`)}` : '';
 	const indexConfig = getSearchIndexConfig(index.config);
 	const config = indexConfig ? `\n${tab(`AND CONFIG ${indexConfig}`)}` : '';
 	const indexOptions = getSearchIndexOptions(index.options);
 	const options = indexOptions ? `\n${tab(`AND OPTIONS ${indexOptions}`)}` : '';
-
-	return `CREATE SEARCH INDEX IF NOT EXISTS ON ${tableName}\n` + 
+	return `CREATE SEARCH INDEX ${ifNotExist ? `IF NOT EXISTS ON `:``}${tableName}\n` + 
 		`${tab(`WITH COLUMNS\n${tab(columnsStatement)}`)}` + 
 		profiles + config + options +
 		';';

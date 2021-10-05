@@ -832,9 +832,13 @@ const isFrozen = type => type.toUpperCase() === 'FROZEN';
 const getTargetType = (type) => {
 	type = removeQuotes((type || '').toLowerCase());
 	switch(type) {
+		case "int":
+		  return {
+			type: "numeric",
+			mode: "integer"	
+		  };
 		case "smallint":
 		case "tinyint":
-		case "int":
 		case "bigint":
 		case "counter":
 		case "decimal":

@@ -257,7 +257,8 @@ const addIndexToCollection = (entitiesData, statementData) => {
             name: statementData.name,
             SecIndxKey: [{name: statementData.column, type: statementData.columnType}],
             indexType: statementData.indexType,
-            customOptions: statementData.customOptions
+            customOptions: statementData.customOptions,
+            indexIfNotExist: statementData.indexIfNotExist
         }
     ];
 

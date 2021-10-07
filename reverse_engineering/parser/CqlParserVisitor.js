@@ -1458,6 +1458,12 @@ CqlParserVisitor.prototype.visitKwStorageAttachedIndex = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#kwSASIIndex.
+CqlParserVisitor.prototype.visitKwSASIIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
 CqlParserVisitor.prototype.visitKwSpaceSavingNoJoin = function(ctx) {
   return this.visitChildren(ctx);

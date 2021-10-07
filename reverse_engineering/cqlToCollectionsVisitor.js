@@ -147,7 +147,7 @@ class Visitor extends CqlParserVisitor {
 		const name = nameContext ? this.visit(nameContext) : '';
 		const indexIfNotExist = this.visitFlagValue(ctx, 'ifNotExist');
 		const customOptions = this.visitIfExists(ctx, 'customIndexOption', []).reduce((options, option)=>({...options, ...option}),{});
-		const isSASI = checkIfSASI(customOptions);
+		const isSASI = this.visitFlagValue(ctx, 'kwSASIIndex');
 		return {
 			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
 			bucketName: keyspace,
@@ -194,7 +194,7 @@ class Visitor extends CqlParserVisitor {
 			return {normalizeLowercase: ctx.normalizeLowercaseOption.getText().toLowerCase() === `'true'`}
 		}
 		if(ctx.maxCompactionFlushMemoryInMbOption){
-			return {maxCompactionFlushMemoryInMb: parseInt(ctx.maxCompactionFlushMemoryInMbOption.getText())}
+			return {maxCompactionFlushMemoryInMb: parseInt(ctx.maxCompactionFlushMemoryInMbOption.getText().replaceAll('\'',''),10)}
 		}
 		if(ctx.modeOption){
 			return {mode: ctx.modeOption.getText().replaceAll('\'','')}

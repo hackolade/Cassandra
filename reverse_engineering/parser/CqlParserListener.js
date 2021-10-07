@@ -2180,6 +2180,15 @@ CqlParserListener.prototype.exitKwStorageAttachedIndex = function(ctx) {
 };
 
 
+// Enter a parse tree produced by CqlParser#kwSASIIndex.
+CqlParserListener.prototype.enterKwSASIIndex = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwSASIIndex.
+CqlParserListener.prototype.exitKwSASIIndex = function(ctx) {
+};
+
+
 // Enter a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
 CqlParserListener.prototype.enterKwSpaceSavingNoJoin = function(ctx) {
 };

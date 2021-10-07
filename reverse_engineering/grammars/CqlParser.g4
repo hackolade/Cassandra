@@ -509,7 +509,7 @@ truncate
 
 createIndex
    : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr #secondaryIndex
-   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing kwStorageAttachedIndex (kwWith kwOptions OPERATOR_EQ LC_BRACKET customIndexOption+ RC_BRACKET)? #customIndex
+   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing (kwStorageAttachedIndex | kwSASIIndex) (kwWith kwOptions OPERATOR_EQ LC_BRACKET customIndexOption+ RC_BRACKET)? #customIndex
    ;
 
 customIndexOption
@@ -523,7 +523,7 @@ customIndexOption
    | kwTokenizationNormalizeUppercase COLON tokenizationNormalizeUppercaseOption=booleanLiteral COMMA?
    | kwNormalizeUppercase COLON normalizeUppercaseOption=booleanLiteral COMMA?
    | kwNormalizeLowercase COLON normalizeLowercaseOption=booleanLiteral COMMA?
-   | kwMaxCompactionFlushMemoryInMb COLON maxCompactionFlushMemoryInMbOption=decimalLiteral COMMA?
+   | kwMaxCompactionFlushMemoryInMb COLON maxCompactionFlushMemoryInMbOption=stringLiteral COMMA?
    | kwMode COLON modeOption=stringLiteral COMMA?
    | kwAnalyzerClass COLON analyzerClassOption=stringLiteral COMMA?
    | kwTokenizationLocale COLON tokenizationLocaleOption=stringLiteral COMMA?
@@ -1180,6 +1180,10 @@ kwAnalyzerClass
 
 kwStorageAttachedIndex
    : K_STORAGE_ATTACHED_INDEX
+   ;
+
+kwSASIIndex
+   : K_SASI_INDEX
    ;
 
 kwSpaceSavingNoJoin

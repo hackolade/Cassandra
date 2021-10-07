@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.8
+// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -926,6 +926,15 @@ CqlParserListener.prototype.enterCustomIndex = function(ctx) {
 
 // Exit a parse tree produced by CqlParser#customIndex.
 CqlParserListener.prototype.exitCustomIndex = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#customIndexOption.
+CqlParserListener.prototype.enterCustomIndexOption = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#customIndexOption.
+CqlParserListener.prototype.exitCustomIndexOption = function(ctx) {
 };
 
 
@@ -2051,6 +2060,114 @@ CqlParserListener.prototype.enterKwNormalize = function(ctx) {
 
 // Exit a parse tree produced by CqlParser#kwNormalize.
 CqlParserListener.prototype.exitKwNormalize = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwAnalyzed.
+CqlParserListener.prototype.enterKwAnalyzed = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwAnalyzed.
+CqlParserListener.prototype.exitKwAnalyzed = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwIsLiteral.
+CqlParserListener.prototype.enterKwIsLiteral = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwIsLiteral.
+CqlParserListener.prototype.exitKwIsLiteral = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
+CqlParserListener.prototype.enterKwMaxCompactionFlushMemoryInMb = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
+CqlParserListener.prototype.exitKwMaxCompactionFlushMemoryInMb = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwTokenizationEnableStemming.
+CqlParserListener.prototype.enterKwTokenizationEnableStemming = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwTokenizationEnableStemming.
+CqlParserListener.prototype.exitKwTokenizationEnableStemming = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
+CqlParserListener.prototype.enterKwTokenizationSkipStopWords = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
+CqlParserListener.prototype.exitKwTokenizationSkipStopWords = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwTokenizationLocale.
+CqlParserListener.prototype.enterKwTokenizationLocale = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwTokenizationLocale.
+CqlParserListener.prototype.exitKwTokenizationLocale = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
+CqlParserListener.prototype.enterKwTokenizationNormalizeLowercase = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
+CqlParserListener.prototype.exitKwTokenizationNormalizeLowercase = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
+CqlParserListener.prototype.enterKwTokenizationNormalizeUppercase = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
+CqlParserListener.prototype.exitKwTokenizationNormalizeUppercase = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwNormalizeLowercase.
+CqlParserListener.prototype.enterKwNormalizeLowercase = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwNormalizeLowercase.
+CqlParserListener.prototype.exitKwNormalizeLowercase = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwNormalizeUppercase.
+CqlParserListener.prototype.enterKwNormalizeUppercase = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwNormalizeUppercase.
+CqlParserListener.prototype.exitKwNormalizeUppercase = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwMode.
+CqlParserListener.prototype.enterKwMode = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwMode.
+CqlParserListener.prototype.exitKwMode = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwAnalyzerClass.
+CqlParserListener.prototype.enterKwAnalyzerClass = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwAnalyzerClass.
+CqlParserListener.prototype.exitKwAnalyzerClass = function(ctx) {
 };
 
 

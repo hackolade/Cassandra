@@ -391,6 +391,83 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "ascii",
 								"propertyType": "checkbox",
 								"propertyTooltip": "When set to true, SAI converts alphabetic, numeric, and symbolic characters that are not in the Basic Latin Unicode block (the first 127 ASCII characters) to the ASCII equivalent, if one exists."
+							},
+							{
+								"propertyName": "analyzed",
+								"propertyKeyword": "analyzed",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, the literal column is analyzed using the specified analyzer"
+							},
+							{
+								"propertyName": "is_literal",
+								"propertyKeyword": "isLiteral",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, designates a column as literal."
+							},
+							{
+								"propertyName": "tokenization_enable_stemming",
+								"propertyKeyword": "tokenizationEnableStemming",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, reduce words to their base form."
+							},
+							{
+								"propertyName": "tokenization_normalize_lowercase",
+								"propertyKeyword": "tokenizationNormalizeLowercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, use lowercase."
+							},
+							{
+								"propertyName": "tokenization_normalize_uppercase",
+								"propertyKeyword": "tokenizationNormalizeUppercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, use uppercase."
+							},
+							{
+								"propertyName": "normalize_lowercase",
+								"propertyKeyword": "normalizeLowercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, index all strings as lowercase."
+							},
+							{
+								"propertyName": "normalize_uppercase",
+								"propertyKeyword": "normalizeUppercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, index all strings as uppercase."
+							},
+							{
+								"propertyName": "tokenization_locale",
+								"propertyKeyword": "tokenizationLocale",
+								"propertyTooltip": "",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "tokenization_skip_stop_words",
+								"propertyKeyword": "tokenizationSkipStopWords",
+								"propertyTooltip": "",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "mode",
+								"propertyKeyword": "mode",
+								"propertyTooltip": "",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "analyzer_class",
+								"propertyKeyword": "analyzerClass",
+								"propertyType": "select",
+								"options": [
+									"org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer",
+									"org.apache.cassandra.index.sasi.analyzer.NonTokenizingAnalyzer"
+								]
+							},
+							{
+								"propertyName": "max_compaction_flush_memory_in_mb",
+								"propertyKeyword": "maxCompactionFlushMemoryInMb",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"minValue": 0,
+								"step": 1
 							}
 						]
 					},

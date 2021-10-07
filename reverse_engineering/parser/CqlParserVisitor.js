@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.8
+// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -620,6 +620,12 @@ CqlParserVisitor.prototype.visitSecondaryIndex = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#customIndex.
 CqlParserVisitor.prototype.visitCustomIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#customIndexOption.
+CqlParserVisitor.prototype.visitCustomIndexOption = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -1370,6 +1376,78 @@ CqlParserVisitor.prototype.visitKwAscii = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwNormalize.
 CqlParserVisitor.prototype.visitKwNormalize = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwAnalyzed.
+CqlParserVisitor.prototype.visitKwAnalyzed = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwIsLiteral.
+CqlParserVisitor.prototype.visitKwIsLiteral = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
+CqlParserVisitor.prototype.visitKwMaxCompactionFlushMemoryInMb = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationEnableStemming.
+CqlParserVisitor.prototype.visitKwTokenizationEnableStemming = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
+CqlParserVisitor.prototype.visitKwTokenizationSkipStopWords = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationLocale.
+CqlParserVisitor.prototype.visitKwTokenizationLocale = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
+CqlParserVisitor.prototype.visitKwTokenizationNormalizeLowercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
+CqlParserVisitor.prototype.visitKwTokenizationNormalizeUppercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwNormalizeLowercase.
+CqlParserVisitor.prototype.visitKwNormalizeLowercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwNormalizeUppercase.
+CqlParserVisitor.prototype.visitKwNormalizeUppercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwMode.
+CqlParserVisitor.prototype.visitKwMode = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwAnalyzerClass.
+CqlParserVisitor.prototype.visitKwAnalyzerClass = function(ctx) {
   return this.visitChildren(ctx);
 };
 

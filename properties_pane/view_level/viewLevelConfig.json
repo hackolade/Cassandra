@@ -142,7 +142,6 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "If not exists",
 				"propertyKeyword": "viewIfNotExist",
 				"propertyTooltip": "If specified, creates the view only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
-				"defaultValue": false,
 				"propertyType": "checkbox"
 			},
 			{

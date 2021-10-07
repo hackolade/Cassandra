@@ -32,7 +32,7 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 				name: index.name,
 				tableName: tableNameStatement,
 				column: columnStatement,
-				using: 'StorageAttachedIndex',
+				using: index.isSASI ? 'org.apache.cassandra.index.sasi.SASIIndex' : 'StorageAttachedIndex',
 				options: getCustomOptions(index.customOptions, index.isSASI),
 				ifNotExist: index.indexIfNotExist
 			});

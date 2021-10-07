@@ -451,88 +451,79 @@ making sure that you maintain a proper JSON format.
 								"propertyName": "analyzed",
 								"propertyKeyword": "analyzed",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, the literal column is analyzed using the specified analyzer"
+								"propertyTooltip": "analyzed option. When set to true, the literal column is analyzed using the specified analyzer"
 							},
 							{
-								"propertyName": "is_literal",
+								"propertyName": "is literal",
 								"propertyKeyword": "isLiteral",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, designates a column as literal."
+								"propertyTooltip": "is_literal option. When set to true, designates a column as literal."
 							},
 							{
-								"propertyName": "tokenization_enable_stemming",
+								"propertyName": "tokenization stemming",
 								"propertyKeyword": "tokenizationEnableStemming",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, reduce words to their base form."
+								"propertyTooltip": "tokenization_enable_stemming option. When set to true, reduce words to their base form."
 							},
 							{
-								"propertyName": "tokenization_normalize_lowercase",
+								"propertyName": "tokenization lowercase",
 								"propertyKeyword": "tokenizationNormalizeLowercase",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, use lowercase."
+								"propertyTooltip": "tokenization_normalize_lowercase option. When set to true, use lowercase."
 							},
 							{
-								"propertyName": "tokenization_normalize_uppercase",
+								"propertyName": "tokenization uppercase",
 								"propertyKeyword": "tokenizationNormalizeUppercase",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, use uppercase."
+								"propertyTooltip": "tokenization_normalize_uppercase option. When set to true, use uppercase."
 							},
 							{
-								"propertyName": "normalize_lowercase",
+								"propertyName": "normalize lowercase",
 								"propertyKeyword": "normalizeLowercase",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, index all strings as lowercase."
+								"propertyTooltip": "normalize_lowercase option. When set to true, index all strings as lowercase."
 							},
 							{
-								"propertyName": "normalize_uppercase",
+								"propertyName": "normalize uppercase",
 								"propertyKeyword": "normalizeUppercase",
 								"propertyType": "checkbox",
-
-								"propertyTooltip": "When set to true, index all strings as uppercase."
+								"propertyTooltip": "normalize_uppercase option. When set to true, index all strings as uppercase."
 							},
 							{
-								"propertyName": "tokenization_locale",
+								"propertyName": "tokenization locale",
 								"propertyKeyword": "tokenizationLocale",
-								"propertyTooltip": "",
-
+								"propertyTooltip": "tokenization_locale option.",
 								"propertyType": "text"
 							},
 							{
-								"propertyName": "tokenization_skip_stop_words",
+								"propertyName": "skip stop words",
 								"propertyKeyword": "tokenizationSkipStopWords",
-								"propertyTooltip": "",
-
+								"propertyTooltip": "tokenization_skip_stop_words option.",
 								"propertyType": "text"
 							},
 							{
 								"propertyName": "mode",
 								"propertyKeyword": "mode",
-								"propertyTooltip": "",
-
+								"propertyTooltip": "mode option.",
 								"propertyType": "text"
 							},
 							{
-								"propertyName": "analyzer_class",
+								"propertyName": "analyzer class",
 								"propertyKeyword": "analyzerClass",
 								"propertyType": "select",
-
+								"propertyTooltip": "analyzer_class option.",
 								"options": [
+									"",
 									"org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer",
 									"org.apache.cassandra.index.sasi.analyzer.NonTokenizingAnalyzer"
 								]
 							},
 							{
-								"propertyName": "max_compaction_flush_memory_in_mb",
+								"propertyName": "max compaction flush mb",
 								"propertyKeyword": "maxCompactionFlushMemoryInMb",
 								"propertyType": "numeric",
 								"valueType": "number",
-
+								"propertyTooltip": "max_compaction_flush_memory_in_mb option.",
 								"minValue": 0,
 								"step": 1
 							}

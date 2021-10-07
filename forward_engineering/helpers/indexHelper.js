@@ -33,7 +33,7 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 				tableName: tableNameStatement,
 				column: columnStatement,
 				using: 'StorageAttachedIndex',
-				options: getCustomOptions(index.customOptions),
+				options: getCustomOptions(index.customOptions, index.isSASI),
 				ifNotExist: index.indexIfNotExist
 			});
 		} else {
@@ -151,7 +151,7 @@ const serializeOptions = (options) => {
 	return Object.keys(options).map(option => `'${option}': '${options[option]}'`);
 };
 
-const getCustomOptions = (options) => {
+const getCustomOptions = (options, isSASI) => {
 	let result = {};
 
 	if (!options) {
@@ -166,8 +166,61 @@ const getCustomOptions = (options) => {
 		result.normalize = 'true';
 	}
 
-	if (options.ascii) {
+	if (options.ascii && !isSASI) {
 		result.ascii = 'true';
+	}
+
+	if(!isSASI){
+		return result;
+	}
+
+
+	if (options.analyzed) {
+		result.analyzed = 'true';
+	}
+
+	if (options.isLiteral) {
+		result.is_literal = 'true';
+	}
+
+	if (options.tokenizationEnableStemming) {
+		result.tokenization_enable_stemming = 'true';
+	}
+
+	if (options.tokenizationNormalizeLowercase) {
+		result.tokenization_normalize_lowercase = 'true';
+	}
+
+	if (options.tokenizationNormalizeUppercase) {
+		result.tokenization_normalize_uppercase = 'true';
+	}
+
+	if (options.normalizeLowercase) {
+		result.normalize_lowercase = 'true';
+	}
+
+	if (options.normalizeUppercase) {
+		result.normalize_uppercase = 'true';
+	}
+
+	if (options.tokenizationLocale) {
+		result.tokenization_locale = `${options.tokenizationLocale}`;
+	}
+
+	if (options.tokenizationSkipStopWords) {
+		result.tokenization_skip_stop_words = `${options.tokenizationSkipStopWords}`;
+	}
+
+	if (options.mode) {
+		result.mode = `${options.mode}`;
+	}
+
+	if (options.analyzerClass) {
+		result.analyzer_class = `${options.analyzerClass}`;
+	}
+
+	if (options.maxCompactionFlushMemoryInMb) {
+		result.max_compaction_flush_memory_in_mb = `${options.maxCompactionFlushMemoryInMb}`;
 	}
 
 	return result;

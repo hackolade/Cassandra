@@ -147,6 +147,7 @@ class Visitor extends CqlParserVisitor {
 		const name = nameContext ? this.visit(nameContext) : '';
 		const indexIfNotExist = this.visitFlagValue(ctx, 'ifNotExist');
 		const customOptions = this.visitIfExists(ctx, 'customIndexOption', []).reduce((options, option)=>({...options, ...option}),{});
+		const isSASI = checkIfSASI(customOptions);
 		return {
 			type: ADD_COLLECTION_LEVEL_INDEX_COMMAND,
 			bucketName: keyspace,
@@ -156,7 +157,8 @@ class Visitor extends CqlParserVisitor {
 			columnType: column.type,
 			indexType: 'custom',
 			customOptions,
-			indexIfNotExist
+			indexIfNotExist,
+			isSASI
 		};
 	}
 
@@ -1036,6 +1038,21 @@ const mergeClusteringKeys = (keysWithDirection = [], keys = []) => {
 	const keysWithDirectionNames = keysWithDirection.map(key => key.name);
 
 	return keys.filter(key => !keysWithDirectionNames.includes(key.name)).concat(keysWithDirection);
+}
+
+const checkIfSASI = (options) => {
+	return options.analyzed
+	|| options.isLiteral
+	|| options.tokenizationEnableStemming
+	|| options.tokenizationNormalizeLowercase
+	|| options.tokenizationNormalizeUppercase
+	|| options.normalizeUppercase
+	|| options.normalizeLowercase
+	|| options.maxCompactionFlushMemoryInMb
+	|| options.mode
+	|| options.analyzerClass
+	|| options.tokenizationLocale
+	|| options.tokenizationSkipStopWords
 }
 
 module.exports = Visitor;

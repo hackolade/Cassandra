@@ -248,7 +248,6 @@ const addIndexToCollection = (entitiesData, statementData) => {
     if (entityIndex === -1) {
         return entitiesData;
     }
-    
     const entity = entities[entityIndex];
     const entityLevelData = entity.entityLevelData || {};
     const indexes = [
@@ -258,7 +257,8 @@ const addIndexToCollection = (entitiesData, statementData) => {
             SecIndxKey: [{name: statementData.column, type: statementData.columnType}],
             indexType: statementData.indexType,
             customOptions: statementData.customOptions,
-            indexIfNotExist: statementData.indexIfNotExist
+            indexIfNotExist: statementData.indexIfNotExist,
+            isSASI: statementData.isSASI
         }
     ];
 

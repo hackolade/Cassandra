@@ -157,11 +157,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": true,
 				"propertyTooltip": "description",
 				"propertyType": "numeric",
-				"valueType": "number",
-				"dependency": {
-					"key": "replStrategy",
-					"value": "SimpleStrategy"
-				}
+				"valueType": "number"
 			},
 			{
 				"propertyName": "Data Centers",

@@ -477,10 +477,28 @@ class Visitor extends CqlParserVisitor {
 	visitReplicationList(ctx) {
 		const items = this.visit(ctx.replicationListItem());
 
-		return items.reduce((replicationProperties, item) => ({
-			...replicationProperties,
-			...item
-		}), {});
+		const definedKeys = ['replStrategy', 'replFactor']
+
+		return items.reduce(
+            (replicationProperties, item) => {
+                const key = Object.keys(item)[0];
+
+                if (!definedKeys.includes(key)) {
+                    const dataCenter = { dataCenterName: key, replFactorValue: Number(item[key]) || 0 };
+
+                    return {
+                        ...replicationProperties,
+                        dataCenters: [...replicationProperties.dataCenters, dataCenter],
+                    };
+                }
+
+                return {
+                    ...replicationProperties,
+                    ...item,
+                };
+            },
+            { dataCenters: [] }
+        );
 	}
 
 	visitReplicationListItem(ctx) {

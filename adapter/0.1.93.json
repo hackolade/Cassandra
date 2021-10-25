@@ -39,19 +39,48 @@
  * 		},
  * }
  */
- {
+{
 	"add": {
-		"entity": [{
-			"path": ["tableIfNotExist"],
-			"value": true
-		}],
-		"container": [{
-			"path": ["keyspaceIfNotExist"],
-			"value": true
-		}],
-		"view": [{
-			"path": ["viewIfNotExist"],
-			"value": true
-		}]
+		"entity": [
+			"tableIfNotExist"
+		],
+		"container": [
+			"keyspaceIfNotExist"
+		],
+		"view": [
+			"viewIfNotExist"
+		]
+	},
+	"modify": {
+		"entity": [
+			{
+				"from": {
+					"tableIfNotExist": ""
+				},
+				"to": {
+					"tableIfNotExist": true
+				}
+			}
+		],
+		"container": [
+			{
+				"from": {
+					"keyspaceIfNotExist": ""
+				},
+				"to": {
+					"keyspaceIfNotExist": true
+				}
+			}
+		],
+		"view": [
+			{
+				"from": {
+					"viewIfNotExist": ""
+				},
+				"to": {
+					"viewIfNotExist": true
+				}
+			}
+		]
 	}
 }

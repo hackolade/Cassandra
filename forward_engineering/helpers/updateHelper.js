@@ -122,6 +122,10 @@ const handleItem = (item, udtMap, generator, data) => {
         return alterTableScript;
     }
 
+    if (generator.name === 'getUpdate' && !item.compMod) {
+        return alterTableScript;
+    }
+
     const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
     const itemProperties = item.properties;
 
@@ -622,7 +626,7 @@ const getAlterModifyUDTScript = (child, udtMap, data) => {
 
     return Object.keys(childProperties).reduce((resultScript, udtKey) => {
         const fieldsInUDT = childProperties[udtKey].properties;
-        const bucketsWithCurrentDefinition = childProperties[udtKey].role.compMod.bucketsWithCurrentDefinition;
+        const bucketsWithCurrentDefinition = childProperties[udtKey].role.compMod.bucketsWithCurrentDefinition || {}
 
         if (!fieldsInUDT) {
             return resultScript;

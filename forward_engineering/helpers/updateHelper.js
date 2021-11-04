@@ -122,10 +122,6 @@ const handleItem = (item, udtMap, generator, data) => {
         return alterTableScript;
     }
 
-    if (generator.name === 'getUpdate' && !item.compMod) {
-        return alterTableScript;
-    }
-
     const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
     const itemProperties = item.properties;
 
@@ -327,6 +323,10 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
                     type: columnType
                 }
             });
+        
+            if (generator.name === 'getUpdate' && !tableProperties[columnName].compMod) {
+                return alterTableScript;
+            }
 
             alterTableScript = alterTableScript.concat([{
                 script: innerScript,

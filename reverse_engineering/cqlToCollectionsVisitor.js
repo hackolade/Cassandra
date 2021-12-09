@@ -701,11 +701,14 @@ class Visitor extends CqlParserVisitor {
 
 		const [description1, description2] = typeDescription ? this.visit(typeDescription) : [DEFAULT_TYPE, DEFAULT_TYPE];
 
-		if (hackoladeType === 'map') {
+		if (hackoladeType.type === 'map') {
 			return {
 				...hackoladeType,
-				subtype: `map<${complexTypeMapper(description2.type || '')}>`
-			}
+				keyType: description1.type,
+				keySubtype: description2.mode,
+				subtype: `map<${complexTypeMapper(description2.type || '')}>`,
+				properties: [Object.assign({ name: 'New column' }, description2)],
+			};
 		}
 
 		return {

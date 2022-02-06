@@ -13,6 +13,7 @@
 		},
 		"excludeDocKind": ["id"],
 		"connectionList": [ "name", "localDataCenter", "user" ],
-		"widestColumn": "name"
+		"widestColumn": "name",
+		"helpUrl": "https://hackolade.com/help/ConnecttoaCassandrainstance.html"
 	}
 ]

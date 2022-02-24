@@ -182,6 +182,14 @@ const retrieveIsItemActivated = (itemConfig) => {
 	return value;
 };
 
+const getUserDefinedFunctions = (udfItems) => {
+	return udfItems.map(item => item.functionBody).filter(item => item).join('\n');
+};
+
+const getUserDefinedAggregations = (udaItems) => {
+	return udaItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
+};
+
 module.exports = {
 	tab,
 	retrieveContainerName,
@@ -198,5 +206,7 @@ module.exports = {
 	canTypeHaveSubtype,
 	getEntityLevelConfig,
 	commentDeactivatedStatement,
-	retrieveIsItemActivated
+	retrieveIsItemActivated,
+	getUserDefinedAggregations,
+	getUserDefinedFunctions
 };

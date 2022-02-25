@@ -1,5 +1,5 @@
 const { getTypeByData } = require('./typeHelper');
-const { commentDeactivatedStatement } = require('./generalHelper');
+const { commentDeactivatedStatement, getTableNameStatement } = require('./generalHelper');
 const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
@@ -82,9 +82,8 @@ const getUpdate = updateData => {
 };
 
 const getDeleteTable = deleteData => { 
-    const script = deleteData.keySpaceName ? 
-        `DROP TABLE "${deleteData.keySpaceName}"."${deleteData.tableName}";` : 
-        `DROP TABLE "${deleteData.tableName}";`;
+    const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
+    const script = `DROP TABLE ${tableStatement}`;
     const deleteScript = commentDeactivatedStatement(script, !!deleteData.applyDropStatements);
     return {
         script: deleteScript,
@@ -104,7 +103,7 @@ const getUpdateTable = updateData => {
         return '';
     }
     const data = { 
-        keySpaceName: updateData.keySpaceName,
+        keyspaceName: updateData.keyspaceName,
         applyDropStatements: updateData.data.applyDropStatements,
         data: updateData.data, 
         item,

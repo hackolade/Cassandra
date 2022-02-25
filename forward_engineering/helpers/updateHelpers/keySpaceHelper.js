@@ -11,29 +11,24 @@ const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n
 
 const getAddUDFScript = (udfData, keySpaceName) => {
 	const { name, columns, calledBody, returnDataType, languageBody, functionBody } = udfData;
-	return `CREATE OR REPLACE FUNCTION ${keySpaceName}.${name} (
-		${columns}
-	)
-	${calledBody} INPUT
-	RETURNS ${returnDataType}
-	LANGUAGE ${languageBody} AS
-	$$
-		${functionBody}
-	$$
-	;`
+	return `CREATE OR REPLACE FUNCTION ${keySpaceName}.${name} (\n` +
+		tab(`${tab(columns, 2)}\n${tab(')')}\n`) +
+		tab(`${calledBody} INPUT\n`) +
+		tab(`RETURNS ${returnDataType}\n`) +
+		tab(`LANGUAGE ${languageBody} AS\n`) + 
+		tab(`$$\n${tab(functionBody, 2)}\n${tab('$$')}`) + ';';
 } 
 
 const getInnerAggregateScript = (script, data) => data ? tab(`\n${script} ${data}`, 2) : '';
 
 const getAddUDAScript = (udfData, keySpaceName) => {
 	const { name, typeInput, stateFunction, stateType, finalFunction, initCondition } = udfData;
-	const finalFuncScript = getInnerAggregateScript('FINALFUNC', finalFunction);
-	const initCondScript = getInnerAggregateScript('INITCOND', initCondition);
-
-	const script = `CREATE OR REPLACE AGGREGATE ${keySpaceName}.${name} (\n${tab(typeInput, 2)}\n)
-	SFUNC ${stateFunction}
-	STYPE ${stateType}`;
-	return script + finalFuncScript + initCondScript + ';';
+	return `CREATE OR REPLACE AGGREGATE ${keySpaceName}.${name} (\n` + 
+		tab(`${tab(typeInput, 2)}\n${tab(')')}\n`) +
+		tab(`SFUNC ${stateFunction}\n`) +
+		tab(`STYPE ${stateType}`) +
+		getInnerAggregateScript('FINALFUNC', finalFunction) +
+		getInnerAggregateScript('INITCOND', initCondition) + ';';
 } 
 
 const getDropUDFScript = (udfData, keySpaceName) => `DROP FUNCTION IF EXISTS ${keySpaceName}.${udfData.name}`;

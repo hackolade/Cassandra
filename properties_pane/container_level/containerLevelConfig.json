@@ -261,7 +261,8 @@ making sure that you maintain a proper JSON format.
 					"options": [
 						"Java",
 						"JavaScript"
-					]
+					],
+					"defaultValue": "Java"
 				},
 				{
 					"propertyName": "Function",
@@ -281,7 +282,8 @@ making sure that you maintain a proper JSON format.
 					"options": [
 						"CALLED ON NULL",
 						"RETURN NULL ON NULL"
-					]
+					],
+					"defaultValue": "CALLED ON NULL"
 				},
 				{
 					"propertyName": "Return data type",

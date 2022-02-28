@@ -1,5 +1,5 @@
 const { getTypeByData } = require('./typeHelper');
-const { commentDeactivatedStatement, getTableNameStatement } = require('./generalHelper');
+const { getTableNameStatement } = require('./generalHelper');
 const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
@@ -83,16 +83,7 @@ const getUpdate = updateData => {
 
 const getDeleteTable = deleteData => { 
     const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-    const script = `DROP TABLE ${tableStatement}`;
-    const deleteScript = commentDeactivatedStatement(script, !!deleteData.applyDropStatements);
-    return {
-        script: deleteScript,
-        added: false,
-        deleted: true,
-        modified: false,
-        keySpaces: deleteData.keySpaceName,
-        name: deleteData.tableName
-    };
+    return`DROP TABLE ${tableStatement}`;
 };
 
 const getUpdateTable = updateData => {
@@ -104,13 +95,19 @@ const getUpdateTable = updateData => {
     }
     const data = { 
         keyspaceName: updateData.keyspaceName,
-        applyDropStatements: updateData.data.applyDropStatements,
-        data: updateData.data, 
+        data: updateData.data,
         item,
     };
     const deleteScript = getDeleteTable({ ...data, tableName: oldName });
     const addScript = getAddTable({ ...data, tableName: newName});
-    return [deleteScript, addScript];
+    return [{
+        script: deleteScript + '\n' + addScript,
+        added: false,
+        deleted: false,
+        modified: true,
+        keySpaces: updateData.keyspaceName,
+        name: updateData.tableName
+    }];
 }
 
 const handleChange = (child, udtMap, generator, data) => {
@@ -189,24 +186,36 @@ const handleItem = (item, udtMap, generator, data) => {
 
             if (itemCompModData.deleted) {
                 const innerScript = getDeleteTable({
-                    applyDropStatements: !!data.applyDropStatements,
                     keyspaceName,
                     tableName
                 });
 
-                return [...alterTableScript, innerScript];
+                return [...alterTableScript, {
+                    script: innerScript,
+                    added: false,
+                    deleted: true,
+                    modified: false,
+                    keySpaces: keyspaceName,
+                    name: tableName
+                }];
             }
 
             if (itemCompModData.created) {
                 const innerScript = getAddTable({
                     item: itemProperties[tableKey], 
-                    applyDropStatements: !!data.applyDropStatements,
                     keyspaceName, 
                     data, 
                     tableName,
                 });
 
-                return [...alterTableScript, innerScript];
+                return [...alterTableScript, {
+                    script: innerScript,
+                    added: true,
+                    deleted: false,
+                    modified: false,
+                    keySpaces: keyspaceName,
+                    name: tableName
+                }];
             }
 
             if (itemCompModData.modified) {
@@ -272,7 +281,6 @@ const getAddTable = (addTableData) => {
         compositeClusteringKey: [...clusteringKeys],
         tableOptions: table.role.tableOptions || '',
         comments: table.role.comments || '',
-        isActivated: addTableData.applyDropStatements,
     }];
 
     const dataSources = [
@@ -282,22 +290,13 @@ const getAddTable = (addTableData) => {
         table
     ];
 
-    const tableStatement = getTableStatement({
+    return getTableStatement({
         tableData: table,
         tableMetaData: entityData,
         keyspaceMetaData: [{ name: addTableData.keyspaceName }],
         dataSources,
         udtTypeMap: {}
     });
-
-    return {
-        script: tableStatement,
-        added: true,
-        deleted: false,
-        modified: false,
-        keySpaces: addTableData.keyspaceName,
-        name: addTableData.tableName
-    }
 }
 
 const fieldTypeCompatible = (oldType, newType) => {
@@ -398,12 +397,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
                 return alterTableScript;
             }
 
-            if (!property.primaryKey && (generator.name === 'getUpdate' || generator.name === 'getDelete')) {
-                const prepareScript = innerScript.replace(/\n*$/, '');
-                innerScript = commentDeactivatedStatement(prepareScript, !!data.applyDropStatements);
-            }
-
-            alterTableScript = alterTableScript.concat([{
+            return alterTableScript.concat([{
                 script: innerScript,
                 addedField: generator.name === 'getAdd',
                 deletedField: generator.name === 'getDelete',
@@ -411,8 +405,6 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
                 keySpaces: keyspaceName,
                 name: tableName
             }]);
-
-            return alterTableScript;
         }, []);
 }
 

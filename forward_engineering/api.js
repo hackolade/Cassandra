@@ -8,12 +8,14 @@ const {
 	retrieveIndexes,
 	retrieveIsItemActivated,
 	commentDeactivatedStatement,
+	getUserDefinedAggregations,
+	getUserDefinedFunctions,
 } = require('./helpers/generalHelper');
 const { getTableStatement } = require('./helpers/tableHelper');
 const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
-const { getAlterScript } = require('./helpers/updateHelper');
+const { getAlterScript } = require('./helpers/updateHelper/updateHelper');
 const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
@@ -193,12 +195,4 @@ module.exports = {
 
 const getScript = (structure) => {
 	return structure.filter(item => item).join('\n\n');
-};
-
-const getUserDefinedFunctions = (udfItems) => {
-	return udfItems.map(item => item.functionBody).filter(item => item).join('\n');
-};
-
-const getUserDefinedAggregations = (udaItems) => {
-	return udaItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
 };

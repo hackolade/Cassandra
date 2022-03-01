@@ -89,6 +89,7 @@ const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData, isParentAct
 const addTab = script => _.trim(script || '').replace(/  /g, '    ');
 
 const getOptionsScript = (collectionRefsDefinitionsMap, viewData) => {
+	setDependencies(dependencies);
 	const clusteringKeyData = getClusteringKeyData(collectionRefsDefinitionsMap, viewData);
 	const tableComment = retrivePropertyFromConfig(viewData, 0, 'comments', '');
 	const tableOptions = retrivePropertyFromConfig(viewData, 0, 'tableOptions', '');
@@ -103,6 +104,7 @@ const getOptionsScript = (collectionRefsDefinitionsMap, viewData) => {
 };
 
 module.exports = {
+	getOptionsScript,
 	getViewScript({
 		schema,
 		viewData,

@@ -91,7 +91,7 @@ const getModifyView = child => {
 		...child.role,
 		comments,
 		tableOptions
-	}
+	};
 	return getAlterView(role);
 }
 
@@ -102,7 +102,7 @@ const getViewScript = ({ child, data, mode }) => {
 		deleted: false,
 		modified: false,
 		viewName: 'view',
-	}
+	};
 	
 	if (mode === 'add') {
 		return {

@@ -24,14 +24,14 @@ const udfData = {
 	requiredProps: requiredPropsForUDF,
 	parser: 'getUDFName',
 	functionName: 'functionBody',
-}
+};
 
 const udaData = {
 	getDropScript: getDropUDAScript,
 	requiredProps: requiredPropsForUDA,
 	parser: 'getUDAName',
 	functionName: 'storedProcFunction',
-}
+};
 
 const parser = {
 	regExpUDFForName: /^.+function(.+?)\(/is,
@@ -76,7 +76,7 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	return {
 		dataForAddScript,
 		dataForDropScript
-	}
+	};
 }
 
 const getModifyUDFA = ({ new: newElements, old: oldElements, udData }) => {

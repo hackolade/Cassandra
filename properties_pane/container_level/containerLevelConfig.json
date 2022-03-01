@@ -246,51 +246,13 @@ making sure that you maintain a proper JSON format.
 					"template": "textarea"
 				},
 				{
-					"propertyName": "Columns",
-					"propertyKeyword": "columns",
-					"shouldValidate": false,
-					"requiredProperty": true,
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Language", 
-					"propertyKeyword": "languageBody",
-					"requiredProperty": true,
-					"shouldValidate": false,
-					"propertyType": "select",
-					"options": [
-						"Java",
-						"JavaScript"
-					],
-					"defaultValue": "Java"
-				},
-				{
 					"propertyName": "Function",
 					"propertyKeyword": "functionBody",
 					"shouldValidate": false,
-					"requiredProperty": true,
+					"propertyTooltip": "description",
 					"propertyType": "details",
 					"template": "textarea",
 					"markdown": false
-				},
-				{
-					"propertyName": "Called / Return", 
-					"propertyKeyword": "calledBody",
-					"requiredProperty": true,
-					"shouldValidate": false,
-					"propertyType": "select",
-					"options": [
-						"CALLED ON NULL",
-						"RETURN NULL ON NULL"
-					],
-					"defaultValue": "CALLED ON NULL"
-				},
-				{
-					"propertyName": "Return data type",
-					"propertyKeyword": "returnDataType",
-					"requiredProperty": true,
-					"shouldValidate": false,
-					"propertyType": "text"
 				},
 				{
 					"propertyName": "Comments",
@@ -335,37 +297,13 @@ making sure that you maintain a proper JSON format.
 					"template": "textarea"
 				},
 				{
-					"propertyName": "Type Input",
-					"propertyKeyword": "typeInput",
+					"propertyName": "Function",
+					"propertyKeyword": "storedProcFunction",
 					"shouldValidate": false,
-					"requiredProperty": true,
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Name State Function",
-					"propertyKeyword": "stateFunction",
-					"shouldValidate": false,
-					"requiredProperty": true,
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Type Returned State Function", 
-					"propertyKeyword": "stateType",
-					"requiredProperty": true,
-					"shouldValidate": false,
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Name Final Function",
-					"propertyKeyword": "finalFunction",
-					"shouldValidate": false,
-					"propertyType": "text"
-				},
-				{
-					"propertyName": "Initial Condition", 
-					"propertyKeyword": "initCondition",
-					"shouldValidate": false,
-					"propertyType": "text"
+					"propertyTooltip": "description",
+					"propertyType": "details",
+					"template": "textarea",
+					"markdown": false
 				},
 				{
 					"propertyName": "Comments",

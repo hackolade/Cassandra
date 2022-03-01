@@ -1,6 +1,10 @@
 const { dependencies } = require('../appDependencies');
 const { getReplication, getDurableWrites } = require('../keyspaceHelper');
-const { retrivePropertyFromConfig, tab } = require('../generalHelper');
+const { retrivePropertyFromConfig, 
+	getUserDefinedFunctions, 
+	getUserDefinedAggregations,
+	tab,
+} = require('../generalHelper');
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -9,33 +13,50 @@ const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "$
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE "${keySpaceName}"`;
 const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
 
-const getAddUDFScript = (udfData, keySpaceName) => {
-	const { name, columns, calledBody, returnDataType, languageBody, functionBody } = udfData;
-	return `CREATE OR REPLACE FUNCTION ${keySpaceName}.${name} (\n` +
-		tab(`${tab(columns, 2)}\n${tab(')')}\n`) +
-		tab(`${calledBody} INPUT\n`) +
-		tab(`RETURNS ${returnDataType}\n`) +
-		tab(`LANGUAGE ${languageBody} AS\n`) + 
-		tab(`$$\n${tab(functionBody, 2)}\n${tab('$$')}`) + ';';
-} 
+const getDropUDFScript = (udfData) => `DROP FUNCTION IF EXISTS ${udfData.name}`;
+const getDropUDAScript = (udfData) => `DROP AGGREGATE IF EXISTS ${udfData.name}`;
 
-const getInnerAggregateScript = (script, data) => data ? tab(`\n${script} ${data}`, 2) : '';
+const requiredPropsForUDF = ['name', 'functionBody'];
+const requiredPropsForUDA = ['name', 'storedProcFunction'];
 
-const getAddUDAScript = (udfData, keySpaceName) => {
-	const { name, typeInput, stateFunction, stateType, finalFunction, initCondition } = udfData;
-	return `CREATE OR REPLACE AGGREGATE ${keySpaceName}.${name} (\n` + 
-		tab(`${tab(typeInput, 2)}\n${tab(')')}\n`) +
-		tab(`SFUNC ${stateFunction}\n`) +
-		tab(`STYPE ${stateType}`) +
-		getInnerAggregateScript('FINALFUNC', finalFunction) +
-		getInnerAggregateScript('INITCOND', initCondition) + ';';
-} 
+const udfData = {
+	getDropScript: getDropUDFScript,
+	requiredProps: requiredPropsForUDF,
+	parser: 'getUDFName',
+	functionName: 'functionBody',
+}
 
-const getDropUDFScript = (udfData, keySpaceName) => `DROP FUNCTION IF EXISTS ${keySpaceName}.${udfData.name}`;
-const getDropUDAScript = (udfData, keySpaceName) => `DROP AGGREGATE IF EXISTS ${keySpaceName}.${udfData.name}`;
+const udaData = {
+	getDropScript: getDropUDAScript,
+	requiredProps: requiredPropsForUDA,
+	parser: 'getUDAName',
+	functionName: 'storedProcFunction',
+}
 
-const requiredPropsForUDF = ['name', 'columns', 'calledBody', 'returnDataType', 'languageBody', 'functionBody'];
-const requiredPropsForUDA = ['name', 'typeInput', 'stateFunction', 'stateType',];
+const parser = {
+	regExpUDFForName: /^.+function(.+?)\(/is,
+	regExpUDAForName: /^.+aggregate(.+?)\(/is,
+	getResult(body, reg) {
+		const result = body.match(reg);
+		if (result && result[1]) {
+			return result[1].trim();
+		}
+		return;
+	},
+	getName(body, regex) {
+		const result = this.getResult(body, regex);
+		if (!result) {
+			return result;
+		}
+		return result.replace(/if not exists/i, '').trim();
+	},
+	getUDFName(body) {
+		return this.getName(body, this.regExpUDFForName);
+	},
+	getUDAName(body) {
+		return this.getName(body, this.regExpUDAForName);
+	},
+}
 
 const getDataForScript = (newElements, oldElements, requiredProps) => {
 	let dataForAddScript = [];
@@ -58,22 +79,41 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	}
 }
 
-const getModifyUDFA = ({ new: newElements, old: oldElements, keySpaceName, getAddScript, getDropScript, requiredProps }) => {
+const getModifyUDFA = ({ new: newElements, old: oldElements, udData }) => {
 	if (!newElements || !oldElements) {
 		return '';
 	}
 
-	const { dataForAddScript, dataForDropScript } = getDataForScript(newElements, oldElements, requiredProps);
+	newElements = newElements.map(element => ({
+		...element,
+		name: parser[udData.parser](element[udData.functionName])
+	}));
+	oldElements = oldElements.map(element => ({
+		...element,
+		name: parser[udData.parser](element[udData.functionName])
+	}));
+
+	const { dataForAddScript, dataForDropScript } = getDataForScript(newElements, oldElements, udData.requiredProps);
 
 
-	const addScript = dataForAddScript.filter(udf => Object.entries(udf).every(([key, value]) => 
-			requiredProps.includes(key) ? !!value : true
+	const addScript = dataForAddScript.filter(ud => Object.entries(ud).every(([key, value]) => 
+			udData['requiredProps'].includes(key) ? !!value : true
 		))
-		.map(udfData => getAddScript(udfData, keySpaceName));
+		.map(ud => ud[udData.functionName]);
 	
-	const dropScript = dataForDropScript.filter(udf => !!udf.name).map(udfData => getDropScript(udfData, keySpaceName));
+	const dropScript = dataForDropScript.filter(ud => !!ud.name).map(udData.getDropScript);
 
-	return [...addScript, ...dropScript].join('\n\n')
+	return [...dropScript, ...addScript].join('\n\n')
+}
+
+const replicationProps = ['replStrategy', 'replFactory', 'dataCenters'];
+
+const getIsModifyKeysSpace = (keySpaceData, props) => {
+	const differentReplication = props.some(prop => {
+		const { new: newElements, old: oldElements } = keySpaceData[prop] || {};
+		return newElements && oldElements && !_.isEqual(newElements, oldElements);
+	});
+	return differentReplication;
 }
 
 const getKeySpaceScript = ({ child, mode }) => {
@@ -90,21 +130,29 @@ const getKeySpaceScript = ({ child, mode }) => {
 	const durableWrites = getDurableWrites(durableWritesProp);
 	
 	if (mode === 'add') {
-		let innerScript = getAddKeyspacePrefix(keySpaceName);
-		innerScript += `${tab(replication)}\n${durableWrites}; \n\n${udfScript}${udaScript}`;
+		const udfData = retrivePropertyFromConfig(keyspaceData, 0, 'UDFs', []);
+		const udaData = retrivePropertyFromConfig(keyspaceData, 0, 'UDAs', []);
+		const udfScript = getUserDefinedFunctions(udfData);
+		const udaScript = getUserDefinedAggregations(udaData);
+
+		const script = [
+			getAddKeyspacePrefix(keySpaceName) + `${tab(replication)}\n${tab(durableWrites)};`,
+			udfScript ? udfScript : '',
+			udaScript ? udaScript : ''
+		].filter(Boolean).join('\n\n');
 
 		return {
-			script: innerScript,
+			script,
 			added: true,
 			deleted: false,
 			modified: false,
 			keySpaces: keySpaceName
 		};
 	} else if (mode === 'delete') {
-		const innerScript = `${getDropKeyspace(keySpaceName)};`;
+		const script = `${getDropKeyspace(keySpaceName)};`;
 
 		return {
-			script: innerScript,
+			script,
 			added: false,
 			deleted: true,
 			modified: false,
@@ -115,23 +163,23 @@ const getKeySpaceScript = ({ child, mode }) => {
 	const dataForUDAScript = compMod?.UDAs || {};
 	const modifyUDFScript = getModifyUDFA({
 		...dataForUDFScript, 
-		getAddScript: getAddUDFScript,
-		getDropScript: getDropUDFScript,
-		requiredProps: requiredPropsForUDF,
-		keySpaceName
+		udData: udfData,
 	});
 	const modifyUDAScript = getModifyUDFA({
 		...dataForUDAScript, 
-		getAddScript: getAddUDAScript,
-		getDropScript: getDropUDAScript,
-		requiredProps: requiredPropsForUDA,
-		keySpaceName
+		udData: udaData,
 	});
-	let innerScript = alterKeyspacePrefix(keySpaceName);
-	innerScript += `${tab(replication)}\n${durableWrites}; \n\n${modifyUDFScript}${modifyUDAScript}`;
+	const isModifyReplication = getIsModifyKeysSpace(compMod, replicationProps);
+	const script = [isModifyReplication ? 
+		alterKeyspacePrefix(keySpaceName) +
+		tab(`${replication}\n`) +
+		tab(`${durableWrites}\n`) : '',
+		modifyUDFScript,
+		modifyUDAScript		
+	].filter(Boolean).join('\n\n');
 
 	return {
-		script: innerScript,
+		script,
 		added: false,
 		deleted: false,
 		modified: true,

@@ -45,9 +45,9 @@ const getDifferentOptions = (tableOptions, comments = {}) => {
 }
 
 const getAddView = child => {
-	const { compMod, properties = [] } = child.role;
+	const { compMod, properties = {} } = child.role;
 
-	const convertedProperties = properties.map(property => ([property.code || property.name, property]));
+	const convertedProperties = Object.entries(properties).map(([__, property]) => ([property.code || property.name, property]));
 
 	const dataForScript = {
 		containerData: [{ name: compMod.keyspaceName }],

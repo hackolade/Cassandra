@@ -1,5 +1,5 @@
 const { getTypeByData } = require('./typeHelper');
-const { getTableNameStatement } = require('./generalHelper');
+const { getTableNameStatement, tab } = require('./generalHelper');
 const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
@@ -7,6 +7,7 @@ const { dependencies } = require('./appDependencies');
 const { getKeySpaceScript } = require('./updateHelpers/keySpaceHelper');
 const { mergeArrays } = require('./updateHelpers/generalHelper');
 const { getViewScript } = require('./updateHelpers/viewHelper');
+const { getIndexTable } = require('./updateHelpers/indexHelper');
 
 let _;
 
@@ -86,28 +87,89 @@ const getDeleteTable = deleteData => {
 	return`DROP TABLE ${tableStatement}`;
 };
 
-const getUpdateTable = updateData => {
-	const item = updateData.item;
-	const { oldName, newName } = getCollectionName(item.compMod);
+const getIsChangeTable = compMod => {
+	const tableProperties = ['name', 'isActivated'];
+	return tableProperties.some(property => !_.isEqual(compMod[property]?.new, compMod[property]?.old));
+}
 
+const getPropertiesForUpdateTable = properties => {
+	const newProperties = Object.entries(properties).map(([name, value]) => {
+		if (!value.compMod) {
+			return [name, value];
+		}
+		const newField = value.compMod?.newField || {};
+		const oldField = value.compMod?.oldField || {};
+		Object.entries(newField).map(([keyNewField, valueNewField]) => {
+			if (oldField[keyNewField] !== valueNewField) {
+				value[keyNewField] = valueNewField;
+			}
+			if (keyNewField === 'name' && oldField[keyNewField] !== valueNewField) {
+				name = valueNewField;
+			}
+		})
+		return [name, value];
+	})
+	return Object.fromEntries(newProperties);
+} 
+
+const getUpdateTable = updateData => {
+	const { item, propertiesScript = [] } = updateData;
+	const { oldName, newName } = getCollectionName(item.role?.compMod);
+	
 	if (!oldName || !newName) {
 		return '';
 	}
-	const data = { 
-		keyspaceName: updateData.keyspaceName,
-		data: updateData.data,
-		item,
-	};
-	const deleteScript = getDeleteTable({ ...data, tableName: oldName });
-	const addScript = getAddTable({ ...data, tableName: newName});
-	return [{
-		script: deleteScript + '\n' + addScript,
+
+	const indexTableScript = getIndexTable(item, updateData.data);
+
+	const isChangeTable = getIsChangeTable({ ...item.role?.compMod, name: { new: newName, old: oldName } } || {});
+
+	const result = {
 		added: false,
 		deleted: false,
 		modified: true,
 		keySpaces: updateData.keyspaceName,
-		name: updateData.tableName
+		name: newName || oldName,
+	};
+
+	if (!isChangeTable) {
+		const option = getOptionsScript(item.role?.compMod || {}, oldName || newName, updateData.isOptionScript);
+		return [{
+			...result,
+			script: [indexTableScript, option].filter(Boolean).join('\n\n'),
+		}, ...propertiesScript];
+	}
+
+	const data = { 
+		keyspaceName: updateData.keyspaceName,
+		data: updateData.data,
+		item: {
+			...item,
+			properties: getPropertiesForUpdateTable(item.role?.properties || item.properties),
+		},
+		isKeyspaceActivated: true,
+	};
+	const deleteScript = getDeleteTable({ ...data, tableName: oldName });
+	const addScript = getAddTable({ ...data, tableName: newName});
+	return [{
+		...result,
+		script: [deleteScript, addScript, indexTableScript].filter(Boolean).join('\n\n'),
 	}];
+}
+
+const getOptionsScript = (compMod, tableName, isGetOptionScript) => {
+	if (!isGetOptionScript || !compMod || !compMod.tableOptions) {
+		return;
+	}
+	
+	const script = getChangeOption({
+		keySpace: compMod.keyspaceName,
+		tableName: tableName,
+		options: compMod.tableOptions,
+		comment: compMod.comments
+	});
+
+	return script ? `${alterTablePrefix(tableName, compMod.keyspaceName)}${tab(script)};` : '';
 }
 
 const handleChange = (child, udtMap, generator, data) => {
@@ -120,25 +182,6 @@ const handleChange = (child, udtMap, generator, data) => {
 		alterTableScript = alterTableScript.concat(alterScript);
 	} else if (objectContainsProp(child, 'items')) {
 		alterTableScript = alterTableScript.concat(handleItem(child.items, udtMap, generator, data));
-	}
-
-	return alterTableScript;
-}
-
-const handleOptions = (generator, itemCompModData, tableName) => {
-	let alterTableScript = '';
-
-	if (generator.name !== 'getUpdate' || !itemCompModData) {
-		return alterTableScript;
-	}
-
-	if (itemCompModData.tableOptions) {
-		alterTableScript += getChangeOption({
-			keySpace: itemCompModData.keyspaceName,
-			tableName: tableName,
-			options: itemCompModData.tableOptions,
-			comment: itemCompModData.comments
-		});
 	}
 
 	return alterTableScript;
@@ -219,35 +262,29 @@ const handleItem = (item, udtMap, generator, data) => {
 			}
 
 			if (itemCompModData.modified) {
-				const updateTableScript = getUpdateTable({ keyspaceName, tableName, data, item: itemProperties[tableKey] });
+				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true });
 
 				return [...alterTableScript, ...updateTableScript];
 			}
 
-			const option = handleOptions(generator, itemCompModData, tableName);
-
-			if (option) {
-				const optionAddingScript = `${alterTablePrefix(tableName, keyspaceName)}\n${option};`;
-				alterTableScript = alterTableScript.concat([{
-					script: optionAddingScript,
-					added: false,
-					deleted: false,
-					modified: true,
-					name: tableName
-				}]);
-			}
-
-			alterTableScript = alterTableScript.concat(handleProperties({ 
-				generator, 
+			const propertiesScript = handleProperties({ 
+				generator,
 				tableProperties, 
 				udtMap, 
 				itemCompModData, 
 				tableName, 
 				isOldModel,
 				data,
-			}));
+			});
+			const updateTableScript = getUpdateTable({ 
+				item: itemProperties[tableKey], 
+				isOptionScript: generator.name === 'getUpdate',
+				propertiesScript,
+				keyspaceName, 
+				data,
+			})
 
-			return alterTableScript;
+			return [...alterTableScript, ...updateTableScript];
 		}, []);
 
 	return alterTableScript;
@@ -281,6 +318,7 @@ const getAddTable = (addTableData) => {
 		compositeClusteringKey: [...clusteringKeys],
 		tableOptions: table.role.tableOptions || '',
 		comments: table.role.comments || '',
+		isActivated: table.role.isActivated,
 	}];
 
 	const dataSources = [
@@ -295,7 +333,8 @@ const getAddTable = (addTableData) => {
 		tableMetaData: entityData,
 		keyspaceMetaData: [{ name: addTableData.keyspaceName }],
 		dataSources,
-		udtTypeMap: {}
+		udtTypeMap: {},
+		isKeyspaceActivated: addTableData.isKeyspaceActivated,
 	});
 }
 

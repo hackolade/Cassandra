@@ -208,5 +208,6 @@ module.exports = {
 	commentDeactivatedStatement,
 	retrieveIsItemActivated,
 	getUserDefinedAggregations,
-	getUserDefinedFunctions
+	getUserDefinedFunctions,
+	getIndexProfiles
 };

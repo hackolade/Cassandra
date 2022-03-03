@@ -248,11 +248,10 @@ const handleItem = (item, udtMap, generator, data) => {
 			}
 
 			const optionScript = getOptionsScript(itemCompModData, tableName, generator.name === 'getUpdate');
-			const indexTableScript = getIndexTable(itemProperties[tableKey], data);
 
-			if (optionScript || indexTableScript) {
+			if (optionScript) {
 				alterTableScript = alterTableScript.concat([{
-					script: [optionScript, indexTableScript].filter(Boolean).join('\n\n'),
+					script: optionScript,
 					added: false,
 					deleted: false,
 					modified: true,

@@ -92,9 +92,29 @@ const getIsChangeTable = compMod => {
 	return tableProperties.some(property => !_.isEqual(compMod[property]?.new, compMod[property]?.old));
 }
 
+const getPropertiesForUpdateTable = properties => {
+	const newProperties = Object.entries(properties).map(([name, value]) => {
+		if (!value.compMod) {
+			return [name, value];
+		}
+		const newField = value.compMod?.newField || {};
+		const oldField = value.compMod?.oldField || {};
+		Object.entries(newField).map(([keyNewField, valueNewField]) => {
+			if (oldField[keyNewField] !== valueNewField) {
+				value[keyNewField] = valueNewField;
+			}
+			if (keyNewField === 'name' && oldField[keyNewField] !== valueNewField) {
+				name = valueNewField;
+			}
+		})
+		return [name, value];
+	})
+	return Object.fromEntries(newProperties);
+} 
+
 const getUpdateTable = updateData => {
-	const { item } = updateData;
-	const { oldName, newName } = getCollectionName(item.compMod);
+	const { item, propertiesScript = [] } = updateData;
+	const { oldName, newName } = getCollectionName(item.role?.compMod);
 	
 	if (!oldName || !newName) {
 		return '';
@@ -113,11 +133,11 @@ const getUpdateTable = updateData => {
 	};
 
 	if (!isChangeTable) {
-		const option = getOptionsScript(item.role?.compMod || {}, oldName || newName, true);
+		const option = getOptionsScript(item.role?.compMod || {}, oldName || newName, updateData.isOptionScript);
 		return [{
 			...result,
 			script: [indexTableScript, option].filter(Boolean).join('\n\n'),
-		}];
+		}, ...propertiesScript];
 	}
 
 	const data = { 
@@ -125,7 +145,7 @@ const getUpdateTable = updateData => {
 		data: updateData.data,
 		item: {
 			...item,
-			properties: item.role?.properties,
+			properties: getPropertiesForUpdateTable(item.role?.properties || item.properties),
 		},
 		isKeyspaceActivated: true,
 	};
@@ -242,34 +262,29 @@ const handleItem = (item, udtMap, generator, data) => {
 			}
 
 			if (itemCompModData.modified) {
-				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey] });
+				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true });
 
 				return [...alterTableScript, ...updateTableScript];
 			}
 
-			const optionScript = getOptionsScript(itemCompModData, tableName, generator.name === 'getUpdate');
-
-			if (optionScript) {
-				alterTableScript = alterTableScript.concat([{
-					script: optionScript,
-					added: false,
-					deleted: false,
-					modified: true,
-					name: tableName
-				}]);
-			}
-
-			alterTableScript = alterTableScript.concat(handleProperties({ 
-				generator, 
+			const propertiesScript = handleProperties({ 
+				generator,
 				tableProperties, 
 				udtMap, 
 				itemCompModData, 
 				tableName, 
 				isOldModel,
 				data,
-			}));
+			});
+			const updateTableScript = getUpdateTable({ 
+				item: itemProperties[tableKey], 
+				isOptionScript: generator.name === 'getUpdate',
+				propertiesScript,
+				keyspaceName, 
+				data,
+			})
 
-			return alterTableScript;
+			return [...alterTableScript, ...updateTableScript];
 		}, []);
 
 	return alterTableScript;

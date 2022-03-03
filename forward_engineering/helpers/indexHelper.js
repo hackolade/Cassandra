@@ -105,9 +105,9 @@ const getCustomIndex = ({ name, tableName, column, using, options, ifNotExist })
 );
 
 const getIndexColumnStatement = (key, dataSources) => {
-	const { name } = getNamesByIds([key.keyId], dataSources)[key.keyId];
+	const { name } = getNamesByIds([key.keyId], dataSources)[key.keyId] || {};
 
-	return wrapKey(`"${name}"`, key.type);
+	return name ? wrapKey(`"${name}"`, key.type) : '';
 };
 
 const wrapKey = (column, type) => {
@@ -131,7 +131,7 @@ const wrapKey = (column, type) => {
 };
 
 const isIndexColumnKeyActivated = (key, dataSources) => {
-	const { isActivated } = getNamesByIds([key.keyId], dataSources)[key.keyId];
+	const { isActivated } = getNamesByIds([key.keyId], dataSources)[key.keyId] || {};
 
 	return isActivated !== false;
 };

@@ -13,11 +13,11 @@ const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "$
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}"`;
 const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
 
-const getDropUDFScript = (udfData) => `DROP FUNCTION IF EXISTS ${udfData.name}`;
-const getDropUDAScript = (udfData) => `DROP AGGREGATE IF EXISTS ${udfData.name}`;
+const getDropUDFScript = udfData => udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name}` : '';
+const getDropUDAScript = udfData => udfData.name ? `DROP AGGREGATE IF EXISTS ${udfData.name}` : '';
 
-const requiredPropsForUDF = ['name', 'functionBody'];
-const requiredPropsForUDA = ['name', 'storedProcFunction'];
+const requiredPropsForUDF = ['functionBody'];
+const requiredPropsForUDA = ['storedProcFunction'];
 
 const udfData = {
 	getDropScript: getDropUDFScript,

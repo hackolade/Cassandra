@@ -84,7 +84,7 @@ const getUpdate = updateData => {
 
 const getDeleteTable = deleteData => { 
 	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-	return`DROP TABLE ${tableStatement}`;
+	return `DROP TABLE IF EXISTS ${tableStatement}`;;
 };
 
 const getIsChangeTable = compMod => {

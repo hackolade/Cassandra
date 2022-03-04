@@ -10,7 +10,7 @@ let _;
 const setDependencies = ({ lodash }) => _ = lodash;
 
 const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n`;
-const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE "${keySpaceName}"`;
+const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}"`;
 const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
 
 const getDropUDFScript = (udfData) => `DROP FUNCTION IF EXISTS ${udfData.name}`;

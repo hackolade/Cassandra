@@ -9,6 +9,13 @@ let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
 
+const scriptData = {
+	added: false,
+	deleted: false,
+	modified: false,
+	keySpaces: 'keySpaces',
+}
+
 const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n`;
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}"`;
 const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
@@ -99,11 +106,17 @@ const getModifyUDFA = ({ new: newElements, old: oldElements, udData }) => {
 	const addScript = dataForAddScript.filter(ud => Object.entries(ud).every(([key, value]) => 
 			udData['requiredProps'].includes(key) ? !!value : true
 		))
-		.map(ud => ud[udData.functionName]);
+		.map(ud => ({
+			...scriptData,
+			added: true,
+			script: ud[udData.functionName]
+		}));
 	
-	const dropScript = dataForDropScript.filter(ud => !!ud.name).map(udData.getDropScript);
+	const dropScript = dataForDropScript
+		.filter(ud => !!ud.name)
+		.map(ud => ({ ...scriptData, script: udData.getDropScript(ud), deleted: true }));
 
-	return [...dropScript, ...addScript].join('\n\n')
+	return [...dropScript, ...addScript];
 }
 
 const replicationProps = ['replStrategy', 'replFactory', 'dataCenters'];
@@ -141,23 +154,19 @@ const getKeySpaceScript = ({ child, mode }) => {
 			udaScript ? udaScript : ''
 		].filter(Boolean).join('\n\n');
 
-		return {
+		return [{
+			...scriptData,
 			script,
 			added: true,
-			deleted: false,
-			modified: false,
-			keySpaces: keySpaceName
-		};
+		}];
 	} else if (mode === 'delete') {
 		const script = `${getDropKeyspace(keySpaceName)};`;
 
-		return {
+		return [{
+			...scriptData,
 			script,
-			added: false,
 			deleted: true,
-			modified: false,
-			keySpaces: keySpaceName
-		};
+		}];
 	} 
 	const dataForUDFScript = compMod?.UDFs || {};
 	const dataForUDAScript = compMod?.UDAs || {};
@@ -170,21 +179,16 @@ const getKeySpaceScript = ({ child, mode }) => {
 		udData: udaData,
 	});
 	const isModifyReplication = getIsModifyKeysSpace(compMod, replicationProps);
-	const script = [isModifyReplication ? 
+	const script = isModifyReplication ? 
 		alterKeyspacePrefix(keySpaceName) +
 		tab(`${replication}\n`) +
-		tab(`${durableWrites}\n`) : '',
-		modifyUDFScript,
-		modifyUDAScript		
-	].filter(Boolean).join('\n\n');
+		tab(`${durableWrites}\n`) : '';
 
-	return {
-		script,
-		added: false,
-		deleted: false,
+	return [{
+		...scriptData,
 		modified: true,
-		keySpaces: keySpaceName
-	};
+		script,
+	}, ...modifyUDAScript, ...modifyUDFScript];
 }
 
 module.exports = {

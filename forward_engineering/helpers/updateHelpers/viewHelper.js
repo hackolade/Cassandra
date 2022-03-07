@@ -5,6 +5,13 @@ let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
 
+const scriptData = {
+	added: false,
+	deleted: false,
+	modified: false,
+	viewName: 'view',
+};
+
 const getViewName = (keyspaceName, nameView) => `${keyspaceName ? `"${keyspaceName}".` : ''}"${nameView}"`;
 
 const modifyProperties = ['code', 'name', 'viewOn'];
@@ -84,7 +91,16 @@ const getModifyView = child => {
 		const dropViewName = compMod.code?.old || compMod.name?.old;
 		const dropScript = getDropView({ ...child, role: { ...child.role, code: dropViewName }});
 		const addScript = getAddView(child);
-		return `${dropScript}\n\n${addScript}`;
+		return [{
+				...scriptData,
+				script: dropScript,
+				deleted: true,
+			}, {
+				...scriptData,
+				script: addScript,
+				added: true,
+			}
+		];
 	}
 	const { comments, tableOptions } = getDifferentOptions(compMod.tableOptions, compMod.comments);
 	const role = {
@@ -92,36 +108,30 @@ const getModifyView = child => {
 		comments,
 		tableOptions
 	};
-	return getAlterView(role);
+	return [{
+		...scriptData,
+		script: getAlterView(role),
+		modified: true,
+	}];
 }
 
 const getViewScript = ({ child, data, mode }) => {
 	setDependencies(dependencies);
-	const result = {
-		added: false,
-		deleted: false,
-		modified: false,
-		viewName: 'view',
-	};
 	
 	if (mode === 'add') {
-		return {
-			...result,
+		return [{
+			...scriptData,
 			added: true,
 			script: getAddView(child)
-		};
+		}];
 	} else if (mode === 'delete') {
-		return {
-			...result,
+		return [{
+			...scriptData,
 			deleted: true,
 			script: getDropView(child)
-		};
+		}];
 	}
-	return {
-		...result,
-		modified: true,
-		script: getModifyView(child)
-	};
+	return getModifyView(child);
 }
 
 module.exports = {

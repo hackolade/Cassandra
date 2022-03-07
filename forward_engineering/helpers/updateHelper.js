@@ -1,5 +1,5 @@
 const { getTypeByData } = require('./typeHelper');
-const { getTableNameStatement, tab } = require('./generalHelper');
+const { getTableNameStatement, commentDeactivatedStatement, tab } = require('./generalHelper');
 const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
@@ -20,19 +20,47 @@ const typesCompatibility = {
 	uuid: ['timeuuid'],
 	text: ['varchar']
 };
+
 const alterTablePrefix = (tableName, keySpace) => 
 	keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"`;
-const remove = columnName => `DROP "${columnName}";`;
 const getUpdateType = updateTypeData => 
 	`${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} 
 	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
-const add = columnData => `ADD "${columnData.name}" ${columnData.type};\n`;
-const rename = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
-const getDelete = deleteData => `${alterTablePrefix(deleteData.tableName, deleteData.keySpace)} ${remove(deleteData.columnData.name)}`;
-const getAdd = addData => `${alterTablePrefix(addData.tableName, addData.keySpace)} ${add(addData.columnData)}`;
-const getRenameColumn = renameData => `${alterTablePrefix(renameData.tableName, renameData.keySpace)} ${rename(renameData.columnData)};`;
+const removeColumnStatement = columnName => `DROP "${columnName}";`;
+const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type};\n`;
+const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
+const getDelete = deleteData => {
+	const script = `${alterTablePrefix(deleteData.keyspaceName, deleteData.tableName)} ${removeColumnStatement(deleteData.columnData.name)}`;
+	return [{
+		added: false,
+		modified: false,
+		deleted: true,
+		script,
+		field: 'field',
+	}];
+};
+const getAdd = addData => {
+	const script = `${alterTablePrefix(addData.keyspaceName, addData.tableName)} ${addColumnStatement(addData.columnData)}`;
+	return [{
+		deleted: false,
+		modified: false,
+		added: true,
+		script,
+		field: 'field',
+	}];
+};
+const getRenameColumn = renameData => {
+	const script = 
+	`${alterTablePrefix(renameData.keyspaceName, renameData.tableName)} ${renameColumnStatement(renameData.columnData)};`;
+	return [{
+		added: false,
+		deleted: false,
+		modified: true,
+		script,
+		field: 'field',
+	}];
+};
 const objectContainsProp = (object, key) => object[key] ? true : false;
-const getAnd = data => ` AND ${data.key} = '${data.value}'`;
 
 const isCommentNew = comment => comment && comment.new !== comment.old;
 const getChangeOption = changeData => {
@@ -77,14 +105,23 @@ const getUpdate = updateData => {
 		return '';
 	}
 	if (!property.primaryKey) {
-		return getDelete(getData({ name: oldName })) + '\n' + getAdd(getData({ name: newName }));
+		const deletePropertyScript = getDelete(getData({ name: oldName }));
+		const addPropertyScript = getAdd(getData({ name: newName }));
+		return [...deletePropertyScript, ...addPropertyScript];;
 	}
 	return getRenameColumn(getData({ oldName, newName })); 
 };
 
 const getDeleteTable = deleteData => { 
 	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-	return `DROP TABLE IF EXISTS ${tableStatement}`;;
+	const script = `DROP TABLE ${tableStatement}`;
+	return [{
+		modified: false,
+		added: false,
+		deleted: true,
+		script,
+		table: 'table',
+	}];
 };
 
 const getIsChangeTable = compMod => {
@@ -124,20 +161,18 @@ const getUpdateTable = updateData => {
 
 	const isChangeTable = getIsChangeTable({ ...item.role?.compMod, name: { new: newName, old: oldName } } || {});
 
-	const result = {
-		added: false,
-		deleted: false,
-		modified: true,
-		keySpaces: updateData.keyspaceName,
-		name: newName || oldName,
-	};
-
 	if (!isChangeTable) {
-		const option = getOptionsScript(item.role?.compMod || {}, oldName || newName, updateData.isOptionScript);
-		return [{
-			...result,
-			script: [indexTableScript, option].filter(Boolean).join('\n\n'),
-		}, ...propertiesScript];
+		const optionScript = getOptionsScript(item.role?.compMod || {}, oldName || newName, updateData.isOptionScript);
+		return [
+			{
+				added: false,
+				deleted: false,
+				modified: true,
+				script: optionScript,
+				table: 'table',
+			},
+			...indexTableScript,
+			...propertiesScript];
 	}
 
 	const data = { 
@@ -151,10 +186,7 @@ const getUpdateTable = updateData => {
 	};
 	const deleteScript = getDeleteTable({ ...data, tableName: oldName });
 	const addScript = getAddTable({ ...data, tableName: newName});
-	return [{
-		...result,
-		script: [deleteScript, addScript, indexTableScript].filter(Boolean).join('\n\n'),
-	}];
+	return [...deleteScript, ...addScript, ...indexTableScript];
 }
 
 const getOptionsScript = (compMod, tableName, isGetOptionScript) => {
@@ -221,44 +253,28 @@ const handleItem = (item, udtMap, generator, data) => {
 
 			const tableProperties = itemProperties[tableKey].properties || {};
 
-			let keyspaceName;
-
-			if (itemCompModData.keyspaceName) {
-				keyspaceName = itemCompModData.keyspaceName;
-			};
+			const keyspaceName = itemCompModData.keyspaceName;
 
 			if (itemCompModData.deleted) {
-				const innerScript = getDeleteTable({
-					keyspaceName,
-					tableName
-				});
-
-				return [...alterTableScript, {
-					script: innerScript,
-					added: false,
-					deleted: true,
-					modified: false,
-					keySpaces: keyspaceName,
-					name: tableName
-				}];
+				return [ 
+					...alterTableScript, 
+					...getDeleteTable({
+						keyspaceName,
+						tableName
+					})
+				];
 			}
 
 			if (itemCompModData.created) {
-				const innerScript = getAddTable({
-					item: itemProperties[tableKey], 
-					keyspaceName, 
-					data, 
-					tableName,
-				});
-
-				return [...alterTableScript, {
-					script: innerScript,
-					added: true,
-					deleted: false,
-					modified: false,
-					keySpaces: keyspaceName,
-					name: tableName
-				}];
+				return [ 
+					...alterTableScript, 
+					...getAddTable({
+						item: itemProperties[tableKey], 
+						keyspaceName, 
+						data, 
+						tableName,
+					})
+				];
 			}
 
 			if (itemCompModData.modified) {
@@ -276,6 +292,7 @@ const handleItem = (item, udtMap, generator, data) => {
 				isOldModel,
 				data,
 			});
+
 			const updateTableScript = getUpdateTable({ 
 				item: itemProperties[tableKey], 
 				isOptionScript: generator.name === 'getUpdate',
@@ -328,7 +345,7 @@ const getAddTable = (addTableData) => {
 		table
 	];
 
-	return getTableStatement({
+	const script = getTableStatement({
 		tableData: table,
 		tableMetaData: entityData,
 		keyspaceMetaData: [{ name: addTableData.keyspaceName }],
@@ -336,6 +353,14 @@ const getAddTable = (addTableData) => {
 		udtTypeMap: {},
 		isKeyspaceActivated: addTableData.isKeyspaceActivated,
 	});
+
+	return [{
+		deleted: false,
+		modified: false,
+		added: true,
+		script,
+		table: 'table',
+	}];
 }
 
 const fieldTypeCompatible = (oldType, newType) => {
@@ -402,7 +427,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 			if (generator.name !== 'getUpdate' && (property.compositePartitionKey || property.compositeClusteringKey)) {
 				return alterTableScript;
 			}
-			let columnType = getTypeByData(property, udtMap, columnName);
+			const columnType = getTypeByData(property, udtMap, columnName);
 			
 			if (property.$ref && !columnType) {
 				columnType = _.last(property.$ref.split('/'));
@@ -412,38 +437,28 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 				return alterTableScript;
 			}
 
-			let keyspaceName;
-
-			if (itemCompModData && itemCompModData.keyspaceName) {
-				keyspaceName = itemCompModData.keyspaceName;
-			};
+			const keyspaceName = itemCompModData?.keyspaceName;
 
 			if (isOldModel) {
 				alterTableScript = alterTableScript.concat(handleAlterTypeForOldModel({ property, udtMap, tableName, keyspaceName, columnName }) || []);
 			}
 
-			let innerScript = generator({
-				keySpace: keyspaceName,
-				tableName: tableName,
-				columnData: {
-					name: columnName,
-					type: columnType
-				},
-				property,
-			});
-	
 			if (generator.name === 'getUpdate' && !property.compMod) {
 				return alterTableScript;
 			}
 
-			return alterTableScript.concat([{
-				script: innerScript,
-				addedField: generator.name === 'getAdd',
-				deletedField: generator.name === 'getDelete',
-				modifiedField: generator.name === 'getUpdate',
-				keySpaces: keyspaceName,
-				name: tableName
-			}]);
+			return [
+				...alterTableScript,
+				...generator({
+					keyspaceName,
+					tableName: tableName,
+					columnData: {
+						name: columnName,
+						type: columnType
+					},
+					property,
+				})
+			];
 		}, []);
 }
 
@@ -683,8 +698,6 @@ const getAlterModifyUDTScript = (child, udtMap, data) => {
 									deleted: false,
 									modified: true,
 									udtName: udtKey,
-									name: fieldKey,
-									keySpaces: bucketsWithCurrentDefinition,
 								});
 							}, []));
 						}
@@ -703,8 +716,6 @@ const getAlterModifyUDTScript = (child, udtMap, data) => {
 							deleted: false,
 							modified: true,
 							udtName: udtKey,
-							name: fieldKey,
-							keySpaces: bucketsWithCurrentDefinition,
 						})
 					}
 					return script;
@@ -730,21 +741,19 @@ const columns = {
 }
 
 const generateScript = (child, udtMap, data, column, mode) => {
-	const properties = child.properties;
-		const getScript = columns[column];
-	let alterTableScript = [];
+	const getScript = columns[column];
 
 	if (Array.isArray(child) && child.length) {
-		alterTableScript = mergeArrays(alterTableScript, child.map(item => {
-			return getScript({ child: item.properties[Object.keys(item.properties)[0]], udtMap, data, mode });
-		}));
-	} else {
-		const itemKey = Object.keys(properties)[0];
-		const item = properties[itemKey];
-		alterTableScript = alterTableScript.concat([getScript({ child: item, udtMap, data, mode })]);
+		return child.reduce((scriptsData, item) => 
+			([...scriptsData, 
+				...getScript({ child: item.properties[Object.keys(item.properties)[0]], udtMap, data, mode })]), 
+			[]);
 	}
+	const properties = child.properties;
+	const itemKey = Object.keys(properties)[0];
+	const item = properties[itemKey];
 
-	return alterTableScript;
+	return getScript({ child: item, udtMap, data, mode });
 }
 
 const getScript = (child, udtMap, data, column, mode) => {
@@ -844,14 +853,31 @@ const getAlterTableScript = (child, udtMap, data) => {
 const getAlterScript = (child, udtMap, data) => {
 	setDependencies(dependencies);
 	let scriptData = getAlterTableScript(child, udtMap, data);
+	scriptData = getCommentedDropScript(scriptData, !data.options?.applyDropStatements);
 	scriptData = sortScript(scriptData);
 	return scriptData.filter(Boolean).join('\n\n');
 }
 
+const getCommentedDropScript = (scriptsData, isCommented) => {
+	if (!isCommented) {
+		return scriptsData;
+	}
+	return scriptsData.map((scriptData = {}) => {
+		if (!scriptData.deleted || !scriptData.script) {
+			return scriptData;
+		}
+		return {
+			...scriptData,
+			script: commentDeactivatedStatement(scriptData.script, false),
+		};
+	})
+}
+
 const sortScript = (scriptData) => {
-	const filter = (key, scriptData, filter) => {
+	const filterProp = (key, prop, script = {}) => script[key] && script[prop];
+	const filter = (key, scriptData, keyProp) => {
 		return scriptData.reduce((scripts, currentScript) => {
-			if (filter(key, currentScript)) {
+			if (filterProp(key, keyProp, currentScript)) {
 				scripts.scripts.push(currentScript);
 				return scripts;
 			}
@@ -863,27 +889,25 @@ const sortScript = (scriptData) => {
 	}
 
 	let sortedScripts = [];
-	const udtFilter = (key, script) => script[key] && script.udtName;
-	const keyspaceFilter = (key, script) => script[key] && _.isString(script.keySpaces) && !script.name;
-	const tableFilter = (key, script) => script[key] && _.isString(script.keySpaces) && script.name;
-	const fieldFilter = (key, script) => script[key];
-	const viewFilter = (key, script) => script[key] && !!script.viewName;
 
-	const { scripts: createKeyspacesScripts, filteredScripts: scriptsWithoutCreateKeyspace } = filter('added', scriptData, keyspaceFilter);
-	const { scripts: deleteKeyspaceScripts, filteredScripts: scriptsWithoutDropKeyspace } = filter('deleted', scriptsWithoutCreateKeyspace, keyspaceFilter);
-	const { scripts: modifyKeyspacesScripts, filteredScripts: scriptsWithoutModifyKeyspace } = filter('modified', scriptsWithoutDropKeyspace, keyspaceFilter);
-	const { scripts: createTablesScripts, filteredScripts: scriptsWithoutCreateTable } = filter('added', scriptsWithoutModifyKeyspace, tableFilter);
-	const { scripts: deleteTablesScripts, filteredScripts: scriptsWithoutDropTable } = filter('deleted', scriptsWithoutCreateTable, tableFilter);
-	const { scripts: modifyTablesScripts, filteredScripts: scriptsWithoutModifyTable } = filter('modified', scriptsWithoutDropTable, tableFilter);
-	const { scripts: createViewsScripts, filteredScripts: scriptsWithoutCreateViews } = filter('added', scriptsWithoutModifyTable, viewFilter);
-	const { scripts: deleteViewsScripts, filteredScripts: scriptsWithoutDeleteViews } = filter('deleted', scriptsWithoutCreateViews, viewFilter);
-	const { scripts: modifyViewsScripts, filteredScripts: scriptsWithoutModifyViews } = filter('modified', scriptsWithoutDeleteViews, viewFilter);
-	const { scripts: createFieldsScripts, filteredScripts: scriptsWithoutCreateField } = filter('addedField', scriptsWithoutModifyViews, fieldFilter);    
-	const { scripts: deleteFieldsScripts, filteredScripts: scriptsWithoutDeleteField } = filter('deletedField', scriptsWithoutCreateField, fieldFilter);
-	const { scripts: modifyFieldsScripts, filteredScripts: scriptsWithoutModifyField } = filter('modifiedField', scriptsWithoutDeleteField, fieldFilter);
-	const { scripts: createUdtScripts, filteredScripts: scriptsWithoutCreateUdt } = filter('added', scriptsWithoutModifyField, udtFilter);
-	const { scripts: deleteUdtScripts, filteredScripts: scriptsWithoutDeleteUdt } = filter('deleted', scriptsWithoutCreateUdt, udtFilter);
-	const { scripts: modifyUdtScripts, filteredScripts: scriptsWithoutModifyUdt } = filter('modified', scriptsWithoutDeleteUdt, udtFilter);
+	const { scripts: createKeyspacesScripts, filteredScripts: scriptsWithoutCreateKeyspace } = filter('added', scriptData, 'keySpaces');
+	const { scripts: deleteKeyspaceScripts, filteredScripts: scriptsWithoutDropKeyspace } = filter('deleted', scriptsWithoutCreateKeyspace, 'keySpaces');
+	const { scripts: modifyKeyspacesScripts, filteredScripts: scriptsWithoutModifyKeyspace } = filter('modified', scriptsWithoutDropKeyspace, 'keySpaces');
+	const { scripts: createTablesScripts, filteredScripts: scriptsWithoutCreateTable } = filter('added', scriptsWithoutModifyKeyspace, 'table');
+	const { scripts: deleteTablesScripts, filteredScripts: scriptsWithoutDropTable } = filter('deleted', scriptsWithoutCreateTable, 'table');
+	const { scripts: modifyTablesScripts, filteredScripts: scriptsWithoutModifyTable } = filter('modified', scriptsWithoutDropTable, 'table');
+	const { scripts: createIndexesScripts, filteredScripts: scriptsWithoutCreateIndexes } = filter('added', scriptsWithoutModifyTable, 'index');
+	const { scripts: deleteIndexesScripts, filteredScripts: scriptsWithoutDropIndexes } = filter('deleted', scriptsWithoutCreateIndexes, 'index');
+	const { scripts: modifyIndexesScripts, filteredScripts: scriptsWithoutModifyIndexes } = filter('modified', scriptsWithoutDropIndexes, 'index');
+	const { scripts: createViewsScripts, filteredScripts: scriptsWithoutCreateViews } = filter('added', scriptsWithoutModifyIndexes, 'viewName');
+	const { scripts: deleteViewsScripts, filteredScripts: scriptsWithoutDeleteViews } = filter('deleted', scriptsWithoutCreateViews, 'viewName');
+	const { scripts: modifyViewsScripts, filteredScripts: scriptsWithoutModifyViews } = filter('modified', scriptsWithoutDeleteViews, 'viewName');
+	const { scripts: createFieldsScripts, filteredScripts: scriptsWithoutCreateField } = filter('added', scriptsWithoutModifyViews, 'field');    
+	const { scripts: deleteFieldsScripts, filteredScripts: scriptsWithoutDeleteField } = filter('deleted', scriptsWithoutCreateField, 'field');
+	const { scripts: modifyFieldsScripts, filteredScripts: scriptsWithoutModifyField } = filter('modified', scriptsWithoutDeleteField, 'field');
+	const { scripts: createUdtScripts, filteredScripts: scriptsWithoutCreateUdt } = filter('added', scriptsWithoutModifyField, 'udtName');
+	const { scripts: deleteUdtScripts, filteredScripts: scriptsWithoutDeleteUdt } = filter('deleted', scriptsWithoutCreateUdt, 'udtName');
+	const { scripts: modifyUdtScripts, filteredScripts: scriptsWithoutModifyUdt } = filter('modified', scriptsWithoutDeleteUdt, 'udtName');
 
 	return sortedScripts.concat(
 		createKeyspacesScripts,
@@ -892,8 +916,11 @@ const sortScript = (scriptData) => {
 		modifyKeyspacesScripts,
 		modifyUdtScripts,
 		modifyTablesScripts,
-		createViewsScripts,
+		deleteIndexesScripts,
+		createIndexesScripts,
+		modifyIndexesScripts,
 		deleteViewsScripts,
+		createViewsScripts,
 		modifyViewsScripts,
 		createFieldsScripts,
 		deleteFieldsScripts,
@@ -901,7 +928,7 @@ const sortScript = (scriptData) => {
 		deleteUdtScripts,
 		deleteTablesScripts,
 		deleteKeyspaceScripts,
-		scriptsWithoutModifyUdt).map((data) => data.script);
+		scriptsWithoutModifyUdt).map(data => data.script);
 }
 
 module.exports = {

@@ -30,7 +30,7 @@ const removeColumnStatement = columnName => `DROP "${columnName}";`;
 const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type};\n`;
 const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
 const getDelete = deleteData => {
-	const script = `${alterTablePrefix(deleteData.keyspaceName, deleteData.tableName)} ${removeColumnStatement(deleteData.columnData.name)}`;
+	const script = `${alterTablePrefix(deleteData.tableName, deleteData.keyspaceName)} ${removeColumnStatement(deleteData.columnData.name)}`;
 	return [{
 		added: false,
 		modified: false,
@@ -40,7 +40,7 @@ const getDelete = deleteData => {
 	}];
 };
 const getAdd = addData => {
-	const script = `${alterTablePrefix(addData.keyspaceName, addData.tableName)} ${addColumnStatement(addData.columnData)}`;
+	const script = `${alterTablePrefix(addData.tableName, addData.keyspaceName)} ${addColumnStatement(addData.columnData)}`;
 	return [{
 		deleted: false,
 		modified: false,
@@ -51,7 +51,7 @@ const getAdd = addData => {
 };
 const getRenameColumn = renameData => {
 	const script = 
-	`${alterTablePrefix(renameData.keyspaceName, renameData.tableName)} ${renameColumnStatement(renameData.columnData)};`;
+	`${alterTablePrefix(renameData.tableName, renameData.keyspaceName)} ${renameColumnStatement(renameData.columnData)};`;
 	return [{
 		added: false,
 		deleted: false,
@@ -451,7 +451,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 				...alterTableScript,
 				...generator({
 					keyspaceName,
-					tableName: tableName,
+					tableName,
 					columnData: {
 						name: columnName,
 						type: columnType

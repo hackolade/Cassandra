@@ -12,5 +12,12 @@
 	"compMode": {
 		"entity": true,
 		"container": false
-	}
+	},
+	"additionalOptions": [
+		{
+			"id": "applyDropStatements",
+			"value": false,
+			"name": "Apply Drop Statements"
+		}
+	]
 }

@@ -1,5 +1,5 @@
 const { getTypeByData } = require('./typeHelper');
-const { getTableNameStatement, commentDeactivatedStatement, tab } = require('./generalHelper');
+const { getTableNameStatement, commentDeactivatedStatement, getApplyDropStatement, tab } = require('./generalHelper');
 const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
@@ -853,13 +853,14 @@ const getAlterTableScript = (child, udtMap, data) => {
 const getAlterScript = (child, udtMap, data) => {
 	setDependencies(dependencies);
 	let scriptData = getAlterTableScript(child, udtMap, data);
-	scriptData = getCommentedDropScript(scriptData, !data.options?.applyDropStatements);
+	scriptData = getCommentedDropScript(scriptData, data);
 	scriptData = sortScript(scriptData);
 	return scriptData.filter(Boolean).join('\n\n');
 }
 
-const getCommentedDropScript = (scriptsData, isCommented) => {
-	if (!isCommented) {
+const getCommentedDropScript = (scriptsData, data) => {
+	const applyDropStatements = getApplyDropStatement(data);
+	if (applyDropStatements) {
 		return scriptsData;
 	}
 	return scriptsData.map((scriptData = {}) => {

@@ -188,7 +188,7 @@ const getIndexTable = (item, data) => {
 	)
 	return [
 		...dropIndexScript, 
-		{ ...scriptData, deleted: true, script: dropIndexSearchScript }, 
+		...dropIndexSearchScript, 
 		{ ...scriptData, added: true, script: addSearchIndexScript }, 
 		{ ...scriptData, added: true, script: addIndexScript }
 	];

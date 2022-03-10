@@ -17,6 +17,7 @@
 		{
 			"id": "applyDropStatements",
 			"value": false,
+			"forUpdate": true,
 			"name": "Apply Drop Statements"
 		}
 	]

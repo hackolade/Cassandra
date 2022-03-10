@@ -89,7 +89,7 @@ const getRenameType = (renameData) =>
 const DEFAULT_KEY_SPACE = { 'Default_Keyspace': 'Default_Keyspace' };
 
 const getCollectionName = compMod => {
-	const { collectionName, code = {} } = compMod;
+	const { collectionName = {}, code = {} } = compMod;
 	return {
 		oldName: code.old || collectionName.old,
 		newName: code.new || collectionName.new,
@@ -152,17 +152,14 @@ const getPropertiesForUpdateTable = properties => {
 const getUpdateTable = updateData => {
 	const { item, propertiesScript = [] } = updateData;
 	const { oldName, newName } = getCollectionName(item.role?.compMod);
-	
-	if (!oldName || !newName) {
-		return '';
-	}
 
 	const indexTableScript = getIndexTable(item, updateData.data);
 
 	const isChangeTable = getIsChangeTable({ ...item.role?.compMod, name: { new: newName, old: oldName } } || {});
 
 	if (!isChangeTable) {
-		const optionScript = getOptionsScript(item.role?.compMod || {}, oldName || newName, updateData.isOptionScript);
+		const tableName = updateData.tableName || oldName || newName;
+		const optionScript = getOptionsScript(item.role?.compMod || {}, tableName, updateData.isOptionScript);
 		return [
 			{
 				added: false,
@@ -172,7 +169,12 @@ const getUpdateTable = updateData => {
 				table: 'table',
 			},
 			...indexTableScript,
-			...propertiesScript];
+			...propertiesScript
+		];
+	}
+		
+	if (!oldName || !newName) {
+		return '';
 	}
 
 	const data = { 
@@ -282,7 +284,7 @@ const handleItem = (item, udtMap, generator, data) => {
 			}
 
 			if (itemCompModData.modified) {
-				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true });
+				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true, tableName });
 
 				return [...alterTableScript, ...updateTableScript];
 			}
@@ -301,7 +303,8 @@ const handleItem = (item, udtMap, generator, data) => {
 				item: itemProperties[tableKey], 
 				isOptionScript: generator.name === 'getUpdate',
 				propertiesScript,
-				keyspaceName, 
+				keyspaceName,
+				tableName,
 				data,
 			})
 

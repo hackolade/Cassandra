@@ -256,16 +256,19 @@ const handleItem = (item, udtMap, generator, data) => {
 			const keyspaceName = itemCompModData.keyspaceName;
 
 			if (itemCompModData.deleted) {
+				const deletedIndexScript = getIndexTable(itemProperties[tableKey], data);
 				return [ 
 					...alterTableScript, 
 					...getDeleteTable({
 						keyspaceName,
 						tableName
-					})
+					}),
+					...deletedIndexScript,
 				];
 			}
 
 			if (itemCompModData.created) {
+				const addedIndexScript = getIndexTable(itemProperties[tableKey], data);
 				return [ 
 					...alterTableScript, 
 					...getAddTable({
@@ -273,7 +276,8 @@ const handleItem = (item, udtMap, generator, data) => {
 						keyspaceName, 
 						data, 
 						tableName,
-					})
+					}),
+					...addedIndexScript,
 				];
 			}
 

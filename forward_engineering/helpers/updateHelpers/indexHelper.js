@@ -87,11 +87,12 @@ const getDataForSearchIndexScript = role => {
 }
 
 const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
-	if (!isDrop) {
-		return '';
+	let script = '';
+	if (!!isDrop) {
+		const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+		script = `DROP SEARCH INDEX ON ${tableNameStatement};`;
 	}
-	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
-	return `DROP SEARCH INDEX ON ${tableNameStatement};`;
+	return [{ ...scriptData, deleted: true, script}];
 }
 
 const getDropIndexScript = (keyspaceName, secIndxs = []) => secIndxs.map(index => {
@@ -99,19 +100,63 @@ const getDropIndexScript = (keyspaceName, secIndxs = []) => secIndxs.map(index =
 	const script = index.name ? `DROP INDEX IF EXISTS ${indexNameStatement}` : '';
 	return {
 		...scriptData, deleted: true, script,
-	}
+	};
 })
+
+const getCreatedIndex = data => {
+	const { item, dataSources, tableName, keyspaceName, isActivated, dbVersion } = data;
+	const isSearchIndex = !!item.role?.searchIndex;
+	const dataForSearchIndexScript = getDataSearchIndex(item.role || {});
+
+	const properties = { ...item.properties || {}, ...item.role.properties || {} };
+	dataSources[0] = { ...(dataSources[0] || {}), properties };
+
+	const script = getIndexes({
+			searchIndex: isSearchIndex && dataForSearchIndexScript,
+			indexes: item.role?.SecIndxs || [],
+		},
+		dataSources,
+		tableName,
+		keyspaceName,
+		isActivated,
+		true,
+		dbVersion
+	);
+	return [{
+		...scriptData,
+		added: true,
+		script,
+	}]
+}
+
+const getDeletedIndex = data => {
+	const { item, keyspaceName, tableName } = data;
+	const dropIndexScript = getDropIndexScript(keyspaceName, item.role?.SecIndxs || []);
+	const dropSearchIndexScript = getDropSearchIndexScript(keyspaceName, tableName, item.role?.searchIndex);
+	return [...dropIndexScript, ...dropSearchIndexScript];
+}
 
 const getIndexTable = (item, data) => {
 	setDependencies(dependencies);
-	const dataForSearchIndexScript = getDataForSearchIndexScript(item.role);
-	const dataForIndexScript = getDataForIndexScript(item.role?.compMod || {});
 
 	const tableName = item.role?.code || item.role?.name;
 	const dataSources = [item.role, data.modelDefinitions];
 	const keyspaceName = item.role.compMod?.keyspaceName;
 	const dbVersion = data.modelData[0].dbVersion;
 	const isActivated = item.role?.isActivated;
+
+	const { compMod = {} } = item.role || {};
+
+	if (compMod.created) {
+		return getCreatedIndex({ item, dataSources, tableName, keyspaceName, isActivated, dbVersion });
+	}
+
+	if (compMod.deleted) {
+		return getDeletedIndex({ item, keyspaceName, tableName });
+	}
+	
+	const dataForSearchIndexScript = getDataForSearchIndexScript(item.role);
+	const dataForIndexScript = getDataForIndexScript(item.role?.compMod || {});
 
 	const dropIndexSearchScript = getDropSearchIndexScript(
 		keyspaceName, 
@@ -122,7 +167,7 @@ const getIndexTable = (item, data) => {
 		keyspaceName,
 		dataForIndexScript.dropSecIndxs,
 	);
-	
+
 	const addSearchIndexScript = getIndexes(
 		{ searchIndex: dataForSearchIndexScript.addDataSearchIndex },
 		dataSources,

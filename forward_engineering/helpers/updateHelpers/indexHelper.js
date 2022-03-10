@@ -5,8 +5,13 @@ let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
 
-const dropIndexStatement = 'DROP INDEX IF EXISTS';
-const dropSearchIndexStatement = 'DROP SEARCH INDEX ON';
+const scriptData = {
+	added: false,
+	deleted: false,
+	modified: false,
+	index: 'index',
+};
+
 const indexSearchProperties = ['searchIndexColumns', 'searchIndexConfig', 'searchIndexOptions', 'searchIndex', 'searchIndexProfiles'];
 
 const getDataSearchIndex = indexTab => {
@@ -48,8 +53,9 @@ const getDataForIndexScript = compMod => {
 	} else if (!oldIndexs.length) {
 		addSecIndxs = newIndexs;
 	} else if (!_.isEqual(newIndexs, oldIndexs)) {
-		dropSecIndxs = oldIndexs;
-		addSecIndxs = newIndexs;
+		const equalElements = _.intersectionWith(newIndexs, oldIndexs, _.isEqual);
+		dropSecIndxs = _.xorWith(oldIndexs, equalElements, _.isEqual);
+		addSecIndxs = _.xorWith(newIndexs, equalElements, _.isEqual);
 	}
 	return {
 		addSecIndxs,
@@ -80,13 +86,21 @@ const getDataForSearchIndexScript = role => {
 	};
 }
 
-const getDropIndexScript = (keySpaceName, tableName, isDrop, statement) => {
+const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
 	if (!isDrop) {
 		return '';
 	}
-	const tableNameStatement = getTableNameStatement(keySpaceName, tableName);
-	return `${statement} ${tableNameStatement};`;
+	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+	return `DROP SEARCH INDEX ON ${tableNameStatement};`;
 }
+
+const getDropIndexScript = (keyspaceName, secIndxs = []) => secIndxs.map(index => {
+	const indexNameStatement = getTableNameStatement(keyspaceName, index.name);
+	const script = index.name ? `DROP INDEX IF EXISTS ${indexNameStatement}` : '';
+	return {
+		...scriptData, deleted: true, script,
+	}
+})
 
 const getIndexTable = (item, data) => {
 	setDependencies(dependencies);
@@ -99,17 +113,14 @@ const getIndexTable = (item, data) => {
 	const dbVersion = data.modelData[0].dbVersion;
 	const isActivated = item.role?.isActivated;
 
-	const dropIndexSearchScript = getDropIndexScript(
+	const dropIndexSearchScript = getDropSearchIndexScript(
 		keyspaceName, 
-		tableName, 
+		tableName,
 		dataForSearchIndexScript.dropDataSearchIndex,
-		dropSearchIndexStatement
 	);
 	const dropIndexScript = getDropIndexScript(
-		keyspaceName, 
-		tableName, 
+		keyspaceName,
 		dataForIndexScript.dropSecIndxs,
-		dropIndexStatement
 	);
 	
 	const addSearchIndexScript = getIndexes(
@@ -130,7 +141,12 @@ const getIndexTable = (item, data) => {
 		true,
 		dbVersion
 	)
-	return [dropIndexSearchScript, addSearchIndexScript, dropIndexScript, addIndexScript].filter(Boolean).join('\n\n');
+	return [
+		...dropIndexScript, 
+		{ ...scriptData, deleted: true, script: dropIndexSearchScript }, 
+		{ ...scriptData, added: true, script: addSearchIndexScript }, 
+		{ ...scriptData, added: true, script: addIndexScript }
+	];
 }
 
 module.exports = {

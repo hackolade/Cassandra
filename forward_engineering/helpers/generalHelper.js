@@ -190,6 +190,12 @@ const getUserDefinedAggregations = (udaItems) => {
 	return udaItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
 };
 
+const getApplyDropStatement = data => {
+	const { applyDropStatements, additionalOptions = [] } = data.options || {};
+	const applyDropStatementsFromUi = (additionalOptions.find(option => option.id === 'applyDropStatements') || {}).value;
+	return applyDropStatements || applyDropStatementsFromUi;
+}
+
 module.exports = {
 	tab,
 	retrieveContainerName,
@@ -209,5 +215,6 @@ module.exports = {
 	retrieveIsItemActivated,
 	getUserDefinedAggregations,
 	getUserDefinedFunctions,
-	getIndexProfiles
+	getIndexProfiles,
+	getApplyDropStatement
 };

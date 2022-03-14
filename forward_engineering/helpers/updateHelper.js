@@ -881,6 +881,12 @@ const getCommentedDropScript = (scriptsData, data) => {
 	})
 }
 
+const isDropInStatements = (child, udtMap, data) => {
+	setDependencies(dependencies);
+	const scriptsData = getAlterTableScript(child, udtMap, data);
+	return scriptsData.some(scriptData => !!scriptData.script && scriptData.deleted);
+}
+
 const sortScript = (scriptData) => {
 	const filterProp = (key, prop, script = {}) => script[key] && script[prop];
 	const filter = (key, scriptData, keyProp) => {
@@ -940,5 +946,6 @@ const sortScript = (scriptData) => {
 }
 
 module.exports = {
-	getAlterScript
+	getAlterScript,
+	isDropInStatements
 };

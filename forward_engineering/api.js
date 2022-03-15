@@ -68,8 +68,12 @@ module.exports = {
 			if (data.isUpdateScript) {
 				let result = '';
 				data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-				data.collections.forEach(jsonSchema => {
-					result += getAlterScript(JSON.parse(jsonSchema), data.udtTypeMap);
+				data.modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
+				data.externalDefinitions = JSON.parse(data.externalDefinitions);
+				data.entities.forEach(entityId => {
+					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+					result += getAlterScript(jsonSchema, data.udtTypeMap, data);
 				})
 				callback(null, result);
 			} else {

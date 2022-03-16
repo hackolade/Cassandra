@@ -842,16 +842,16 @@ const getAlterTableScript = (child, udtMap, data) => {
 		alterScript = mergeArrays(alterScript, getAlterUdtScript(child.modelDefinitions, udtMap, data));
 	}
 
+	if (objectContainsProp(child, 'added')) {
+		alterScript = mergeArrays(alterScript, handleChange(child.added, udtMap, getAdd, data));
+	}
+
 	if (objectContainsProp(child, 'modified')) {
 		alterScript = mergeArrays(alterScript, handleChange(child.modified, udtMap, getUpdate, data));
 	}
 
 	if (objectContainsProp(child, 'deleted')) {
 		alterScript = mergeArrays(alterScript, handleChange(child.deleted, udtMap, getDelete, data));
-	}
-
-	if (objectContainsProp(child, 'added')) {
-		alterScript = mergeArrays(alterScript, handleChange(child.added, udtMap, getAdd, data));
 	}
 
 	return alterScript;
@@ -879,6 +879,12 @@ const getCommentedDropScript = (scriptsData, data) => {
 			script: commentDeactivatedStatement(scriptData.script, false),
 		};
 	})
+}
+
+const isDropInStatements = (child, udtMap, data) => {
+	setDependencies(dependencies);
+	const scriptsData = getAlterTableScript(child, udtMap, data);
+	return scriptsData.some(scriptData => !!scriptData.script && scriptData.deleted);
 }
 
 const sortScript = (scriptData) => {
@@ -925,14 +931,14 @@ const sortScript = (scriptData) => {
 		modifyUdtScripts,
 		modifyTablesScripts,
 		deleteIndexesScripts,
-		createIndexesScripts,
 		modifyIndexesScripts,
 		deleteViewsScripts,
-		createViewsScripts,
 		modifyViewsScripts,
-		createFieldsScripts,
 		deleteFieldsScripts,
+		createFieldsScripts,
 		modifyFieldsScripts,
+		createIndexesScripts,
+		createViewsScripts,
 		deleteUdtScripts,
 		deleteTablesScripts,
 		deleteKeyspaceScripts,
@@ -940,5 +946,6 @@ const sortScript = (scriptData) => {
 }
 
 module.exports = {
-	getAlterScript
+	getAlterScript,
+	isDropInStatements
 };

@@ -18,7 +18,8 @@
 			"id": "applyDropStatements",
 			"value": false,
 			"forUpdate": true,
-			"name": "Apply Drop Statements"
+			"name": "Apply Drop Statements",
+			"isDropInStatements": true
 		},
 		{
 			"name": "Exclude Keyspace ALTER statements",

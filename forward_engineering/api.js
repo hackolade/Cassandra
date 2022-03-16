@@ -12,7 +12,7 @@ const {
 	getUserDefinedFunctions,
 } = require('./helpers/generalHelper');
 const { getTableStatement } = require('./helpers/tableHelper');
-const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
+const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 const { getAlterScript, isDropInStatements } = require('./helpers/updateHelper');
@@ -69,12 +69,14 @@ module.exports = {
 		try {
 			setDependencies(app);
 			if (data.isUpdateScript) {
-				let result = '';
-				data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-				data.collections.forEach(jsonSchema => {
-					result += getAlterScript(JSON.parse(jsonSchema), data.udtTypeMap);
+				const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				const scripts = data.entities.map(entityId => {
+					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+					return getAlterScript(jsonSchema, data.udtTypeMap, data);
 				})
-				callback(null, result);
+				callback(null, scripts.filter(Boolean).join('\n\n'));
 			} else {
 				const modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
 				const externalDefinitions = JSON.parse(data.externalDefinitions);
@@ -198,17 +200,29 @@ module.exports = {
 	isDropInStatements(data, logger, callback, app) {
 		try {
 			setDependencies(app);
-			data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-			data.jsonSchema = JSON.parse(data.jsonSchema);
-			data.modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
-			data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
-			data.externalDefinitions = JSON.parse(data.externalDefinitions);
+			let result;
+			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+			
+			if (typeof data.jsonSchema !== 'string') {
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				result = data.entities.map(entityId => {
+						const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+						data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+						return isDropInStatements(jsonSchema, data.udtTypeMap, data);
+					})
+					.some(Boolean);
+			} else {
+				const jsonSchema = JSON.parse(data.jsonSchema);
+				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
+				result = isDropInStatements(data.jsonSchema, data.udtTypeMap, data)
+			}
 
-			callback(null, isDropInStatements(data.jsonSchema, data.udtTypeMap, data));
+			callback(null, result);
 		}	catch (e) {
 			callback({ message: e.message, stack: e.stack });
 		}
-	}
+	},
 };
 
 const getScript = (structure) => {

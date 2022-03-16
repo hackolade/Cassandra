@@ -197,32 +197,29 @@ module.exports = {
 	isDropInStatements(data, logger, callback, app) {
 		try {
 			setDependencies(app);
+			let result;
 			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
-			const jsonSchema = JSON.parse(data.jsonSchema);
-			const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
-			data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
+			
+			if (typeof data.jsonSchema !== 'string') {
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				result = data.entities.map(entityId => {
+						const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+						data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+						return isDropInStatements(jsonSchema, data.udtTypeMap, data);
+					})
+					.some(Boolean);
+			} else {
+				const jsonSchema = JSON.parse(data.jsonSchema);
+				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
+				result = isDropInStatements(data.jsonSchema, data.udtTypeMap, data)
+			}
 
-			callback(null, isDropInStatements(data.jsonSchema, data.udtTypeMap, data));
+			callback(null, result);
 		}	catch (e) {
 			callback({ message: e.message, stack: e.stack });
 		}
 	},
-
-	isDropInStatementsFromContainer(data, logger, callback, app) {
-		try {
-			setDependencies(app)
-			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
-			data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
-			const result = data.entities.map(entityId => {
-				const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
-				data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
-				return isDropInStatements(jsonSchema, data.udtTypeMap, data);
-			})
-			callback(null, result.some(Boolean));
-		} catch (e) {
-			callback({ message: e.message, stack: e.stack });
-		}
-	}
 };
 
 const getScript = (structure) => {

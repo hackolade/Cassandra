@@ -15,7 +15,7 @@ const { getTableStatement } = require('./helpers/tableHelper');
 const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
-const { getAlterScript } = require('./helpers/updateHelper');
+const { getAlterScript, isDropInStatements } = require('./helpers/updateHelper');
 const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
@@ -194,6 +194,21 @@ module.exports = {
 				callback,
 				callback
 			);
+	},
+
+	isDropInStatements(data, logger, callback, app) {
+		try {
+			setDependencies(app);
+			data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
+			data.jsonSchema = JSON.parse(data.jsonSchema);
+			data.modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
+			data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
+			data.externalDefinitions = JSON.parse(data.externalDefinitions);
+
+			callback(null, isDropInStatements(data.jsonSchema, data.udtTypeMap, data));
+		}	catch (e) {
+			callback({ message: e.message, stack: e.stack });
+		}
 	}
 };
 

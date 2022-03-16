@@ -20,6 +20,7 @@ const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
+const { getScriptOptions } = require('./helpers/getScriptOptions');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
@@ -32,6 +33,8 @@ module.exports = {
 			data.externalDefinitions = JSON.parse(data.externalDefinitions);
 
 			if (data.isUpdateScript) {
+				data.scriptOptions = getScriptOptions(data);
+
 				callback(null, getAlterScript(data.jsonSchema, data.udtTypeMap, data));
 			} else {
 				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, true)}`;

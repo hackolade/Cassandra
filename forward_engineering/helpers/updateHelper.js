@@ -763,23 +763,23 @@ const generateScript = (child, udtMap, data, column, mode) => {
 	return getScript({ child: item, udtMap, data, mode });
 }
 
-const getScript = (child, udtMap, data, column, mode) => {
+const getScript = (child, udtMap, data, column, mode, options = {}) => {
 	let alterScript = [];
 
 	if (objectContainsProp(child, 'properties')) {
-		alterScript = mergeArrays(alterScript, getScript(child.properties, udtMap, data, column));
+		alterScript = mergeArrays(alterScript, getScript(child.properties, udtMap, data, column, undefined, options));
 	}
 
-	if (objectContainsProp(child, 'modified')) {
-		alterScript = mergeArrays(alterScript, getScript(child.modified, udtMap, data, column,'update'))
+	if (objectContainsProp(child, 'modified') && !options[column]?.skipModified) {
+		alterScript = mergeArrays(alterScript, getScript(child.modified, udtMap, data, column, 'update', options));
 	}
 
 	if (objectContainsProp(child, 'added')) {
-		alterScript = mergeArrays(alterScript, getScript(child.added, udtMap, data, column,'add'));
+		alterScript = mergeArrays(alterScript, getScript(child.added, udtMap, data, column, 'add', options));
 	}
 
 	if (objectContainsProp(child, 'deleted')) {
-		alterScript = mergeArrays(alterScript, getScript(child.deleted, udtMap, data, column,'delete'));
+		alterScript = mergeArrays(alterScript, getScript(child.deleted, udtMap, data, column, 'delete', options));
 	}
 
 	if (objectContainsProp(child, 'items')) {
@@ -787,7 +787,7 @@ const getScript = (child, udtMap, data, column, mode) => {
 	}
 
 	return alterScript;
-}
+};
 
 const getAlterUdtScript = (child, udtMap, data) => {
 	let alterScript = [];
@@ -835,7 +835,7 @@ const getAlterTableScript = (child, udtMap, data) => {
 	}
 
 	if (objectContainsProp(child, 'containers')) {
-		alterScript = mergeArrays(alterScript, getScript(child.containers, udtMap, data, 'containers'));
+		alterScript = mergeArrays(alterScript,getScript(child.containers, udtMap, data, 'containers', undefined, data.scriptOptions));
 	}
 
 	if (objectContainsProp(child, 'modelDefinitions')) {

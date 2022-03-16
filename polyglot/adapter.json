@@ -51,6 +51,29 @@
 				}
 			}
 		],
-		"entity": [["setEntityCompositeKeys", "compositePartitionKey", "primaryKey"]]
+		"entity": [
+			[
+				"setEntityCompositeKeys",
+				"compositePartitionKey",
+				"primaryKey"
+			]
+		]
+	},
+	"postConvert": {
+		"modify": {
+			"field": [
+				[
+					"updateModelDefinitionOfFirstOrder",
+					{
+						"from": {
+							"type": "map"
+						},
+						"to": {
+							"type": "udt"
+						}
+					}
+				]
+			]
+		}
 	}
 }

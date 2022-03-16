@@ -12,7 +12,7 @@ const {
 	getUserDefinedFunctions,
 } = require('./helpers/generalHelper');
 const { getTableStatement } = require('./helpers/tableHelper');
-const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
+const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
 const { getAlterScript, isDropInStatements } = require('./helpers/updateHelper');
@@ -66,16 +66,14 @@ module.exports = {
 		try {
 			setDependencies(app);
 			if (data.isUpdateScript) {
-				let result = '';
-				data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-				data.modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
-				data.externalDefinitions = JSON.parse(data.externalDefinitions);
-				data.entities.forEach(entityId => {
+				const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				const scripts = data.entities.map(entityId => {
 					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
-					result += getAlterScript(jsonSchema, data.udtTypeMap, data);
+					return getAlterScript(jsonSchema, data.udtTypeMap, data);
 				})
-				callback(null, result);
+				callback(null, scripts.filter(Boolean).join('\n\n'));
 			} else {
 				const modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
 				const externalDefinitions = JSON.parse(data.externalDefinitions);
@@ -199,14 +197,29 @@ module.exports = {
 	isDropInStatements(data, logger, callback, app) {
 		try {
 			setDependencies(app);
-			data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-			data.jsonSchema = JSON.parse(data.jsonSchema);
-			data.modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
-			data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
-			data.externalDefinitions = JSON.parse(data.externalDefinitions);
+			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+			const jsonSchema = JSON.parse(data.jsonSchema);
+			const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
+			data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
 
 			callback(null, isDropInStatements(data.jsonSchema, data.udtTypeMap, data));
 		}	catch (e) {
+			callback({ message: e.message, stack: e.stack });
+		}
+	},
+
+	isDropInStatementsFromContainer(data, logger, callback, app) {
+		try {
+			setDependencies(app)
+			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+			data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+			const result = data.entities.map(entityId => {
+				const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+				data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+				return isDropInStatements(jsonSchema, data.udtTypeMap, data);
+			})
+			callback(null, result.some(Boolean));
+		} catch (e) {
 			callback({ message: e.message, stack: e.stack });
 		}
 	}

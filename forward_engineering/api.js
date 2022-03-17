@@ -12,14 +12,15 @@ const {
 	getUserDefinedFunctions,
 } = require('./helpers/generalHelper');
 const { getTableStatement } = require('./helpers/tableHelper');
-const { sortUdt, getUdtMap, getUdtScripts } = require('./helpers/udtHelper');
+const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
-const { getAlterScript } = require('./helpers/updateHelper');
+const { getAlterScript, isDropInStatements } = require('./helpers/updateHelper');
 const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
+const { getScriptOptions } = require('./helpers/getScriptOptions');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
@@ -32,6 +33,8 @@ module.exports = {
 			data.externalDefinitions = JSON.parse(data.externalDefinitions);
 
 			if (data.isUpdateScript) {
+				data.scriptOptions = getScriptOptions(data);
+
 				callback(null, getAlterScript(data.jsonSchema, data.udtTypeMap, data));
 			} else {
 				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, true)}`;
@@ -66,12 +69,14 @@ module.exports = {
 		try {
 			setDependencies(app);
 			if (data.isUpdateScript) {
-				let result = '';
-				data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-				data.collections.forEach(jsonSchema => {
-					result += getAlterScript(JSON.parse(jsonSchema), data.udtTypeMap);
+				const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				const scripts = data.entities.map(entityId => {
+					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+					return getAlterScript(jsonSchema, data.udtTypeMap, data);
 				})
-				callback(null, result);
+				callback(null, scripts.filter(Boolean).join('\n\n'));
 			} else {
 				const modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
 				const externalDefinitions = JSON.parse(data.externalDefinitions);
@@ -190,7 +195,34 @@ module.exports = {
 				callback,
 				callback
 			);
-	}
+	},
+
+	isDropInStatements(data, logger, callback, app) {
+		try {
+			setDependencies(app);
+			let result;
+			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+			
+			if (typeof data.jsonSchema !== 'string') {
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				result = data.entities.map(entityId => {
+						const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
+						data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
+						return isDropInStatements(jsonSchema, data.udtTypeMap, data);
+					})
+					.some(Boolean);
+			} else {
+				const jsonSchema = JSON.parse(data.jsonSchema);
+				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
+				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
+				result = isDropInStatements(data.jsonSchema, data.udtTypeMap, data)
+			}
+
+			callback(null, result);
+		}	catch (e) {
+			callback({ message: e.message, stack: e.stack });
+		}
+	},
 };
 
 const getScript = (structure) => {

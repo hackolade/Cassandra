@@ -173,7 +173,7 @@ const commentDeactivatedStatement = (statement, isActivated = true, isParentActi
 }
 
 const retrieveIsItemActivated = (itemConfig) => {
-	const value = retrivePropertyFromConfig(itemConfig, 0, "isActivated");
+	const value = retrivePropertyFromConfig(itemConfig, 0, "isActivated", true);
 
 	if (value === undefined) {
 		return true;

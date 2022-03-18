@@ -26,16 +26,15 @@ module.exports = {
 	generateScript(data, logger, callback, app) {
 		try {
 			setDependencies(app);
-			data.udtTypeMap = getUdtMap([data.modelDefinitions, data.externalDefinitions]);
-			data.jsonSchema = JSON.parse(data.jsonSchema);
-			data.modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
-			data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
-			data.externalDefinitions = JSON.parse(data.externalDefinitions);
+			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
+			const jsonSchema = JSON.parse(data.jsonSchema);
+			const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
+			data = { ...data, jsonSchema, udtTypeMap, modelDefinitions, externalDefinitions, internalDefinitions };
 
 			if (data.isUpdateScript) {
 				data.scriptOptions = getScriptOptions(data);
 
-				callback(null, getAlterScript(data.jsonSchema, data.udtTypeMap, data));
+				callback(null, getAlterScript(data.jsonSchema, udtTypeMap, data));
 			} else {
 				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, true)}`;
 				callback(null, script);
@@ -71,6 +70,8 @@ module.exports = {
 			if (data.isUpdateScript) {
 				const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
 				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
+				data.scriptOptions = getScriptOptions(data);
+				
 				const scripts = data.entities.map(entityId => {
 					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));

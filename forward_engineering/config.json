@@ -11,7 +11,8 @@
 	"applyScriptToInstance": true,
 	"compMode": {
 		"entity": true,
-		"container": true
+		"container": false,
+		"modelLevel": true
 	},
 	"additionalOptions": [
 		{

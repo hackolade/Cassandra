@@ -11,7 +11,10 @@
 	"applyScriptToInstance": true,
 	"compMode": {
 		"entity": true,
-		"container": true
+		"container": false
+	},
+	"subTabs": {
+		"model": true
 	},
 	"additionalOptions": [
 		{

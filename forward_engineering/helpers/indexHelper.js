@@ -233,7 +233,7 @@ const getSearchIndex = ({ tableName, columns, index, isActivated, ifNotExist }) 
 	const config = indexConfig ? `\n${tab(`AND CONFIG ${indexConfig}`)}` : '';
 	const indexOptions = getSearchIndexOptions(index.options);
 	const options = indexOptions ? `\n${tab(`AND OPTIONS ${indexOptions}`)}` : '';
-	return `CREATE SEARCH INDEX ${ifNotExist ? `IF NOT EXISTS ON `:``}${tableName}\n` + 
+	return `CREATE SEARCH INDEX ${ifNotExist ? `IF NOT EXISTS `:``}ON ${tableName}\n` + 
 		`${tab(`WITH COLUMNS\n${tab(columnsStatement)}`)}` + 
 		profiles + config + options +
 		';';

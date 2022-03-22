@@ -1,6 +1,7 @@
 const { dependencies } = require('../appDependencies');
-const { getIndexProfiles, getTableNameStatement } = require('../generalHelper');
+const { getIndexProfiles, getTableNameStatement, tab } = require('../generalHelper');
 const { getIndexes } = require('../indexHelper');
+const { getNamesByIds } = require('../schemaHelper');
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -13,9 +14,6 @@ let nameCollectionsExistsScript = {
 };
 
 const scriptData = {
-	added: false,
-	deleted: false,
-	modified: false,
 	index: 'index',
 };
 
@@ -30,7 +28,7 @@ const setNameCollectionsScript = (keyspaceName, name, type) => {
 	nameCollectionsExistsScript = { ...nameCollectionsExistsScript, [type]: [...nameCollectionsExistsScript[type], statement] };
 };
 
-const indexSearchProperties = ['searchIndexColumns', 'searchIndexConfig', 'searchIndexOptions', 'searchIndex', 'searchIndexProfiles'];
+const indexSearchProperties = ['searchIndexOptions', 'searchIndexProfiles'];
 
 const getDataSearchIndex = indexTab => {
 	return {
@@ -52,12 +50,16 @@ const getModifyDataSearchIndex = (item, type) => {
 }
 
 const compareProperty = (newProperty, oldProperty, data) => {
-	if (_.isEmpty(newProperty) && _.isEmpty(oldProperty)) {
+	const newPropertyEmpty = _.isObject(newProperty) && _.isEmpty(newProperty) || !newProperty;
+	const oldPropertyEmpty = _.isObject(oldProperty) && _.isEmpty(oldProperty) || !oldProperty;
+
+	if (newPropertyEmpty && oldPropertyEmpty) {
 		return data;
 	}
-	if (_.isEmpty(newProperty)) {
+
+	if (newPropertyEmpty) {
 		return { ...data, drop: true };
-	} else if (_.isEmpty(oldProperty)) {
+	} else if (oldPropertyEmpty) {
 		return { ...data, add: true };
 	} else if (!_.isEqual(newProperty, oldProperty)) {
 		return { ...data, modify: true};
@@ -65,51 +67,143 @@ const compareProperty = (newProperty, oldProperty, data) => {
 	return data;
 }
 
-const getDataForIndexScript = compMod => {
-	const { new: newIndexs = [], old: oldIndexs = [] } = compMod.SecIndxs || {};
-	let addSecIndxs;
-	let dropSecIndxs;
+const getDataForScript = (newData, oldData) => {
+	let addData;
+	let dropData;
 	
-	if (!newIndexs.length && !oldIndexs.length) {
+	if (!newData.length && !oldData.length) {
 		return {};
 	}
 
-	if (!newIndexs.length) {
-		dropSecIndxs = oldIndexs;
-	} else if (!oldIndexs.length) {
-		addSecIndxs = newIndexs;
-	} else if (!_.isEqual(newIndexs, oldIndexs)) {
-		const equalElements = _.intersectionWith(newIndexs, oldIndexs, _.isEqual);
-		dropSecIndxs = _.xorWith(oldIndexs, equalElements, _.isEqual);
-		addSecIndxs = _.xorWith(newIndexs, equalElements, _.isEqual);
+	if (!newData.length) {
+		addData = oldData;
+	} else if (!oldData.length) {
+		addData = newData;
+	} else if (!_.isEqual(newData, oldData)) {
+		const equalElements = _.intersectionWith(newData, oldData, _.isEqual);
+		dropData = _.xorWith(oldData, equalElements, _.isEqual);
+		addData = _.xorWith(newData, equalElements, _.isEqual);
 	}
 	return {
-		addSecIndxs,
-		dropSecIndxs,
+		addData,
+		dropData,
 	}
 }
 
 const getDataForSearchIndexScript = role => {
 	const { compMod } = role;
 	const dataSearchIndex = getDataSearchIndex(role);
-	const searchIndexCompare = indexSearchProperties
+	const searchIndex = _.get(role, 'compMod.searchIndex', {});
+	const searchPropertiesCompare = indexSearchProperties
 		.reduce((data, property) => compareProperty(compMod[property]?.new, compMod[property]?.old, data), {});
 	
-	let dropDataSearchIndex;
-	let addDataSearchIndex;
+	let dropData;
+	let addData;
 
-	if (searchIndexCompare.add && !searchIndexCompare.drop && !searchIndexCompare.modify) {
-		addDataSearchIndex = getModifyDataSearchIndex(role, 'new');
-	} else if (searchIndexCompare.drop && !searchIndexCompare.add && !searchIndexCompare.modify) {
-		dropDataSearchIndex = dataSearchIndex;
-	} else if (searchIndexCompare.modify) {
-		addDataSearchIndex = getModifyDataSearchIndex(role, 'new');;
-		dropDataSearchIndex = dataSearchIndex;
+	if (!searchIndex.old) {
+		addData = getModifyDataSearchIndex(role, 'new');
+	} else if (!searchIndex.new) {
+		dropData = dataSearchIndex;
+	} else if (!_.isEmpty(searchPropertiesCompare)) {
+		addData = getModifyDataSearchIndex(role, 'new');;
+		dropData = dataSearchIndex;
 	} 
 	return {
-		addDataSearchIndex,
-		dropDataSearchIndex
+		addData,
+		dropData
 	};
+}
+
+const getDataColumn = (dataSources, column = {}) => {
+	const keyId = _.get(column, 'key[0].keyId', '');
+	const { name = '' } = getNamesByIds([keyId], dataSources)[keyId] || {};
+	return {
+		...column,
+		name,
+	};
+}
+
+const getDataForSearchIndexColumns = (dataSources, columns = {}) => {
+	const newColumns = (columns.new || []).map(getDataColumn.bind(null, dataSources));
+	const oldColumns = (columns.old || []).map(getDataColumn.bind(null, dataSources));
+	return getDataForScript(newColumns, oldColumns);
+}
+
+const getDataForSearchIndexConfig = ({ new: newConfig = {}, old: oldConfig = {} }) => {
+	const keys = _.union(Object.keys(newConfig), Object.keys(oldConfig));
+
+	return keys.reduce((config, key) => {
+		if (key === 'id') {
+			return config;
+		}
+		const { add, modify, drop } = compareProperty(newConfig[key], oldConfig[key], {});
+
+		return {
+			modifyData: add || modify ? { ...config.modifyData, [key]: newConfig[key] } : config.modifyData,
+			dropData: drop ? { ...config.dropData, [key]: oldConfig[key] } : config.dropData,
+		}
+	}, { modifyData: {}, dropData: {} });
+}
+
+const getSearchConfigScript = (keyspaceName, tableName, config) => {
+	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+	const alterScript = `ALTER SEARCH INDEX CONFIG\n` +
+		tab(`ON ${tableNameStatement}\n`);
+	
+	const dropScript = Object.entries(config.dropData).map(([key]) => {
+		const script = alterScript +
+			tab(`DROP ${key}`);
+		return {
+			...scriptData,
+			deleted: true,
+			script,
+		};
+	})
+	const modifyScript = Object.entries(config.modifyData).map(([key, value]) => {
+		const preparedValue = _.isString(value) ? `'${value}'` : value;
+		const script = alterScript +
+			tab(`SET ${key} = ${preparedValue};`);
+		return {
+			...scriptData,
+			modified: true,
+			script,
+		};
+	});
+
+	return [...modifyScript, ...dropScript];
+}
+
+const getSearchColumnsScript = (keyspaceName, tableName, columns) => {
+	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+	const alterScript = `ALTER SEARCH INDEX SCHEMA\n` +
+		tab(`ON ${tableNameStatement}\n`);
+	
+	const getScript = (alterScript, statement, scriptType, column) => {
+		const script = alterScript +
+			tab(`${statement} "${column.name}";`);
+		return {
+			...scriptData,
+			...scriptType,
+			script
+		};
+	};
+
+	const dropScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { deleted: true }));
+	const addScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { added: true }));
+
+	return [...dropScripts, ...addScripts];
+}
+
+const getRenewalScript = (keyspaceName, tableName, startStatement) => {
+	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+	const script = `${startStatement} SEARCH INDEX\n` +
+		tab(`ON ${tableNameStatement};`);
+	
+	return {
+		added: true,
+		renewal: true,
+		script,
+	}
 }
 
 const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
@@ -214,35 +308,67 @@ const getDeletedIndex = data => {
 	return [...dropIndexScript, ...dropSearchIndexScript];
 }
 
-const getUpdateIndex = data => {
+const getUpdateSearchIndexScript = data => {
 	const { item, keyspaceName, tableName, dbVersion, isActivated, dataSources } = data;
 
-	const dataForSearchIndexScript = getDataForSearchIndexScript(item.role);
-	const dataForIndexScript = getDataForIndexScript(item.role?.compMod || {});
+	const dataForScript = getDataForSearchIndexScript(item.role);
+	
+	if (dataForScript.dropData || dataForScript.addData) {
+		const dropIndexSearchScript = getDropSearchIndexScript(
+			keyspaceName, 
+			tableName,
+			!!dataForScript.dropData,
+		);
+	
+		const addSearchIndexScript = getAddSearchIndexScript({
+			searchIndex: dataForScript.addData,
+			dataSources,
+			tableName,
+			keyspaceName,
+			isActivated,
+			dbVersion
+		});
+		
+		return [...dropIndexSearchScript, ...addSearchIndexScript];
+	}
+	
+	const columns = _.get(item, 'role.compMod.searchIndexColumns', {});
+	const config = _.get(item, 'role.compMod.searchIndexConfig', {})
+	
+	const dataForColumnsScript = getDataForSearchIndexColumns(dataSources, columns);
+	const dataForConfigScript = getDataForSearchIndexConfig(config);
 
-	const dropIndexSearchScript = getDropSearchIndexScript(
-		keyspaceName, 
-		tableName,
-		!!dataForSearchIndexScript.dropDataSearchIndex,
-	);
+	const configScript = getSearchConfigScript(keyspaceName, tableName, dataForConfigScript);
+	const columnsScript = getSearchColumnsScript(keyspaceName, tableName, dataForColumnsScript);
+
+	const renewalData = {
+		RELOAD: configScript.length || columnsScript.length,
+		REBUILD: columnsScript.length,
+	};
+	const renewalScripts = Object.entries(renewalData).reduce((scripts, [key, value]) => {
+		if (!value) {
+			return scripts;
+		}
+		return [...scripts, getRenewalScript(keyspaceName, tableName, key)];
+	}, []);
+
+	return [...configScript, ...columnsScript, ...renewalScripts];
+}
+
+const getUpdateIndexScript = data => {
+	const { item, keyspaceName, tableName, dbVersion, isActivated, dataSources } = data;
+	const { new: newIndexes = [], old: oldIndexes = [] } = _.get(item, 'role.compMod.SecIndxs', {});
+
+	const dataForIndexScript = getDataForScript(newIndexes, oldIndexes);
 
 	const dropIndexScript = getDropIndexScript(
 		keyspaceName,
 		tableName,
-		dataForIndexScript.dropSecIndxs,
+		dataForIndexScript.dropData,
 	);
 
-	let addSearchIndexScript = getAddSearchIndexScript({
-		searchIndex: dataForSearchIndexScript.addDataSearchIndex,
-		dataSources,
-		tableName,
-		keyspaceName,
-		isActivated,
-		dbVersion
-	});
-
 	const addIndexScript = getAddIndexScript({
-		indexes: dataForIndexScript.addSecIndxs,
+		indexes: dataForIndexScript.addData,
 		dataSources,
 		tableName,
 		keyspaceName,
@@ -250,7 +376,14 @@ const getUpdateIndex = data => {
 		dbVersion
 	});
 
-	return [...dropIndexScript, ...dropIndexSearchScript, ...addSearchIndexScript, ...addIndexScript];
+	return [...dropIndexScript, ...addIndexScript];
+}
+
+const getUpdateIndex = data => {
+	const updateSearchIndexScript = getUpdateSearchIndexScript(data);
+	const updateIndexScript = getUpdateIndexScript(data);
+
+	return [...updateIndexScript, ...updateSearchIndexScript];
 }
 
 const getIndexTable = (item, data) => {

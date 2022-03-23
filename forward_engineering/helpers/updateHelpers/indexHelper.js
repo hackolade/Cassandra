@@ -152,7 +152,7 @@ const getSearchConfigScript = (keyspaceName, tableName, config) => {
 	
 	const dropScript = Object.entries(config.dropData).map(([key]) => {
 		const script = alterScript +
-			tab(`DROP ${key}`);
+			tab(`DROP ${key};`);
 		return {
 			...scriptData,
 			deleted: true,

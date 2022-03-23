@@ -42,7 +42,7 @@ const getDataSearchIndex = indexTab => {
 }
 
 const getModifyDataSearchIndex = (item, type) => {
-	const itemData = [...indexSearchProperties, 'searchIndexIfNotExist']
+	const itemData = [...indexSearchProperties, 'searchIndexIfNotExist', 'searchIndexColumns', 'searchIndexConfig']
 		.map(property => ([property, (item?.compMod || {})[property]?.[type]]))
 		.filter(([__, value]) => !!value);
 	item = { ...item, ...Object.fromEntries(itemData) };

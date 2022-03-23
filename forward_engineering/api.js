@@ -204,7 +204,7 @@ module.exports = {
 			let result;
 			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
 			
-			if (typeof data.jsonSchema !== 'string') {
+			if (data.level === 'container') {
 				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
 				result = data.entities.map(entityId => {
 						const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
@@ -212,7 +212,7 @@ module.exports = {
 						return isDropInStatements(jsonSchema, data.udtTypeMap, data);
 					})
 					.some(Boolean);
-			} else {
+			} else if (data.level === 'entity') {
 				const jsonSchema = JSON.parse(data.jsonSchema);
 				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
 				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };

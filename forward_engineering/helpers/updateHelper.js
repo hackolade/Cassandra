@@ -552,7 +552,8 @@ const sortScript = (scriptData) => {
 	const { scripts: createIndexesScripts, filteredScripts: scriptsWithoutCreateIndexes } = filter('added', scriptsWithoutModifyTable, 'index');
 	const { scripts: deleteIndexesScripts, filteredScripts: scriptsWithoutDropIndexes } = filter('deleted', scriptsWithoutCreateIndexes, 'index');
 	const { scripts: modifyIndexesScripts, filteredScripts: scriptsWithoutModifyIndexes } = filter('modified', scriptsWithoutDropIndexes, 'index');
-	const { scripts: createViewsScripts, filteredScripts: scriptsWithoutCreateViews } = filter('added', scriptsWithoutModifyIndexes, 'viewName');
+	const { scripts: renewalIndexesScripts, filteredScripts: scriptsWithoutRenewalIndexes } = filter('added', scriptsWithoutModifyIndexes, 'renewal');
+	const { scripts: createViewsScripts, filteredScripts: scriptsWithoutCreateViews } = filter('added', scriptsWithoutRenewalIndexes, 'viewName');
 	const { scripts: deleteViewsScripts, filteredScripts: scriptsWithoutDeleteViews } = filter('deleted', scriptsWithoutCreateViews, 'viewName');
 	const { scripts: modifyViewsScripts, filteredScripts: scriptsWithoutModifyViews } = filter('modified', scriptsWithoutDeleteViews, 'viewName');
 	const { scripts: createFieldsScripts, filteredScripts: scriptsWithoutCreateField } = filter('added', scriptsWithoutModifyViews, 'field');    
@@ -580,6 +581,7 @@ const sortScript = (scriptData) => {
 		createViewsScripts,
 		deleteUdtScripts,
 		deleteTablesScripts,
+		renewalIndexesScripts,
 		deleteKeyspaceScripts,
 		scriptsWithoutModifyUdt).map(data => data.script);
 }

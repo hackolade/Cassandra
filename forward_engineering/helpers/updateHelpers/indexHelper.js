@@ -76,7 +76,7 @@ const getDataForScript = (newData, oldData) => {
 	}
 
 	if (!newData.length) {
-		addData = oldData;
+		dropData = oldData;
 	} else if (!oldData.length) {
 		addData = newData;
 	} else if (!_.isEqual(newData, oldData)) {

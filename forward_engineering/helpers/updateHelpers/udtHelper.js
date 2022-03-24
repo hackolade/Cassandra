@@ -133,6 +133,7 @@ const getUpdateScript = (item, data, udtMap) => {
 					udtName,
 				})
 				script = [...script, {
+					...scriptData,
 					script: renameScript,
 					modified: true,
 				}];

@@ -41,7 +41,7 @@ const getProperty = (newProperty, oldProperty) => {
 
 const getDifferentOptions = (tableOptions, comments = {}) => {
 	const newComments = getProperty(comments.new, comments.old);
-	const { new: newProperties, old: oldProperties } = tableOptions;
+	const { new: newProperties = {}, old: oldProperties = {} } = tableOptions;
 	const newTableOptions = Object.entries(newProperties)
 		.map(([property, value]) => [property, getProperty(value, oldProperties[property])])
 		.filter(([__, value]) => value);

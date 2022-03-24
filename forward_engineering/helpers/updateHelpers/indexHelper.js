@@ -100,6 +100,10 @@ const getDataForSearchIndexScript = role => {
 	let dropData;
 	let addData;
 
+	if (!searchIndex.old && !searchIndex.new) {
+		return {};
+	}
+
 	if (!searchIndex.old) {
 		addData = getModifyDataSearchIndex(role, 'new');
 	} else if (!searchIndex.new) {
@@ -124,8 +128,9 @@ const getDataColumn = (dataSources, column = {}) => {
 }
 
 const getDataForSearchIndexColumns = (dataSources, columns = {}) => {
-	const newColumns = (columns.new || []).map(getDataColumn.bind(null, dataSources));
-	const oldColumns = (columns.old || []).map(getDataColumn.bind(null, dataSources));
+	const filterColumn = column => (column.key || []).length;
+	const newColumns = (columns.new || []).map(getDataColumn.bind(null, dataSources)).filter(filterColumn);
+	const oldColumns = (columns.old || []).map(getDataColumn.bind(null, dataSources)).filter(filterColumn);
 	return getDataForScript(newColumns, oldColumns);
 }
 
@@ -189,7 +194,7 @@ const getSearchColumnsScript = (keyspaceName, tableName, columns) => {
 	};
 
 	const dropScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { deleted: true }));
-	const addScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { added: true }));
+	const addScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { modified: true }));
 
 	return [...dropScripts, ...addScripts];
 }

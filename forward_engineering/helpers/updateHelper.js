@@ -140,7 +140,7 @@ const getUpdateTable = updateData => {
 	}
 		
 	if (!oldName || !newName) {
-		return '';
+		return [];
 	}
 
 	const data = { 
@@ -159,7 +159,7 @@ const getUpdateTable = updateData => {
 
 const getOptionsScript = (compMod, tableName, isGetOptionScript) => {
 	if (!isGetOptionScript || !compMod || !compMod.tableOptions) {
-		return;
+		return '';
 	}
 	
 	const script = getChangeOption({
@@ -546,7 +546,9 @@ const sortScript = (scriptData) => {
 	const { scripts: createKeyspacesScripts, filteredScripts: scriptsWithoutCreateKeyspace } = filter('added', scriptData, 'keySpaces');
 	const { scripts: deleteKeyspaceScripts, filteredScripts: scriptsWithoutDropKeyspace } = filter('deleted', scriptsWithoutCreateKeyspace, 'keySpaces');
 	const { scripts: modifyKeyspacesScripts, filteredScripts: scriptsWithoutModifyKeyspace } = filter('modified', scriptsWithoutDropKeyspace, 'keySpaces');
-	const { scripts: createTablesScripts, filteredScripts: scriptsWithoutCreateTable } = filter('added', scriptsWithoutModifyKeyspace, 'table');
+	const { scripts: deleteFunctionScripts, filteredScripts: scriptsWithoutDropFunction } = filter('deleted', scriptsWithoutModifyKeyspace, 'udf');
+	const { scripts: createFunctionScripts, filteredScripts: scriptsWithoutCreateFunction } = filter('added', scriptsWithoutDropFunction, 'udf');
+	const { scripts: createTablesScripts, filteredScripts: scriptsWithoutCreateTable } = filter('added', scriptsWithoutCreateFunction, 'table');
 	const { scripts: deleteTablesScripts, filteredScripts: scriptsWithoutDropTable } = filter('deleted', scriptsWithoutCreateTable, 'table');
 	const { scripts: modifyTablesScripts, filteredScripts: scriptsWithoutModifyTable } = filter('modified', scriptsWithoutDropTable, 'table');
 	const { scripts: createIndexesScripts, filteredScripts: scriptsWithoutCreateIndexes } = filter('added', scriptsWithoutModifyTable, 'index');
@@ -565,6 +567,8 @@ const sortScript = (scriptData) => {
 
 	return sortedScripts.concat(
 		createKeyspacesScripts,
+		deleteUdtScripts,
+		deleteTablesScripts,
 		createUdtScripts,
 		modifyKeyspacesScripts,
 		modifyUdtScripts,
@@ -579,9 +583,9 @@ const sortScript = (scriptData) => {
 		modifyFieldsScripts,
 		createIndexesScripts,
 		createViewsScripts,
-		deleteUdtScripts,
-		deleteTablesScripts,
 		renewalIndexesScripts,
+		deleteFunctionScripts,
+		createFunctionScripts,
 		deleteKeyspaceScripts,
 		scriptsWithoutModifyUdt).map(data => data.script);
 }

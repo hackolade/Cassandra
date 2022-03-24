@@ -69,6 +69,13 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	let dataForAddScript = [];
 	let dataForDropScript = [];
 
+	if (!newElements.length && !oldElements.length) {
+		return {
+			dataForAddScript,
+			dataForDropScript
+		};
+	}
+
 	if (!oldElements.length) {
 		dataForAddScript = newElements;
 	} else if (!newElements.length) {
@@ -86,11 +93,7 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	};
 }
 
-const getModifyUDFA = ({ new: newElements, old: oldElements, udData }) => {
-	if (!newElements || !oldElements) {
-		return '';
-	}
-
+const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData }) => {
 	newElements = newElements.map(element => ({
 		...element,
 		name: parser[udData.parser](element[udData.functionName])
@@ -107,14 +110,14 @@ const getModifyUDFA = ({ new: newElements, old: oldElements, udData }) => {
 			udData['requiredProps'].includes(key) ? !!value : true
 		))
 		.map(ud => ({
-			...scriptData,
+			udf: 'udf',
 			added: true,
 			script: ud[udData.functionName]
 		}));
 	
 	const dropScript = dataForDropScript
 		.filter(ud => !!ud.name)
-		.map(ud => ({ ...scriptData, script: udData.getDropScript(ud), deleted: true }));
+		.map(ud => ({ udf: 'udf', script: udData.getDropScript(ud), deleted: true }));
 
 	return [...dropScript, ...addScript];
 }
@@ -182,7 +185,7 @@ const getKeySpaceScript = ({ child, mode }) => {
 	const script = isModifyReplication ? 
 		alterKeyspacePrefix(keySpaceName) +
 		tab(`${replication}\n`) +
-		tab(`${durableWrites}\n`) : '';
+		tab(`${durableWrites};`) : '';
 
 	return [{
 		...scriptData,

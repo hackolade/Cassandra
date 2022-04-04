@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
+// Generated from grammars/CqlParser.g4 by ANTLR 4.8
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -2258,6 +2258,15 @@ CqlParserListener.prototype.enterKwIndexed = function(ctx) {
 
 // Exit a parse tree produced by CqlParser#kwIndexed.
 CqlParserListener.prototype.exitKwIndexed = function(ctx) {
+};
+
+
+// Enter a parse tree produced by CqlParser#kwLowerCase.
+CqlParserListener.prototype.enterKwLowerCase = function(ctx) {
+};
+
+// Exit a parse tree produced by CqlParser#kwLowerCase.
+CqlParserListener.prototype.exitKwLowerCase = function(ctx) {
 };
 
 

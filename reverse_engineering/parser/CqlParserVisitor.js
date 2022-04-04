@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
+// Generated from grammars/CqlParser.g4 by ANTLR 4.8
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -1508,6 +1508,12 @@ CqlParserVisitor.prototype.visitKwExcluded = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwIndexed.
 CqlParserVisitor.prototype.visitKwIndexed = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwLowerCase.
+CqlParserVisitor.prototype.visitKwLowerCase = function(ctx) {
   return this.visitChildren(ctx);
 };
 

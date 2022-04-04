@@ -629,6 +629,12 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "checkbox",
 						"propertyTooltip": "include the specified fields in the index.",
 						"defaultValue": true
+					},
+					{
+						"propertyName": "lowerCase",
+						"propertyKeyword": "lowerCase",
+						"propertyType": "checkbox",
+						"propertyTooltip": "use the LowerCaseStrField field type."
 					}
 				]
 			},

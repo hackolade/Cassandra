@@ -817,6 +817,10 @@ K_INDEXED
    : I N D E X E D
    ;
 
+K_LOWERCASE
+   : L O W E R C A S E
+   ;
+
 K_COLUMNS
    : C O L U M N S
    ;

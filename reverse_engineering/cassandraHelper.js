@@ -724,6 +724,7 @@ module.exports = (_) => {
 				key: [field['@_name']],
 				indexed: Boolean(field['@_indexed']),
 				docValues: Boolean(field['@_docValues']),
+				lowerCase: field['@_type']?.startsWith('LowerCase'),
 			};
 		});
 

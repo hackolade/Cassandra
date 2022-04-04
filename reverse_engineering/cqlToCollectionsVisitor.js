@@ -281,13 +281,15 @@ class Visitor extends CqlParserVisitor {
 		const docValues = ctx.docValuesOption ? ctx.docValuesOption.getText().toLowerCase() === `true` : false;
 		const excluded = ctx.excludedOption ? ctx.excludedOption.getText().toLowerCase() === `true` : false;
 		const indexed = ctx.indexedOption ? ctx.indexedOption.getText().toLowerCase() === `true` : false;
+		const lowerCase = ctx.lowerCase?.getText().toLowerCase() === 'true';
 		return {
 			key: [key],
 			copyField,
 			docValues,
 			excluded,
-			indexed
-		}
+			indexed,
+			lowerCase,
+		};
 	}
 
 	visitCreateType(ctx) {

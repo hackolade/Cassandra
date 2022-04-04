@@ -239,7 +239,7 @@ const getSearchIndex = ({ tableName, columns, index, isActivated, ifNotExist }) 
 		';';
 };
 
-const getSearchIndexColumns = (columns) => {
+const getSearchIndexColumns = columns => {
 	return columns.map(column => {
 		const options = [];
 
@@ -257,6 +257,10 @@ const getSearchIndexColumns = (columns) => {
 
 		if (!column.indexed) {
 			options.push(`indexed: false`);
+		}
+
+		if (column.lowerCase) {
+			options.push(`lowerCase: true`);
 		}
 
 		return {

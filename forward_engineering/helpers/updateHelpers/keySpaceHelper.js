@@ -17,11 +17,11 @@ const scriptData = {
 }
 
 const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n`;
-const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}"`;
+const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}";`;
 const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
 
-const getDropUDFScript = udfData => udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name}` : '';
-const getDropUDAScript = udfData => udfData.name ? `DROP AGGREGATE IF EXISTS ${udfData.name}` : '';
+const getDropUDFScript = udfData => udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name};` : '';
+const getDropUDAScript = udfData => udfData.name ? `DROP AGGREGATE IF EXISTS ${udfData.name};` : '';
 
 const requiredPropsForUDF = ['functionBody'];
 const requiredPropsForUDA = ['storedProcFunction'];
@@ -163,7 +163,7 @@ const getKeySpaceScript = ({ child, mode }) => {
 			added: true,
 		}];
 	} else if (mode === 'delete') {
-		const script = `${getDropKeyspace(keySpaceName)};`;
+		const script = getDropKeyspace(keySpaceName);
 
 		return [{
 			...scriptData,

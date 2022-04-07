@@ -40,7 +40,7 @@ const getAddToUDT = addToUDTData => {
 		...scriptData,
 		added: true,
 		script:
-		`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};\n`
+		`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};`
 	})
 	);
 };
@@ -48,7 +48,7 @@ const getAddToUDT = addToUDTData => {
 const getCreateUdt = (createData) => 
 	`CREATE TYPE IF NOT EXISTS "${createData.keySpaceName}"."${createData.UDTName}" (\n` +
 	`${tab(createData.columnScript)} \n` + 
-	')' ;
+	');' ;
 
 const getKeySpaces = role => {
 	const keySpaces = role.compMod?.bucketsWithCurrentDefinition;

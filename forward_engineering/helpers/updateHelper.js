@@ -7,7 +7,7 @@ const { dependencies } = require('./appDependencies');
 const { getKeySpaceScript } = require('./updateHelpers/keySpaceHelper');
 const { mergeArrays, checkIsOldModel, fieldTypeCompatible } = require('./updateHelpers/generalHelper');
 const { getViewScript } = require('./updateHelpers/viewHelper');
-const { getIndexTable } = require('./updateHelpers/indexHelper');
+const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
 const { alterTablePrefix, getDelete } = require('./updateHelpers/tableHelper');
 
@@ -19,11 +19,11 @@ const getUpdateType = updateTypeData =>
 	`${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} 
 	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
 
-const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type};\n`;
+const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type}`;
 const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
 
 const getAdd = addData => {
-	const script = `${alterTablePrefix(addData.tableName, addData.keyspaceName)} ${addColumnStatement(addData.columnData)}`;
+	const script = `${alterTablePrefix(addData.tableName, addData.keyspaceName)} ${addColumnStatement(addData.columnData)};`;
 	return [{
 		deleted: false,
 		modified: false,
@@ -45,12 +45,12 @@ const getRenameColumn = renameData => {
 };
 const objectContainsProp = (object, key) => object[key] ? true : false;
 
-const isCommentNew = comment => comment && comment.new !== comment.old;
-const getChangeOption = changeData => {
-	const optionsDiff = getDiff(changeData.options.new, changeData.options.old);
+const isCommentNew = comment => comment && comment.new && comment.new !== comment.old;
+const getChangeOption = ({ options, comment }) => {
+	const optionsDiff = getDiff(options.new || {}, options.old || {});
 	const configOptionsWithValues = mergeValuesWithConfigOptions(optionsDiff);
-	return isCommentNew(changeData.comment)
-		? parseToString(configOptionsWithValues, changeData.comment.new)
+	return isCommentNew(comment)
+		? parseToString(configOptionsWithValues, comment.new)
 		: parseToString(configOptionsWithValues);
 };
 
@@ -67,20 +67,22 @@ const getUpdate = updateData => {
 	const oldName = _.get(property, 'compMod.oldField.name');
 	const newName = _.get(property, 'compMod.newField.name');
 	const getData = columnData => ({ ...updateData, columnData: { ...updateData.columnData, ...columnData }});
-	if (!oldName || !newName) {
+	if (!oldName || !newName || oldName === newName) {
 		return '';
 	}
-	if (!property.primaryKey) {
+	if (!property.compositeClusteringKey && !property.compositePartitionKey) {
 		const deletePropertyScript = getDelete(getData({ name: oldName }));
 		const addPropertyScript = getAdd(getData({ name: newName }));
 		return [...deletePropertyScript, ...addPropertyScript];;
+	} else if (!property.compositePartitionKey) {
+		return getRenameColumn(getData({ oldName, newName })); 
 	}
-	return getRenameColumn(getData({ oldName, newName })); 
+	return ''
 };
 
 const getDeleteTable = deleteData => { 
 	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-	const script = `DROP TABLE ${tableStatement}`;
+	const script = `DROP TABLE IF EXISTS ${tableStatement};`;
 	return [{
 		modified: false,
 		added: false,
@@ -88,6 +90,17 @@ const getDeleteTable = deleteData => {
 		script,
 		table: 'table',
 	}];
+};
+
+const getIsColumnInIndex = (item, columnName, data) => {
+	const itemData = { properties: item.properties || {}, ..._.omit(item.role || {}, ['properties']) };
+
+	const dataSources = [itemData, data.modelDefinitions];
+	const secIndexes = _.get(item, 'role.SecIndxs', [])
+		.map(index => getDataColumnIndex(dataSources, {}, index, 'SecIndxKey')).map(index => index.name).filter(Boolean);
+	const searchIndexes = _.get(item, 'role.searchIndexColumns', [])
+		.map(index => getDataColumnIndex(dataSources, {}, index)).map(index => index.name).filter(Boolean);
+	return [...searchIndexes, ...secIndexes].includes(columnName);
 };
 
 const getIsChangeTable = compMod => {
@@ -163,8 +176,6 @@ const getOptionsScript = (compMod, tableName, isGetOptionScript) => {
 	}
 	
 	const script = getChangeOption({
-		keySpace: compMod.keyspaceName,
-		tableName: tableName,
 		options: compMod.tableOptions,
 		comment: compMod.comments
 	});
@@ -244,6 +255,7 @@ const handleItem = (item, udtMap, generator, data) => {
 			}
 
 			const propertiesScript = handleProperties({ 
+				item: itemProperties[tableKey],
 				generator,
 				tableProperties, 
 				udtMap, 
@@ -363,7 +375,7 @@ const handleAlterTypeForOldModel = ({ property, udtMap, tableName, keyspaceName,
 	};
 }
 
-const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data }) => {
+const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data, item }) => {
 	return Object.keys(tableProperties)
 		.reduce((alterTableScript, columnName) => {
 			const property = tableProperties[columnName];
@@ -386,7 +398,9 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 				alterTableScript = alterTableScript.concat(handleAlterTypeForOldModel({ property, udtMap, tableName, keyspaceName, columnName }) || []);
 			}
 
-			if (generator.name === 'getUpdate' && !property.compMod) {
+			const isColumnInIndex = getIsColumnInIndex(item, columnName, data);
+
+			if (generator.name === 'getUpdate' && (!property.compMod || isColumnInIndex)) {
 				return alterTableScript;
 			}
 
@@ -567,22 +581,22 @@ const sortScript = (scriptData) => {
 
 	return sortedScripts.concat(
 		createKeyspacesScripts,
-		deleteUdtScripts,
-		deleteTablesScripts,
-		createUdtScripts,
 		modifyKeyspacesScripts,
+		deleteViewsScripts,
+		deleteTablesScripts,
+		deleteUdtScripts,
+		createUdtScripts,
 		modifyUdtScripts,
 		createTablesScripts,
 		modifyTablesScripts,
-		deleteIndexesScripts,
-		modifyIndexesScripts,
-		deleteViewsScripts,
-		modifyViewsScripts,
 		deleteFieldsScripts,
 		createFieldsScripts,
 		modifyFieldsScripts,
+		deleteIndexesScripts,
 		createIndexesScripts,
+		modifyIndexesScripts,
 		createViewsScripts,
+		modifyViewsScripts,
 		renewalIndexesScripts,
 		deleteFunctionScripts,
 		createFunctionScripts,

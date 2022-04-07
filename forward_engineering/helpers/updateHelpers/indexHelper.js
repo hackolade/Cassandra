@@ -118,19 +118,31 @@ const getDataForSearchIndexScript = role => {
 	};
 }
 
-const getDataColumn = (dataSources, column = {}) => {
-	const keyId = _.get(column, 'key[0].keyId', '');
+const getDataColumnIndex = (dataSources, oldIdToNameHashTable, column = {}, key = 'key') => {
+	setDependencies(dependencies);
+	const keyId = _.get(column, `${key}[0].keyId`, '');
+	const columnWithoutKeyId = _.omit(column, key);
+	const nameFromHashTable = oldIdToNameHashTable[keyId];
+	if (nameFromHashTable) {
+		return {
+			...columnWithoutKeyId,
+			name: nameFromHashTable
+		}
+	}
 	const { name = '' } = getNamesByIds([keyId], dataSources)[keyId] || {};
 	return {
-		...column,
+		...columnWithoutKeyId,
 		name,
 	};
 }
 
-const getDataForSearchIndexColumns = (dataSources, columns = {}) => {
-	const filterColumn = column => (column.key || []).length;
-	const newColumns = (columns.new || []).map(getDataColumn.bind(null, dataSources)).filter(filterColumn);
-	const oldColumns = (columns.old || []).map(getDataColumn.bind(null, dataSources)).filter(filterColumn);
+const getDataForSearchIndexColumns = (item, dataSources) => {
+	const oldIdToNameHashTable = _.get(item, 'role.compMod.oldIdToNameHashTable', {});
+	const columns = _.get(item, 'role.compMod.searchIndexColumns', {});
+	const filterColumn = column => column.name;
+	const newColumns = (columns.new || []).map(column => getDataColumnIndex(dataSources, {}, column)).filter(filterColumn);
+	const oldColumns = (columns.old || [])
+		.map(column => getDataColumnIndex(dataSources, oldIdToNameHashTable, column)).filter(filterColumn);
 	return getDataForScript(newColumns, oldColumns);
 }
 
@@ -228,7 +240,7 @@ const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.
 	const isExistScript = checkExistsScript(keyspaceName, tableIndexName, 'dropIndexes');
 	let script = '';
 	if (index.name && !isExistScript) {
-		script = `DROP INDEX IF EXISTS ${tableNameStatement}`;
+		script = `DROP INDEX IF EXISTS ${tableNameStatement};`;
 		setNameCollectionsScript(keyspaceName, tableIndexName, 'dropIndexes');
 	}
 	return {
@@ -337,10 +349,9 @@ const getUpdateSearchIndexScript = data => {
 		return [...dropIndexSearchScript, ...addSearchIndexScript];
 	}
 	
-	const columns = _.get(item, 'role.compMod.searchIndexColumns', {});
 	const config = _.get(item, 'role.compMod.searchIndexConfig', {})
 	
-	const dataForColumnsScript = getDataForSearchIndexColumns(dataSources, columns);
+	const dataForColumnsScript = getDataForSearchIndexColumns(item, dataSources);
 	const dataForConfigScript = getDataForSearchIndexConfig(config);
 
 	const configScript = getSearchConfigScript(keyspaceName, tableName, dataForConfigScript);
@@ -417,5 +428,6 @@ const getIndexTable = (item, data) => {
 }
 
 module.exports = {
-	getIndexTable
+	getIndexTable,
+	getDataColumnIndex
 }

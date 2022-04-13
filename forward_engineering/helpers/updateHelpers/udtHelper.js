@@ -46,7 +46,7 @@ const getAddToUDT = addToUDTData => {
 };
 
 const getCreateUdt = (createData) => 
-	`CREATE TYPE IF NOT EXISTS "${createData.keySpaceName}"."${createData.UDTName}" (\n` +
+	`CREATE TYPE IF NOT EXISTS "${createData.keySpaceName}"."${createData.udtName}" (\n` +
 	`${tab(createData.columnScript)} \n` + 
 	');' ;
 
@@ -63,7 +63,8 @@ const getAddScript = (item, udtMap) => {
 		const columnScript = getColumnDefinition(properties, udtMap);
 
 		return Object.keys(keySpaces).map(currentKeyspace => {
-			const script = getCreateUdt({ keySpaceName: currentKeyspace, UDTName: item.name || '', columnScript });
+			const udtName = role.code || role.name || '';
+			const script = getCreateUdt({ keySpaceName: currentKeyspace, udtName, columnScript });
 			return {
 					...scriptData,
 					added: true,
@@ -79,7 +80,7 @@ const getAddScript = (item, udtMap) => {
 				type: getTypeByData(property, udtMap),
 				name,
 				keySpaces,
-				udtName: item.name,
+				udtName: role.code || role.name || '',
 			})
 		]), [])
 };
@@ -153,7 +154,7 @@ const getDeleteScript = item => {
 		return [scriptData];
 	}
 	const keySpaces = getKeySpaces(role);
-	const udtName = role.code || role.name;
+	const udtName = role.code || role.name || '';
 
 	const script = Object.entries(keySpaces)
 		.reduce((script, [keyspaceName, keySpace]) => {

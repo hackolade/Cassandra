@@ -9,7 +9,7 @@ const scriptData = {
 	added: false,
 	deleted: false,
 	modified: false,
-	viewName: 'view',
+	view: 'view',
 };
 
 const getViewName = (keyspaceName, nameView) => `${keyspaceName ? `"${keyspaceName}".` : ''}"${nameView}"`;

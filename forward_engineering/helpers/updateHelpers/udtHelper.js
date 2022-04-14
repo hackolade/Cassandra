@@ -15,7 +15,7 @@ const scriptData = {
 	added: false,
 	deleted: false,
 	modified: false,
-	udtName: 'udt',
+	udt: 'udt',
 };
 
 const getAlterTypePrefix = keySpaceName => `ALTER TYPE "${keySpaceName}"`;

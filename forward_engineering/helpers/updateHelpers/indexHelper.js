@@ -205,22 +205,25 @@ const getSearchColumnsScript = (keyspaceName, tableName, columns) => {
 		};
 	};
 
-	const dropScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { deleted: true }));
-	const addScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { modified: true }));
+	const dropSearchScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { deleted: true }));
+	const addSearchScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { modified: true }));
+	if (dropSearchScripts.length) {
+		dropSearchScripts.push(getRenewalScript(keyspaceName, tableName, 'RELOAD', 'deleted'));
+	}
 
-	return [...dropScripts, ...addScripts];
+	return { dropSearchScripts, addSearchScripts };
 }
 
-const getRenewalScript = (keyspaceName, tableName, startStatement) => {
+const getRenewalScript = (keyspaceName, tableName, startStatement, key = 'added') => {
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const script = `${startStatement} SEARCH INDEX\n` +
 		tab(`ON ${tableNameStatement};`);
 	
 	return {
-		added: true,
 		renewal: true,
-		script,
-	}
+		[key]: true,
+		script
+	};
 }
 
 const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
@@ -355,11 +358,11 @@ const getUpdateSearchIndexScript = data => {
 	const dataForConfigScript = getDataForSearchIndexConfig(config);
 
 	const configScript = getSearchConfigScript(keyspaceName, tableName, dataForConfigScript);
-	const columnsScript = getSearchColumnsScript(keyspaceName, tableName, dataForColumnsScript);
+	const { dropSearchScripts, addSearchScripts } = getSearchColumnsScript(keyspaceName, tableName, dataForColumnsScript);
 
 	const renewalData = {
-		RELOAD: configScript.length || columnsScript.length,
-		REBUILD: columnsScript.length,
+		RELOAD: configScript.length || addSearchScripts.length,
+		REBUILD: dropSearchScripts.length || addSearchScripts.length,
 	};
 	const renewalScripts = Object.entries(renewalData).reduce((scripts, [key, value]) => {
 		if (!value) {
@@ -368,7 +371,7 @@ const getUpdateSearchIndexScript = data => {
 		return [...scripts, getRenewalScript(keyspaceName, tableName, key)];
 	}, []);
 
-	return [...configScript, ...columnsScript, ...renewalScripts];
+	return [...configScript, ...dropSearchScripts, ...addSearchScripts, ...renewalScripts];
 }
 
 const getUpdateIndexScript = data => {

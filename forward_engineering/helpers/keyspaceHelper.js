@@ -5,11 +5,12 @@ const getCreateStatement = ({name, replication, durableWrites, ifNotExist}) => `
 const getSimpleStrategy = (factor) => `'class' : 'SimpleStrategy',\n'replication_factor' : ${factor}`;
 
 const getNetworkTopologyStrategy = (dataCenters) => 
-	"'class' : 'NetworkTopologyStrategy',\n" +
-	dataCenters.reduce((replicaCenters, data) => [
-		...replicaCenters,
-		`'${data.dataCenterName}' : ${getFactor(data.replFactorValue)}`
-	], []).join(',\n');
+	["'class' : 'NetworkTopologyStrategy'"].concat(
+		dataCenters.reduce((replicaCenters, data) => [
+			...replicaCenters,
+			`'${data.dataCenterName}' : ${getFactor(data.replFactorValue)}`
+		], [])
+	).join(',\n')
 
 const getTopology = (strategy, factor, dataCenters) => {
 	if (strategy === "NetworkTopologyStrategy") {

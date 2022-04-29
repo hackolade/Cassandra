@@ -382,7 +382,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 			if (generator.name !== 'getUpdate' && (property.compositePartitionKey || property.compositeClusteringKey)) {
 				return alterTableScript;
 			}
-			const columnType = getTypeByData(property, udtMap, columnName);
+			let columnType = getTypeByData(property, udtMap, columnName);
 			
 			if (property.$ref && !columnType) {
 				columnType = _.last(property.$ref.split('/'));

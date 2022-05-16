@@ -22,12 +22,11 @@ const getColumnNames = (collectionRefsDefinitionsMap, columns) => {
 	})).filter(_.identity);
 };
 
-const getWhereStatement = (primaryKeys, columnsNames) => {
+const getWhereStatement = columnsNames => {
 	if (_.isEmpty(columnsNames)) {
 		return '';
 	}
 	return 'WHERE ' + columnsNames
-		.filter(name => !primaryKeys.includes(name))
 		.reduce((statement, name) => {
 			if (!statement) {
 				return `${name} IS NOT NULL`;
@@ -58,16 +57,6 @@ const getClusteringKeyData = (collectionRefsDefinitionsMap, viewData) => {
 	);
 
 	return { clusteringKeys, clusteringKeysHash };
-};
-
-const getPrimaryKeysNames = (collectionRefsDefinitionsMap, viewData) => {
-	const partitionKeys = retrivePropertyFromConfig(viewData, 0, 'compositePartitionKey', []);
-	const partitionKeysHash = getNamesByIds(
-		collectionRefsDefinitionsMap,
-		partitionKeys.map(key => key.keyId)
-	);
-
-	return _.values(partitionKeysHash).filter(_.identity).map(field => `"${field.name}"`);
 };
 
 const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData, isParentActivated) => {
@@ -103,10 +92,40 @@ const getOptionsScript = (collectionRefsDefinitionsMap, viewData) => {
 	));
 };
 
+const getEmptyViewScript = ({ viewData, entitySchema, entityData, entityName, isViewChildrenActivated }) => {
+	let script = [];
+
+	const entityColumns = entitySchema?.properties || {};
+	const entityFieldsMap = Object.keys(entityColumns).reduce(( fieldsMap, key ) => {
+		const field = entitySchema.properties[key];
+
+		return {
+			...fieldsMap,
+			[field.GUID]: field,
+		};
+	}, {});
+	const primaryKeyScript = getPrimaryKeyScript(entityFieldsMap, entityData, isViewChildrenActivated);
+	const optionsScript = getOptionsScript({}, viewData);
+
+	script.push(`AS SELECT * FROM ${entityName}`);
+	script.push(getWhereStatement(Object.keys(entityColumns)));
+
+	if (primaryKeyScript) {
+		script.push(primaryKeyScript);
+	}
+	
+	if (optionsScript) {
+		script.push(optionsScript);
+	}
+
+	return script;
+};
+
 module.exports = {
 	getOptionsScript,
 	getViewScript({
 		schema,
+		entitySchema,
 		viewData,
 		entityData,
 		containerData,
@@ -132,22 +151,26 @@ module.exports = {
 		const optionsScript = getOptionsScript(collectionRefsDefinitionsMap, viewData);
 		script.push(`CREATE MATERIALIZED VIEW ${ifNotExist? `IF NOT EXISTS `:``}${name}`);
 	
-		if (!columns) {
-			script.push(`AS SELECT * FROM ${tableName};`);
+		if (_.isEmpty(columns)) {
+			script.concat(getEmptyViewScript({
+				viewData,
+				entitySchema,
+				entityData,
+				entityName: tableName,
+				isViewChildrenActivated,
+			}));
 		} else {
 			const columnsNames = getColumnNames(collectionRefsDefinitionsMap, columns);
 			script.push(`AS SELECT ${columnsNames.join(', ')}`);
 			script.push(`FROM ${tableName}`);
-			const primaryKeysNames = getPrimaryKeysNames(collectionRefsDefinitionsMap, viewData);
-			script.push(getWhereStatement(primaryKeysNames, columnsNames));
-		}
-
-		if (primaryKeyScript) {
-			script.push(primaryKeyScript);
-		}
-
-		if (optionsScript) {
-			script.push(optionsScript);
+			script.push(getWhereStatement(columnsNames));
+			if (primaryKeyScript) {
+				script.push(primaryKeyScript);
+			}
+	
+			if (optionsScript) {
+				script.push(optionsScript);
+			}
 		}
 		
 		return commentDeactivatedStatement(

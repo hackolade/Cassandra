@@ -1,6 +1,15 @@
 [
 	{
 		"lowerTab": "Connection",
+		"helpUrl": [
+			{
+				"value": "https://hackolade.com/help/Astra.html",
+				"dependency": {
+					"key": "clusterType",
+					"value": "apolloCloud"
+				}
+			}
+		],
 		"structure": [
 			{
 				"inputLabel": "Name",
@@ -80,6 +89,7 @@
 		]
 	}, {
 		"lowerTab": "Authentication",
+		"helpUrl": "https://hackolade.com/help/Usernamepassword1.html",
 		"structure": [
 			{
 				"inputLabel": "Authentication type",
@@ -130,6 +140,7 @@
 		]	
 	}, {
 		"lowerTab": "SSL",
+		"helpUrl": "https://hackolade.com/help/LDAP2.html",
 		"disable": {
 			"key": "clusterType",
 			"value": "apolloCloud"
@@ -258,6 +269,7 @@
 	},
 	{
 		"tab": "SSH",
+		"helpUrl": "https://hackolade.com/help/SSH2.html",
 		"structure": [
 			{
 				"inputLabel": "Use SSH Tunnel",

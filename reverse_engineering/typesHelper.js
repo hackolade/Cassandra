@@ -90,9 +90,13 @@ module.exports = (_) => {
 
 	const getAppType = (type) => {
 		switch(type) {
+			case "int":
+				return {
+					type: "numeric",
+					mode: "integer"	
+				};
 			case "smallint":
 			case "tinyint":
-			case "int":
 			case "bigint":
 			case "counter":
 			case "decimal":

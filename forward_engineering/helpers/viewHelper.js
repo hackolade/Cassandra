@@ -89,6 +89,7 @@ const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData, isParentAct
 const addTab = script => _.trim(script || '').replace(/  /g, '    ');
 
 const getOptionsScript = (collectionRefsDefinitionsMap, viewData) => {
+	setDependencies(dependencies);
 	const clusteringKeyData = getClusteringKeyData(collectionRefsDefinitionsMap, viewData);
 	const tableComment = retrivePropertyFromConfig(viewData, 0, 'comments', '');
 	const tableOptions = retrivePropertyFromConfig(viewData, 0, 'tableOptions', '');
@@ -103,13 +104,15 @@ const getOptionsScript = (collectionRefsDefinitionsMap, viewData) => {
 };
 
 module.exports = {
+	getOptionsScript,
 	getViewScript({
 		schema,
 		viewData,
 		entityData,
 		containerData,
 		collectionRefsDefinitionsMap,
-		isKeyspaceActivated = true
+		isKeyspaceActivated = true,
+		ifNotExist = false
 	}) {
 		setDependencies(dependencies);
 		let script = [];
@@ -127,8 +130,7 @@ module.exports = {
 
 		const primaryKeyScript = getPrimaryKeyScript(collectionRefsDefinitionsMap, viewData, isViewChildrenActivated);
 		const optionsScript = getOptionsScript(collectionRefsDefinitionsMap, viewData);
-
-		script.push(`CREATE MATERIALIZED VIEW IF NOT EXISTS ${name}`);
+		script.push(`CREATE MATERIALIZED VIEW ${ifNotExist? `IF NOT EXISTS `:``}${name}`);
 	
 		if (!columns) {
 			script.push(`AS SELECT * FROM ${tableName};`);

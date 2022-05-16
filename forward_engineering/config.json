@@ -11,6 +11,26 @@
 	"applyScriptToInstance": true,
 	"compMode": {
 		"entity": true,
-		"container": false
-	}
+		"container": true
+	},
+	"additionalOptions": [
+		{
+			"id": "applyDropStatements",
+			"value": false,
+			"forUpdate": true,
+			"name": "Apply Drop Statements",
+			"isDropInStatements": true
+		},
+		{
+			"name": "Exclude Keyspace ALTER statements",
+			"id": "excludeContainerAlterStatements",
+			"value": false,
+			"forUpdate": true,
+			"compModeDependency": {
+				"containers": {
+					"modified": true
+				}
+			}
+		}
+	]
 }

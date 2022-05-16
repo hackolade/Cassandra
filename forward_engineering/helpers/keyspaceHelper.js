@@ -1,15 +1,16 @@
 const { tab, retrieveContainerName, retrivePropertyFromConfig } = require('./generalHelper'); 
 
-const getCreateStatement = (name, replication, durableWrites) => `CREATE KEYSPACE IF NOT EXISTS "${name}" \n${tab(replication)}\n${durableWrites}; \n\nUSE "${name}";`;
+const getCreateStatement = ({name, replication, durableWrites, ifNotExist}) => `CREATE KEYSPACE ${ifNotExist? `IF NOT EXISTS ` : ``}"${name}" \n${tab(replication)}\n${durableWrites}; \n\nUSE "${name}";`;
 
 const getSimpleStrategy = (factor) => `'class' : 'SimpleStrategy',\n'replication_factor' : ${factor}`;
 
 const getNetworkTopologyStrategy = (dataCenters) => 
-	"'class' : 'NetworkTopologyStrategy',\n" +
-	dataCenters.reduce((replicaCenters, data) => [
-		...replicaCenters,
-		`'${data.dataCenterName}' : ${getFactor(data.replFactorValue)}`
-	], []).join(',\n');
+	["'class' : 'NetworkTopologyStrategy'"].concat(
+		dataCenters.reduce((replicaCenters, data) => [
+			...replicaCenters,
+			`'${data.dataCenterName}' : ${getFactor(data.replFactorValue)}`
+		], [])
+	).join(',\n')
 
 const getTopology = (strategy, factor, dataCenters) => {
 	if (strategy === "NetworkTopologyStrategy") {
@@ -37,11 +38,12 @@ const getKeyspaceStatement = (keyspaceData) => {
 	} else if (keyspaceName === "") {
 		return "";
 	} else {
-		return getCreateStatement(
-			keyspaceName,
-			getReplication(replicationStrategy, replicationFactor, dataCenters),
-			getDurableWrites(durableWrites)
-		);	
+		return getCreateStatement({
+			name: keyspaceName,
+			replication: getReplication(replicationStrategy, replicationFactor, dataCenters),
+			durableWrites: getDurableWrites(durableWrites),
+			ifNotExist: retrivePropertyFromConfig(keyspaceData, 0, "keyspaceIfNotExist", undefined)
+		});	
 	}
 };
 

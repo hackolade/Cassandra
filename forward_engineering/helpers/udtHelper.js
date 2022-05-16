@@ -121,8 +121,16 @@ const sortUdt = (definitionJsonSchema) => {
 	return definitionJsonSchema;
 };
 
+const prepareDefinitions = data => {
+	const modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
+	const externalDefinitions = JSON.parse(data.externalDefinitions);
+	const udtTypeMap = getUdtMap([modelDefinitions, externalDefinitions]);
+	return { udtTypeMap, modelDefinitions, externalDefinitions };
+}
+
 module.exports = {
 	getUdtScripts,
 	getUdtMap,
-	sortUdt
+	sortUdt,
+	prepareDefinitions,
 };

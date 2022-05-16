@@ -509,7 +509,25 @@ truncate
 
 createIndex
    : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr #secondaryIndex
-   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing kwStorageAttachedIndex (kwWith kwOptions OPERATOR_EQ LC_BRACKET kwCaseSensitive COLON caseSensitiveOption=booleanLiteral COMMA kwNormalize COLON normalizeOption=booleanLiteral COMMA kwAscii COLON asciiOption=booleanLiteral RC_BRACKET)? #customIndex
+   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing (kwStorageAttachedIndex | kwSASIIndex) (kwWith kwOptions OPERATOR_EQ LC_BRACKET customIndexOption+ RC_BRACKET)? #customIndex
+   ;
+
+customIndexOption
+   : kwCaseSensitive COLON caseSensitiveOption=booleanLiteral COMMA?
+   | kwNormalize COLON normalizeOption=booleanLiteral COMMA?
+   | kwAscii COLON asciiOption=booleanLiteral COMMA?
+   | kwAnalyzed COLON analyzedOption=booleanLiteral COMMA?
+   | kwIsLiteral COLON isLiteralOption=booleanLiteral COMMA?
+   | kwTokenizationEnableStemming COLON tokenizationEnableStemmingOption=booleanLiteral COMMA?
+   | kwTokenizationNormalizeLowercase COLON tokenizationNormalizeLowercaseOption=booleanLiteral COMMA?
+   | kwTokenizationNormalizeUppercase COLON tokenizationNormalizeUppercaseOption=booleanLiteral COMMA?
+   | kwNormalizeUppercase COLON normalizeUppercaseOption=booleanLiteral COMMA?
+   | kwNormalizeLowercase COLON normalizeLowercaseOption=booleanLiteral COMMA?
+   | kwMaxCompactionFlushMemoryInMb COLON maxCompactionFlushMemoryInMbOption=stringLiteral COMMA?
+   | kwMode COLON modeOption=stringLiteral COMMA?
+   | kwAnalyzerClass COLON analyzerClassOption=stringLiteral COMMA?
+   | kwTokenizationLocale COLON tokenizationLocaleOption=stringLiteral COMMA?
+   | kwTokenizationSkipStopWords COLON tokenizationSkipStopWordsOption=stringLiteral COMMA?
    ;
 
 createSearchIndex
@@ -542,10 +560,15 @@ searchIndexOptions
                            RC_BRACKET
    ;
 
-searchIndexProfiles
+searchIndexProfile
    : kwSpaceSavingAll
    | kwSpaceSavingNoJoin
    | kwSpaceSavingSlowTriePrecision
+   | kwSpaceSavingNoTextField
+   ;
+
+searchIndexProfiles
+   : searchIndexProfile (syntaxComma searchIndexProfile)*
    ;
 
 searchIndexColumnList
@@ -553,8 +576,8 @@ searchIndexColumnList
    ;
 
 searchIndexColumn
-   : column (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)?  RC_BRACKET)?
-   | star=STAR (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)?  RC_BRACKET)?
+   : column (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)? (syntaxComma? kwLowerCase COLON lowerCase=booleanLiteral)?  RC_BRACKET)?
+   | star=STAR (LC_BRACKET (kwCopyField COLON copyFieldOption=booleanLiteral)? (syntaxComma? kwDocValues COLON docValuesOption=booleanLiteral)? (syntaxComma? kwExcluded COLON excludedOption=booleanLiteral)? (syntaxComma? kwIndexed COLON indexedOption=booleanLiteral)? (syntaxComma? kwLowerCase COLON lowerCase=booleanLiteral)? RC_BRACKET)?
    ;
    
 
@@ -1106,8 +1129,61 @@ kwNormalize
    : K_NORMALIZE
    ;
 
+kwAnalyzed
+   : K_ANALYZED
+   ;
+
+kwIsLiteral
+   : K_IS_LITERAL
+   ;
+
+kwMaxCompactionFlushMemoryInMb
+   : K_MAX_COMPACTION_FLUSH_MEMORY_IN_MB
+   ;
+
+kwTokenizationEnableStemming
+   : K_TOKENIZATION_ENABLE_STEMMING
+   ;
+
+kwTokenizationSkipStopWords
+   : K_TOKENIZATION_SKIP_STOP_WORDS
+   ;
+
+kwTokenizationLocale
+   : K_TOKENIZATION_LOCALE
+   ;
+
+kwTokenizationNormalizeLowercase
+   : K_TOKENIZATION_NORMALIZE_LOWERCASE
+   ;
+
+kwTokenizationNormalizeUppercase
+   : K_TOKENIZATION_NORMALIZE_UPPERCASE
+   ;
+
+kwNormalizeLowercase
+   : K_NORMALIZE_LOWERCASE
+   ;
+
+kwNormalizeUppercase
+   : K_NORMALIZE_UPPERCASE
+   ;
+
+kwMode
+   :  K_MODE
+   ;
+
+
+kwAnalyzerClass
+   :  K_ANALYZER_CLASS
+   ;
+
 kwStorageAttachedIndex
    : K_STORAGE_ATTACHED_INDEX
+   ;
+
+kwSASIIndex
+   : K_SASI_INDEX
    ;
 
 kwSpaceSavingNoJoin
@@ -1120,6 +1196,10 @@ kwSpaceSavingAll
 
 kwSpaceSavingSlowTriePrecision
    : K_SPACE_SAVING_SLOW_TRIE_PRECISION
+   ;
+
+kwSpaceSavingNoTextField
+   : K_SPACE_SAVING_NO_TEXT_FIELD
    ;
 
 kwCopyField
@@ -1136,6 +1216,10 @@ kwExcluded
 
 kwIndexed
    : K_INDEXED
+   ;
+
+kwLowerCase
+   : K_LOWERCASE
    ;
 
 kwColumns

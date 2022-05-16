@@ -171,6 +171,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -258,6 +266,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -327,6 +343,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -414,6 +438,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -471,6 +503,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -531,6 +571,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -596,6 +644,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -657,6 +713,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -722,6 +786,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -782,6 +854,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -873,6 +953,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -952,6 +1040,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -1092,6 +1188,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -1147,6 +1251,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -1199,6 +1311,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -1256,6 +1376,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Clustering key",
@@ -1331,6 +1459,14 @@ making sure that you maintain a proper JSON format.
 				}]
 			},
 			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
 				"shouldValidate": false,
@@ -1397,6 +1533,14 @@ making sure that you maintain a proper JSON format.
 					"key": "primaryKey",
 					"value": true
 				}]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
 			},
 			{
 				"propertyName": "Frozen",

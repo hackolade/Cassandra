@@ -16,7 +16,7 @@
  *				"<type>": [<names of new property>]
  *			}
  * 		},
- * 		"delete": {
+ * 		"remove": {
  * 			"entity": [<names of new property>],
  * 			"container": [<names of new property>],
  * 			"model": [<names of new property>],
@@ -40,40 +40,47 @@
  * }
  */
 {
+	"add": {
+		"entity": [
+			"tableIfNotExist"
+		],
+		"container": [
+			"keyspaceIfNotExist"
+		],
+		"view": [
+			"viewIfNotExist"
+		]
+	},
 	"modify": {
-		"field": [
+		"entity": [
 			{
 				"from": {
-					"primaryKey": true
+					"tableIfNotExist": ""
 				},
 				"to": {
-					"compositePartitionKey": true
+					"tableIfNotExist": true
 				}
 			}
 		],
-		"entity": [
-			[
-				"setEntityCompositeKeys",
-				"compositePartitionKey",
-				"primaryKey"
-			]
+		"container": [
+			{
+				"from": {
+					"keyspaceIfNotExist": ""
+				},
+				"to": {
+					"keyspaceIfNotExist": true
+				}
+			}
+		],
+		"view": [
+			{
+				"from": {
+					"viewIfNotExist": ""
+				},
+				"to": {
+					"viewIfNotExist": true
+				}
+			}
 		]
-	},
-	"postConvert": {
-		"modify": {
-			"field": [
-				[
-					"updateModelDefinitionOfFirstOrder",
-					{
-						"from": {
-							"type": "map"
-						},
-						"to": {
-							"type": "udt"
-						}
-					}
-				]
-			]
-		}
 	}
 }

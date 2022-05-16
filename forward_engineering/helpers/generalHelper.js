@@ -32,13 +32,32 @@ const retrieveIndexes = (entityConfig) => {
 			indexType: 'search',
 			columns: indexTab.searchIndexColumns,
 			config: indexTab.searchIndexConfig,
-			profiles: [indexTab.searchIndexProfiles].filter(Boolean),
+			profiles: getIndexProfiles(indexTab.searchIndexProfiles),
 			options: indexTab.searchIndexOptions,
+			ifNotExist: indexTab.searchIndexIfNotExist
 		};
 	}
 
 	return result;
 };
+const getIndexProfiles = (searchIndexProfiles) => {
+	if (!Array.isArray(searchIndexProfiles)) {
+		return [searchIndexProfiles].filter(Boolean);
+	}
+	
+	const isSpaceSavingAll = [
+		"spaceSavingNoJoin",
+		"spaceSavingNoTextfield",
+		"spaceSavingSlowTriePrecision"
+	].every(item => searchIndexProfiles.includes(item));
+
+	if (isSpaceSavingAll) {
+		return ['spaceSavingAll'];
+	}
+
+	return searchIndexProfiles;
+};
+
 const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
 const getNameWithKeyspace = (keyspaceName, name) => `${(keyspaceName) ? `"${keyspaceName}".` : ""}${name}`;
 
@@ -154,7 +173,7 @@ const commentDeactivatedStatement = (statement, isActivated = true, isParentActi
 }
 
 const retrieveIsItemActivated = (itemConfig) => {
-	const value = retrivePropertyFromConfig(itemConfig, 0, "isActivated");
+	const value = retrivePropertyFromConfig(itemConfig, 0, "isActivated", true);
 
 	if (value === undefined) {
 		return true;
@@ -162,6 +181,20 @@ const retrieveIsItemActivated = (itemConfig) => {
 
 	return value;
 };
+
+const getUserDefinedFunctions = (udfItems) => {
+	return udfItems.map(item => item.functionBody).filter(item => item).join('\n');
+};
+
+const getUserDefinedAggregations = (udaItems) => {
+	return udaItems.map(item => item.storedProcFunction).filter(item => item).join('\n');
+};
+
+const getApplyDropStatement = data => {
+	const { applyDropStatements, additionalOptions = [] } = data.options || {};
+	const applyDropStatementsFromUi = (additionalOptions.find(option => option.id === 'applyDropStatements') || {}).value;
+	return applyDropStatements || applyDropStatementsFromUi;
+}
 
 module.exports = {
 	tab,
@@ -179,5 +212,9 @@ module.exports = {
 	canTypeHaveSubtype,
 	getEntityLevelConfig,
 	commentDeactivatedStatement,
-	retrieveIsItemActivated
+	retrieveIsItemActivated,
+	getUserDefinedAggregations,
+	getUserDefinedFunctions,
+	getIndexProfiles,
+	getApplyDropStatement
 };

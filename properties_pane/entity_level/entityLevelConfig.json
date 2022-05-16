@@ -141,6 +141,13 @@ making sure that you maintain a proper JSON format.
 				]
 			},
 			{
+				"propertyName": "If not exists",
+				"propertyKeyword": "tableIfNotExist",
+				"propertyTooltip": "If specified, creates the table only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
+				"defaultValue": false,
+				"propertyType": "checkbox"
+			},
+			{
 				"propertyName": "Options",
 				"propertyType": "block",
 				"propertyKeyword": "tableOptions",
@@ -351,12 +358,41 @@ making sure that you maintain a proper JSON format.
 						}
 					},
 					{
+						"propertyName": "If not exists",
+						"propertyKeyword": "indexIfNotExist",
+						"propertyTooltip": "If specified, creates the index only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
+						"defaultValue": false,
+						"propertyType": "checkbox"
+					},
+					{
+						"propertyName": "Is SASI index",
+						"propertyKeyword": "isSASI",
+						"defaultValue": false,
+						"propertyType": "checkbox",
+						"dependency":{
+							"key": "indexType",
+							"value": "custom"
+						}
+					},
+					{
 						"propertyName": "Options",
 						"propertyType": "block",
 						"propertyKeyword": "customOptions",
 						"dependency": {
-							"key": "indexType",
-							"value": "custom"
+							"type": "and",
+							"values":[
+								{
+									"key": "indexType",
+									"value": "custom"
+								},
+								
+								{
+									"type": "not",
+									"values": {
+										"key": "isSASI",
+										"value": true									}
+								}
+							]
 						},
 						"structure": [
 							{
@@ -377,6 +413,119 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "ascii",
 								"propertyType": "checkbox",
 								"propertyTooltip": "When set to true, SAI converts alphabetic, numeric, and symbolic characters that are not in the Basic Latin Unicode block (the first 127 ASCII characters) to the ASCII equivalent, if one exists."
+							}
+						]
+					},
+					{
+						"propertyName": "Options",
+						"propertyType": "block",
+						"propertyKeyword": "customOptions",
+						"dependency": {
+							"type": "and",
+							"values":[
+								{
+									"key": "indexType",
+									"value": "custom"
+								},
+								{
+									"key": "isSASI",
+									"value": true
+								}
+							]
+						},
+						"structure": [
+							{
+								"propertyName": "case_sensitive",
+								"propertyKeyword": "case_sensitive",
+								"propertyType": "checkbox",
+								"propertyTooltip": "Ignore case in matching string values.",
+								"defaultValue": true
+							},
+							{
+								"propertyName": "normalize",
+								"propertyKeyword": "normalize",
+								"propertyType": "checkbox",
+								"propertyTooltip": "When set to true, perform Unicode normalization on indexed strings."
+							},
+							{
+								"propertyName": "analyzed",
+								"propertyKeyword": "analyzed",
+								"propertyType": "checkbox",
+								"propertyTooltip": "analyzed option. When set to true, the literal column is analyzed using the specified analyzer"
+							},
+							{
+								"propertyName": "is literal",
+								"propertyKeyword": "isLiteral",
+								"propertyType": "checkbox",
+								"propertyTooltip": "is_literal option. When set to true, designates a column as literal."
+							},
+							{
+								"propertyName": "tokenization stemming",
+								"propertyKeyword": "tokenizationEnableStemming",
+								"propertyType": "checkbox",
+								"propertyTooltip": "tokenization_enable_stemming option. When set to true, reduce words to their base form."
+							},
+							{
+								"propertyName": "tokenization lowercase",
+								"propertyKeyword": "tokenizationNormalizeLowercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "tokenization_normalize_lowercase option. When set to true, use lowercase."
+							},
+							{
+								"propertyName": "tokenization uppercase",
+								"propertyKeyword": "tokenizationNormalizeUppercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "tokenization_normalize_uppercase option. When set to true, use uppercase."
+							},
+							{
+								"propertyName": "normalize lowercase",
+								"propertyKeyword": "normalizeLowercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "normalize_lowercase option. When set to true, index all strings as lowercase."
+							},
+							{
+								"propertyName": "normalize uppercase",
+								"propertyKeyword": "normalizeUppercase",
+								"propertyType": "checkbox",
+								"propertyTooltip": "normalize_uppercase option. When set to true, index all strings as uppercase."
+							},
+							{
+								"propertyName": "tokenization locale",
+								"propertyKeyword": "tokenizationLocale",
+								"propertyTooltip": "tokenization_locale option.",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "skip stop words",
+								"propertyKeyword": "tokenizationSkipStopWords",
+								"propertyTooltip": "tokenization_skip_stop_words option.",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "mode",
+								"propertyKeyword": "mode",
+								"propertyTooltip": "mode option.",
+								"propertyType": "text"
+							},
+							{
+								"propertyName": "analyzer class",
+								"propertyKeyword": "analyzerClass",
+								"propertyType": "select",
+								"propertyTooltip": "analyzer_class option.",
+								"options": [
+									"",
+									"org.apache.cassandra.index.sasi.analyzer.StandardAnalyzer",
+									"org.apache.cassandra.index.sasi.analyzer.NonTokenizingAnalyzer"
+								]
+							},
+							{
+								"propertyName": "max compaction flush mb",
+								"propertyKeyword": "maxCompactionFlushMemoryInMb",
+								"propertyType": "numeric",
+								"valueType": "number",
+								"propertyTooltip": "max_compaction_flush_memory_in_mb option.",
+								"minValue": 0,
+								"step": 1
 							}
 						]
 					},
@@ -480,12 +629,18 @@ making sure that you maintain a proper JSON format.
 						"propertyType": "checkbox",
 						"propertyTooltip": "include the specified fields in the index.",
 						"defaultValue": true
+					},
+					{
+						"propertyName": "lowerCase",
+						"propertyKeyword": "lowerCase",
+						"propertyType": "checkbox",
+						"propertyTooltip": "use the LowerCaseStrField field type."
 					}
 				]
 			},
 			{
 				"propertyName": "Profiles",
-				"propertyType": "select",
+				"propertyType": "multipleCheckboxSelect",
 				"propertyKeyword": "searchIndexProfiles",
 				"propertyTooltip": "",
 				"dependency": {
@@ -506,11 +661,34 @@ making sure that you maintain a proper JSON format.
 					]
 				},
 				"options": [
-					"",
-					"spaceSavingAll",
 					"spaceSavingNoJoin",
+					"spaceSavingNoTextfield",
 					"spaceSavingSlowTriePrecision"
 				]
+			},
+			{
+				"propertyName": "If not exists",
+				"propertyKeyword": "searchIndexIfNotExist",
+				"propertyTooltip": "If specified, creates the search index only when it does not exist. The creation of view succeeds (no error is thrown) if the specified view already exists in the system. This parameter is mutually exclusive to OR REPLACE and cannot be specified together.",
+				"defaultValue": false,
+				"propertyType": "checkbox",
+				"dependency": {
+					"type": "and",
+					"values":[
+						{
+							"key": "searchIndex",
+							"value": true
+						},
+						{
+							"type": "not",
+							"values": {
+								"level": "model",
+								"key": "dbVersion",
+								"value": "Astra DB"
+							}
+						}
+					]
+				}
 			},
 			{
 				"propertyName": "Config",

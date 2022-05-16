@@ -27,20 +27,21 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 
 		const isIndexKeyActivated = index.isActivated && isIndexColumnKeyActivated(index.SecIndxKey, dataSources);
 		const columnStatement = getIndexColumnStatement(index.SecIndxKey, dataSources);
-
 		if (index.indexType === 'custom') {
 			indexStatement = getCustomIndex({
 				name: index.name,
 				tableName: tableNameStatement,
 				column: columnStatement,
-				using: 'StorageAttachedIndex',
-				options: getCustomOptions(index.customOptions),
+				using: index.isSASI ? 'org.apache.cassandra.index.sasi.SASIIndex' : 'StorageAttachedIndex',
+				options: getCustomOptions(index.customOptions, index.isSASI),
+				ifNotExist: index.indexIfNotExist
 			});
 		} else {
-			indexStatement = getIndex(
+			indexStatement =  getIndex(
 				index.name,
 				tableNameStatement,
 				columnStatement,
+				index.indexIfNotExist
 			);
 		}
 
@@ -71,6 +72,7 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 		isActivated: isActivated && isParentActivated,
 		index: searchIndex,
 		columns,
+		ifNotExist: searchIndex.ifNotExist
 	});
 
 	return [{
@@ -91,21 +93,21 @@ const uniqueByName = (columns) => {
 	}, []);
 };
 
-const getIndex = (name, tableName, indexColumnStatement) => (
-	`CREATE INDEX IF NOT EXISTS ${name ? `"${name}"` : ``}\n${tab(`ON ${tableName} (${indexColumnStatement});`)}`	
+const getIndex = (name, tableName, indexColumnStatement, ifNotExist) => (
+	`CREATE INDEX ${ifNotExist ? `IF NOT EXISTS ` : ``}${name ? `"${name}"` : ``}\n${tab(`ON ${tableName} (${indexColumnStatement});`)}`	
 );
 
-const getCustomIndex = ({ name, tableName, column, using, options }) => (
-	`CREATE CUSTOM INDEX IF NOT EXISTS ${name ? `"${name}"` : ``}\n` +
+const getCustomIndex = ({ name, tableName, column, using, options, ifNotExist }) => (
+	`CREATE CUSTOM INDEX ${ifNotExist ? `IF NOT EXISTS ` : ``}${name ? `"${name}"` : ``}\n` +
 	`${tab(`ON ${tableName} (${column})`)}\n` +
 	`${tab(`USING '${using || 'StorageAttachedIndex'}'`)}` +
 	`${Object.keys(options).length ? '\n' + tab(`WITH OPTIONS = {\n${tab(serializeOptions(options).join(',\n'))}\n}`) : ''};`	
 );
 
 const getIndexColumnStatement = (key, dataSources) => {
-	const { name } = getNamesByIds([key.keyId], dataSources)[key.keyId];
+	const { name } = getNamesByIds([key.keyId], dataSources)[key.keyId] || {};
 
-	return wrapKey(`"${name}"`, key.type);
+	return name ? wrapKey(`"${name}"`, key.type) : '';
 };
 
 const wrapKey = (column, type) => {
@@ -129,7 +131,7 @@ const wrapKey = (column, type) => {
 };
 
 const isIndexColumnKeyActivated = (key, dataSources) => {
-	const { isActivated } = getNamesByIds([key.keyId], dataSources)[key.keyId];
+	const { isActivated } = getNamesByIds([key.keyId], dataSources)[key.keyId] || {};
 
 	return isActivated !== false;
 };
@@ -149,7 +151,7 @@ const serializeOptions = (options) => {
 	return Object.keys(options).map(option => `'${option}': '${options[option]}'`);
 };
 
-const getCustomOptions = (options) => {
+const getCustomOptions = (options, isSASI) => {
 	let result = {};
 
 	if (!options) {
@@ -164,28 +166,80 @@ const getCustomOptions = (options) => {
 		result.normalize = 'true';
 	}
 
-	if (options.ascii) {
+	if (options.ascii && !isSASI) {
 		result.ascii = 'true';
+	}
+
+	if(!isSASI){
+		return result;
+	}
+
+
+	if (options.analyzed) {
+		result.analyzed = 'true';
+	}
+
+	if (options.isLiteral) {
+		result.is_literal = 'true';
+	}
+
+	if (options.tokenizationEnableStemming) {
+		result.tokenization_enable_stemming = 'true';
+	}
+
+	if (options.tokenizationNormalizeLowercase) {
+		result.tokenization_normalize_lowercase = 'true';
+	}
+
+	if (options.tokenizationNormalizeUppercase) {
+		result.tokenization_normalize_uppercase = 'true';
+	}
+
+	if (options.normalizeLowercase) {
+		result.normalize_lowercase = 'true';
+	}
+
+	if (options.normalizeUppercase) {
+		result.normalize_uppercase = 'true';
+	}
+
+	if (options.tokenizationLocale) {
+		result.tokenization_locale = `${options.tokenizationLocale}`;
+	}
+
+	if (options.tokenizationSkipStopWords) {
+		result.tokenization_skip_stop_words = `${options.tokenizationSkipStopWords}`;
+	}
+
+	if (options.mode) {
+		result.mode = `${options.mode}`;
+	}
+
+	if (options.analyzerClass) {
+		result.analyzer_class = `${options.analyzerClass}`;
+	}
+
+	if (options.maxCompactionFlushMemoryInMb) {
+		result.max_compaction_flush_memory_in_mb = `${options.maxCompactionFlushMemoryInMb}`;
 	}
 
 	return result;
 };
 
-const getSearchIndex = ({ tableName, columns, index, isActivated }) => {
+const getSearchIndex = ({ tableName, columns, index, isActivated, ifNotExist }) => {
 	const columnsStatement = getSearchIndexColumnStatements(getSearchIndexColumns(columns), isActivated);
 	const profiles = index.profiles.length ? `\n${tab(`AND PROFILES ${index.profiles.join(', ')}`)}` : '';
 	const indexConfig = getSearchIndexConfig(index.config);
 	const config = indexConfig ? `\n${tab(`AND CONFIG ${indexConfig}`)}` : '';
 	const indexOptions = getSearchIndexOptions(index.options);
 	const options = indexOptions ? `\n${tab(`AND OPTIONS ${indexOptions}`)}` : '';
-
-	return `CREATE SEARCH INDEX IF NOT EXISTS ON ${tableName}\n` + 
+	return `CREATE SEARCH INDEX ${ifNotExist ? `IF NOT EXISTS `:``}ON ${tableName}\n` + 
 		`${tab(`WITH COLUMNS\n${tab(columnsStatement)}`)}` + 
 		profiles + config + options +
 		';';
 };
 
-const getSearchIndexColumns = (columns) => {
+const getSearchIndexColumns = columns => {
 	return columns.map(column => {
 		const options = [];
 
@@ -203,6 +257,10 @@ const getSearchIndexColumns = (columns) => {
 
 		if (!column.indexed) {
 			options.push(`indexed: false`);
+		}
+
+		if (column.lowerCase) {
+			options.push(`lowerCase: true`);
 		}
 
 		return {

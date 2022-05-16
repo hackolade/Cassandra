@@ -16,7 +16,7 @@
  *				"<type>": [<names of new property>]
  *			}
  * 		},
- * 		"delete": {
+ * 		"remove": {
  * 			"entity": [<names of new property>],
  * 			"container": [<names of new property>],
  * 			"model": [<names of new property>],
@@ -39,41 +39,59 @@
  * 		},
  * }
  */
-{
+ {
 	"modify": {
-		"field": [
+		"entity": [
 			{
 				"from": {
-					"primaryKey": true
+					"searchIndexProfiles": "spaceSavingAll"
 				},
 				"to": {
-					"compositePartitionKey": true
+					"searchIndexProfiles": [
+						"spaceSavingNoJoin",
+						"spaceSavingNoTextfield",
+						"spaceSavingSlowTriePrecision"
+					]
+				}
+			},
+			{
+				"from": {
+					"searchIndexProfiles": "spaceSavingNoJoin"
+				},
+				"to": {
+					"searchIndexProfiles": [
+						"spaceSavingNoJoin"
+					]
+				}
+			},
+			{
+				"from": {
+					"searchIndexProfiles": "spaceSavingNoTextfield"
+				},
+				"to": {
+					"searchIndexProfiles": [
+						"spaceSavingNoTextfield"
+					]
+				}
+			},
+			{
+				"from": {
+					"searchIndexProfiles": "spaceSavingSlowTriePrecision"
+				},
+				"to": {
+					"searchIndexProfiles": [
+						"spaceSavingSlowTriePrecision"
+					]
+				}
+			},
+			{
+				"from": {
+					"searchIndexProfiles": ""
+				},
+				"to": {
+					"searchIndexProfiles": []
 				}
 			}
-		],
-		"entity": [
-			[
-				"setEntityCompositeKeys",
-				"compositePartitionKey",
-				"primaryKey"
-			]
 		]
-	},
-	"postConvert": {
-		"modify": {
-			"field": [
-				[
-					"updateModelDefinitionOfFirstOrder",
-					{
-						"from": {
-							"type": "map"
-						},
-						"to": {
-							"type": "udt"
-						}
-					}
-				]
-			]
-		}
 	}
 }

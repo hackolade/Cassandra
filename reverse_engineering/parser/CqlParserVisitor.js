@@ -1,4 +1,4 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.7.2
+// Generated from grammars/CqlParser.g4 by ANTLR 4.8
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
@@ -624,6 +624,12 @@ CqlParserVisitor.prototype.visitCustomIndex = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#customIndexOption.
+CqlParserVisitor.prototype.visitCustomIndexOption = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#createSearchIndex.
 CqlParserVisitor.prototype.visitCreateSearchIndex = function(ctx) {
   return this.visitChildren(ctx);
@@ -644,6 +650,12 @@ CqlParserVisitor.prototype.visitDirectoryFactory = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#searchIndexOptions.
 CqlParserVisitor.prototype.visitSearchIndexOptions = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#searchIndexProfile.
+CqlParserVisitor.prototype.visitSearchIndexProfile = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -1368,8 +1380,86 @@ CqlParserVisitor.prototype.visitKwNormalize = function(ctx) {
 };
 
 
+// Visit a parse tree produced by CqlParser#kwAnalyzed.
+CqlParserVisitor.prototype.visitKwAnalyzed = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwIsLiteral.
+CqlParserVisitor.prototype.visitKwIsLiteral = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
+CqlParserVisitor.prototype.visitKwMaxCompactionFlushMemoryInMb = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationEnableStemming.
+CqlParserVisitor.prototype.visitKwTokenizationEnableStemming = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
+CqlParserVisitor.prototype.visitKwTokenizationSkipStopWords = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationLocale.
+CqlParserVisitor.prototype.visitKwTokenizationLocale = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
+CqlParserVisitor.prototype.visitKwTokenizationNormalizeLowercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
+CqlParserVisitor.prototype.visitKwTokenizationNormalizeUppercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwNormalizeLowercase.
+CqlParserVisitor.prototype.visitKwNormalizeLowercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwNormalizeUppercase.
+CqlParserVisitor.prototype.visitKwNormalizeUppercase = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwMode.
+CqlParserVisitor.prototype.visitKwMode = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwAnalyzerClass.
+CqlParserVisitor.prototype.visitKwAnalyzerClass = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
 // Visit a parse tree produced by CqlParser#kwStorageAttachedIndex.
 CqlParserVisitor.prototype.visitKwStorageAttachedIndex = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwSASIIndex.
+CqlParserVisitor.prototype.visitKwSASIIndex = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -1388,6 +1478,12 @@ CqlParserVisitor.prototype.visitKwSpaceSavingAll = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
 CqlParserVisitor.prototype.visitKwSpaceSavingSlowTriePrecision = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
+CqlParserVisitor.prototype.visitKwSpaceSavingNoTextField = function(ctx) {
   return this.visitChildren(ctx);
 };
 
@@ -1412,6 +1508,12 @@ CqlParserVisitor.prototype.visitKwExcluded = function(ctx) {
 
 // Visit a parse tree produced by CqlParser#kwIndexed.
 CqlParserVisitor.prototype.visitKwIndexed = function(ctx) {
+  return this.visitChildren(ctx);
+};
+
+
+// Visit a parse tree produced by CqlParser#kwLowerCase.
+CqlParserVisitor.prototype.visitKwLowerCase = function(ctx) {
   return this.visitChildren(ctx);
 };
 

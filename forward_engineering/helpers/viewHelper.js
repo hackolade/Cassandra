@@ -12,14 +12,33 @@ const getColumnNames = (collectionRefsDefinitionsMap, columns) => {
 	return _.uniq(Object.keys(columns).map(name => {
 		const id = _.get(columns, [name, 'GUID']);
 
-		const itemData = Object.keys(collectionRefsDefinitionsMap).find(viewFieldId => {
+		const itemDataId = Object.keys(collectionRefsDefinitionsMap).find(viewFieldId => {
 			const definitionData = collectionRefsDefinitionsMap[viewFieldId];
 
 			return definitionData.definitionId === id;
 		});
+		const itemData = collectionRefsDefinitionsMap[itemDataId];
 
 		return `"${_.get(itemData, 'name', name)}"`;
 	})).filter(_.identity);
+};
+
+const getViewColumns = (collectionRefsDefinitionsMap, properties) => {
+	return Object.keys(properties).reduce((columns, name) => {
+		const id = _.get(properties, [name, 'GUID']);
+
+		const itemDataId = Object.keys(collectionRefsDefinitionsMap).find(viewFieldId => {
+			const definitionData = collectionRefsDefinitionsMap[viewFieldId];
+
+			return definitionData.definitionId === id;
+		});
+		const itemData = collectionRefsDefinitionsMap[itemDataId];
+
+		return {
+			...columns,
+			[_.get(itemData, 'name', name)]: properties[name],
+		};
+	}, {});
 };
 
 const getWhereStatement = columnsNames => {
@@ -135,7 +154,7 @@ module.exports = {
 	}) {
 		setDependencies(dependencies);
 		let script = [];
-		const columns = schema.properties || {};
+		const columns = getViewColumns(collectionRefsDefinitionsMap, schema.properties || {});
 		const view = _.first(viewData) || {};
 
 		const entityName = retrieveEntityName(entityData);

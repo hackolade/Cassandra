@@ -78,6 +78,23 @@ const getClusteringKeyData = (collectionRefsDefinitionsMap, viewData) => {
 	return { clusteringKeys, clusteringKeysHash };
 };
 
+const getPrimaryKeysNames = (collectionRefsDefinitionsMap, viewData) => {
+	return [
+		...getCompositeKeysNames(collectionRefsDefinitionsMap, viewData, 'compositePartitionKey'),
+		...getCompositeKeysNames(collectionRefsDefinitionsMap, viewData, 'compositeClusteringKey'),
+	];
+};
+
+const getCompositeKeysNames = (collectionRefsDefinitionsMap, viewData, key) => {
+	const partitionKeys = retrivePropertyFromConfig(viewData, 0, key, []);
+	const partitionKeysHash = getNamesByIds(
+		collectionRefsDefinitionsMap,
+		partitionKeys.map(key => key.keyId)
+	);
+
+	return _.values(partitionKeysHash).filter(_.identity).map(field => `"${field.name}"`);
+};
+
 const getPrimaryKeyScript = (collectionRefsDefinitionsMap, viewData, isParentActivated) => {
 	const partitionKeys = retrivePropertyFromConfig(viewData, 0, 'compositePartitionKey', []);
 	const partitionKeysHash = getNamesByIds(
@@ -127,7 +144,7 @@ const getEmptyViewScript = ({ viewData, entitySchema, entityData, entityName, is
 	const optionsScript = getOptionsScript({}, viewData);
 
 	script.push(`AS SELECT * FROM ${entityName}`);
-	script.push(getWhereStatement(Object.keys(entityColumns)));
+	script.push(getWhereStatement(getPrimaryKeysNames(collectionRefsDefinitionsMap, entityData)));
 
 	if (primaryKeyScript) {
 		script.push(primaryKeyScript);
@@ -182,7 +199,10 @@ module.exports = {
 			const columnsNames = getColumnNames(collectionRefsDefinitionsMap, columns);
 			script.push(`AS SELECT ${columnsNames.join(', ')}`);
 			script.push(`FROM ${tableName}`);
-			script.push(getWhereStatement(columnsNames));
+			script.push(getWhereStatement(_.uniq([
+				...getPrimaryKeysNames(collectionRefsDefinitionsMap, viewData),
+				...getCompositeKeysNames(collectionRefsDefinitionsMap, viewData, 'whereClause')
+			])));
 			if (primaryKeyScript) {
 				script.push(primaryKeyScript);
 			}

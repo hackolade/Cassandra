@@ -79,7 +79,10 @@ const getClusteringKeyData = (collectionRefsDefinitionsMap, viewData) => {
 };
 
 const getPrimaryKeysNames = (collectionRefsDefinitionsMap, viewData) => {
-	return getCompositeKeysNames(collectionRefsDefinitionsMap, viewData, 'compositePartitionKey');
+	return [
+		...getCompositeKeysNames(collectionRefsDefinitionsMap, viewData, 'compositePartitionKey'),
+		...getCompositeKeysNames(collectionRefsDefinitionsMap, viewData, 'compositeClusteringKey'),
+	];
 };
 
 const getCompositeKeysNames = (collectionRefsDefinitionsMap, viewData, key) => {

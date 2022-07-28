@@ -40,8 +40,13 @@ const fieldTypeCompatible = (oldType, newType) => {
 	return true
 };
 
+const checkFieldPropertiesChanged = (compMod, propertiesToCheck) => {
+	return propertiesToCheck.some(prop => compMod?.oldField[prop] !== compMod?.newField[prop]);
+};
+
 module.exports = {
 	mergeArrays,
 	checkIsOldModel,
-	fieldTypeCompatible
+	fieldTypeCompatible,
+	checkFieldPropertiesChanged
 }

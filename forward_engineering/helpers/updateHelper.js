@@ -107,7 +107,6 @@ const getUpdateColumnProvider = {
 };
 
 const getUpdate = updateData => {
-	const property = updateData.property;
 	const hydratedColumn = hydrateColumn(updateData);
 	const { newName, oldName } = hydratedColumn;
 	if (!oldName || !newName) {

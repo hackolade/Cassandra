@@ -11,5 +11,8 @@
 		"default": "",
 		"enum": [],
 		"sample": ""
+	},
+	"compatibilityTypes": {
+		"bool": ["blob"]
 	}
 }

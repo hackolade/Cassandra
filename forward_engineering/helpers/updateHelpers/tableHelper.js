@@ -19,14 +19,16 @@ const getDelete = deleteData => {
 const hydrateColumn = ({ tableName, keyspaceName, isOldModel, property, udtMap }) => {
 	const { oldField = {}, newField = {} } = property?.compMod || {};
 	const newType = getTypeByData(newField, udtMap);
+	const oldType = getTypeByData(oldField, udtMap)
 	return {
 		property,
 		isOldModel,
 		oldName: oldField.name,
 		newName: newField.name,
-		newTechName: `${oldField.name}_${(newType || '').toLowerCase()}`,
 		newType,
-		oldType: getTypeByData(oldField, udtMap),
+		oldType,
+		isNameChange: oldField.name !== newField.name,
+		isTypeChange: newType !== oldType,
 		dataForScript: {
 			tableName,
 			keyspaceName,

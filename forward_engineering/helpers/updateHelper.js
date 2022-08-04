@@ -5,7 +5,7 @@ const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
 const { dependencies } = require('./appDependencies');
 const { getKeySpaceScript } = require('./updateHelpers/keySpaceHelper');
-const { mergeArrays, checkIsOldModel, fieldTypeCompatible, checkFieldPropertiesChanged } = require('./updateHelpers/generalHelper');
+const { mergeArrays, checkIsOldModel, fieldTypeCompatible } = require('./updateHelpers/generalHelper');
 const { getViewScript } = require('./updateHelpers/viewHelper');
 const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
@@ -71,7 +71,10 @@ const getUpdateColumnProvider = {
 	},
 
 	alterName(hydratedColumn) {
-		const { newName, oldName, dataForScript, property } = hydratedColumn;
+		const { newName, oldName, dataForScript, property, isTypeChange } = hydratedColumn;
+		if (property.primaryKey && isTypeChange) {
+			return [];
+		}
 		if (!property.primaryKey) {
 			return this.alterDropCreate(hydratedColumn);
 		}
@@ -79,14 +82,14 @@ const getUpdateColumnProvider = {
 	},
 
 	alterType(hydratedColumn) {
-		const { isOldModel, oldType, newType, dataForScript, newTechName } = hydratedColumn;
-		if (!oldType || !newType) {
+		const { isOldModel, oldType, newType, dataForScript, property } = hydratedColumn;
+		if (!oldType || !newType || property.primaryKey) {
 			return [];
 		}
-		const isFieldFieldTypeCompatible = fieldTypeCompatible(oldType, newType);
+		const isFieldTypeCompatible = fieldTypeCompatible(oldType, newType);
 		
 		if (isOldModel) {
-			if (!isFieldFieldTypeCompatible) {
+			if (!isFieldTypeCompatible) {
 				return this.alterDropCreate(hydratedColumn);
 			}
 		
@@ -99,10 +102,6 @@ const getUpdateColumnProvider = {
 			}];
 		} 
 
-		if (!isFieldFieldTypeCompatible) {
-			return this.alterDropCreate({...hydratedColumn, newName: newTechName });
-		}
-
 		return this.alterDropCreate(hydratedColumn);
 	}
 };
@@ -114,9 +113,9 @@ const getUpdate = updateData => {
 	if (!oldName || !newName) {
 		return [];
 	}
-	if (checkFieldPropertiesChanged(property.compMod || {}, ['name'])) {
+	if (hydratedColumn.isNameChange) {
 		return getUpdateColumnProvider.alterName(hydratedColumn);
-	} else if (checkFieldPropertiesChanged(property.compMod || {}, ['mode', 'type'])) {
+	} else if (hydratedColumn.isTypeChange) {
 		return getUpdateColumnProvider.alterType(hydratedColumn);
 	}
 

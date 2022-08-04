@@ -20,5 +20,8 @@
 		"sample":"",
 		"pattern": "",
 		"comments":""
+	},
+	"compatibilityTypes": {
+		"timeuuid": ["blob", "uuid"]
 	}
 }

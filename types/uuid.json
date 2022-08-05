@@ -20,8 +20,5 @@
 		"sample":"",
 		"pattern": "",
 		"comments":""
-	},
-	"compatibilityTypes": {
-		"uuid": ["blob"]
 	}
 }

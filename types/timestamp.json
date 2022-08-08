@@ -21,5 +21,15 @@
 		"format": "YYYY-MM-DD hh:mm:ss.nnn"
 	}, {
 		"format": "YYYY-MM-DD hh:mm:ss.nnnZ"
-	}]
+	}],
+	"compatibilityTypes": [
+		{
+			"from": {
+				"type": "timestamp"
+			},
+			"to": {
+				"type": "blob"
+			}
+		}
+	]
 }

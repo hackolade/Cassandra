@@ -20,5 +20,15 @@
 		"sample":"",
 		"pattern": "",
 		"comments":""
-	}
+	},
+	"compatibilityTypes": [
+		{
+			"from": {
+				"type": "uuid"
+			},
+			"to": {
+				"type": "blob"
+			}
+		}
+	]
 }

@@ -58,5 +58,41 @@
 		"string": {
 			"parentType": "string"
 		}
-	}
+	},
+	"compatibilityTypes": [
+		{
+			"from": {
+				"mode": "text"
+			},
+			"to": {
+				"mode": "varchar"
+			}
+		},
+		{
+			"from": {
+				"mode": "varchar"
+			},
+			"to": [
+				{
+					"mode": "text"
+				},
+				{
+					"type": "blob"
+				}	
+			]
+		},
+		{
+			"from": [
+				{
+					"mode": "ascii"
+				},
+				{
+					"mode": "inet"
+				}
+			],
+			"to": {
+				"type": "blob"
+			}
+		}
+	]
 }

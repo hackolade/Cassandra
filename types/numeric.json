@@ -24,5 +24,40 @@
 		"enum": [],
 		"mode": "integer",
 		"sample": ""
-	}
+	},
+	"compatibilityTypes": [
+		{
+			"from": {
+				"mode": "integer"
+			},
+			"to": {
+				"mode": "varint"
+			}
+		},
+		{
+			"from": [
+				{
+					"mode": "bigint"
+				},
+				{
+					"mode": "decimal"
+				},
+				{
+					"mode": "double"
+				},
+				{
+					"mode": "float"
+				},
+				{
+					"mode": "varint"
+				},
+				{
+					"mode": "integer"
+				}
+			],
+			"to": {
+				"type": "blob"
+			}
+		}
+	]
 }

@@ -33,7 +33,7 @@ const fieldTypeCompatible = (oldType, newType) => {
 		return type === oldType;
 	});
 
-	if (!foundCapabilityType) {
+	if (!Boolean(foundCapabilityType.length)) {
 		return false;
 	}
 

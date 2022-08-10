@@ -43,5 +43,5 @@ const fieldTypeCompatible = (oldType, newType) => {
 module.exports = {
 	mergeArrays,
 	checkIsOldModel,
-	fieldTypeCompatible
+	fieldTypeCompatible,
 }

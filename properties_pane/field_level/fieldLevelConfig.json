@@ -136,7 +136,8 @@ making sure that you maintain a proper JSON format.
 				],
 				"data": "options",
 				"valueType": "string",
-				"cleanDependency": true
+				"cleanDependency": true,
+				"typeable": true
 			},
 			{
 				"propertyName": "JSON Type",
@@ -251,7 +252,8 @@ making sure that you maintain a proper JSON format.
 					"varint"
 				],
 				"data": "options",
-				"valueType": "string"
+				"valueType": "string",
+				"typeable": true
 			},
 			"dependencies",
 			{
@@ -920,6 +922,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,
 				"propertyType": "select",
+				"typeable": true,
 				"options": [
 					"set<str>",
 					"set<num>",
@@ -1009,6 +1012,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,
 				"propertyType": "select",
+				"typeable": true,
 				"options": [
 					"list<str>",
 					"list<num>",
@@ -1098,6 +1102,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "keyType",
 				"shouldValidate": false,
 				"propertyType": "select",
+				"typeable": true,
 				"options": [
 					"char",
 					"numeric",
@@ -1117,6 +1122,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "keySubtype",
 				"shouldValidate": false,
 				"propertyType": "select",
+				"typeable": true,
 				"options": [
 					"text",
 					"varchar",
@@ -1133,6 +1139,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "keySubtype",
 				"shouldValidate": false,
 				"propertyType": "select",
+				"typeable": true,
 				"options": [
 					"integer",
 					"bigint",
@@ -1155,6 +1162,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,
 				"propertyType": "select",
+				"typeable": true,
 				"options": [
 					"map<str>",
 					"map<num>",

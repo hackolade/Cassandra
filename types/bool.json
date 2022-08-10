@@ -11,5 +11,15 @@
 		"default": "",
 		"enum": [],
 		"sample": ""
-	}
+	},
+	"compatibilityTypes": [
+		{
+			"from": {
+				"type": "bool"
+			},
+			"to": {
+				"type": "blob"
+			}
+		}
+	]
 }

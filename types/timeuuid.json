@@ -20,5 +20,20 @@
 		"sample":"",
 		"pattern": "",
 		"comments":""
-	}
+	},
+	"compatibilityTypes": [
+		{
+			"from": {
+				"type": "timeuuid"
+			},
+			"to": [
+				{
+					"type": "blob"
+				},
+				{
+					"type": "uuid"
+				}
+			]
+		}
+	]
 }

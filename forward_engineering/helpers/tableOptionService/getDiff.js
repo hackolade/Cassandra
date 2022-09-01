@@ -45,13 +45,24 @@ const isDiffParsedJsonString = (oldValue, value) => {
 };
 
 const isDiffCaching = (oldValue, value) => {
-	const jsonOld = Object.assign({}, oldValue, { id: null });
-	const jsonNew = Object.assign({}, value, { id: null });
+	const updateKeys = caches => {
+		const perPartitionValue = _.get(caches, 'rowsPerPartition');
+		if (perPartitionValue) {
+			return { ..._.omit(caches, 'rowsPerPartition'), 'rows_per_partition': perPartitionValue };
+		}
+
+		return caches;
+	};
+
+	const jsonOld = Object.assign({}, updateKeys(oldValue), { id: null });
+	const jsonNew = Object.assign({}, updateKeys(value), { id: null });
 
 	return !_.isEqual(jsonOld, jsonNew);
 };
 
 const getModifiedAndNewOptions = (newOptions, oldOptions) => {
+	oldOptions = _.isEmpty(oldOptions) ? optionDefaultValues : oldOptions;
+	
 	return Object.entries(newOptions).reduce((acc, [name, value]) => {
 		if (REDUNDANT_OPTIONS.includes(name)) {
 			return acc;
@@ -65,12 +76,15 @@ const getModifiedAndNewOptions = (newOptions, oldOptions) => {
 	}, {});
 };
 
-const getDeletedOptions = (newOptions, oldOptions) =>
-	Object.keys(oldOptions).filter(oldOptionKey => !newOptions.hasOwnProperty(oldOptionKey));
+const getDeletedOptions = (newOptions, oldOptions) => {
+	newOptions = _.isEmpty(newOptions) ? optionDefaultValues : newOptions;
 
-const getDefaultOptionsByName = optionNames => {
+	return Object.keys(oldOptions).filter(oldOptionKey => !newOptions.hasOwnProperty(oldOptionKey));
+};
+
+const getDefaultOptionsByName = (optionNames, oldOptions) => {
 	return optionNames.reduce((acc, optionName) => {
-		if (optionDefaultValues.hasOwnProperty(optionName)) {
+		if (optionDefaultValues.hasOwnProperty(optionName) && isDiff(_.get(oldOptions, optionName), optionDefaultValues[optionName], optionName)) {
 			return Object.assign({}, acc, { [optionName]: optionDefaultValues[optionName] });
 		}
 
@@ -83,6 +97,6 @@ module.exports = {
 		setDependencies(dependencies);
 		const modifiedAndNewOptions = getModifiedAndNewOptions(newOptions, oldOptions);
 		const deletedOptionNames = getDeletedOptions(newOptions, oldOptions);
-		return Object.assign({}, modifiedAndNewOptions, getDefaultOptionsByName(deletedOptionNames));
+		return Object.assign({}, modifiedAndNewOptions, getDefaultOptionsByName(deletedOptionNames, oldOptions));
 	},
 };

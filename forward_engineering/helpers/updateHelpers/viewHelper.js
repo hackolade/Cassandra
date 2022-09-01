@@ -39,7 +39,7 @@ const getProperty = (newProperty, oldProperty) => {
 	}
 }
 
-const getDifferentOptions = (tableOptions, comments = {}) => {
+const getDifferentOptions = (tableOptions = {}, comments = {}) => {
 	const newComments = getProperty(comments.new, comments.old);
 	const { new: newProperties = {}, old: oldProperties = {} } = tableOptions;
 	const newTableOptions = Object.entries(newProperties)

@@ -2,6 +2,7 @@ const { dependencies } = require('../appDependencies');
 const { getIndexProfiles, getTableNameStatement, tab } = require('../generalHelper');
 const { getIndexes } = require('../indexHelper');
 const { getNamesByIds } = require('../schemaHelper');
+const { getDiffOptions, getDiffConfig, getDiffIndexProfiles } = require('./indexOptionService');
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -28,7 +29,7 @@ const setNameCollectionsScript = (keyspaceName, name, type) => {
 	nameCollectionsExistsScript = { ...nameCollectionsExistsScript, [type]: [...nameCollectionsExistsScript[type], statement] };
 };
 
-const indexSearchProperties = ['searchIndexOptions', 'searchIndexProfiles'];
+const indexSearchProperties = ['searchIndexProfiles'];
 
 const getDataSearchIndex = indexTab => {
 	return {
@@ -49,25 +50,7 @@ const getModifyDataSearchIndex = (item, type) => {
 	return getDataSearchIndex(item);
 }
 
-const compareProperty = (newProperty, oldProperty, data) => {
-	const newPropertyEmpty = _.isObject(newProperty) && _.isEmpty(newProperty) || !newProperty;
-	const oldPropertyEmpty = _.isObject(oldProperty) && _.isEmpty(oldProperty) || !oldProperty;
-
-	if (newPropertyEmpty && oldPropertyEmpty) {
-		return data;
-	}
-
-	if (newPropertyEmpty) {
-		return { ...data, drop: true };
-	} else if (oldPropertyEmpty) {
-		return { ...data, add: true };
-	} else if (!_.isEqual(newProperty, oldProperty)) {
-		return { ...data, modify: true};
-	}
-	return data;
-}
-
-const getDataForScript = (newData, oldData) => {
+const getDataForScript = (newData, oldData, isEqual = _.isEqual) => {
 	let addData;
 	let dropData;
 	
@@ -80,9 +63,9 @@ const getDataForScript = (newData, oldData) => {
 	} else if (!oldData.length) {
 		addData = newData;
 	} else if (!_.isEqual(newData, oldData)) {
-		const equalElements = _.intersectionWith(newData, oldData, _.isEqual);
-		dropData = _.xorWith(oldData, equalElements, _.isEqual);
-		addData = _.xorWith(newData, equalElements, _.isEqual);
+		const equalElements = _.intersectionWith(newData, oldData, isEqual);
+		dropData = _.xorWith(oldData, equalElements, isEqual);
+		addData = _.xorWith(newData, equalElements, isEqual);
 	}
 	return {
 		addData,
@@ -94,9 +77,11 @@ const getDataForSearchIndexScript = role => {
 	const { compMod } = role;
 	const dataSearchIndex = getDataSearchIndex(role);
 	const searchIndex = _.get(role, 'compMod.searchIndex', {});
-	const searchPropertiesCompare = indexSearchProperties
-		.reduce((data, property) => compareProperty(compMod[property]?.new, compMod[property]?.old, data), {});
-	
+	const searchPropertiesCompare = _.merge(
+		getDiffOptions(compMod?.searchIndexOptions?.old, compMod?.searchIndexOptions?.new),
+		getDiffIndexProfiles(compMod?.searchIndexProfiles?.old, compMod?.searchIndexProfiles?.new),
+	);
+
 	let dropData;
 	let addData;
 
@@ -108,8 +93,8 @@ const getDataForSearchIndexScript = role => {
 		addData = getModifyDataSearchIndex(role, 'new');
 	} else if (!searchIndex.new) {
 		dropData = dataSearchIndex;
-	} else if (!_.isEmpty(searchPropertiesCompare)) {
-		addData = getModifyDataSearchIndex(role, 'new');;
+	} else if (!_.isEmpty(searchPropertiesCompare.modifyData) || !_.isEmpty(searchPropertiesCompare.dropData)) {
+		addData = getModifyDataSearchIndex(role, 'new');
 		dropData = dataSearchIndex;
 	} 
 	return {
@@ -138,28 +123,15 @@ const getDataColumnIndex = (dataSources, oldIdToNameHashTable, column = {}, key 
 
 const getDataForSearchIndexColumns = (item, dataSources) => {
 	const oldIdToNameHashTable = _.get(item, 'role.compMod.oldIdToNameHashTable', {});
+	const newIdToNameHashTable = _.get(item, 'role.compMod.newIdToNameHashTable', {});
 	const columns = _.get(item, 'role.compMod.searchIndexColumns', {});
 	const filterColumn = column => column.name;
-	const newColumns = (columns.new || []).map(column => getDataColumnIndex(dataSources, {}, column)).filter(filterColumn);
+	const newColumns = (columns.new || [])
+		.map(column => getDataColumnIndex(dataSources, newIdToNameHashTable, column)).filter(filterColumn);
 	const oldColumns = (columns.old || [])
 		.map(column => getDataColumnIndex(dataSources, oldIdToNameHashTable, column)).filter(filterColumn);
-	return getDataForScript(newColumns, oldColumns);
-}
-
-const getDataForSearchIndexConfig = ({ new: newConfig = {}, old: oldConfig = {} }) => {
-	const keys = _.union(Object.keys(newConfig), Object.keys(oldConfig));
-
-	return keys.reduce((config, key) => {
-		if (key === 'id') {
-			return config;
-		}
-		const { add, modify, drop } = compareProperty(newConfig[key], oldConfig[key], {});
-
-		return {
-			modifyData: add || modify ? { ...config.modifyData, [key]: newConfig[key] } : config.modifyData,
-			dropData: drop ? { ...config.dropData, [key]: oldConfig[key] } : config.dropData,
-		}
-	}, { modifyData: {}, dropData: {} });
+	const isEqual = (oldValue, newValue) => oldValue?.name === newValue?.name;
+	return getDataForScript(newColumns, oldColumns, isEqual);
 }
 
 const getSearchConfigScript = (keyspaceName, tableName, config) => {
@@ -176,16 +148,18 @@ const getSearchConfigScript = (keyspaceName, tableName, config) => {
 			script,
 		};
 	})
-	const modifyScript = Object.entries(config.modifyData).map(([key, value]) => {
-		const preparedValue = _.isString(value) ? `'${value}'` : value;
-		const script = alterScript +
-			tab(`SET ${key} = ${preparedValue};`);
-		return {
-			...scriptData,
-			modified: true,
-			script,
-		};
-	});
+	const modifyScript = Object.entries(config.modifyData)
+		.filter(([__, value]) => typeof value !== 'string' || Boolean(value))
+		.map(([key, value]) => {
+			const preparedValue = _.isString(value) ? `'${value}'` : value;
+			const script = alterScript +
+				tab(`SET ${key} = ${preparedValue};`);
+			return {
+				...scriptData,
+				modified: true,
+				script,
+			};
+		});
 
 	return [...modifyScript, ...dropScript];
 }
@@ -355,7 +329,7 @@ const getUpdateSearchIndexScript = data => {
 	const config = _.get(item, 'role.compMod.searchIndexConfig', {})
 	
 	const dataForColumnsScript = getDataForSearchIndexColumns(item, dataSources);
-	const dataForConfigScript = getDataForSearchIndexConfig(config);
+	const dataForConfigScript = getDiffConfig(config.old, config.new)
 
 	const configScript = getSearchConfigScript(keyspaceName, tableName, dataForConfigScript);
 	const { dropSearchScripts, addSearchScripts } = getSearchColumnsScript(keyspaceName, tableName, dataForColumnsScript);

@@ -13,6 +13,8 @@ let state = {
 	sshTunnel: null,
 };
 
+const COLUMNS_TO_FILTER_OUT = ['solr_query'];
+
 module.exports = (_) => {
 
 	const requireKeyStore = (app) => new Promise((resolve, reject) => {
@@ -512,13 +514,15 @@ module.exports = (_) => {
 	
 	const getTableSchema = (columns, udtHash, sample = {}) => {
 		let schema = {};
-		columns.forEach(column => {
-			const columnType = typesHelper(_).getColumnType(column, udtHash, sample ? sample[column.name] : undefined);
-			schema[column.name] = columnType;
-			schema[column.name].code = column.name;
-			schema[column.name].static = column.isStatic;
-			schema[column.name].frozen = column.type.options.frozen;
-		});
+		columns
+			.filter(column => !_.includes(COLUMNS_TO_FILTER_OUT, column.name))
+			.forEach(column => {
+				const columnType = typesHelper(_).getColumnType(column, udtHash, sample ? sample[column.name] : undefined);
+				schema[column.name] = columnType;
+				schema[column.name].code = column.name;
+				schema[column.name].static = column.isStatic;
+				schema[column.name].frozen = column.type.options.frozen;
+			});
 		return { properties: schema };
 	};
 	

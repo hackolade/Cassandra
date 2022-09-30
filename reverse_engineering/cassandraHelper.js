@@ -13,7 +13,7 @@ let state = {
 	sshTunnel: null,
 };
 
-COLUMNS_TO_FILTER_OUT = ['solr_query'];
+const COLUMNS_TO_FILTER_OUT = ['solr_query'];
 
 module.exports = (_) => {
 

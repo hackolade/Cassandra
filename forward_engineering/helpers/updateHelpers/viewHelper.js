@@ -76,7 +76,10 @@ const getDropView = child => {
 
 const getAlterView = role => {
 	const viewData = [role];
-	const optionScript = getOptionsScript(role.compMod.collectionData?.collectionRefsDefinitionsMap || {}, viewData);
+	const optionScript = getOptionsScript({ 
+		collectionRefsDefinitionsMap: role.compMod.collectionData?.collectionRefsDefinitionsMap || {}, 
+		viewData 
+	});
 	const viewName = role.name || role.code;
 	const keyspaceName = role.compMod.keyspaceName;
 	if (optionScript) {

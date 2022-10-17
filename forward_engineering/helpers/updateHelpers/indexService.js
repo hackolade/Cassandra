@@ -6,6 +6,8 @@ const setDependencies = ({ lodash }) => _ = lodash;
 
 const REDUNDANT_OPTIONS = ['id'];
 
+const REDUNDANT_PROPERTIES_FOR_INDEX = ['SecIndxComments', 'SecIndxDescription'];
+
 const SEARCH_INDEX_OPTIONS_DEFAULT = {
 	recovery: false,
 	reindex: true,
@@ -21,7 +23,11 @@ const SEARCH_INDEX_CONFIG_DEFAULT = {
 	realtime: false
 };
 
-const isDiff = (oldValue, newValue) => oldValue !== newValue;
+const INDEX_CONFIG_DEFAULT = {
+	indexIfNotExist: false,
+};
+
+const isDiff = (oldValue, newValue) => !_.isEqual(oldValue, newValue);
 
 const getModifiedProperties = (oldProperties, newProperties) => {
 	
@@ -98,8 +104,20 @@ const getDiff = defaultData => (oldData = {}, newData = {}) => {
 	}
 };
 
+const isIndexDiff = (defaultData, redundantProperty) => (oldData = {}, newData = {}) => {
+	setDependencies(dependencies);
+	newData = Object.assign({}, defaultData, newData);
+	oldData = Object.assign({}, defaultData, oldData);
+	const keys = _.uniq([..._.keys(newData), ..._.keys(oldData)]).filter(key => !redundantProperty.includes(key));
+	return keys.reduce(
+		(isDifferent, key) => 
+		!isDifferent && _.isEqual(newData[key], oldData[key]) ? isDifferent : true, false);
+};
+
 module.exports = {
 	getDiffOptions: getDiffOptions(SEARCH_INDEX_OPTIONS_DEFAULT),
 	getDiffConfig: getDiff(SEARCH_INDEX_CONFIG_DEFAULT),
 	getDiffIndexProfiles: getDiff({}),
+	isIndexDiff: isIndexDiff(INDEX_CONFIG_DEFAULT, [...REDUNDANT_OPTIONS, ...REDUNDANT_PROPERTIES_FOR_INDEX]),
+	REDUNDANT_OPTIONS,
 }

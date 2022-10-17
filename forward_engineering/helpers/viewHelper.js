@@ -11,7 +11,7 @@ const setDependencies = ({ lodash }) => _ = lodash;
 const columnsToName = column => column.name;
 
 const joinColumns = (columns = [], isParentActivated) => {
-	let [activatedColumns, deactivatedColumns] = _.partition(columns, column => column.isActivated);
+	let [activatedColumns, deactivatedColumns] = _.partition(columns, column => _.get(column, 'isActivated', true));
 	deactivatedColumns = deactivatedColumns.map(columnsToName).join(', ');
 	activatedColumns = activatedColumns.map(columnsToName).join(', ');
 	const getDeactivatedStatement = columns => commentDeactivatedStatement(columns, false, isParentActivated, 'INLINE');
@@ -67,7 +67,7 @@ const getViewColumns = (collectionRefsDefinitionsMap, properties) => {
 };
 
 const getWhereStatement = (columns = [], isParentActivated) => {
-	const [activatedColumns, deactivatedColumns] = _.partition(columns, column => column.isActivated)
+	const [activatedColumns, deactivatedColumns] = _.partition(columns, column => _.get(column, 'isActivated', true))
 	if (_.isEmpty(columns) || deactivatedColumns.length === columns.length) {
 		return '';
 	}

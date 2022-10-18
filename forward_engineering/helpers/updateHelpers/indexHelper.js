@@ -2,7 +2,12 @@ const { dependencies } = require('../appDependencies');
 const { getIndexProfiles, getTableNameStatement, tab } = require('../generalHelper');
 const { getIndexes } = require('../indexHelper');
 const { getNamesByIds } = require('../schemaHelper');
-const { getDiffOptions, getDiffConfig, getDiffIndexProfiles } = require('./indexOptionService');
+const { 
+	getDiffOptions, 
+	getDiffConfig, 
+	getDiffIndexProfiles,
+	isEqualIndex,
+} = require('./indexService');
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -103,20 +108,24 @@ const getDataForSearchIndexScript = role => {
 	};
 }
 
-const getDataColumnIndex = (dataSources, oldIdToNameHashTable, column = {}, key = 'key') => {
+const getNameByKeyId = (dataSources, idToNameHashTable, keyId) => {
+	const nameFromHashTable = idToNameHashTable[keyId];
+	if (nameFromHashTable) {
+		return nameFromHashTable
+	}
+
+	const { name = '' } = getNamesByIds([keyId], dataSources)[keyId] || {};
+
+	return name;
+}
+
+const getDataColumnIndex = (dataSources, idToNameHashTable, column = {}, key = 'key') => {
 	setDependencies(dependencies);
 	const keyId = _.get(column, `${key}[0].keyId`, '');
-	const columnWithoutKeyId = _.omit(column, key);
-	const nameFromHashTable = oldIdToNameHashTable[keyId];
-	if (nameFromHashTable) {
-		return {
-			...columnWithoutKeyId,
-			name: nameFromHashTable
-		}
-	}
-	const { name = '' } = getNamesByIds([keyId], dataSources)[keyId] || {};
+	const name = getNameByKeyId(dataSources, idToNameHashTable, keyId);
+
 	return {
-		...columnWithoutKeyId,
+		..._.omit(column, key),
 		name,
 	};
 }
@@ -227,9 +236,9 @@ const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.
 
 const getAddSearchIndexScript = data => {
 	const { keyspaceName, tableName, searchIndex, dataSources, isActivated, dbVersion } = data;
-	const isExistScrip = checkExistsScript(keyspaceName, tableName, 'createSearchIndexes');
+	const isExistScript = checkExistsScript(keyspaceName, tableName, 'createSearchIndexes');
 	const dataIndexScript = { ...scriptData, added: true, script: '' };
-	if (isExistScrip) {
+	if (isExistScript) {
 		return [dataIndexScript];
 	}
 	setNameCollectionsScript(keyspaceName, tableName, 'createSearchIndexes');
@@ -348,11 +357,37 @@ const getUpdateSearchIndexScript = data => {
 	return [...configScript, ...dropSearchScripts, ...addSearchScripts, ...renewalScripts];
 }
 
+const prepareIndexes = (idToNameHashTable, dataSources, indexes = []) => {
+	return indexes.map(index => {
+		const secIndexesKey = _.get(index, 'SecIndxKey', []).map(key => ({
+				...key,
+				name: getNameByKeyId(dataSources, idToNameHashTable, _.get(key, 'keyId')),
+			})
+		);
+		return {
+			..._.omit(index, ['SecIndxKey']),
+			SecIndxKey: secIndexesKey,
+		}
+	})
+}
+
+const removeKeyIdFromKeys = (keys = []) => keys.map(key => _.omit(key, 'keyId'));
+
 const getUpdateIndexScript = data => {
 	const { item, keyspaceName, tableName, dbVersion, isActivated, dataSources } = data;
 	const { new: newIndexes = [], old: oldIndexes = [] } = _.get(item, 'role.compMod.SecIndxs', {});
+	const { oldIdToNameHashTable = {}, newIdToNameHashTable = {} } = _.get(item, 'role.compMod', {});
+	const preparedNewIndexes = prepareIndexes(newIdToNameHashTable, dataSources, newIndexes);
+	const preparedOldIndexes = prepareIndexes(oldIdToNameHashTable, dataSources, oldIndexes);
 
-	const dataForIndexScript = getDataForScript(newIndexes, oldIndexes);
+	const isEqual = (newIndex = {}, oldIndex = {}) => {
+		return isEqualIndex(
+			{ ...oldIndex, SecIndxKey: removeKeyIdFromKeys(oldIndex.SecIndxKey) }, 
+			{ ...newIndex, SecIndxKey: removeKeyIdFromKeys(newIndex.SecIndxKey) }, 
+		);
+	};
+
+	const dataForIndexScript = getDataForScript(preparedNewIndexes, preparedOldIndexes, isEqual);
 
 	const dropIndexScript = getDropIndexScript(
 		keyspaceName,

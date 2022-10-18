@@ -6,7 +6,7 @@ const {
 	getDiffOptions, 
 	getDiffConfig, 
 	getDiffIndexProfiles,
-	isIndexDiff,
+	isEqualIndex,
 } = require('./indexService');
 let _;
 
@@ -376,19 +376,18 @@ const removeKeyIdFromKeys = (keys = []) => keys.map(key => _.omit(key, 'keyId'))
 const getUpdateIndexScript = data => {
 	const { item, keyspaceName, tableName, dbVersion, isActivated, dataSources } = data;
 	const { new: newIndexes = [], old: oldIndexes = [] } = _.get(item, 'role.compMod.SecIndxs', {});
-	const { oldIdToNameHashTable = {}, newIdToNameHashTable = {} } = _.get(item, 'role.compMod.oldIdToNameHashTable', {});
+	const { oldIdToNameHashTable = {}, newIdToNameHashTable = {} } = _.get(item, 'role.compMod', {});
 	const preparedNewIndexes = prepareIndexes(newIdToNameHashTable, dataSources, newIndexes);
 	const preparedOldIndexes = prepareIndexes(oldIdToNameHashTable, dataSources, oldIndexes);
 
-	const isEqualIndex = (newIndex = {}, oldIndex = {}) => {
-		const isDifferent = isIndexDiff(
+	const isEqual = (newIndex = {}, oldIndex = {}) => {
+		return isEqualIndex(
 			{ ...oldIndex, SecIndxKey: removeKeyIdFromKeys(oldIndex.SecIndxKey) }, 
 			{ ...newIndex, SecIndxKey: removeKeyIdFromKeys(newIndex.SecIndxKey) }, 
 		);
-		return !isDifferent;
 	};
 
-	const dataForIndexScript = getDataForScript(preparedNewIndexes, preparedOldIndexes, isEqualIndex);
+	const dataForIndexScript = getDataForScript(preparedNewIndexes, preparedOldIndexes, isEqual);
 
 	const dropIndexScript = getDropIndexScript(
 		keyspaceName,

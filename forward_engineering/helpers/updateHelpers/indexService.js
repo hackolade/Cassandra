@@ -104,20 +104,20 @@ const getDiff = defaultData => (oldData = {}, newData = {}) => {
 	}
 };
 
-const isIndexDiff = (defaultData, redundantProperty) => (oldData = {}, newData = {}) => {
+const isEqualIndex = (defaultData, redundantProperty) => (oldData = {}, newData = {}) => {
 	setDependencies(dependencies);
 	newData = Object.assign({}, defaultData, newData);
 	oldData = Object.assign({}, defaultData, oldData);
 	const keys = _.uniq([..._.keys(newData), ..._.keys(oldData)]).filter(key => !redundantProperty.includes(key));
 	return keys.reduce(
-		(isDifferent, key) => 
-		!isDifferent && _.isEqual(newData[key], oldData[key]) ? isDifferent : true, false);
+		(isEqual, key) => 
+		isEqual && _.isEqual(newData[key], oldData[key]) ? isEqual : false, true);
 };
 
 module.exports = {
 	getDiffOptions: getDiffOptions(SEARCH_INDEX_OPTIONS_DEFAULT),
 	getDiffConfig: getDiff(SEARCH_INDEX_CONFIG_DEFAULT),
 	getDiffIndexProfiles: getDiff({}),
-	isIndexDiff: isIndexDiff(INDEX_CONFIG_DEFAULT, [...REDUNDANT_OPTIONS, ...REDUNDANT_PROPERTIES_FOR_INDEX]),
+	isEqualIndex: isEqualIndex(INDEX_CONFIG_DEFAULT, [...REDUNDANT_OPTIONS, ...REDUNDANT_PROPERTIES_FOR_INDEX]),
 	REDUNDANT_OPTIONS,
 }

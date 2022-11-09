@@ -34,7 +34,7 @@ const setNameCollectionsScript = (keyspaceName, name, type) => {
 	nameCollectionsExistsScript = { ...nameCollectionsExistsScript, [type]: [...nameCollectionsExistsScript[type], statement] };
 };
 
-const indexSearchProperties = ['searchIndexProfiles'];
+const indexSearchProperties = ['searchIndexProfiles', 'searchIndexOptions'];
 
 const getDataSearchIndex = indexTab => {
 	return {
@@ -325,7 +325,7 @@ const getUpdateSearchIndexScript = data => {
 	
 		const addSearchIndexScript = getAddSearchIndexScript({
 			searchIndex: dataForScript.addData,
-			dataSources,
+			dataSources: [...dataSources, { properties: item.properties || [] }],
 			tableName,
 			keyspaceName,
 			isActivated,

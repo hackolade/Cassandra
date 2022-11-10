@@ -329,7 +329,7 @@ const handleItem = (item, udtMap, generator, data) => {
 }
 
 const getAddTable = (addTableData) => {
-	let table = addTableData.item;
+	const table = addTableData.item;
 	const data = addTableData.data;
 	const compositePartitionKey = getTableParameter(table, 'compositePartitionKey') || [];
 	const compositeClusteringKey = getTableParameter(table, 'compositeClusteringKey') || [];

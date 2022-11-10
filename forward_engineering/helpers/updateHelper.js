@@ -9,7 +9,7 @@ const { mergeArrays, checkIsOldModel, fieldTypeCompatible } = require('./updateH
 const { getViewScript } = require('./updateHelpers/viewHelper');
 const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
-const { alterTablePrefix, getDelete, hydrateColumn } = require('./updateHelpers/tableHelper');
+const { alterTablePrefix, getDelete, hydrateColumn, isTableChange, getTableParameter } = require('./updateHelpers/tableHelper');
 
 let _;
 
@@ -144,12 +144,7 @@ const getIsColumnInIndex = (item, columnName, data) => {
 	return [...searchIndexes, ...secIndexes].includes(columnName);
 };
 
-const getIsChangeTable = compMod => {
-	const tableProperties = ['name', 'isActivated'];
-	return tableProperties.some(property => !_.isEqual(compMod[property]?.new, compMod[property]?.old));
-}
-
-const getPropertiesForUpdateTable = properties => {
+const getPropertiesForUpdateTable = (properties = [])=> {
 	const newProperties = Object.entries(properties).map(([name, value]) => {
 		if (!value.compMod) {
 			return [name, value];
@@ -174,10 +169,17 @@ const getUpdateTable = updateData => {
 	const { oldName, newName } = getCollectionName(item.role?.compMod);
 
 	const indexTableScript = getIndexTable(item, updateData.data);
+	const compModeWithName = { ...item.role?.compMod || {}, name: { new: newName, old: oldName } }
 
-	const isChangeTable = getIsChangeTable({ ...item.role?.compMod, name: { new: newName, old: oldName } } || {});
+	const tableIsChange = isTableChange({ 
+		item: { 
+			...item, 
+			role: { ...item.role, compMod: compModeWithName },
+		},
+		data: updateData.data,
+	});
 
-	if (!isChangeTable) {
+	if (!tableIsChange) {
 		const tableName = updateData.tableName || oldName || newName;
 		const optionScript = getOptionsScript(item.role?.compMod || {}, tableName, updateData.isOptionScript);
 		return [
@@ -203,7 +205,12 @@ const getUpdateTable = updateData => {
 		item: {
 			...item,
 			properties: getPropertiesForUpdateTable(item.role?.properties || item.properties),
+			role: {
+				...(item?.role || {}),
+				tableOptions: getTableParameter(item, 'tableOptions') || {},
+			}
 		},
+		modifiedProperties: item.properties,
 		isKeyspaceActivated: true,
 	};
 	const deleteScript = getDeleteTable({ ...data, tableName: oldName });
@@ -324,29 +331,13 @@ const handleItem = (item, udtMap, generator, data) => {
 const getAddTable = (addTableData) => {
 	const table = addTableData.item;
 	const data = addTableData.data;
-	const tableProperties = table.properties || {};
-	let partitionKeys = [];
-	let clusteringKeys = [];
-	if (tableProperties) {
-		partitionKeys = Object.keys(tableProperties).map(key => {
-			if (tableProperties[key].compositePartitionKey) {
-				return { keyId: tableProperties[key].GUID };
-			}
-			return;
-		}).filter(item => item);
-
-		clusteringKeys = Object.keys(tableProperties).map(key => {
-			if (tableProperties[key].compositeClusteringKey) {
-				return { keyId: tableProperties[key].GUID };
-			}
-			return;
-		}).filter(item => item);
-}
+	const compositePartitionKey = getTableParameter(table, 'compositePartitionKey') || [];
+	const compositeClusteringKey = getTableParameter(table, 'compositeClusteringKey') || [];
 
 	const entityData = [{
+		compositePartitionKey,
+		compositeClusteringKey,
 		collectionName: addTableData.tableName,
-		compositePartitionKey: [...partitionKeys],
-		compositeClusteringKey: [...clusteringKeys],
 		tableOptions: table.role.tableOptions || '',
 		comments: table.role.comments || '',
 		isActivated: table.role.isActivated,
@@ -356,7 +347,8 @@ const getAddTable = (addTableData) => {
 		data.externalDefinitions,
 		data.modelDefinitions,
 		data.internalDefinitions,
-		table
+		table,
+		{ properties: addTableData.modifiedProperties || [] }
 	];
 
 	const script = getTableStatement({

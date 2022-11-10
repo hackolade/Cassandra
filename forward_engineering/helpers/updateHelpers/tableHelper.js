@@ -1,4 +1,10 @@
 const { getTypeByData } = require("../typeHelper");
+const { getNamesByIds } = require("../schemaHelper");
+const { dependencies } = require('../appDependencies');
+
+let _;
+
+const setDependencies = ({ lodash }) => _ = lodash;
 
 const removeColumnStatement = columnName => `DROP "${columnName}";`;
 
@@ -40,8 +46,66 @@ const hydrateColumn = ({ tableName, keyspaceName, isOldModel, property, udtMap }
 	}
 };
 
+const getTableParameter = (item, key) => {
+	const parameter = item?.role?.compMod?.[key];
+
+	return parameter?.new || item?.role?.[key];
+};
+
+const addToKeysHashType = (keysHash, keys) => {
+	return Object.entries(keysHash).reduce((keysHash, [id, key]) => {
+		const type = (keys.find(key => key.keyId === id) || {}).type;
+		return {
+			...keysHash,
+			[id]: {
+				...key,
+				...(type ? { type } : {})
+			}
+		};
+	}, {});
+};
+
+const tableKeysIsEqual = ({ newKeys = [], oldKeys =[], dataSources }) => {
+	const newKeysHash = addToKeysHashType(getNamesByIds(newKeys.map(key => key.keyId), dataSources), newKeys);
+	const oldKeysHash = addToKeysHashType(getNamesByIds(oldKeys.map(key => key.keyId), dataSources), oldKeys);
+	const difference = _.differenceWith(_.values(newKeysHash), _.values(oldKeysHash), _.isEqual);
+
+	return _.isEmpty(difference);
+};
+
+const isTableChange = ({ item, data }) => {
+	setDependencies(dependencies);
+
+	const compMod = item?.role?.compMod || {};
+	const dataSources = [
+		item,
+		{ properties: item.role.properties },
+		data.externalDefinitions,
+		data.modelDefinitions,
+		data.internalDefinitions,
+	];	
+	const tableProperties = ['name', 'isActivated'];
+	const { compositeClusteringKey = {}, compositePartitionKey = {} } = compMod || {};
+	const compositeClusteringKeyIsEqual = tableKeysIsEqual({ 
+		newKeys: compositeClusteringKey.new, 
+		oldKeys: compositeClusteringKey.old, 
+		dataSources,
+	});
+
+	const compositePartitionKeyIsEqual = tableKeysIsEqual({ 
+		newKeys: compositePartitionKey.new, 
+		oldKeys: compositePartitionKey.old, 
+		dataSources,
+	});
+
+	return !compositeClusteringKeyIsEqual || !compositePartitionKeyIsEqual ||
+		tableProperties.some(property => !_.isEqual(compMod[property]?.new, compMod[property]?.old));
+}
+
 module.exports = {
 	getDelete,
 	alterTablePrefix,
-	hydrateColumn
+	hydrateColumn,
+	isTableChange,
+	getTableParameter,
 }

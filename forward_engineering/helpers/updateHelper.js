@@ -171,7 +171,7 @@ const getUpdateTable = updateData => {
 	const indexTableScript = getIndexTable(item, updateData.data);
 	const compModeWithName = { ...item.role?.compMod || {}, name: { new: newName, old: oldName } }
 
-	const tableIsCHange = isTableChange({ 
+	const tableIsChange = isTableChange({ 
 		item: { 
 			...item, 
 			role: { ...item.role, compMod: compModeWithName },
@@ -179,7 +179,7 @@ const getUpdateTable = updateData => {
 		data: updateData.data,
 	});
 
-	if (!tableIsCHange) {
+	if (!tableIsChange) {
 		const tableName = updateData.tableName || oldName || newName;
 		const optionScript = getOptionsScript(item.role?.compMod || {}, tableName, updateData.isOptionScript);
 		return [

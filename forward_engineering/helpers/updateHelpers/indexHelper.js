@@ -108,25 +108,25 @@ const getDataForSearchIndexScript = role => {
 	};
 }
 
-const getNameByKeyId = (dataSources, idToNameHashTable, keyId) => {
-	const nameFromHashTable = idToNameHashTable[keyId];
-	if (nameFromHashTable) {
-		return nameFromHashTable
+const getFieldDataByKeyId = (dataSources, idToNameHashTable, keyId) => {
+	const fieldData = getNamesByIds([keyId], dataSources)[keyId] || {};
+	if (fieldData.name) {
+		return fieldData
 	}
 
-	const { name = '' } = getNamesByIds([keyId], dataSources)[keyId] || {};
+	const name = idToNameHashTable[keyId] || '';
 
-	return name;
+	return { name };
 }
 
 const getDataColumnIndex = (dataSources, idToNameHashTable, column = {}, key = 'key') => {
 	setDependencies(dependencies);
 	const keyId = _.get(column, `${key}[0].keyId`, '');
-	const name = getNameByKeyId(dataSources, idToNameHashTable, keyId);
+	const fieldData = getFieldDataByKeyId(dataSources, idToNameHashTable, keyId);
 
 	return {
 		..._.omit(column, key),
-		name,
+		...fieldData,
 	};
 }
 
@@ -134,7 +134,7 @@ const getDataForSearchIndexColumns = (item, dataSources) => {
 	const oldIdToNameHashTable = _.get(item, 'role.compMod.oldIdToNameHashTable', {});
 	const newIdToNameHashTable = _.get(item, 'role.compMod.newIdToNameHashTable', {});
 	const columns = _.get(item, 'role.compMod.searchIndexColumns', {});
-	const filterColumn = column => column.name;
+	const filterColumn = column => column.name && !column.compositePartitionKey;
 	const newColumns = (columns.new || [])
 		.map(column => getDataColumnIndex(dataSources, newIdToNameHashTable, column)).filter(filterColumn);
 	const oldColumns = (columns.old || [])
@@ -325,7 +325,7 @@ const getUpdateSearchIndexScript = data => {
 	
 		const addSearchIndexScript = getAddSearchIndexScript({
 			searchIndex: dataForScript.addData,
-			dataSources: [...dataSources, { properties: item.properties || [] }],
+			dataSources,
 			tableName,
 			keyspaceName,
 			isActivated,
@@ -361,7 +361,7 @@ const prepareIndexes = (idToNameHashTable, dataSources, indexes = []) => {
 	return indexes.map(index => {
 		const secIndexesKey = _.get(index, 'SecIndxKey', []).map(key => ({
 				...key,
-				name: getNameByKeyId(dataSources, idToNameHashTable, _.get(key, 'keyId')),
+				name: getFieldDataByKeyId(dataSources, idToNameHashTable, _.get(key, 'keyId'))?.name || '',
 			})
 		);
 		return {
@@ -414,19 +414,38 @@ const getUpdateIndex = data => {
 	return [...updateIndexScript, ...updateSearchIndexScript];
 }
 
-const getIndexTable = (item, data) => {
-	setDependencies(dependencies);
-
+const createDataSources = (item, data) => {
 	const properties = { ...item.properties || {}, ...item.role.properties || {} };
 	const itemData = { properties, ..._.omit(item.role || {}, ['properties']) };
+	
+	return [
+		itemData, 
+		data.modelDefinitions, 
+		data.externalDefinitions, 
+		data.internalDefinitions,
+		{ properties: item?.properties || {} },
+		{ properties: _.get(item, 'role.compMod.newProperties', []) },
+		{ properties: _.get(item, 'role.compMod.oldProperties', []) }
+	];
+};
 
+const getIndexTable = (item, data, tableIsChange) => {
+	setDependencies(dependencies);
+
+	const dataSources = createDataSources(item, data);
 	const tableName = item.role?.code || item.role?.name;
-	const dataSources = [itemData, data.modelDefinitions];
 	const keyspaceName = item.role.compMod?.keyspaceName;
 	const dbVersion = data.modelData[0].dbVersion;
 	const isActivated = item.role?.isActivated;
 
 	const { compMod = {} } = item.role || {};
+
+	if (tableIsChange) {
+		const createdIndexes = getCreatedIndex({ item, dataSources, tableName, keyspaceName, isActivated, dbVersion });
+		const deletedIndex = getDeletedIndex({ item, keyspaceName, tableName });
+
+		return [...createdIndexes, ...deletedIndex];
+	}
 
 	if (compMod.created) {
 		return getCreatedIndex({ item, dataSources, tableName, keyspaceName, isActivated, dbVersion });

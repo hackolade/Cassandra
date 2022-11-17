@@ -9,7 +9,16 @@ const { mergeArrays, checkIsOldModel, fieldTypeCompatible } = require('./updateH
 const { getViewScript } = require('./updateHelpers/viewHelper');
 const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
-const { alterTablePrefix, getDelete, hydrateColumn, isTableChange, getTableParameter } = require('./updateHelpers/tableHelper');
+const { 
+	alterTablePrefix, 
+	getDelete, 
+	hydrateColumn, 
+	isTableChange, 
+	getTableParameter, 
+	addColumnInExistScript,
+	getAdd,
+} = require('./updateHelpers/tableHelper');
+const { getUdtMap } = require('./udtHelper');
 
 let _;
 
@@ -19,19 +28,8 @@ const getUpdateType = updateTypeData =>
 	`${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} 
 	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
 
-const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type}`;
 const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
 
-const getAdd = addData => {
-	const script = `${alterTablePrefix(addData.tableName, addData.keyspaceName)} ${addColumnStatement(addData.columnData)};`;
-	return [{
-		deleted: false,
-		modified: false,
-		added: true,
-		script,
-		field: 'field',
-	}];
-};
 const getRenameColumn = renameData => {
 	const script = 
 	`${alterTablePrefix(renameData.tableName, renameData.keyspaceName)} ${renameColumnStatement(renameData.columnData)};`;
@@ -117,6 +115,7 @@ const getUpdate = updateData => {
 	} else if (hydratedColumn.isTypeChange) {
 		return getUpdateColumnProvider.alterType(hydratedColumn);
 	}
+	addColumnInExistScript(hydratedColumn.dataForScript);
 
 	return [];
 };
@@ -168,7 +167,6 @@ const getUpdateTable = updateData => {
 	const { item, propertiesScript = [] } = updateData;
 	const { oldName, newName } = getCollectionName(item.role?.compMod);
 
-	const indexTableScript = getIndexTable(item, updateData.data);
 	const compModeWithName = { ...item.role?.compMod || {}, name: { new: newName, old: oldName } }
 
 	const tableIsChange = isTableChange({ 
@@ -177,7 +175,9 @@ const getUpdateTable = updateData => {
 			role: { ...item.role, compMod: compModeWithName },
 		},
 		data: updateData.data,
+		dataSources: updateData.dataSources,
 	});
+	const indexTableScript = getIndexTable(item, updateData.data, tableIsChange);
 
 	if (!tableIsChange) {
 		const tableName = updateData.tableName || oldName || newName;
@@ -210,8 +210,8 @@ const getUpdateTable = updateData => {
 				tableOptions: getTableParameter(item, 'tableOptions') || {},
 			}
 		},
-		modifiedProperties: item.properties,
 		isKeyspaceActivated: true,
+		dataSources: updateData.dataSources,
 	};
 	const deleteScript = getDeleteTable({ ...data, tableName: oldName });
 	const addScript = getAddTable({ ...data, tableName: newName});
@@ -282,22 +282,33 @@ const handleItem = (item, udtMap, generator, data) => {
 				];
 			}
 
+			const dataSources = [
+				data.modelDefinitions,
+				data.internalDefinitions,
+				data.externalDefinitions,
+				tableProperties,
+				{ properties: _.get(itemProperties[tableKey], 'role.properties', [])},
+				{ properties: _.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
+				{ properties: _.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) }
+			];
+
 			if (itemCompModData.created) {
 				const addedIndexScript = getIndexTable(itemProperties[tableKey], data);
 				return [ 
 					...alterTableScript, 
 					...getAddTable({
 						item: itemProperties[tableKey], 
-						keyspaceName, 
+						keyspaceName,
 						data, 
 						tableName,
+						dataSources,
 					}),
 					...addedIndexScript,
 				];
 			}
 
 			if (itemCompModData.modified) {
-				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true, tableName });
+				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true, tableName, dataSources });
 
 				return [...alterTableScript, ...updateTableScript];
 			}
@@ -311,6 +322,7 @@ const handleItem = (item, udtMap, generator, data) => {
 				tableName, 
 				isOldModel,
 				data,
+				dataSources,
 			});
 
 			const updateTableScript = getUpdateTable({ 
@@ -320,6 +332,7 @@ const handleItem = (item, udtMap, generator, data) => {
 				keyspaceName,
 				tableName,
 				data,
+				dataSources,
 			})
 
 			return [...alterTableScript, ...updateTableScript];
@@ -329,7 +342,7 @@ const handleItem = (item, udtMap, generator, data) => {
 }
 
 const getAddTable = (addTableData) => {
-	const table = addTableData.item;
+	let table = addTableData.item;
 	const data = addTableData.data;
 	const compositePartitionKey = getTableParameter(table, 'compositePartitionKey') || [];
 	const compositeClusteringKey = getTableParameter(table, 'compositeClusteringKey') || [];
@@ -343,19 +356,11 @@ const getAddTable = (addTableData) => {
 		isActivated: table.role.isActivated,
 	}];
 
-	const dataSources = [
-		data.externalDefinitions,
-		data.modelDefinitions,
-		data.internalDefinitions,
-		table,
-		{ properties: addTableData.modifiedProperties || [] }
-	];
-
 	const script = getTableStatement({
 		tableData: table,
 		tableMetaData: entityData,
 		keyspaceMetaData: [{ name: addTableData.keyspaceName }],
-		dataSources,
+		dataSources: addTableData.dataSources,
 		udtTypeMap: data.udtTypeMap || {},
 		isKeyspaceActivated: addTableData.isKeyspaceActivated,
 	});
@@ -369,11 +374,14 @@ const getAddTable = (addTableData) => {
 	}];
 }
 
-const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data, item }) => {
+const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data, item, dataSources }) => {
 	return Object.keys(tableProperties)
 		.reduce((alterTableScript, columnName) => {
 			const property = tableProperties[columnName];
 			if (generator.name !== 'getUpdate' && (property.compositePartitionKey || property.compositeClusteringKey)) {
+				return alterTableScript;
+			}
+			if (generator.name === 'getAdd' && (property || {}).hasOwnProperty('compMod')) {
 				return alterTableScript;
 			}
 			let columnType = getTypeByData(property, udtMap, columnName);
@@ -405,7 +413,8 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 					},
 					property,
 					isOldModel,
-					udtMap
+					udtMap,
+					dataSources,
 				})
 			];
 		}, []);
@@ -486,12 +495,12 @@ const getAlterTableScript = (child, udtMap, data) => {
 		alterScript = mergeArrays(alterScript, getScript(sortAddedUdt(child.modelDefinitions), udtMap, data, 'udt'));
 	}
 
-	if (objectContainsProp(child, 'added')) {
-		alterScript = mergeArrays(alterScript, handleChange(child.added, udtMap, getAdd, data));
-	}
-
 	if (objectContainsProp(child, 'modified')) {
 		alterScript = mergeArrays(alterScript, handleChange(child.modified, udtMap, getUpdate, data));
+	}
+
+	if (objectContainsProp(child, 'added')) {
+		alterScript = mergeArrays(alterScript, handleChange(child.added, udtMap, getAdd, data));
 	}
 
 	if (objectContainsProp(child, 'deleted')) {
@@ -503,7 +512,12 @@ const getAlterTableScript = (child, udtMap, data) => {
 
 const getAlterScript = (child, udtMap, data) => {
 	setDependencies(dependencies);
-	let scriptData = getAlterTableScript(child, udtMap, data);
+	const generalUdtTypeMap = Object.assign(
+		{},
+		udtMap,
+		getUdtMap([child])
+	);
+	let scriptData = getAlterTableScript(child, generalUdtTypeMap, data);
 	scriptData = _.uniqWith(scriptData, _.isEqual);
 	scriptData = getCommentedDropScript(scriptData, data);
 	scriptData = sortScript(scriptData);

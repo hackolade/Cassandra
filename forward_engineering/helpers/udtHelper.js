@@ -37,8 +37,9 @@ const getUdtMap = (udtSources) => {
 	return udtSources.reduce((map, source) => {
 		eachField(source, (field, fieldName) => {
 			if (field.type === 'udt') {
-				map[fieldName] = {
-					name: getName(fieldName, field),
+				const name = getName(fieldName, field);
+				map[name] = {
+					name,
 					frozen: field.frozen
 				};
 			}

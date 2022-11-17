@@ -84,7 +84,8 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 	const getValueTypeFromArray = (arraySchema, defaultType, udtTypeMap, propertyName) => {
 		if (arraySchema.items) {
 			if (Array.isArray(arraySchema.items)) {
-				return complexType(arraySchema.items[0], isFrozen(arraySchema), 0);
+				const name = arraySchema.items[0].code || arraySchema.items[0].name;
+				return complexType(arraySchema.items[0], isFrozen(arraySchema), name || 0);
 			} else {
 				return complexType(arraySchema.items, isFrozen(arraySchema), 0);
 			}

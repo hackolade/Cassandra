@@ -7,6 +7,7 @@ const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFrom
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 const xmlParser = require('fast-xml-parser');
+const filterComplexUdt = require('./helpers/filterComplexUdt');
 
 let state = {
 	client: null,
@@ -921,6 +922,10 @@ module.exports = (_) => {
 			if (!_.isEmpty(data.views)) {
 				packageData.views = getViewsData(data.views, data.tableName, schema);
 			}
+			packageData = {
+				...packageData,
+				documents: filterComplexUdt(_).filterUdts(schema.properties, data.records),
+			};
 		} else if (!includeEmptyCollection) {
 			packageData = null;
 		}

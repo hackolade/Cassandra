@@ -84,7 +84,7 @@ module.exports = (_) => {
 		const subtype = getSubType(appType.type, valueType);
 
 		return Object.assign({}, appType, {
-			items, subtype
+			items: _.uniqWith(items, _.isEqual), subtype
 		});
 	};
 

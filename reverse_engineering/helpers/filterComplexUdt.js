@@ -1,6 +1,5 @@
 module.exports = (_) => {
-	const handleItem = (properties, record, index) => {
-		const propertyValue = properties[index];
+	const handleItem = (properties, record, propertyValue) => {
 		if (_.isUndefined(propertyValue)) {
 			return record;
 		}
@@ -15,13 +14,13 @@ module.exports = (_) => {
 		return _.isPlainObject(record) ? filterUdt(propertyValue.properties || {}, record) : record;
 	};
 	const handleItems = (properties, records) => {
-		return records.map((record, index) => handleItem(properties, record, index)).filter(record => {
+		return records.map((record) => handleItem(properties, record, properties?.[0])).filter(record => {
 			return !_.isBoolean(record) && !_.isEmpty(record);
 		});
 	};
 
 	const handleTuple = (properties, records) => {
-		const handlerRecords = records.map((record, index) => handleItem(properties, record, index));
+		const handlerRecords = records.map((record, index) => handleItem(properties, record, properties?.[index]));
 
 		return handlerRecords.some(record => record === undefined) ? [] : handlerRecords; 
 	};

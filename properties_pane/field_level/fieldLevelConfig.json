@@ -1522,8 +1522,6 @@ making sure that you maintain a proper JSON format.
 		],
 		"___5": [],
 		"udt": [
-			"arrayItemName",
-			"arrayItemCode",
 			"name",
 			"code",
 			"sampleName",

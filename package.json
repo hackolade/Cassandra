@@ -30,7 +30,6 @@
 			"enableReverseEngineering": true,
 			"disableChoices": true,
 			"enableJsonType": true,
-			"enableArrayItemName": true,
 			"FEScriptCommentsSupported": true,
 			"relationships": {
 				"compositeRelationships": {

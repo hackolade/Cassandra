@@ -46,9 +46,9 @@ const getPathById = (schema, id, path) => {
 
 const getRootItemMetadataById = (id, properties) => {
 	const propertyName = Object.keys(properties).find(propertyName => (properties[propertyName].GUID === id || properties[propertyName].id === id));
-
-	if (properties[propertyName] && properties[propertyName].code) {
-		return { name: properties[propertyName].code, ...getAttributes(properties[propertyName]) };
+	const propertyValue = properties[propertyName];
+	if (propertyValue && (propertyValue.code || propertyValue.name)) {
+		return { name: propertyValue.code || propertyValue.name, ...getAttributes(properties[propertyName]) };
 	}
 
 	return { name: propertyName, ...getAttributes(properties[propertyName]) };

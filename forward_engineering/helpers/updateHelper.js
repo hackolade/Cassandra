@@ -250,7 +250,7 @@ const handleItem = (item, udtMap, generator, data) => {
 	let alterTableScript = [];
 
 	if (!objectContainsProp(item, 'properties')) {
-			return alterTableScript;
+		return alterTableScript;
 	}
 
 	const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
@@ -286,7 +286,7 @@ const handleItem = (item, udtMap, generator, data) => {
 				data.modelDefinitions,
 				data.internalDefinitions,
 				data.externalDefinitions,
-				tableProperties,
+				{ properties: tableProperties },
 				{ properties: _.get(itemProperties[tableKey], 'role.properties', [])},
 				{ properties: _.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
 				{ properties: _.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) }

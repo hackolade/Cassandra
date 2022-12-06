@@ -2,11 +2,14 @@ const { getTypeByData } = require("../typeHelper");
 const { getNamesByIds } = require("../schemaHelper");
 const { dependencies } = require('../appDependencies');
 const { eachField, getTableNameStatement } = require('../generalHelper');
+const { getTableStatement } = require('../tableHelper');
 
 let _;
 
-let existScript = {
+let existScripts = {
 	modifiedColumn: [],
+	addTable: [],
+	deleteTable: [],
 };
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -18,7 +21,7 @@ const alterTablePrefix = (tableName, keySpace) =>
 	keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"`;
 
 const getAdd = addData => {
-	if (isColumnInExistScript(addData)) {
+	if (isScriptExists(addData)) {
 		return [];
 	}
 
@@ -33,7 +36,7 @@ const getAdd = addData => {
 };
 
 const getDelete = deleteData => {
-	if (isColumnInExistScript(deleteData)) {
+	if (isScriptExists(deleteData)) {
 		return [];
 	};
 	const script = `${alterTablePrefix(deleteData.tableName, deleteData.keyspaceName)} ${removeColumnStatement(deleteData.columnData.name)}`;
@@ -46,20 +49,24 @@ const getDelete = deleteData => {
 	}];
 };
 
-const addColumnInExistScript = (data = {}, type = 'modifiedColumn') => {
+const generateFullName = data => {
 	const { tableName, keyspaceName, columnData } = data;
-	const fullColumnName = `${getTableNameStatement(keyspaceName, tableName)}.${columnData?.name}`;
-	existScript = {
-		...existScript,
-		[type]: [...(existScript?.[type] || []), fullColumnName],
+	const fulTableName = getTableNameStatement(keyspaceName, tableName);
+	return columnData?.name ? `${fulTableName}.${columnData?.name}` : fulTableName;
+};
+
+const addScriptToExistScripts = (data = {}, type = 'modifiedColumn') => {
+	const fullName = generateFullName(data);
+	existScripts = {
+		...existScripts,
+		[type]: [...(existScripts?.[type] || []), fullName],
 	}
 };
 
-const isColumnInExistScript = (data = {}, type = 'modifiedColumn') => {
-	const { tableName, keyspaceName, columnData } = data;
-	const fullColumnName = `${getTableNameStatement(keyspaceName, tableName)}.${columnData?.name}`;
+const isScriptExists = (data = {}, type = 'modifiedColumn') => {
+	const fullName = generateFullName(data);
 
-	return (existScript?.[type] || []).some(columnName => columnName === fullColumnName);
+	return (existScripts?.[type] || []).some(scriptName => scriptName === fullName);
 };
 
 const prepareField = (field, dataSources) => {
@@ -170,6 +177,58 @@ const isTableChange = ({ item, dataSources }) => {
 
 	return !compositeClusteringKeyIsEqual || !compositePartitionKeyIsEqual ||
 		tableProperties.some(property => !_.isEqual(compMod[property]?.new, compMod[property]?.old));
+};
+
+const getDeleteTable = deleteData => {
+	if (isScriptExists(deleteData, 'deleteTable')) {
+		return [];
+	}
+	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
+	const script = `DROP TABLE IF EXISTS ${tableStatement};`;
+	addScriptToExistScripts(deleteData, 'deleteTable')
+	return [{
+		modified: false,
+		added: false,
+		deleted: true,
+		script,
+		table: 'table',
+	}];
+};
+
+const getAddTable = (addTableData) => {
+	if (isScriptExists(addTableData, 'addTable')) {
+		return [];
+	}
+	let table = addTableData.item;
+	const data = addTableData.data;
+	const compositePartitionKey = getTableParameter(table, 'compositePartitionKey') || [];
+	const compositeClusteringKey = getTableParameter(table, 'compositeClusteringKey') || [];
+
+	const entityData = [{
+		compositePartitionKey,
+		compositeClusteringKey,
+		collectionName: addTableData.tableName,
+		tableOptions: table.role.tableOptions || '',
+		comments: table.role.comments || '',
+		isActivated: table.role.isActivated,
+	}];
+
+	const script = getTableStatement({
+		tableData: table,
+		tableMetaData: entityData,
+		keyspaceMetaData: [{ name: addTableData.keyspaceName }],
+		dataSources: addTableData.dataSources,
+		udtTypeMap: data.udtTypeMap || {},
+		isKeyspaceActivated: addTableData.isKeyspaceActivated,
+	});
+	addScriptToExistScripts(addTableData, 'addTable');
+	return [{
+		deleted: false,
+		modified: false,
+		added: true,
+		script,
+		table: 'table',
+	}];
 }
 
 module.exports = {
@@ -179,5 +238,7 @@ module.exports = {
 	hydrateColumn,
 	isTableChange,
 	getTableParameter,
-	addColumnInExistScript,
+	addScriptToExistScripts,
+	getDeleteTable,
+	getAddTable,
 }

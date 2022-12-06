@@ -1,6 +1,6 @@
 const { getTypeByData } = require('./typeHelper');
-const { getTableNameStatement, commentDeactivatedStatement, getApplyDropStatement, tab } = require('./generalHelper');
-const { getTableStatement, mergeValuesWithConfigOptions } = require('./tableHelper');
+const { commentDeactivatedStatement, getApplyDropStatement, tab } = require('./generalHelper');
+const { mergeValuesWithConfigOptions } = require('./tableHelper');
 const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
 const { dependencies } = require('./appDependencies');
@@ -14,9 +14,10 @@ const {
 	getDelete, 
 	hydrateColumn, 
 	isTableChange, 
-	getTableParameter, 
-	addColumnInExistScript,
+	addScriptToExistScripts,
 	getAdd,
+	getDeleteTable,
+	getAddTable,
 } = require('./updateHelpers/tableHelper');
 const { getUdtMap } = require('./udtHelper');
 
@@ -115,21 +116,9 @@ const getUpdate = updateData => {
 	} else if (hydratedColumn.isTypeChange) {
 		return getUpdateColumnProvider.alterType(hydratedColumn);
 	}
-	addColumnInExistScript(hydratedColumn.dataForScript);
+	addScriptToExistScripts(hydratedColumn.dataForScript);
 
 	return [];
-};
-
-const getDeleteTable = deleteData => { 
-	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-	const script = `DROP TABLE IF EXISTS ${tableStatement};`;
-	return [{
-		modified: false,
-		added: false,
-		deleted: true,
-		script,
-		table: 'table',
-	}];
 };
 
 const getIsColumnInIndex = (item, columnName, data) => {
@@ -207,7 +196,7 @@ const getUpdateTable = updateData => {
 			properties: getPropertiesForUpdateTable(item.role?.properties || item.properties),
 			role: {
 				...(item?.role || {}),
-				tableOptions: getTableParameter(item, 'tableOptions') || {},
+				tableOptions: item?.role?.compMod?.['tableOptions'] || {},
 			}
 		},
 		isKeyspaceActivated: true,
@@ -339,39 +328,6 @@ const handleItem = (item, udtMap, generator, data) => {
 		}, []);
 
 	return alterTableScript;
-}
-
-const getAddTable = (addTableData) => {
-	let table = addTableData.item;
-	const data = addTableData.data;
-	const compositePartitionKey = getTableParameter(table, 'compositePartitionKey') || [];
-	const compositeClusteringKey = getTableParameter(table, 'compositeClusteringKey') || [];
-
-	const entityData = [{
-		compositePartitionKey,
-		compositeClusteringKey,
-		collectionName: addTableData.tableName,
-		tableOptions: table.role.tableOptions || '',
-		comments: table.role.comments || '',
-		isActivated: table.role.isActivated,
-	}];
-
-	const script = getTableStatement({
-		tableData: table,
-		tableMetaData: entityData,
-		keyspaceMetaData: [{ name: addTableData.keyspaceName }],
-		dataSources: addTableData.dataSources,
-		udtTypeMap: data.udtTypeMap || {},
-		isKeyspaceActivated: addTableData.isKeyspaceActivated,
-	});
-
-	return [{
-		deleted: false,
-		modified: false,
-		added: true,
-		script,
-		table: 'table',
-	}];
 }
 
 const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data, item, dataSources }) => {

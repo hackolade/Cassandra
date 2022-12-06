@@ -66,7 +66,7 @@ const addScriptToExistScripts = (data = {}, type = 'modifiedColumn') => {
 const isScriptExists = (data = {}, type = 'modifiedColumn') => {
 	const fullName = generateFullName(data);
 
-	return (existScripts?.[type] || []).some(columnName => columnName === fullName);
+	return (existScripts?.[type] || []).some(scriptName => scriptName === fullName);
 };
 
 const prepareField = (field, dataSources) => {

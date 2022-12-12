@@ -85,6 +85,17 @@ const getAddScript = (item, udtMap) => {
 		]), [])
 };
 
+const prepareField = (field, property) => {
+	if (field.type !== 'reference' || field.$ref || !property.$ref) {
+		return field;
+	}
+
+	return {
+		...field,
+		$ref: property.$ref,
+	}
+};
+
 const getUpdateScript = (item, data, udtMap) => {
 	const { role = {}, properties } = item;
 	if (!properties) {
@@ -97,8 +108,8 @@ const getUpdateScript = (item, data, udtMap) => {
 		const itemNewName = _.get(property, 'compMod.newField.name');
 		const { compMod = {} } = property
 
-		const oldFieldType = getTypeByData(compMod.oldField, udtMap, 'newField');
-		const newFieldType = getTypeByData(compMod.newField, udtMap, 'oldField');
+		const oldFieldType = getTypeByData(prepareField(compMod.oldField, property), udtMap, 'newField');
+		const newFieldType = getTypeByData(prepareField(compMod.newField, property), udtMap, 'oldField');
 
 		const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
 		const newScript = Object.keys(keySpaces).reduce((script, keySpaceName) => {
@@ -185,7 +196,7 @@ const getUdtScript = ({ child, mode, data, udtMap }) => {
 	if (mode === 'add') {
 		return getAddScript(child, udtMap);
 	} else if (mode === 'update') {
-		return getUpdateScript(child, data);
+		return getUpdateScript(child, data, udtMap);
 	}
 	return getDeleteScript(child);
 

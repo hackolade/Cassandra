@@ -509,7 +509,7 @@ truncate
 
 createIndex
    : kwCreate kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr #secondaryIndex
-   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing (kwStorageAttachedIndex | kwSASIIndex) (kwWith kwOptions OPERATOR_EQ LC_BRACKET customIndexOption+ RC_BRACKET)? #customIndex
+   | kwCreate kwCustom kwIndex ifNotExist? indexName? kwOn (keyspace DOT)? table syntaxBracketLr indexColumnSpec syntaxBracketRr kwUsing (kwStorageAttachedIndex | kwSASIIndex | kwSolrIndex) (kwWith kwOptions OPERATOR_EQ LC_BRACKET customIndexOption+ RC_BRACKET)? #customIndex
    ;
 
 customIndexOption
@@ -869,7 +869,7 @@ dataType
    ;
 
 dataTypeName
-   : id
+   : (keyspace DOT)? type
    | STRING_LITERAL
    | K_TIMESTAMP
    | K_SET
@@ -1180,6 +1180,10 @@ kwAnalyzerClass
 
 kwStorageAttachedIndex
    : K_STORAGE_ATTACHED_INDEX
+   ;
+
+kwSolrIndex
+   : K_SOLR_INDEX
    ;
 
 kwSASIIndex

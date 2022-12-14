@@ -788,7 +788,7 @@ module.exports = (_) => {
 
 			return {
 				...schema,
-				...handleUdts(nestedUdts) || {}
+				...(handleUdts(nestedUdts) || {})
 			};
 		} else {
 			return null;

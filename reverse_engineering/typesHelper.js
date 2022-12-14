@@ -214,7 +214,7 @@ module.exports = (_) => {
 	};
 
 	const getItems = (valueData, sample, udtHash) => {
-		if (!Array.isArray(sample)) {
+		if (!Array.isArray(sample) || sample.length === 0) {
 			return getDefaultItems(valueData, udtHash);
 		}
 

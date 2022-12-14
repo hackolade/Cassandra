@@ -1,3102 +1,3107 @@
-// Generated from grammars/CqlParser.g4 by ANTLR 4.8
+// Generated from grammars/CqlParser.g4 by ANTLR 4.9.2
 // jshint ignore: start
 var antlr4 = require('antlr4/index');
 
 // This class defines a complete listener for a parse tree produced by CqlParser.
-function CqlParserListener() {
-	antlr4.tree.ParseTreeListener.call(this);
-	return this;
+class CqlParserListener extends antlr4.tree.ParseTreeListener {
+
+	// Enter a parse tree produced by CqlParser#root.
+	enterRoot(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#root.
+	exitRoot(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#cqls.
+	enterCqls(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#cqls.
+	exitCqls(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#statementSeparator.
+	enterStatementSeparator(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#statementSeparator.
+	exitStatementSeparator(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#empty.
+	enterEmpty(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#empty.
+	exitEmpty(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#cql.
+	enterCql(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#cql.
+	exitCql(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#revoke.
+	enterRevoke(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#revoke.
+	exitRevoke(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#listUsers.
+	enterListUsers(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#listUsers.
+	exitListUsers(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#listRoles.
+	enterListRoles(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#listRoles.
+	exitListRoles(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#listPermissions.
+	enterListPermissions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#listPermissions.
+	exitListPermissions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#grant.
+	enterGrant(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#grant.
+	exitGrant(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#priviledge.
+	enterPriviledge(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#priviledge.
+	exitPriviledge(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#resource.
+	enterResource(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#resource.
+	exitResource(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createUser.
+	enterCreateUser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createUser.
+	exitCreateUser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createRole.
+	enterCreateRole(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createRole.
+	exitCreateRole(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createType.
+	enterCreateType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createType.
+	exitCreateType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#typeMemberColumnList.
+	enterTypeMemberColumnList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#typeMemberColumnList.
+	exitTypeMemberColumnList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createTrigger.
+	enterCreateTrigger(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createTrigger.
+	exitCreateTrigger(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createMaterializedView.
+	enterCreateMaterializedView(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createMaterializedView.
+	exitCreateMaterializedView(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#materializedViewWhere.
+	enterMaterializedViewWhere(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#materializedViewWhere.
+	exitMaterializedViewWhere(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#columnNotNullList.
+	enterColumnNotNullList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#columnNotNullList.
+	exitColumnNotNullList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#columnNotNull.
+	enterColumnNotNull(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#columnNotNull.
+	exitColumnNotNull(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#materializedViewOptions.
+	enterMaterializedViewOptions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#materializedViewOptions.
+	exitMaterializedViewOptions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createKeyspace.
+	enterCreateKeyspace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createKeyspace.
+	exitCreateKeyspace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createFunction.
+	enterCreateFunction(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createFunction.
+	exitCreateFunction(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#codeBlock.
+	enterCodeBlock(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#codeBlock.
+	exitCodeBlock(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#paramList.
+	enterParamList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#paramList.
+	exitParamList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#returnMode.
+	enterReturnMode(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#returnMode.
+	exitReturnMode(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createAggregate.
+	enterCreateAggregate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createAggregate.
+	exitCreateAggregate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#initCondDefinition.
+	enterInitCondDefinition(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#initCondDefinition.
+	exitInitCondDefinition(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#initCondHash.
+	enterInitCondHash(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#initCondHash.
+	exitInitCondHash(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#initCondHashItem.
+	enterInitCondHashItem(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#initCondHashItem.
+	exitInitCondHashItem(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#initCondListNested.
+	enterInitCondListNested(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#initCondListNested.
+	exitInitCondListNested(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#initCondList.
+	enterInitCondList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#initCondList.
+	exitInitCondList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#orReplace.
+	enterOrReplace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#orReplace.
+	exitOrReplace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterUser.
+	enterAlterUser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterUser.
+	exitAlterUser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#userPassword.
+	enterUserPassword(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#userPassword.
+	exitUserPassword(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#userSuperUser.
+	enterUserSuperUser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#userSuperUser.
+	exitUserSuperUser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterType.
+	enterAlterType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterType.
+	exitAlterType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTypeOperation.
+	enterAlterTypeOperation(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTypeOperation.
+	exitAlterTypeOperation(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTypeRename.
+	enterAlterTypeRename(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTypeRename.
+	exitAlterTypeRename(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTypeRenameList.
+	enterAlterTypeRenameList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTypeRenameList.
+	exitAlterTypeRenameList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTypeRenameItem.
+	enterAlterTypeRenameItem(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTypeRenameItem.
+	exitAlterTypeRenameItem(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTypeAdd.
+	enterAlterTypeAdd(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTypeAdd.
+	exitAlterTypeAdd(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTypeAlterType.
+	enterAlterTypeAlterType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTypeAlterType.
+	exitAlterTypeAlterType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTable.
+	enterAlterTable(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTable.
+	exitAlterTable(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableOperation.
+	enterAlterTableOperation(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableOperation.
+	exitAlterTableOperation(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableWith.
+	enterAlterTableWith(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableWith.
+	exitAlterTableWith(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableRename.
+	enterAlterTableRename(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableRename.
+	exitAlterTableRename(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableDropCompactStorage.
+	enterAlterTableDropCompactStorage(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableDropCompactStorage.
+	exitAlterTableDropCompactStorage(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableDropColumns.
+	enterAlterTableDropColumns(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableDropColumns.
+	exitAlterTableDropColumns(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableDropColumnList.
+	enterAlterTableDropColumnList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableDropColumnList.
+	exitAlterTableDropColumnList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableAdd.
+	enterAlterTableAdd(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableAdd.
+	exitAlterTableAdd(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterTableColumnDefinition.
+	enterAlterTableColumnDefinition(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterTableColumnDefinition.
+	exitAlterTableColumnDefinition(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterRole.
+	enterAlterRole(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterRole.
+	exitAlterRole(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#roleWith.
+	enterRoleWith(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#roleWith.
+	exitRoleWith(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#roleWithOptions.
+	enterRoleWithOptions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#roleWithOptions.
+	exitRoleWithOptions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterMaterializedView.
+	enterAlterMaterializedView(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterMaterializedView.
+	exitAlterMaterializedView(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropUser.
+	enterDropUser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropUser.
+	exitDropUser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropType.
+	enterDropType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropType.
+	exitDropType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropMaterializedView.
+	enterDropMaterializedView(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropMaterializedView.
+	exitDropMaterializedView(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropAggregate.
+	enterDropAggregate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropAggregate.
+	exitDropAggregate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropFunction.
+	enterDropFunction(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropFunction.
+	exitDropFunction(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropTrigger.
+	enterDropTrigger(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropTrigger.
+	exitDropTrigger(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropRole.
+	enterDropRole(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropRole.
+	exitDropRole(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropTable.
+	enterDropTable(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropTable.
+	exitDropTable(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropKeyspace.
+	enterDropKeyspace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropKeyspace.
+	exitDropKeyspace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dropIndex.
+	enterDropIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dropIndex.
+	exitDropIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createTable.
+	enterCreateTable(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createTable.
+	exitCreateTable(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#withElement.
+	enterWithElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#withElement.
+	exitWithElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#clusteringOrderColumns.
+	enterClusteringOrderColumns(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#clusteringOrderColumns.
+	exitClusteringOrderColumns(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#clusteringOrder.
+	enterClusteringOrder(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#clusteringOrder.
+	exitClusteringOrder(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#tableOptions.
+	enterTableOptions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#tableOptions.
+	exitTableOptions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#tableOptionItem.
+	enterTableOptionItem(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#tableOptionItem.
+	exitTableOptionItem(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#tableOptionName.
+	enterTableOptionName(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#tableOptionName.
+	exitTableOptionName(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#tableOptionValue.
+	enterTableOptionValue(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#tableOptionValue.
+	exitTableOptionValue(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#optionHash.
+	enterOptionHash(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#optionHash.
+	exitOptionHash(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#optionHashItem.
+	enterOptionHashItem(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#optionHashItem.
+	exitOptionHashItem(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#optionHashKey.
+	enterOptionHashKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#optionHashKey.
+	exitOptionHashKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#optionHashValue.
+	enterOptionHashValue(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#optionHashValue.
+	exitOptionHashValue(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#columnDefinitionList.
+	enterColumnDefinitionList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#columnDefinitionList.
+	exitColumnDefinitionList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#columnDefinition.
+	enterColumnDefinition(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#columnDefinition.
+	exitColumnDefinition(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#primaryKeyColumn.
+	enterPrimaryKeyColumn(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#primaryKeyColumn.
+	exitPrimaryKeyColumn(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#primaryKeyElement.
+	enterPrimaryKeyElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#primaryKeyElement.
+	exitPrimaryKeyElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#primaryKeyDefinition.
+	enterPrimaryKeyDefinition(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#primaryKeyDefinition.
+	exitPrimaryKeyDefinition(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#singlePrimaryKey.
+	enterSinglePrimaryKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#singlePrimaryKey.
+	exitSinglePrimaryKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#compoundKey.
+	enterCompoundKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#compoundKey.
+	exitCompoundKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#compositeKey.
+	enterCompositeKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#compositeKey.
+	exitCompositeKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#partitionKeyList.
+	enterPartitionKeyList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#partitionKeyList.
+	exitPartitionKeyList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#clusteringKeyList.
+	enterClusteringKeyList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#clusteringKeyList.
+	exitClusteringKeyList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#partitionKey.
+	enterPartitionKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#partitionKey.
+	exitPartitionKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#clusteringKey.
+	enterClusteringKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#clusteringKey.
+	exitClusteringKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#applyBatch.
+	enterApplyBatch(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#applyBatch.
+	exitApplyBatch(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#beginBatch.
+	enterBeginBatch(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#beginBatch.
+	exitBeginBatch(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#batchType.
+	enterBatchType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#batchType.
+	exitBatchType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#alterKeyspace.
+	enterAlterKeyspace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#alterKeyspace.
+	exitAlterKeyspace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#replicationList.
+	enterReplicationList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#replicationList.
+	exitReplicationList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#replicationListItem.
+	enterReplicationListItem(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#replicationListItem.
+	exitReplicationListItem(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#durableWrites.
+	enterDurableWrites(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#durableWrites.
+	exitDurableWrites(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#use.
+	enterUse(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#use.
+	exitUse(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#truncate.
+	enterTruncate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#truncate.
+	exitTruncate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#secondaryIndex.
+	enterSecondaryIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#secondaryIndex.
+	exitSecondaryIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#customIndex.
+	enterCustomIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#customIndex.
+	exitCustomIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#customIndexOption.
+	enterCustomIndexOption(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#customIndexOption.
+	exitCustomIndexOption(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#createSearchIndex.
+	enterCreateSearchIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#createSearchIndex.
+	exitCreateSearchIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#searchIndexConfigs.
+	enterSearchIndexConfigs(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#searchIndexConfigs.
+	exitSearchIndexConfigs(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#directoryFactory.
+	enterDirectoryFactory(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#directoryFactory.
+	exitDirectoryFactory(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#searchIndexOptions.
+	enterSearchIndexOptions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#searchIndexOptions.
+	exitSearchIndexOptions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#searchIndexProfile.
+	enterSearchIndexProfile(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#searchIndexProfile.
+	exitSearchIndexProfile(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#searchIndexProfiles.
+	enterSearchIndexProfiles(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#searchIndexProfiles.
+	exitSearchIndexProfiles(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#searchIndexColumnList.
+	enterSearchIndexColumnList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#searchIndexColumnList.
+	exitSearchIndexColumnList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#searchIndexColumn.
+	enterSearchIndexColumn(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#searchIndexColumn.
+	exitSearchIndexColumn(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#indexName.
+	enterIndexName(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#indexName.
+	exitIndexName(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#indexColumnSpec.
+	enterIndexColumnSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#indexColumnSpec.
+	exitIndexColumnSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#indexKeysSpec.
+	enterIndexKeysSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#indexKeysSpec.
+	exitIndexKeysSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#indexEntriesSSpec.
+	enterIndexEntriesSSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#indexEntriesSSpec.
+	exitIndexEntriesSSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#indexFullSpec.
+	enterIndexFullSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#indexFullSpec.
+	exitIndexFullSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#indexValuesSpec.
+	enterIndexValuesSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#indexValuesSpec.
+	exitIndexValuesSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#deleteStatement.
+	enterDeleteStatement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#deleteStatement.
+	exitDeleteStatement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#deleteColumnList.
+	enterDeleteColumnList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#deleteColumnList.
+	exitDeleteColumnList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#deleteColumnItem.
+	enterDeleteColumnItem(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#deleteColumnItem.
+	exitDeleteColumnItem(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#update.
+	enterUpdate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#update.
+	exitUpdate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#ifSpec.
+	enterIfSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#ifSpec.
+	exitIfSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#ifConditionList.
+	enterIfConditionList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#ifConditionList.
+	exitIfConditionList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#ifCondition.
+	enterIfCondition(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#ifCondition.
+	exitIfCondition(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignments.
+	enterAssignments(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignments.
+	exitAssignments(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignmentElement.
+	enterAssignmentElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignmentElement.
+	exitAssignmentElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignmentSet.
+	enterAssignmentSet(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignmentSet.
+	exitAssignmentSet(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignmentMap.
+	enterAssignmentMap(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignmentMap.
+	exitAssignmentMap(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignmentMapExpression.
+	enterAssignmentMapExpression(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignmentMapExpression.
+	exitAssignmentMapExpression(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignmentList.
+	enterAssignmentList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignmentList.
+	exitAssignmentList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#assignmentTuple.
+	enterAssignmentTuple(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#assignmentTuple.
+	exitAssignmentTuple(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#insert.
+	enterInsert(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#insert.
+	exitInsert(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#usingTtlTimestamp.
+	enterUsingTtlTimestamp(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#usingTtlTimestamp.
+	exitUsingTtlTimestamp(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#timestamp.
+	enterTimestamp(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#timestamp.
+	exitTimestamp(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#ttl.
+	enterTtl(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#ttl.
+	exitTtl(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#usingTimestampSpec.
+	enterUsingTimestampSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#usingTimestampSpec.
+	exitUsingTimestampSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#ifNotExist.
+	enterIfNotExist(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#ifNotExist.
+	exitIfNotExist(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#ifExist.
+	enterIfExist(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#ifExist.
+	exitIfExist(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#insertValuesSpec.
+	enterInsertValuesSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#insertValuesSpec.
+	exitInsertValuesSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#insertColumnSpec.
+	enterInsertColumnSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#insertColumnSpec.
+	exitInsertColumnSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#columnList.
+	enterColumnList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#columnList.
+	exitColumnList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#expressionList.
+	enterExpressionList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#expressionList.
+	exitExpressionList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#expression.
+	enterExpression(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#expression.
+	exitExpression(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#select.
+	enterSelect(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#select.
+	exitSelect(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#allowFilteringSpec.
+	enterAllowFilteringSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#allowFilteringSpec.
+	exitAllowFilteringSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#limitSpec.
+	enterLimitSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#limitSpec.
+	exitLimitSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#fromSpec.
+	enterFromSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#fromSpec.
+	exitFromSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#fromSpecElement.
+	enterFromSpecElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#fromSpecElement.
+	exitFromSpecElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#orderSpec.
+	enterOrderSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#orderSpec.
+	exitOrderSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#orderSpecElement.
+	enterOrderSpecElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#orderSpecElement.
+	exitOrderSpecElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#whereSpec.
+	enterWhereSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#whereSpec.
+	exitWhereSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#distinctSpec.
+	enterDistinctSpec(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#distinctSpec.
+	exitDistinctSpec(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#selectElements.
+	enterSelectElements(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#selectElements.
+	exitSelectElements(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#selectElement.
+	enterSelectElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#selectElement.
+	exitSelectElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#relationElements.
+	enterRelationElements(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#relationElements.
+	exitRelationElements(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#relationElement.
+	enterRelationElement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#relationElement.
+	exitRelationElement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#relalationContains.
+	enterRelalationContains(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#relalationContains.
+	exitRelalationContains(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#relalationContainsKey.
+	enterRelalationContainsKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#relalationContainsKey.
+	exitRelalationContainsKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#functionCall.
+	enterFunctionCall(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#functionCall.
+	exitFunctionCall(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#functionArgs.
+	enterFunctionArgs(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#functionArgs.
+	exitFunctionArgs(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#constant.
+	enterConstant(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#constant.
+	exitConstant(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#decimalLiteral.
+	enterDecimalLiteral(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#decimalLiteral.
+	exitDecimalLiteral(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#floatLiteral.
+	enterFloatLiteral(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#floatLiteral.
+	exitFloatLiteral(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#stringLiteral.
+	enterStringLiteral(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#stringLiteral.
+	exitStringLiteral(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#booleanLiteral.
+	enterBooleanLiteral(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#booleanLiteral.
+	exitBooleanLiteral(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#hexadecimalLiteral.
+	enterHexadecimalLiteral(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#hexadecimalLiteral.
+	exitHexadecimalLiteral(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#keyspace.
+	enterKeyspace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#keyspace.
+	exitKeyspace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#table.
+	enterTable(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#table.
+	exitTable(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#column.
+	enterColumn(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#column.
+	exitColumn(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dataType.
+	enterDataType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dataType.
+	exitDataType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dataTypeName.
+	enterDataTypeName(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dataTypeName.
+	exitDataTypeName(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#dataTypeDefinition.
+	enterDataTypeDefinition(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#dataTypeDefinition.
+	exitDataTypeDefinition(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#orderDirection.
+	enterOrderDirection(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#orderDirection.
+	exitOrderDirection(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#role.
+	enterRole(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#role.
+	exitRole(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#trigger.
+	enterTrigger(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#trigger.
+	exitTrigger(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#triggerClass.
+	enterTriggerClass(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#triggerClass.
+	exitTriggerClass(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#materializedView.
+	enterMaterializedView(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#materializedView.
+	exitMaterializedView(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#type.
+	enterType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#type.
+	exitType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#aggregate.
+	enterAggregate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#aggregate.
+	exitAggregate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#functionStatement.
+	enterFunctionStatement(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#functionStatement.
+	exitFunctionStatement(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#language.
+	enterLanguage(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#language.
+	exitLanguage(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#user.
+	enterUser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#user.
+	exitUser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#password.
+	enterPassword(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#password.
+	exitPassword(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#hashKey.
+	enterHashKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#hashKey.
+	exitHashKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#param.
+	enterParam(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#param.
+	exitParam(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#paramName.
+	enterParamName(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#paramName.
+	exitParamName(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAdd.
+	enterKwAdd(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAdd.
+	exitKwAdd(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAggregate.
+	enterKwAggregate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAggregate.
+	exitKwAggregate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAll.
+	enterKwAll(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAll.
+	exitKwAll(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAllPermissions.
+	enterKwAllPermissions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAllPermissions.
+	exitKwAllPermissions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAllow.
+	enterKwAllow(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAllow.
+	exitKwAllow(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAlter.
+	enterKwAlter(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAlter.
+	exitKwAlter(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAnd.
+	enterKwAnd(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAnd.
+	exitKwAnd(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwApply.
+	enterKwApply(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwApply.
+	exitKwApply(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAs.
+	enterKwAs(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAs.
+	exitKwAs(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAsc.
+	enterKwAsc(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAsc.
+	exitKwAsc(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAuthorize.
+	enterKwAuthorize(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAuthorize.
+	exitKwAuthorize(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwBatch.
+	enterKwBatch(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwBatch.
+	exitKwBatch(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwBegin.
+	enterKwBegin(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwBegin.
+	exitKwBegin(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwBy.
+	enterKwBy(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwBy.
+	exitKwBy(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwCalled.
+	enterKwCalled(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwCalled.
+	exitKwCalled(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwClustering.
+	enterKwClustering(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwClustering.
+	exitKwClustering(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwCompact.
+	enterKwCompact(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwCompact.
+	exitKwCompact(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwContains.
+	enterKwContains(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwContains.
+	exitKwContains(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwCreate.
+	enterKwCreate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwCreate.
+	exitKwCreate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDelete.
+	enterKwDelete(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDelete.
+	exitKwDelete(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDesc.
+	enterKwDesc(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDesc.
+	exitKwDesc(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDescibe.
+	enterKwDescibe(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDescibe.
+	exitKwDescibe(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDistinct.
+	enterKwDistinct(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDistinct.
+	exitKwDistinct(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDrop.
+	enterKwDrop(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDrop.
+	exitKwDrop(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDurableWrites.
+	enterKwDurableWrites(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDurableWrites.
+	exitKwDurableWrites(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwEntries.
+	enterKwEntries(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwEntries.
+	exitKwEntries(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwExecute.
+	enterKwExecute(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwExecute.
+	exitKwExecute(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwExists.
+	enterKwExists(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwExists.
+	exitKwExists(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFiltering.
+	enterKwFiltering(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFiltering.
+	exitKwFiltering(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFinalfunc.
+	enterKwFinalfunc(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFinalfunc.
+	exitKwFinalfunc(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFrom.
+	enterKwFrom(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFrom.
+	exitKwFrom(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFull.
+	enterKwFull(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFull.
+	exitKwFull(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFunction.
+	enterKwFunction(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFunction.
+	exitKwFunction(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFunctions.
+	enterKwFunctions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFunctions.
+	exitKwFunctions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwGrant.
+	enterKwGrant(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwGrant.
+	exitKwGrant(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwIf.
+	enterKwIf(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwIf.
+	exitKwIf(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwIn.
+	enterKwIn(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwIn.
+	exitKwIn(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwIndex.
+	enterKwIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwIndex.
+	exitKwIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwCustom.
+	enterKwCustom(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwCustom.
+	exitKwCustom(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSearch.
+	enterKwSearch(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSearch.
+	exitKwSearch(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAscii.
+	enterKwAscii(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAscii.
+	exitKwAscii(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNormalize.
+	enterKwNormalize(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNormalize.
+	exitKwNormalize(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAnalyzed.
+	enterKwAnalyzed(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAnalyzed.
+	exitKwAnalyzed(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwIsLiteral.
+	enterKwIsLiteral(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwIsLiteral.
+	exitKwIsLiteral(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
+	enterKwMaxCompactionFlushMemoryInMb(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
+	exitKwMaxCompactionFlushMemoryInMb(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTokenizationEnableStemming.
+	enterKwTokenizationEnableStemming(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTokenizationEnableStemming.
+	exitKwTokenizationEnableStemming(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
+	enterKwTokenizationSkipStopWords(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
+	exitKwTokenizationSkipStopWords(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTokenizationLocale.
+	enterKwTokenizationLocale(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTokenizationLocale.
+	exitKwTokenizationLocale(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
+	enterKwTokenizationNormalizeLowercase(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
+	exitKwTokenizationNormalizeLowercase(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
+	enterKwTokenizationNormalizeUppercase(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
+	exitKwTokenizationNormalizeUppercase(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNormalizeLowercase.
+	enterKwNormalizeLowercase(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNormalizeLowercase.
+	exitKwNormalizeLowercase(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNormalizeUppercase.
+	enterKwNormalizeUppercase(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNormalizeUppercase.
+	exitKwNormalizeUppercase(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwMode.
+	enterKwMode(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwMode.
+	exitKwMode(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAnalyzerClass.
+	enterKwAnalyzerClass(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAnalyzerClass.
+	exitKwAnalyzerClass(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwStorageAttachedIndex.
+	enterKwStorageAttachedIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwStorageAttachedIndex.
+	exitKwStorageAttachedIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSolrIndex.
+	enterKwSolrIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSolrIndex.
+	exitKwSolrIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSASIIndex.
+	enterKwSASIIndex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSASIIndex.
+	exitKwSASIIndex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
+	enterKwSpaceSavingNoJoin(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
+	exitKwSpaceSavingNoJoin(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSpaceSavingAll.
+	enterKwSpaceSavingAll(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSpaceSavingAll.
+	exitKwSpaceSavingAll(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
+	enterKwSpaceSavingSlowTriePrecision(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
+	exitKwSpaceSavingSlowTriePrecision(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
+	enterKwSpaceSavingNoTextField(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
+	exitKwSpaceSavingNoTextField(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwCopyField.
+	enterKwCopyField(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwCopyField.
+	exitKwCopyField(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDocValues.
+	enterKwDocValues(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDocValues.
+	exitKwDocValues(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwExcluded.
+	enterKwExcluded(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwExcluded.
+	exitKwExcluded(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwIndexed.
+	enterKwIndexed(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwIndexed.
+	exitKwIndexed(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLowerCase.
+	enterKwLowerCase(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLowerCase.
+	exitKwLowerCase(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwColumns.
+	enterKwColumns(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwColumns.
+	exitKwColumns(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwProfiles.
+	enterKwProfiles(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwProfiles.
+	exitKwProfiles(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwConfig.
+	enterKwConfig(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwConfig.
+	exitKwConfig(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwAutoCommitTime.
+	enterKwAutoCommitTime(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwAutoCommitTime.
+	exitKwAutoCommitTime(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDefaultQueryField.
+	enterKwDefaultQueryField(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDefaultQueryField.
+	exitKwDefaultQueryField(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDirectoryFactory.
+	enterKwDirectoryFactory(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDirectoryFactory.
+	exitKwDirectoryFactory(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFilterCacheLowWaterMark.
+	enterKwFilterCacheLowWaterMark(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFilterCacheLowWaterMark.
+	exitKwFilterCacheLowWaterMark(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwFilterCacheHighWaterMark.
+	enterKwFilterCacheHighWaterMark(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwFilterCacheHighWaterMark.
+	exitKwFilterCacheHighWaterMark(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwDirectoryFactoryClass.
+	enterKwDirectoryFactoryClass(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwDirectoryFactoryClass.
+	exitKwDirectoryFactoryClass(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwMergeMaxThreadCount.
+	enterKwMergeMaxThreadCount(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwMergeMaxThreadCount.
+	exitKwMergeMaxThreadCount(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwMergeMaxMergeCount.
+	enterKwMergeMaxMergeCount(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwMergeMaxMergeCount.
+	exitKwMergeMaxMergeCount(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRamBufferSize.
+	enterKwRamBufferSize(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRamBufferSize.
+	exitKwRamBufferSize(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRealtime.
+	enterKwRealtime(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRealtime.
+	exitKwRealtime(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRecovery.
+	enterKwRecovery(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRecovery.
+	exitKwRecovery(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwReindex.
+	enterKwReindex(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwReindex.
+	exitKwReindex(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLenient.
+	enterKwLenient(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLenient.
+	exitKwLenient(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwStandard.
+	enterKwStandard(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwStandard.
+	exitKwStandard(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwEncrypted.
+	enterKwEncrypted(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwEncrypted.
+	exitKwEncrypted(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwCaseSensitive.
+	enterKwCaseSensitive(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwCaseSensitive.
+	exitKwCaseSensitive(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwInitcond.
+	enterKwInitcond(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwInitcond.
+	exitKwInitcond(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwInput.
+	enterKwInput(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwInput.
+	exitKwInput(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwInsert.
+	enterKwInsert(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwInsert.
+	exitKwInsert(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwInto.
+	enterKwInto(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwInto.
+	exitKwInto(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwIs.
+	enterKwIs(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwIs.
+	exitKwIs(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwJson.
+	enterKwJson(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwJson.
+	exitKwJson(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwKey.
+	enterKwKey(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwKey.
+	exitKwKey(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwKeys.
+	enterKwKeys(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwKeys.
+	exitKwKeys(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwKeyspace.
+	enterKwKeyspace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwKeyspace.
+	exitKwKeyspace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwKeyspaces.
+	enterKwKeyspaces(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwKeyspaces.
+	exitKwKeyspaces(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLanguage.
+	enterKwLanguage(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLanguage.
+	exitKwLanguage(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLimit.
+	enterKwLimit(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLimit.
+	exitKwLimit(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwList.
+	enterKwList(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwList.
+	exitKwList(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLogged.
+	enterKwLogged(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLogged.
+	exitKwLogged(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLogin.
+	enterKwLogin(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLogin.
+	exitKwLogin(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwMaterialized.
+	enterKwMaterialized(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwMaterialized.
+	exitKwMaterialized(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwModify.
+	enterKwModify(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwModify.
+	exitKwModify(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNosuperuser.
+	enterKwNosuperuser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNosuperuser.
+	exitKwNosuperuser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNorecursive.
+	enterKwNorecursive(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNorecursive.
+	exitKwNorecursive(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNot.
+	enterKwNot(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNot.
+	exitKwNot(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwNull.
+	enterKwNull(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwNull.
+	exitKwNull(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwOf.
+	enterKwOf(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwOf.
+	exitKwOf(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwOn.
+	enterKwOn(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwOn.
+	exitKwOn(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwOptions.
+	enterKwOptions(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwOptions.
+	exitKwOptions(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwOr.
+	enterKwOr(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwOr.
+	exitKwOr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwOrder.
+	enterKwOrder(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwOrder.
+	exitKwOrder(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwPassword.
+	enterKwPassword(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwPassword.
+	exitKwPassword(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwPrimary.
+	enterKwPrimary(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwPrimary.
+	exitKwPrimary(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRename.
+	enterKwRename(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRename.
+	exitKwRename(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwReplace.
+	enterKwReplace(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwReplace.
+	exitKwReplace(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwReplication.
+	enterKwReplication(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwReplication.
+	exitKwReplication(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwReturns.
+	enterKwReturns(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwReturns.
+	exitKwReturns(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRole.
+	enterKwRole(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRole.
+	exitKwRole(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwInternal.
+	enterKwInternal(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwInternal.
+	exitKwInternal(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwLdap.
+	enterKwLdap(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwLdap.
+	exitKwLdap(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwScheme.
+	enterKwScheme(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwScheme.
+	exitKwScheme(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRoles.
+	enterKwRoles(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRoles.
+	exitKwRoles(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSelect.
+	enterKwSelect(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSelect.
+	exitKwSelect(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSet.
+	enterKwSet(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSet.
+	exitKwSet(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSfunc.
+	enterKwSfunc(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSfunc.
+	exitKwSfunc(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwStorage.
+	enterKwStorage(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwStorage.
+	exitKwStorage(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwStype.
+	enterKwStype(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwStype.
+	exitKwStype(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwSuperuser.
+	enterKwSuperuser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwSuperuser.
+	exitKwSuperuser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTable.
+	enterKwTable(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTable.
+	exitKwTable(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTimestamp.
+	enterKwTimestamp(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTimestamp.
+	exitKwTimestamp(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTo.
+	enterKwTo(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTo.
+	exitKwTo(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTrigger.
+	enterKwTrigger(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTrigger.
+	exitKwTrigger(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTruncate.
+	enterKwTruncate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTruncate.
+	exitKwTruncate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwTtl.
+	enterKwTtl(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwTtl.
+	exitKwTtl(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwType.
+	enterKwType(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwType.
+	exitKwType(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwUnlogged.
+	enterKwUnlogged(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwUnlogged.
+	exitKwUnlogged(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwUpdate.
+	enterKwUpdate(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwUpdate.
+	exitKwUpdate(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwUse.
+	enterKwUse(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwUse.
+	exitKwUse(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwUser.
+	enterKwUser(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwUser.
+	exitKwUser(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwUsers.
+	enterKwUsers(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwUsers.
+	exitKwUsers(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwUsing.
+	enterKwUsing(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwUsing.
+	exitKwUsing(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwValues.
+	enterKwValues(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwValues.
+	exitKwValues(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwView.
+	enterKwView(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwView.
+	exitKwView(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwWhere.
+	enterKwWhere(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwWhere.
+	exitKwWhere(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwWith.
+	enterKwWith(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwWith.
+	exitKwWith(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#kwRevoke.
+	enterKwRevoke(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#kwRevoke.
+	exitKwRevoke(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#eof.
+	enterEof(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#eof.
+	exitEof(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketLr.
+	enterSyntaxBracketLr(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketLr.
+	exitSyntaxBracketLr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketRr.
+	enterSyntaxBracketRr(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketRr.
+	exitSyntaxBracketRr(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketLc.
+	enterSyntaxBracketLc(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketLc.
+	exitSyntaxBracketLc(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketRc.
+	enterSyntaxBracketRc(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketRc.
+	exitSyntaxBracketRc(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketLa.
+	enterSyntaxBracketLa(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketLa.
+	exitSyntaxBracketLa(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketRa.
+	enterSyntaxBracketRa(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketRa.
+	exitSyntaxBracketRa(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketLs.
+	enterSyntaxBracketLs(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketLs.
+	exitSyntaxBracketLs(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxBracketRs.
+	enterSyntaxBracketRs(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxBracketRs.
+	exitSyntaxBracketRs(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxComma.
+	enterSyntaxComma(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxComma.
+	exitSyntaxComma(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#syntaxColon.
+	enterSyntaxColon(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#syntaxColon.
+	exitSyntaxColon(ctx) {
+	}
+
+
+	// Enter a parse tree produced by CqlParser#id.
+	enterId(ctx) {
+	}
+
+	// Exit a parse tree produced by CqlParser#id.
+	exitId(ctx) {
+	}
+
+
+
 }
-
-CqlParserListener.prototype = Object.create(antlr4.tree.ParseTreeListener.prototype);
-CqlParserListener.prototype.constructor = CqlParserListener;
-
-// Enter a parse tree produced by CqlParser#root.
-CqlParserListener.prototype.enterRoot = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#root.
-CqlParserListener.prototype.exitRoot = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#cqls.
-CqlParserListener.prototype.enterCqls = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#cqls.
-CqlParserListener.prototype.exitCqls = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#statementSeparator.
-CqlParserListener.prototype.enterStatementSeparator = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#statementSeparator.
-CqlParserListener.prototype.exitStatementSeparator = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#empty.
-CqlParserListener.prototype.enterEmpty = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#empty.
-CqlParserListener.prototype.exitEmpty = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#cql.
-CqlParserListener.prototype.enterCql = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#cql.
-CqlParserListener.prototype.exitCql = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#revoke.
-CqlParserListener.prototype.enterRevoke = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#revoke.
-CqlParserListener.prototype.exitRevoke = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#listUsers.
-CqlParserListener.prototype.enterListUsers = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#listUsers.
-CqlParserListener.prototype.exitListUsers = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#listRoles.
-CqlParserListener.prototype.enterListRoles = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#listRoles.
-CqlParserListener.prototype.exitListRoles = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#listPermissions.
-CqlParserListener.prototype.enterListPermissions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#listPermissions.
-CqlParserListener.prototype.exitListPermissions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#grant.
-CqlParserListener.prototype.enterGrant = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#grant.
-CqlParserListener.prototype.exitGrant = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#priviledge.
-CqlParserListener.prototype.enterPriviledge = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#priviledge.
-CqlParserListener.prototype.exitPriviledge = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#resource.
-CqlParserListener.prototype.enterResource = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#resource.
-CqlParserListener.prototype.exitResource = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createUser.
-CqlParserListener.prototype.enterCreateUser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createUser.
-CqlParserListener.prototype.exitCreateUser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createRole.
-CqlParserListener.prototype.enterCreateRole = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createRole.
-CqlParserListener.prototype.exitCreateRole = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createType.
-CqlParserListener.prototype.enterCreateType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createType.
-CqlParserListener.prototype.exitCreateType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#typeMemberColumnList.
-CqlParserListener.prototype.enterTypeMemberColumnList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#typeMemberColumnList.
-CqlParserListener.prototype.exitTypeMemberColumnList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createTrigger.
-CqlParserListener.prototype.enterCreateTrigger = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createTrigger.
-CqlParserListener.prototype.exitCreateTrigger = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createMaterializedView.
-CqlParserListener.prototype.enterCreateMaterializedView = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createMaterializedView.
-CqlParserListener.prototype.exitCreateMaterializedView = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#materializedViewWhere.
-CqlParserListener.prototype.enterMaterializedViewWhere = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#materializedViewWhere.
-CqlParserListener.prototype.exitMaterializedViewWhere = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#columnNotNullList.
-CqlParserListener.prototype.enterColumnNotNullList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#columnNotNullList.
-CqlParserListener.prototype.exitColumnNotNullList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#columnNotNull.
-CqlParserListener.prototype.enterColumnNotNull = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#columnNotNull.
-CqlParserListener.prototype.exitColumnNotNull = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#materializedViewOptions.
-CqlParserListener.prototype.enterMaterializedViewOptions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#materializedViewOptions.
-CqlParserListener.prototype.exitMaterializedViewOptions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createKeyspace.
-CqlParserListener.prototype.enterCreateKeyspace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createKeyspace.
-CqlParserListener.prototype.exitCreateKeyspace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createFunction.
-CqlParserListener.prototype.enterCreateFunction = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createFunction.
-CqlParserListener.prototype.exitCreateFunction = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#codeBlock.
-CqlParserListener.prototype.enterCodeBlock = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#codeBlock.
-CqlParserListener.prototype.exitCodeBlock = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#paramList.
-CqlParserListener.prototype.enterParamList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#paramList.
-CqlParserListener.prototype.exitParamList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#returnMode.
-CqlParserListener.prototype.enterReturnMode = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#returnMode.
-CqlParserListener.prototype.exitReturnMode = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createAggregate.
-CqlParserListener.prototype.enterCreateAggregate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createAggregate.
-CqlParserListener.prototype.exitCreateAggregate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#initCondDefinition.
-CqlParserListener.prototype.enterInitCondDefinition = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#initCondDefinition.
-CqlParserListener.prototype.exitInitCondDefinition = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#initCondHash.
-CqlParserListener.prototype.enterInitCondHash = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#initCondHash.
-CqlParserListener.prototype.exitInitCondHash = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#initCondHashItem.
-CqlParserListener.prototype.enterInitCondHashItem = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#initCondHashItem.
-CqlParserListener.prototype.exitInitCondHashItem = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#initCondListNested.
-CqlParserListener.prototype.enterInitCondListNested = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#initCondListNested.
-CqlParserListener.prototype.exitInitCondListNested = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#initCondList.
-CqlParserListener.prototype.enterInitCondList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#initCondList.
-CqlParserListener.prototype.exitInitCondList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#orReplace.
-CqlParserListener.prototype.enterOrReplace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#orReplace.
-CqlParserListener.prototype.exitOrReplace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterUser.
-CqlParserListener.prototype.enterAlterUser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterUser.
-CqlParserListener.prototype.exitAlterUser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#userPassword.
-CqlParserListener.prototype.enterUserPassword = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#userPassword.
-CqlParserListener.prototype.exitUserPassword = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#userSuperUser.
-CqlParserListener.prototype.enterUserSuperUser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#userSuperUser.
-CqlParserListener.prototype.exitUserSuperUser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterType.
-CqlParserListener.prototype.enterAlterType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterType.
-CqlParserListener.prototype.exitAlterType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTypeOperation.
-CqlParserListener.prototype.enterAlterTypeOperation = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTypeOperation.
-CqlParserListener.prototype.exitAlterTypeOperation = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTypeRename.
-CqlParserListener.prototype.enterAlterTypeRename = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTypeRename.
-CqlParserListener.prototype.exitAlterTypeRename = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTypeRenameList.
-CqlParserListener.prototype.enterAlterTypeRenameList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTypeRenameList.
-CqlParserListener.prototype.exitAlterTypeRenameList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTypeRenameItem.
-CqlParserListener.prototype.enterAlterTypeRenameItem = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTypeRenameItem.
-CqlParserListener.prototype.exitAlterTypeRenameItem = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTypeAdd.
-CqlParserListener.prototype.enterAlterTypeAdd = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTypeAdd.
-CqlParserListener.prototype.exitAlterTypeAdd = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTypeAlterType.
-CqlParserListener.prototype.enterAlterTypeAlterType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTypeAlterType.
-CqlParserListener.prototype.exitAlterTypeAlterType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTable.
-CqlParserListener.prototype.enterAlterTable = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTable.
-CqlParserListener.prototype.exitAlterTable = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableOperation.
-CqlParserListener.prototype.enterAlterTableOperation = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableOperation.
-CqlParserListener.prototype.exitAlterTableOperation = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableWith.
-CqlParserListener.prototype.enterAlterTableWith = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableWith.
-CqlParserListener.prototype.exitAlterTableWith = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableRename.
-CqlParserListener.prototype.enterAlterTableRename = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableRename.
-CqlParserListener.prototype.exitAlterTableRename = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableDropCompactStorage.
-CqlParserListener.prototype.enterAlterTableDropCompactStorage = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableDropCompactStorage.
-CqlParserListener.prototype.exitAlterTableDropCompactStorage = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableDropColumns.
-CqlParserListener.prototype.enterAlterTableDropColumns = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableDropColumns.
-CqlParserListener.prototype.exitAlterTableDropColumns = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableDropColumnList.
-CqlParserListener.prototype.enterAlterTableDropColumnList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableDropColumnList.
-CqlParserListener.prototype.exitAlterTableDropColumnList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableAdd.
-CqlParserListener.prototype.enterAlterTableAdd = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableAdd.
-CqlParserListener.prototype.exitAlterTableAdd = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterTableColumnDefinition.
-CqlParserListener.prototype.enterAlterTableColumnDefinition = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterTableColumnDefinition.
-CqlParserListener.prototype.exitAlterTableColumnDefinition = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterRole.
-CqlParserListener.prototype.enterAlterRole = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterRole.
-CqlParserListener.prototype.exitAlterRole = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#roleWith.
-CqlParserListener.prototype.enterRoleWith = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#roleWith.
-CqlParserListener.prototype.exitRoleWith = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#roleWithOptions.
-CqlParserListener.prototype.enterRoleWithOptions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#roleWithOptions.
-CqlParserListener.prototype.exitRoleWithOptions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterMaterializedView.
-CqlParserListener.prototype.enterAlterMaterializedView = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterMaterializedView.
-CqlParserListener.prototype.exitAlterMaterializedView = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropUser.
-CqlParserListener.prototype.enterDropUser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropUser.
-CqlParserListener.prototype.exitDropUser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropType.
-CqlParserListener.prototype.enterDropType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropType.
-CqlParserListener.prototype.exitDropType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropMaterializedView.
-CqlParserListener.prototype.enterDropMaterializedView = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropMaterializedView.
-CqlParserListener.prototype.exitDropMaterializedView = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropAggregate.
-CqlParserListener.prototype.enterDropAggregate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropAggregate.
-CqlParserListener.prototype.exitDropAggregate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropFunction.
-CqlParserListener.prototype.enterDropFunction = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropFunction.
-CqlParserListener.prototype.exitDropFunction = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropTrigger.
-CqlParserListener.prototype.enterDropTrigger = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropTrigger.
-CqlParserListener.prototype.exitDropTrigger = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropRole.
-CqlParserListener.prototype.enterDropRole = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropRole.
-CqlParserListener.prototype.exitDropRole = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropTable.
-CqlParserListener.prototype.enterDropTable = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropTable.
-CqlParserListener.prototype.exitDropTable = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropKeyspace.
-CqlParserListener.prototype.enterDropKeyspace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropKeyspace.
-CqlParserListener.prototype.exitDropKeyspace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dropIndex.
-CqlParserListener.prototype.enterDropIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dropIndex.
-CqlParserListener.prototype.exitDropIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createTable.
-CqlParserListener.prototype.enterCreateTable = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createTable.
-CqlParserListener.prototype.exitCreateTable = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#withElement.
-CqlParserListener.prototype.enterWithElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#withElement.
-CqlParserListener.prototype.exitWithElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#clusteringOrderColumns.
-CqlParserListener.prototype.enterClusteringOrderColumns = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#clusteringOrderColumns.
-CqlParserListener.prototype.exitClusteringOrderColumns = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#clusteringOrder.
-CqlParserListener.prototype.enterClusteringOrder = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#clusteringOrder.
-CqlParserListener.prototype.exitClusteringOrder = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#tableOptions.
-CqlParserListener.prototype.enterTableOptions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#tableOptions.
-CqlParserListener.prototype.exitTableOptions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#tableOptionItem.
-CqlParserListener.prototype.enterTableOptionItem = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#tableOptionItem.
-CqlParserListener.prototype.exitTableOptionItem = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#tableOptionName.
-CqlParserListener.prototype.enterTableOptionName = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#tableOptionName.
-CqlParserListener.prototype.exitTableOptionName = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#tableOptionValue.
-CqlParserListener.prototype.enterTableOptionValue = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#tableOptionValue.
-CqlParserListener.prototype.exitTableOptionValue = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#optionHash.
-CqlParserListener.prototype.enterOptionHash = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#optionHash.
-CqlParserListener.prototype.exitOptionHash = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#optionHashItem.
-CqlParserListener.prototype.enterOptionHashItem = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#optionHashItem.
-CqlParserListener.prototype.exitOptionHashItem = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#optionHashKey.
-CqlParserListener.prototype.enterOptionHashKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#optionHashKey.
-CqlParserListener.prototype.exitOptionHashKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#optionHashValue.
-CqlParserListener.prototype.enterOptionHashValue = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#optionHashValue.
-CqlParserListener.prototype.exitOptionHashValue = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#columnDefinitionList.
-CqlParserListener.prototype.enterColumnDefinitionList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#columnDefinitionList.
-CqlParserListener.prototype.exitColumnDefinitionList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#columnDefinition.
-CqlParserListener.prototype.enterColumnDefinition = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#columnDefinition.
-CqlParserListener.prototype.exitColumnDefinition = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#primaryKeyColumn.
-CqlParserListener.prototype.enterPrimaryKeyColumn = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#primaryKeyColumn.
-CqlParserListener.prototype.exitPrimaryKeyColumn = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#primaryKeyElement.
-CqlParserListener.prototype.enterPrimaryKeyElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#primaryKeyElement.
-CqlParserListener.prototype.exitPrimaryKeyElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#primaryKeyDefinition.
-CqlParserListener.prototype.enterPrimaryKeyDefinition = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#primaryKeyDefinition.
-CqlParserListener.prototype.exitPrimaryKeyDefinition = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#singlePrimaryKey.
-CqlParserListener.prototype.enterSinglePrimaryKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#singlePrimaryKey.
-CqlParserListener.prototype.exitSinglePrimaryKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#compoundKey.
-CqlParserListener.prototype.enterCompoundKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#compoundKey.
-CqlParserListener.prototype.exitCompoundKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#compositeKey.
-CqlParserListener.prototype.enterCompositeKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#compositeKey.
-CqlParserListener.prototype.exitCompositeKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#partitionKeyList.
-CqlParserListener.prototype.enterPartitionKeyList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#partitionKeyList.
-CqlParserListener.prototype.exitPartitionKeyList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#clusteringKeyList.
-CqlParserListener.prototype.enterClusteringKeyList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#clusteringKeyList.
-CqlParserListener.prototype.exitClusteringKeyList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#partitionKey.
-CqlParserListener.prototype.enterPartitionKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#partitionKey.
-CqlParserListener.prototype.exitPartitionKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#clusteringKey.
-CqlParserListener.prototype.enterClusteringKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#clusteringKey.
-CqlParserListener.prototype.exitClusteringKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#applyBatch.
-CqlParserListener.prototype.enterApplyBatch = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#applyBatch.
-CqlParserListener.prototype.exitApplyBatch = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#beginBatch.
-CqlParserListener.prototype.enterBeginBatch = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#beginBatch.
-CqlParserListener.prototype.exitBeginBatch = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#batchType.
-CqlParserListener.prototype.enterBatchType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#batchType.
-CqlParserListener.prototype.exitBatchType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#alterKeyspace.
-CqlParserListener.prototype.enterAlterKeyspace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#alterKeyspace.
-CqlParserListener.prototype.exitAlterKeyspace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#replicationList.
-CqlParserListener.prototype.enterReplicationList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#replicationList.
-CqlParserListener.prototype.exitReplicationList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#replicationListItem.
-CqlParserListener.prototype.enterReplicationListItem = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#replicationListItem.
-CqlParserListener.prototype.exitReplicationListItem = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#durableWrites.
-CqlParserListener.prototype.enterDurableWrites = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#durableWrites.
-CqlParserListener.prototype.exitDurableWrites = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#use.
-CqlParserListener.prototype.enterUse = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#use.
-CqlParserListener.prototype.exitUse = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#truncate.
-CqlParserListener.prototype.enterTruncate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#truncate.
-CqlParserListener.prototype.exitTruncate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#secondaryIndex.
-CqlParserListener.prototype.enterSecondaryIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#secondaryIndex.
-CqlParserListener.prototype.exitSecondaryIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#customIndex.
-CqlParserListener.prototype.enterCustomIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#customIndex.
-CqlParserListener.prototype.exitCustomIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#customIndexOption.
-CqlParserListener.prototype.enterCustomIndexOption = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#customIndexOption.
-CqlParserListener.prototype.exitCustomIndexOption = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#createSearchIndex.
-CqlParserListener.prototype.enterCreateSearchIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#createSearchIndex.
-CqlParserListener.prototype.exitCreateSearchIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#searchIndexConfigs.
-CqlParserListener.prototype.enterSearchIndexConfigs = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#searchIndexConfigs.
-CqlParserListener.prototype.exitSearchIndexConfigs = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#directoryFactory.
-CqlParserListener.prototype.enterDirectoryFactory = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#directoryFactory.
-CqlParserListener.prototype.exitDirectoryFactory = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#searchIndexOptions.
-CqlParserListener.prototype.enterSearchIndexOptions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#searchIndexOptions.
-CqlParserListener.prototype.exitSearchIndexOptions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#searchIndexProfile.
-CqlParserListener.prototype.enterSearchIndexProfile = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#searchIndexProfile.
-CqlParserListener.prototype.exitSearchIndexProfile = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#searchIndexProfiles.
-CqlParserListener.prototype.enterSearchIndexProfiles = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#searchIndexProfiles.
-CqlParserListener.prototype.exitSearchIndexProfiles = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#searchIndexColumnList.
-CqlParserListener.prototype.enterSearchIndexColumnList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#searchIndexColumnList.
-CqlParserListener.prototype.exitSearchIndexColumnList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#searchIndexColumn.
-CqlParserListener.prototype.enterSearchIndexColumn = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#searchIndexColumn.
-CqlParserListener.prototype.exitSearchIndexColumn = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#indexName.
-CqlParserListener.prototype.enterIndexName = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#indexName.
-CqlParserListener.prototype.exitIndexName = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#indexColumnSpec.
-CqlParserListener.prototype.enterIndexColumnSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#indexColumnSpec.
-CqlParserListener.prototype.exitIndexColumnSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#indexKeysSpec.
-CqlParserListener.prototype.enterIndexKeysSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#indexKeysSpec.
-CqlParserListener.prototype.exitIndexKeysSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#indexEntriesSSpec.
-CqlParserListener.prototype.enterIndexEntriesSSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#indexEntriesSSpec.
-CqlParserListener.prototype.exitIndexEntriesSSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#indexFullSpec.
-CqlParserListener.prototype.enterIndexFullSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#indexFullSpec.
-CqlParserListener.prototype.exitIndexFullSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#indexValuesSpec.
-CqlParserListener.prototype.enterIndexValuesSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#indexValuesSpec.
-CqlParserListener.prototype.exitIndexValuesSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#deleteStatement.
-CqlParserListener.prototype.enterDeleteStatement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#deleteStatement.
-CqlParserListener.prototype.exitDeleteStatement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#deleteColumnList.
-CqlParserListener.prototype.enterDeleteColumnList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#deleteColumnList.
-CqlParserListener.prototype.exitDeleteColumnList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#deleteColumnItem.
-CqlParserListener.prototype.enterDeleteColumnItem = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#deleteColumnItem.
-CqlParserListener.prototype.exitDeleteColumnItem = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#update.
-CqlParserListener.prototype.enterUpdate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#update.
-CqlParserListener.prototype.exitUpdate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#ifSpec.
-CqlParserListener.prototype.enterIfSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#ifSpec.
-CqlParserListener.prototype.exitIfSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#ifConditionList.
-CqlParserListener.prototype.enterIfConditionList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#ifConditionList.
-CqlParserListener.prototype.exitIfConditionList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#ifCondition.
-CqlParserListener.prototype.enterIfCondition = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#ifCondition.
-CqlParserListener.prototype.exitIfCondition = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignments.
-CqlParserListener.prototype.enterAssignments = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignments.
-CqlParserListener.prototype.exitAssignments = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignmentElement.
-CqlParserListener.prototype.enterAssignmentElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignmentElement.
-CqlParserListener.prototype.exitAssignmentElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignmentSet.
-CqlParserListener.prototype.enterAssignmentSet = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignmentSet.
-CqlParserListener.prototype.exitAssignmentSet = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignmentMap.
-CqlParserListener.prototype.enterAssignmentMap = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignmentMap.
-CqlParserListener.prototype.exitAssignmentMap = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignmentMapExpression.
-CqlParserListener.prototype.enterAssignmentMapExpression = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignmentMapExpression.
-CqlParserListener.prototype.exitAssignmentMapExpression = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignmentList.
-CqlParserListener.prototype.enterAssignmentList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignmentList.
-CqlParserListener.prototype.exitAssignmentList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#assignmentTuple.
-CqlParserListener.prototype.enterAssignmentTuple = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#assignmentTuple.
-CqlParserListener.prototype.exitAssignmentTuple = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#insert.
-CqlParserListener.prototype.enterInsert = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#insert.
-CqlParserListener.prototype.exitInsert = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#usingTtlTimestamp.
-CqlParserListener.prototype.enterUsingTtlTimestamp = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#usingTtlTimestamp.
-CqlParserListener.prototype.exitUsingTtlTimestamp = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#timestamp.
-CqlParserListener.prototype.enterTimestamp = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#timestamp.
-CqlParserListener.prototype.exitTimestamp = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#ttl.
-CqlParserListener.prototype.enterTtl = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#ttl.
-CqlParserListener.prototype.exitTtl = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#usingTimestampSpec.
-CqlParserListener.prototype.enterUsingTimestampSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#usingTimestampSpec.
-CqlParserListener.prototype.exitUsingTimestampSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#ifNotExist.
-CqlParserListener.prototype.enterIfNotExist = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#ifNotExist.
-CqlParserListener.prototype.exitIfNotExist = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#ifExist.
-CqlParserListener.prototype.enterIfExist = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#ifExist.
-CqlParserListener.prototype.exitIfExist = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#insertValuesSpec.
-CqlParserListener.prototype.enterInsertValuesSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#insertValuesSpec.
-CqlParserListener.prototype.exitInsertValuesSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#insertColumnSpec.
-CqlParserListener.prototype.enterInsertColumnSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#insertColumnSpec.
-CqlParserListener.prototype.exitInsertColumnSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#columnList.
-CqlParserListener.prototype.enterColumnList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#columnList.
-CqlParserListener.prototype.exitColumnList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#expressionList.
-CqlParserListener.prototype.enterExpressionList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#expressionList.
-CqlParserListener.prototype.exitExpressionList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#expression.
-CqlParserListener.prototype.enterExpression = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#expression.
-CqlParserListener.prototype.exitExpression = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#select.
-CqlParserListener.prototype.enterSelect = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#select.
-CqlParserListener.prototype.exitSelect = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#allowFilteringSpec.
-CqlParserListener.prototype.enterAllowFilteringSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#allowFilteringSpec.
-CqlParserListener.prototype.exitAllowFilteringSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#limitSpec.
-CqlParserListener.prototype.enterLimitSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#limitSpec.
-CqlParserListener.prototype.exitLimitSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#fromSpec.
-CqlParserListener.prototype.enterFromSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#fromSpec.
-CqlParserListener.prototype.exitFromSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#fromSpecElement.
-CqlParserListener.prototype.enterFromSpecElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#fromSpecElement.
-CqlParserListener.prototype.exitFromSpecElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#orderSpec.
-CqlParserListener.prototype.enterOrderSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#orderSpec.
-CqlParserListener.prototype.exitOrderSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#orderSpecElement.
-CqlParserListener.prototype.enterOrderSpecElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#orderSpecElement.
-CqlParserListener.prototype.exitOrderSpecElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#whereSpec.
-CqlParserListener.prototype.enterWhereSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#whereSpec.
-CqlParserListener.prototype.exitWhereSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#distinctSpec.
-CqlParserListener.prototype.enterDistinctSpec = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#distinctSpec.
-CqlParserListener.prototype.exitDistinctSpec = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#selectElements.
-CqlParserListener.prototype.enterSelectElements = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#selectElements.
-CqlParserListener.prototype.exitSelectElements = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#selectElement.
-CqlParserListener.prototype.enterSelectElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#selectElement.
-CqlParserListener.prototype.exitSelectElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#relationElements.
-CqlParserListener.prototype.enterRelationElements = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#relationElements.
-CqlParserListener.prototype.exitRelationElements = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#relationElement.
-CqlParserListener.prototype.enterRelationElement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#relationElement.
-CqlParserListener.prototype.exitRelationElement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#relalationContains.
-CqlParserListener.prototype.enterRelalationContains = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#relalationContains.
-CqlParserListener.prototype.exitRelalationContains = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#relalationContainsKey.
-CqlParserListener.prototype.enterRelalationContainsKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#relalationContainsKey.
-CqlParserListener.prototype.exitRelalationContainsKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#functionCall.
-CqlParserListener.prototype.enterFunctionCall = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#functionCall.
-CqlParserListener.prototype.exitFunctionCall = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#functionArgs.
-CqlParserListener.prototype.enterFunctionArgs = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#functionArgs.
-CqlParserListener.prototype.exitFunctionArgs = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#constant.
-CqlParserListener.prototype.enterConstant = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#constant.
-CqlParserListener.prototype.exitConstant = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#decimalLiteral.
-CqlParserListener.prototype.enterDecimalLiteral = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#decimalLiteral.
-CqlParserListener.prototype.exitDecimalLiteral = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#floatLiteral.
-CqlParserListener.prototype.enterFloatLiteral = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#floatLiteral.
-CqlParserListener.prototype.exitFloatLiteral = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#stringLiteral.
-CqlParserListener.prototype.enterStringLiteral = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#stringLiteral.
-CqlParserListener.prototype.exitStringLiteral = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#booleanLiteral.
-CqlParserListener.prototype.enterBooleanLiteral = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#booleanLiteral.
-CqlParserListener.prototype.exitBooleanLiteral = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#hexadecimalLiteral.
-CqlParserListener.prototype.enterHexadecimalLiteral = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#hexadecimalLiteral.
-CqlParserListener.prototype.exitHexadecimalLiteral = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#keyspace.
-CqlParserListener.prototype.enterKeyspace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#keyspace.
-CqlParserListener.prototype.exitKeyspace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#table.
-CqlParserListener.prototype.enterTable = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#table.
-CqlParserListener.prototype.exitTable = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#column.
-CqlParserListener.prototype.enterColumn = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#column.
-CqlParserListener.prototype.exitColumn = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dataType.
-CqlParserListener.prototype.enterDataType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dataType.
-CqlParserListener.prototype.exitDataType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dataTypeName.
-CqlParserListener.prototype.enterDataTypeName = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dataTypeName.
-CqlParserListener.prototype.exitDataTypeName = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#dataTypeDefinition.
-CqlParserListener.prototype.enterDataTypeDefinition = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#dataTypeDefinition.
-CqlParserListener.prototype.exitDataTypeDefinition = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#orderDirection.
-CqlParserListener.prototype.enterOrderDirection = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#orderDirection.
-CqlParserListener.prototype.exitOrderDirection = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#role.
-CqlParserListener.prototype.enterRole = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#role.
-CqlParserListener.prototype.exitRole = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#trigger.
-CqlParserListener.prototype.enterTrigger = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#trigger.
-CqlParserListener.prototype.exitTrigger = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#triggerClass.
-CqlParserListener.prototype.enterTriggerClass = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#triggerClass.
-CqlParserListener.prototype.exitTriggerClass = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#materializedView.
-CqlParserListener.prototype.enterMaterializedView = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#materializedView.
-CqlParserListener.prototype.exitMaterializedView = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#type.
-CqlParserListener.prototype.enterType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#type.
-CqlParserListener.prototype.exitType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#aggregate.
-CqlParserListener.prototype.enterAggregate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#aggregate.
-CqlParserListener.prototype.exitAggregate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#functionStatement.
-CqlParserListener.prototype.enterFunctionStatement = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#functionStatement.
-CqlParserListener.prototype.exitFunctionStatement = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#language.
-CqlParserListener.prototype.enterLanguage = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#language.
-CqlParserListener.prototype.exitLanguage = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#user.
-CqlParserListener.prototype.enterUser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#user.
-CqlParserListener.prototype.exitUser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#password.
-CqlParserListener.prototype.enterPassword = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#password.
-CqlParserListener.prototype.exitPassword = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#hashKey.
-CqlParserListener.prototype.enterHashKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#hashKey.
-CqlParserListener.prototype.exitHashKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#param.
-CqlParserListener.prototype.enterParam = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#param.
-CqlParserListener.prototype.exitParam = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#paramName.
-CqlParserListener.prototype.enterParamName = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#paramName.
-CqlParserListener.prototype.exitParamName = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAdd.
-CqlParserListener.prototype.enterKwAdd = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAdd.
-CqlParserListener.prototype.exitKwAdd = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAggregate.
-CqlParserListener.prototype.enterKwAggregate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAggregate.
-CqlParserListener.prototype.exitKwAggregate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAll.
-CqlParserListener.prototype.enterKwAll = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAll.
-CqlParserListener.prototype.exitKwAll = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAllPermissions.
-CqlParserListener.prototype.enterKwAllPermissions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAllPermissions.
-CqlParserListener.prototype.exitKwAllPermissions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAllow.
-CqlParserListener.prototype.enterKwAllow = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAllow.
-CqlParserListener.prototype.exitKwAllow = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAlter.
-CqlParserListener.prototype.enterKwAlter = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAlter.
-CqlParserListener.prototype.exitKwAlter = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAnd.
-CqlParserListener.prototype.enterKwAnd = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAnd.
-CqlParserListener.prototype.exitKwAnd = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwApply.
-CqlParserListener.prototype.enterKwApply = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwApply.
-CqlParserListener.prototype.exitKwApply = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAs.
-CqlParserListener.prototype.enterKwAs = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAs.
-CqlParserListener.prototype.exitKwAs = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAsc.
-CqlParserListener.prototype.enterKwAsc = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAsc.
-CqlParserListener.prototype.exitKwAsc = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAuthorize.
-CqlParserListener.prototype.enterKwAuthorize = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAuthorize.
-CqlParserListener.prototype.exitKwAuthorize = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwBatch.
-CqlParserListener.prototype.enterKwBatch = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwBatch.
-CqlParserListener.prototype.exitKwBatch = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwBegin.
-CqlParserListener.prototype.enterKwBegin = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwBegin.
-CqlParserListener.prototype.exitKwBegin = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwBy.
-CqlParserListener.prototype.enterKwBy = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwBy.
-CqlParserListener.prototype.exitKwBy = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwCalled.
-CqlParserListener.prototype.enterKwCalled = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwCalled.
-CqlParserListener.prototype.exitKwCalled = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwClustering.
-CqlParserListener.prototype.enterKwClustering = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwClustering.
-CqlParserListener.prototype.exitKwClustering = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwCompact.
-CqlParserListener.prototype.enterKwCompact = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwCompact.
-CqlParserListener.prototype.exitKwCompact = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwContains.
-CqlParserListener.prototype.enterKwContains = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwContains.
-CqlParserListener.prototype.exitKwContains = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwCreate.
-CqlParserListener.prototype.enterKwCreate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwCreate.
-CqlParserListener.prototype.exitKwCreate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDelete.
-CqlParserListener.prototype.enterKwDelete = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDelete.
-CqlParserListener.prototype.exitKwDelete = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDesc.
-CqlParserListener.prototype.enterKwDesc = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDesc.
-CqlParserListener.prototype.exitKwDesc = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDescibe.
-CqlParserListener.prototype.enterKwDescibe = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDescibe.
-CqlParserListener.prototype.exitKwDescibe = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDistinct.
-CqlParserListener.prototype.enterKwDistinct = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDistinct.
-CqlParserListener.prototype.exitKwDistinct = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDrop.
-CqlParserListener.prototype.enterKwDrop = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDrop.
-CqlParserListener.prototype.exitKwDrop = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDurableWrites.
-CqlParserListener.prototype.enterKwDurableWrites = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDurableWrites.
-CqlParserListener.prototype.exitKwDurableWrites = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwEntries.
-CqlParserListener.prototype.enterKwEntries = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwEntries.
-CqlParserListener.prototype.exitKwEntries = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwExecute.
-CqlParserListener.prototype.enterKwExecute = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwExecute.
-CqlParserListener.prototype.exitKwExecute = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwExists.
-CqlParserListener.prototype.enterKwExists = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwExists.
-CqlParserListener.prototype.exitKwExists = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFiltering.
-CqlParserListener.prototype.enterKwFiltering = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFiltering.
-CqlParserListener.prototype.exitKwFiltering = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFinalfunc.
-CqlParserListener.prototype.enterKwFinalfunc = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFinalfunc.
-CqlParserListener.prototype.exitKwFinalfunc = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFrom.
-CqlParserListener.prototype.enterKwFrom = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFrom.
-CqlParserListener.prototype.exitKwFrom = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFull.
-CqlParserListener.prototype.enterKwFull = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFull.
-CqlParserListener.prototype.exitKwFull = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFunction.
-CqlParserListener.prototype.enterKwFunction = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFunction.
-CqlParserListener.prototype.exitKwFunction = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFunctions.
-CqlParserListener.prototype.enterKwFunctions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFunctions.
-CqlParserListener.prototype.exitKwFunctions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwGrant.
-CqlParserListener.prototype.enterKwGrant = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwGrant.
-CqlParserListener.prototype.exitKwGrant = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwIf.
-CqlParserListener.prototype.enterKwIf = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwIf.
-CqlParserListener.prototype.exitKwIf = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwIn.
-CqlParserListener.prototype.enterKwIn = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwIn.
-CqlParserListener.prototype.exitKwIn = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwIndex.
-CqlParserListener.prototype.enterKwIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwIndex.
-CqlParserListener.prototype.exitKwIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwCustom.
-CqlParserListener.prototype.enterKwCustom = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwCustom.
-CqlParserListener.prototype.exitKwCustom = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSearch.
-CqlParserListener.prototype.enterKwSearch = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSearch.
-CqlParserListener.prototype.exitKwSearch = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAscii.
-CqlParserListener.prototype.enterKwAscii = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAscii.
-CqlParserListener.prototype.exitKwAscii = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNormalize.
-CqlParserListener.prototype.enterKwNormalize = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNormalize.
-CqlParserListener.prototype.exitKwNormalize = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAnalyzed.
-CqlParserListener.prototype.enterKwAnalyzed = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAnalyzed.
-CqlParserListener.prototype.exitKwAnalyzed = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwIsLiteral.
-CqlParserListener.prototype.enterKwIsLiteral = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwIsLiteral.
-CqlParserListener.prototype.exitKwIsLiteral = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
-CqlParserListener.prototype.enterKwMaxCompactionFlushMemoryInMb = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwMaxCompactionFlushMemoryInMb.
-CqlParserListener.prototype.exitKwMaxCompactionFlushMemoryInMb = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTokenizationEnableStemming.
-CqlParserListener.prototype.enterKwTokenizationEnableStemming = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTokenizationEnableStemming.
-CqlParserListener.prototype.exitKwTokenizationEnableStemming = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
-CqlParserListener.prototype.enterKwTokenizationSkipStopWords = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTokenizationSkipStopWords.
-CqlParserListener.prototype.exitKwTokenizationSkipStopWords = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTokenizationLocale.
-CqlParserListener.prototype.enterKwTokenizationLocale = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTokenizationLocale.
-CqlParserListener.prototype.exitKwTokenizationLocale = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
-CqlParserListener.prototype.enterKwTokenizationNormalizeLowercase = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTokenizationNormalizeLowercase.
-CqlParserListener.prototype.exitKwTokenizationNormalizeLowercase = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
-CqlParserListener.prototype.enterKwTokenizationNormalizeUppercase = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTokenizationNormalizeUppercase.
-CqlParserListener.prototype.exitKwTokenizationNormalizeUppercase = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNormalizeLowercase.
-CqlParserListener.prototype.enterKwNormalizeLowercase = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNormalizeLowercase.
-CqlParserListener.prototype.exitKwNormalizeLowercase = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNormalizeUppercase.
-CqlParserListener.prototype.enterKwNormalizeUppercase = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNormalizeUppercase.
-CqlParserListener.prototype.exitKwNormalizeUppercase = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwMode.
-CqlParserListener.prototype.enterKwMode = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwMode.
-CqlParserListener.prototype.exitKwMode = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAnalyzerClass.
-CqlParserListener.prototype.enterKwAnalyzerClass = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAnalyzerClass.
-CqlParserListener.prototype.exitKwAnalyzerClass = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwStorageAttachedIndex.
-CqlParserListener.prototype.enterKwStorageAttachedIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwStorageAttachedIndex.
-CqlParserListener.prototype.exitKwStorageAttachedIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSASIIndex.
-CqlParserListener.prototype.enterKwSASIIndex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSASIIndex.
-CqlParserListener.prototype.exitKwSASIIndex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
-CqlParserListener.prototype.enterKwSpaceSavingNoJoin = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSpaceSavingNoJoin.
-CqlParserListener.prototype.exitKwSpaceSavingNoJoin = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSpaceSavingAll.
-CqlParserListener.prototype.enterKwSpaceSavingAll = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSpaceSavingAll.
-CqlParserListener.prototype.exitKwSpaceSavingAll = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
-CqlParserListener.prototype.enterKwSpaceSavingSlowTriePrecision = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSpaceSavingSlowTriePrecision.
-CqlParserListener.prototype.exitKwSpaceSavingSlowTriePrecision = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
-CqlParserListener.prototype.enterKwSpaceSavingNoTextField = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSpaceSavingNoTextField.
-CqlParserListener.prototype.exitKwSpaceSavingNoTextField = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwCopyField.
-CqlParserListener.prototype.enterKwCopyField = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwCopyField.
-CqlParserListener.prototype.exitKwCopyField = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDocValues.
-CqlParserListener.prototype.enterKwDocValues = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDocValues.
-CqlParserListener.prototype.exitKwDocValues = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwExcluded.
-CqlParserListener.prototype.enterKwExcluded = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwExcluded.
-CqlParserListener.prototype.exitKwExcluded = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwIndexed.
-CqlParserListener.prototype.enterKwIndexed = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwIndexed.
-CqlParserListener.prototype.exitKwIndexed = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLowerCase.
-CqlParserListener.prototype.enterKwLowerCase = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLowerCase.
-CqlParserListener.prototype.exitKwLowerCase = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwColumns.
-CqlParserListener.prototype.enterKwColumns = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwColumns.
-CqlParserListener.prototype.exitKwColumns = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwProfiles.
-CqlParserListener.prototype.enterKwProfiles = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwProfiles.
-CqlParserListener.prototype.exitKwProfiles = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwConfig.
-CqlParserListener.prototype.enterKwConfig = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwConfig.
-CqlParserListener.prototype.exitKwConfig = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwAutoCommitTime.
-CqlParserListener.prototype.enterKwAutoCommitTime = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwAutoCommitTime.
-CqlParserListener.prototype.exitKwAutoCommitTime = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDefaultQueryField.
-CqlParserListener.prototype.enterKwDefaultQueryField = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDefaultQueryField.
-CqlParserListener.prototype.exitKwDefaultQueryField = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDirectoryFactory.
-CqlParserListener.prototype.enterKwDirectoryFactory = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDirectoryFactory.
-CqlParserListener.prototype.exitKwDirectoryFactory = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFilterCacheLowWaterMark.
-CqlParserListener.prototype.enterKwFilterCacheLowWaterMark = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFilterCacheLowWaterMark.
-CqlParserListener.prototype.exitKwFilterCacheLowWaterMark = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwFilterCacheHighWaterMark.
-CqlParserListener.prototype.enterKwFilterCacheHighWaterMark = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwFilterCacheHighWaterMark.
-CqlParserListener.prototype.exitKwFilterCacheHighWaterMark = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwDirectoryFactoryClass.
-CqlParserListener.prototype.enterKwDirectoryFactoryClass = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwDirectoryFactoryClass.
-CqlParserListener.prototype.exitKwDirectoryFactoryClass = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwMergeMaxThreadCount.
-CqlParserListener.prototype.enterKwMergeMaxThreadCount = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwMergeMaxThreadCount.
-CqlParserListener.prototype.exitKwMergeMaxThreadCount = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwMergeMaxMergeCount.
-CqlParserListener.prototype.enterKwMergeMaxMergeCount = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwMergeMaxMergeCount.
-CqlParserListener.prototype.exitKwMergeMaxMergeCount = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRamBufferSize.
-CqlParserListener.prototype.enterKwRamBufferSize = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRamBufferSize.
-CqlParserListener.prototype.exitKwRamBufferSize = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRealtime.
-CqlParserListener.prototype.enterKwRealtime = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRealtime.
-CqlParserListener.prototype.exitKwRealtime = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRecovery.
-CqlParserListener.prototype.enterKwRecovery = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRecovery.
-CqlParserListener.prototype.exitKwRecovery = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwReindex.
-CqlParserListener.prototype.enterKwReindex = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwReindex.
-CqlParserListener.prototype.exitKwReindex = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLenient.
-CqlParserListener.prototype.enterKwLenient = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLenient.
-CqlParserListener.prototype.exitKwLenient = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwStandard.
-CqlParserListener.prototype.enterKwStandard = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwStandard.
-CqlParserListener.prototype.exitKwStandard = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwEncrypted.
-CqlParserListener.prototype.enterKwEncrypted = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwEncrypted.
-CqlParserListener.prototype.exitKwEncrypted = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwCaseSensitive.
-CqlParserListener.prototype.enterKwCaseSensitive = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwCaseSensitive.
-CqlParserListener.prototype.exitKwCaseSensitive = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwInitcond.
-CqlParserListener.prototype.enterKwInitcond = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwInitcond.
-CqlParserListener.prototype.exitKwInitcond = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwInput.
-CqlParserListener.prototype.enterKwInput = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwInput.
-CqlParserListener.prototype.exitKwInput = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwInsert.
-CqlParserListener.prototype.enterKwInsert = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwInsert.
-CqlParserListener.prototype.exitKwInsert = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwInto.
-CqlParserListener.prototype.enterKwInto = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwInto.
-CqlParserListener.prototype.exitKwInto = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwIs.
-CqlParserListener.prototype.enterKwIs = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwIs.
-CqlParserListener.prototype.exitKwIs = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwJson.
-CqlParserListener.prototype.enterKwJson = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwJson.
-CqlParserListener.prototype.exitKwJson = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwKey.
-CqlParserListener.prototype.enterKwKey = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwKey.
-CqlParserListener.prototype.exitKwKey = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwKeys.
-CqlParserListener.prototype.enterKwKeys = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwKeys.
-CqlParserListener.prototype.exitKwKeys = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwKeyspace.
-CqlParserListener.prototype.enterKwKeyspace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwKeyspace.
-CqlParserListener.prototype.exitKwKeyspace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwKeyspaces.
-CqlParserListener.prototype.enterKwKeyspaces = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwKeyspaces.
-CqlParserListener.prototype.exitKwKeyspaces = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLanguage.
-CqlParserListener.prototype.enterKwLanguage = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLanguage.
-CqlParserListener.prototype.exitKwLanguage = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLimit.
-CqlParserListener.prototype.enterKwLimit = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLimit.
-CqlParserListener.prototype.exitKwLimit = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwList.
-CqlParserListener.prototype.enterKwList = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwList.
-CqlParserListener.prototype.exitKwList = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLogged.
-CqlParserListener.prototype.enterKwLogged = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLogged.
-CqlParserListener.prototype.exitKwLogged = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLogin.
-CqlParserListener.prototype.enterKwLogin = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLogin.
-CqlParserListener.prototype.exitKwLogin = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwMaterialized.
-CqlParserListener.prototype.enterKwMaterialized = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwMaterialized.
-CqlParserListener.prototype.exitKwMaterialized = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwModify.
-CqlParserListener.prototype.enterKwModify = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwModify.
-CqlParserListener.prototype.exitKwModify = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNosuperuser.
-CqlParserListener.prototype.enterKwNosuperuser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNosuperuser.
-CqlParserListener.prototype.exitKwNosuperuser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNorecursive.
-CqlParserListener.prototype.enterKwNorecursive = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNorecursive.
-CqlParserListener.prototype.exitKwNorecursive = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNot.
-CqlParserListener.prototype.enterKwNot = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNot.
-CqlParserListener.prototype.exitKwNot = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwNull.
-CqlParserListener.prototype.enterKwNull = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwNull.
-CqlParserListener.prototype.exitKwNull = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwOf.
-CqlParserListener.prototype.enterKwOf = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwOf.
-CqlParserListener.prototype.exitKwOf = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwOn.
-CqlParserListener.prototype.enterKwOn = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwOn.
-CqlParserListener.prototype.exitKwOn = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwOptions.
-CqlParserListener.prototype.enterKwOptions = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwOptions.
-CqlParserListener.prototype.exitKwOptions = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwOr.
-CqlParserListener.prototype.enterKwOr = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwOr.
-CqlParserListener.prototype.exitKwOr = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwOrder.
-CqlParserListener.prototype.enterKwOrder = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwOrder.
-CqlParserListener.prototype.exitKwOrder = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwPassword.
-CqlParserListener.prototype.enterKwPassword = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwPassword.
-CqlParserListener.prototype.exitKwPassword = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwPrimary.
-CqlParserListener.prototype.enterKwPrimary = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwPrimary.
-CqlParserListener.prototype.exitKwPrimary = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRename.
-CqlParserListener.prototype.enterKwRename = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRename.
-CqlParserListener.prototype.exitKwRename = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwReplace.
-CqlParserListener.prototype.enterKwReplace = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwReplace.
-CqlParserListener.prototype.exitKwReplace = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwReplication.
-CqlParserListener.prototype.enterKwReplication = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwReplication.
-CqlParserListener.prototype.exitKwReplication = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwReturns.
-CqlParserListener.prototype.enterKwReturns = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwReturns.
-CqlParserListener.prototype.exitKwReturns = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRole.
-CqlParserListener.prototype.enterKwRole = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRole.
-CqlParserListener.prototype.exitKwRole = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwInternal.
-CqlParserListener.prototype.enterKwInternal = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwInternal.
-CqlParserListener.prototype.exitKwInternal = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwLdap.
-CqlParserListener.prototype.enterKwLdap = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwLdap.
-CqlParserListener.prototype.exitKwLdap = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwScheme.
-CqlParserListener.prototype.enterKwScheme = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwScheme.
-CqlParserListener.prototype.exitKwScheme = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRoles.
-CqlParserListener.prototype.enterKwRoles = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRoles.
-CqlParserListener.prototype.exitKwRoles = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSelect.
-CqlParserListener.prototype.enterKwSelect = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSelect.
-CqlParserListener.prototype.exitKwSelect = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSet.
-CqlParserListener.prototype.enterKwSet = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSet.
-CqlParserListener.prototype.exitKwSet = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSfunc.
-CqlParserListener.prototype.enterKwSfunc = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSfunc.
-CqlParserListener.prototype.exitKwSfunc = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwStorage.
-CqlParserListener.prototype.enterKwStorage = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwStorage.
-CqlParserListener.prototype.exitKwStorage = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwStype.
-CqlParserListener.prototype.enterKwStype = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwStype.
-CqlParserListener.prototype.exitKwStype = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwSuperuser.
-CqlParserListener.prototype.enterKwSuperuser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwSuperuser.
-CqlParserListener.prototype.exitKwSuperuser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTable.
-CqlParserListener.prototype.enterKwTable = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTable.
-CqlParserListener.prototype.exitKwTable = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTimestamp.
-CqlParserListener.prototype.enterKwTimestamp = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTimestamp.
-CqlParserListener.prototype.exitKwTimestamp = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTo.
-CqlParserListener.prototype.enterKwTo = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTo.
-CqlParserListener.prototype.exitKwTo = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTrigger.
-CqlParserListener.prototype.enterKwTrigger = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTrigger.
-CqlParserListener.prototype.exitKwTrigger = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTruncate.
-CqlParserListener.prototype.enterKwTruncate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTruncate.
-CqlParserListener.prototype.exitKwTruncate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwTtl.
-CqlParserListener.prototype.enterKwTtl = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwTtl.
-CqlParserListener.prototype.exitKwTtl = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwType.
-CqlParserListener.prototype.enterKwType = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwType.
-CqlParserListener.prototype.exitKwType = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwUnlogged.
-CqlParserListener.prototype.enterKwUnlogged = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwUnlogged.
-CqlParserListener.prototype.exitKwUnlogged = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwUpdate.
-CqlParserListener.prototype.enterKwUpdate = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwUpdate.
-CqlParserListener.prototype.exitKwUpdate = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwUse.
-CqlParserListener.prototype.enterKwUse = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwUse.
-CqlParserListener.prototype.exitKwUse = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwUser.
-CqlParserListener.prototype.enterKwUser = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwUser.
-CqlParserListener.prototype.exitKwUser = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwUsers.
-CqlParserListener.prototype.enterKwUsers = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwUsers.
-CqlParserListener.prototype.exitKwUsers = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwUsing.
-CqlParserListener.prototype.enterKwUsing = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwUsing.
-CqlParserListener.prototype.exitKwUsing = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwValues.
-CqlParserListener.prototype.enterKwValues = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwValues.
-CqlParserListener.prototype.exitKwValues = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwView.
-CqlParserListener.prototype.enterKwView = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwView.
-CqlParserListener.prototype.exitKwView = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwWhere.
-CqlParserListener.prototype.enterKwWhere = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwWhere.
-CqlParserListener.prototype.exitKwWhere = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwWith.
-CqlParserListener.prototype.enterKwWith = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwWith.
-CqlParserListener.prototype.exitKwWith = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#kwRevoke.
-CqlParserListener.prototype.enterKwRevoke = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#kwRevoke.
-CqlParserListener.prototype.exitKwRevoke = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#eof.
-CqlParserListener.prototype.enterEof = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#eof.
-CqlParserListener.prototype.exitEof = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketLr.
-CqlParserListener.prototype.enterSyntaxBracketLr = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketLr.
-CqlParserListener.prototype.exitSyntaxBracketLr = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketRr.
-CqlParserListener.prototype.enterSyntaxBracketRr = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketRr.
-CqlParserListener.prototype.exitSyntaxBracketRr = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketLc.
-CqlParserListener.prototype.enterSyntaxBracketLc = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketLc.
-CqlParserListener.prototype.exitSyntaxBracketLc = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketRc.
-CqlParserListener.prototype.enterSyntaxBracketRc = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketRc.
-CqlParserListener.prototype.exitSyntaxBracketRc = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketLa.
-CqlParserListener.prototype.enterSyntaxBracketLa = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketLa.
-CqlParserListener.prototype.exitSyntaxBracketLa = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketRa.
-CqlParserListener.prototype.enterSyntaxBracketRa = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketRa.
-CqlParserListener.prototype.exitSyntaxBracketRa = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketLs.
-CqlParserListener.prototype.enterSyntaxBracketLs = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketLs.
-CqlParserListener.prototype.exitSyntaxBracketLs = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxBracketRs.
-CqlParserListener.prototype.enterSyntaxBracketRs = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxBracketRs.
-CqlParserListener.prototype.exitSyntaxBracketRs = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxComma.
-CqlParserListener.prototype.enterSyntaxComma = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxComma.
-CqlParserListener.prototype.exitSyntaxComma = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#syntaxColon.
-CqlParserListener.prototype.enterSyntaxColon = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#syntaxColon.
-CqlParserListener.prototype.exitSyntaxColon = function(ctx) {
-};
-
-
-// Enter a parse tree produced by CqlParser#id.
-CqlParserListener.prototype.enterId = function(ctx) {
-};
-
-// Exit a parse tree produced by CqlParser#id.
-CqlParserListener.prototype.exitId = function(ctx) {
-};
-
-
 
 exports.CqlParserListener = CqlParserListener;

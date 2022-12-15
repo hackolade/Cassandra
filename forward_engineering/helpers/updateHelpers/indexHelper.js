@@ -7,6 +7,7 @@ const {
 	getDiffConfig, 
 	getDiffIndexProfiles,
 	isEqualIndex,
+	prepareSearchIndexProfile,
 } = require('./indexService');
 let _;
 
@@ -36,23 +37,23 @@ const setNameCollectionsScript = (keyspaceName, name, type) => {
 
 const indexSearchProperties = ['searchIndexProfiles', 'searchIndexOptions'];
 
-const getDataSearchIndex = indexTab => {
+const getDataSearchIndex = (indexTab, dbVersion) => {
 	return {
 		indexType: 'search',
 		columns: indexTab.searchIndexColumns,
 		config: indexTab.searchIndexConfig,
-		profiles: getIndexProfiles(indexTab.searchIndexProfiles),
+		profiles: getIndexProfiles(indexTab.searchIndexProfiles, dbVersion),
 		options: indexTab.searchIndexOptions,
 		ifNotExist: indexTab.searchIndexIfNotExist
 	};
 }
 
-const getModifyDataSearchIndex = (item, type) => {
+const getModifyDataSearchIndex = (item, type, dbVersion) => {
 	const itemData = [...indexSearchProperties, 'searchIndexIfNotExist', 'searchIndexColumns', 'searchIndexConfig']
 		.map(property => ([property, (item?.compMod || {})[property]?.[type]]))
 		.filter(([__, value]) => !!value);
 	item = { ...item, ...Object.fromEntries(itemData) };
-	return getDataSearchIndex(item);
+	return getDataSearchIndex(item, dbVersion);
 }
 
 const getDataForScript = (newData, oldData, isEqual = _.isEqual) => {
@@ -78,13 +79,26 @@ const getDataForScript = (newData, oldData, isEqual = _.isEqual) => {
 	}
 }
 
-const getDataForSearchIndexScript = role => {
+const getDataForSearchIndexScript = (role, dataSources, dbVersion) => {
 	const { compMod } = role;
-	const dataSearchIndex = getDataSearchIndex(role);
+	const oldIdToNameHashTable = _.get(role, 'compMod.oldIdToNameHashTable', {});
+	const columns = _.get(role, 'compMod.searchIndexColumns', {});
+	const filterColumn = column => column?.name && !column?.compositePartitionKey;
+	const oldColumns = (columns.old || [])
+		.map(column => getDataColumnIndex({ 
+			dataSources, 
+			column, 
+			allAttributes: true,
+			idToNameHashTable: oldIdToNameHashTable, 
+		}))
+		.filter(filterColumn);
+	const dataSearchIndex = getDataSearchIndex(role, dbVersion);
 	const searchIndex = _.get(role, 'compMod.searchIndex', {});
+	const newProfiles = compMod?.searchIndexProfiles?.new;
+	const oldProfiles = prepareSearchIndexProfile(compMod?.searchIndexProfiles?.old, newProfiles, oldColumns)
 	const searchPropertiesCompare = _.merge(
 		getDiffOptions(compMod?.searchIndexOptions?.old, compMod?.searchIndexOptions?.new),
-		getDiffIndexProfiles(compMod?.searchIndexProfiles?.old, compMod?.searchIndexProfiles?.new),
+		getDiffIndexProfiles(oldProfiles, newProfiles),
 	);
 
 	let dropData;
@@ -95,11 +109,11 @@ const getDataForSearchIndexScript = role => {
 	}
 
 	if (!searchIndex.old) {
-		addData = getModifyDataSearchIndex(role, 'new');
+		addData = getModifyDataSearchIndex(role, 'new', dbVersion);
 	} else if (!searchIndex.new) {
 		dropData = dataSearchIndex;
 	} else if (!_.isEmpty(searchPropertiesCompare.modifyData) || !_.isEmpty(searchPropertiesCompare.dropData)) {
-		addData = getModifyDataSearchIndex(role, 'new');
+		addData = getModifyDataSearchIndex(role, 'new', dbVersion);
 		dropData = dataSearchIndex;
 	} 
 	return {
@@ -108,8 +122,8 @@ const getDataForSearchIndexScript = role => {
 	};
 }
 
-const getFieldDataByKeyId = (dataSources, idToNameHashTable, keyId) => {
-	const fieldData = getNamesByIds([keyId], dataSources)[keyId] || {};
+const getFieldDataByKeyId = ({ dataSources, idToNameHashTable, keyId, allAttributes = false }) => {
+	const fieldData = getNamesByIds([keyId], dataSources, allAttributes)[keyId] || {};
 	if (fieldData.name) {
 		return fieldData
 	}
@@ -119,10 +133,16 @@ const getFieldDataByKeyId = (dataSources, idToNameHashTable, keyId) => {
 	return { name };
 }
 
-const getDataColumnIndex = (dataSources, idToNameHashTable, column = {}, key = 'key') => {
+const getDataColumnIndex = ({ 
+	dataSources, 
+	idToNameHashTable, 
+	column = {}, 
+	key = 'key', 
+	allAttributes = false,
+}) => {
 	setDependencies(dependencies);
 	const keyId = _.get(column, `${key}[0].keyId`, '');
-	const fieldData = getFieldDataByKeyId(dataSources, idToNameHashTable, keyId);
+	const fieldData = getFieldDataByKeyId({ dataSources, idToNameHashTable, keyId, allAttributes }) || {};
 
 	return {
 		..._.omit(column, key),
@@ -136,9 +156,11 @@ const getDataForSearchIndexColumns = (item, dataSources) => {
 	const columns = _.get(item, 'role.compMod.searchIndexColumns', {});
 	const filterColumn = column => column.name && !column.compositePartitionKey;
 	const newColumns = (columns.new || [])
-		.map(column => getDataColumnIndex(dataSources, newIdToNameHashTable, column)).filter(filterColumn);
+		.map(column => getDataColumnIndex({ dataSources, idToNameHashTable: newIdToNameHashTable, column }))
+		.filter(filterColumn);
 	const oldColumns = (columns.old || [])
-		.map(column => getDataColumnIndex(dataSources, oldIdToNameHashTable, column)).filter(filterColumn);
+		.map(column => getDataColumnIndex({ dataSources, idToNameHashTable: oldIdToNameHashTable, column }))
+		.filter(filterColumn);
 	const isEqual = (oldValue, newValue) => oldValue?.name === newValue?.name;
 	return getDataForScript(newColumns, oldColumns, isEqual);
 }
@@ -280,7 +302,7 @@ const getAddIndexScript = data => {
 const getCreatedIndex = data => {
 	const { item, dataSources, tableName, keyspaceName, isActivated, dbVersion } = data;
 	const isSearchIndex = !!item.role?.searchIndex;
-	const dataForSearchIndexScript = getDataSearchIndex(item.role || {});
+	const dataForSearchIndexScript = getDataSearchIndex(item.role || {}, dbVersion);
 
 	const script = getIndexes({
 			searchIndex: isSearchIndex && dataForSearchIndexScript,
@@ -314,7 +336,7 @@ const getDeletedIndex = data => {
 const getUpdateSearchIndexScript = data => {
 	const { item, keyspaceName, tableName, dbVersion, isActivated, dataSources } = data;
 
-	const dataForScript = getDataForSearchIndexScript(item.role);
+	const dataForScript = getDataForSearchIndexScript(item.role, dataSources, dbVersion);
 	
 	if (dataForScript.dropData || dataForScript.addData) {
 		const dropIndexSearchScript = getDropSearchIndexScript(
@@ -361,7 +383,7 @@ const prepareIndexes = (idToNameHashTable, dataSources, indexes = []) => {
 	return indexes.map(index => {
 		const secIndexesKey = _.get(index, 'SecIndxKey', []).map(key => ({
 				...key,
-				name: getFieldDataByKeyId(dataSources, idToNameHashTable, _.get(key, 'keyId'))?.name || '',
+				name: getFieldDataByKeyId({ dataSources, idToNameHashTable, keyId: _.get(key, 'keyId') })?.name || '',
 			})
 		);
 		return {

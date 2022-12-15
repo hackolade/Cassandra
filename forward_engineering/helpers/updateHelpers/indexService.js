@@ -27,6 +27,16 @@ const INDEX_CONFIG_DEFAULT = {
 	indexIfNotExist: false,
 };
 
+const SEARCH_INDEX_PROFILES_DATA_FOR_PREPARE = {
+	spaceSavingNoTextfield: {
+		mode: ['text', 'varchar'],
+	},
+	spaceSavingSlowTriePrecision: {
+		childType: ['timestamp', 'date', 'time', 'numeric', 'timeuuid'],
+		type: ['timestamp', 'date', 'time', 'numeric', 'timeuuid'],
+	},
+};
+
 const isDiff = (oldValue, newValue) => !_.isEqual(oldValue, newValue);
 
 const getModifiedProperties = (oldProperties, newProperties) => {
@@ -114,10 +124,29 @@ const isEqualIndex = (defaultData, redundantProperty) => (oldData = {}, newData 
 		isEqual && _.isEqual(newData[key], oldData[key]) ? isEqual : false, true);
 };
 
+const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumns = []) => {
+	return Object.entries(SEARCH_INDEX_PROFILES_DATA_FOR_PREPARE).reduce((oldProfiles, [profile, profileData]) => {
+		if (!newProfiles.includes(profile) || oldProfiles.includes(profile)) {
+			return oldProfiles;
+		}
+
+		const profileIsNotExist = Object.entries(profileData).reduce((profileValue, [key, keyValues]) => {
+			if (profileValue) {
+				return profileValue;
+			}
+			const keysOldColumns = oldColumns.map(column => column[key]).filter(Boolean);
+			return keyValues.some(value => keysOldColumns.includes(value));
+		}, false);
+
+		return profileIsNotExist ? oldProfiles: [...oldProfiles, profile];
+	}, oldProfiles);
+};
+
 module.exports = {
 	getDiffOptions: getDiffOptions(SEARCH_INDEX_OPTIONS_DEFAULT),
 	getDiffConfig: getDiff(SEARCH_INDEX_CONFIG_DEFAULT),
 	getDiffIndexProfiles: getDiff({}),
 	isEqualIndex: isEqualIndex(INDEX_CONFIG_DEFAULT, [...REDUNDANT_OPTIONS, ...REDUNDANT_PROPERTIES_FOR_INDEX]),
+	prepareSearchIndexProfile,
 	REDUNDANT_OPTIONS,
 }

@@ -712,6 +712,27 @@ module.exports = (_) => {
 		return result;
 	};
 
+	const transformObjectToArray = schema => Array.isArray(schema) ? schema : [schema];
+
+	const getSearchIndexProfile = schema => {
+		const fields = transformObjectToArray(schema.fields.field);
+		const fieldTypes = transformObjectToArray(schema.types.fieldType);
+		const uniqueKeys = (schema.uniqueKey || '').replace(/^\(|\)$/g, '').split(',');
+		const fieldsWithoutNoJoin = fields.filter(field => field['@_name'] !== '_partitionKey');
+		const isNotOnlyUniqueKeysHaveStrField = fieldsWithoutNoJoin
+			.some(field => !uniqueKeys.includes(field['@_name']) && field['@_type'] === 'StrField');
+		const spaceSavingSlowTriePrecision = fieldTypes.some(fieldType => fieldType['@_precisionStep'] === 0);
+		const uniqueKeysHaveStrField = fieldsWithoutNoJoin.some(field => uniqueKeys.includes(field['@_name']) && field['@_type'] === 'StrField');
+		const fieldTypesWithStrField = fieldTypes.some(fieldType => fieldType['@_name'] === 'StrField');
+		const searchIndexProfiles = {
+			spaceSavingSlowTriePrecision,
+			spaceSavingNoJoin: fields.length !== fieldsWithoutNoJoin.length,
+			spaceSavingNoTextfield: isNotOnlyUniqueKeysHaveStrField || (!uniqueKeysHaveStrField && fieldTypesWithStrField),
+		};
+
+		return Object.entries(searchIndexProfiles).filter(([___, value]) => value).map(([spaceName]) => spaceName);
+	};
+
 	const getSearchIndex = (indexData) => {
 		if (_.isEmpty(indexData)) {
 			return {};
@@ -719,8 +740,9 @@ module.exports = (_) => {
 
 		const schema = xmlParser.parse(indexData['schema'], { parseAttributeValue: true, ignoreAttributes: false }).schema;
 		const config = xmlParser.parse(indexData['config'], { parseAttributeValue: true, ignoreAttributes: false }).config;
+		const fields = transformObjectToArray(schema.fields.field);
 
-		const searchIndexColumns = schema.fields.field.filter(field => (
+		const searchIndexColumns = fields.filter(field => (
 			field['@_name'] !== schema.uniqueKey
 			&&
 			field['@_name'] !== '_partitionKey'
@@ -734,11 +756,13 @@ module.exports = (_) => {
 		});
 
 		const searchIndexConfig = getSearchIndexConfig(config);
+		const searchIndexProfiles = getSearchIndexProfile(schema);
 
 		return {
 			searchIndex: true,
 			searchIndexColumns,
 			searchIndexConfig,
+			searchIndexProfiles,
 		};
 	};
 

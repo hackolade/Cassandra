@@ -126,9 +126,13 @@ const getIsColumnInIndex = (item, columnName, data) => {
 
 	const dataSources = [itemData, data.modelDefinitions];
 	const secIndexes = _.get(item, 'role.SecIndxs', [])
-		.map(index => getDataColumnIndex(dataSources, {}, index, 'SecIndxKey')).map(index => index.name).filter(Boolean);
+		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index, key: 'SecIndxKey' }))
+		.map(index => index.name)
+		.filter(Boolean);
 	const searchIndexes = _.get(item, 'role.searchIndexColumns', [])
-		.map(index => getDataColumnIndex(dataSources, {}, index)).map(index => index.name).filter(Boolean);
+		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index }))
+		.map(index => index.name)
+		.filter(Boolean);
 	return [...searchIndexes, ...secIndexes].includes(columnName);
 };
 

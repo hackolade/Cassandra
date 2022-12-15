@@ -27,7 +27,8 @@ const getCreateTableScript = (data, isKeyspaceActivated) => {
 		udtTypeMap,
 		isKeyspaceActivated: isEntityChildrenActivated
 	});
-	const indexes = getIndexes(retrieveIndexes(data.entityData), dataSources, entityName, containerName, isEntityActivated, isKeyspaceActivated);
+	const dbVersion = data.modelData?.[0]?.dbVersion;
+	const indexes = getIndexes(retrieveIndexes(data.entityData, dbVersion), dataSources, entityName, containerName, isEntityActivated, isKeyspaceActivated, dbVersion);
 	const UDF = getUserDefinedFunctions(retrieveUDF(data.containerData));
 	const UDA = getUserDefinedAggregations(retrieveUDA(data.containerData));
 

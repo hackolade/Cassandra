@@ -3,6 +3,16 @@ const fs = require('fs');
 const path = require('path');
 const TAB_SIZE = 2;
 
+const getDataStaxVersion = (dbVersion = '') => {
+	if (!dbVersion.startsWith('DSE')) {
+		return '';
+	}
+
+	const version = dbVersion.split(' ')[1] || '';
+
+	return version.split('.')[0] || '';
+};
+
 const tab = (text, count = 1) => {
 	const space = ' '.repeat(count * TAB_SIZE);
 
@@ -21,7 +31,7 @@ const retrieveEntityName = (entityConfig) => retrivePropertyFromConfig(
 );
 const retrieveUDF = (containerConfig) => retrivePropertyFromConfig(containerConfig, 1, "UDFs", []);
 const retrieveUDA = (containerConfig) => retrivePropertyFromConfig(containerConfig, 2, "UDAs", []);
-const retrieveIndexes = (entityConfig) => {
+const retrieveIndexes = (entityConfig, dbVersion) => {
 	const indexTab = entityConfig[1];
 	const result = {
 		indexes: retrivePropertyFromConfig(entityConfig, 1, "SecIndxs", []),
@@ -32,7 +42,7 @@ const retrieveIndexes = (entityConfig) => {
 			indexType: 'search',
 			columns: indexTab.searchIndexColumns,
 			config: indexTab.searchIndexConfig,
-			profiles: getIndexProfiles(indexTab.searchIndexProfiles),
+			profiles: getIndexProfiles(indexTab.searchIndexProfiles, dbVersion),
 			options: indexTab.searchIndexOptions,
 			ifNotExist: indexTab.searchIndexIfNotExist
 		};
@@ -40,16 +50,25 @@ const retrieveIndexes = (entityConfig) => {
 
 	return result;
 };
-const getIndexProfiles = (searchIndexProfiles) => {
-	if (!Array.isArray(searchIndexProfiles)) {
-		return [searchIndexProfiles].filter(Boolean);
-	}
+
+const filterSpaceSaving = (searchIndexProfiles, profileForFilter) => searchIndexProfiles.filter(profile => !profileForFilter.includes(profile));
+
+const getIndexProfiles = (searchIndexProfiles, dbVersion) => {
+	const dataStaxVersion = getDataStaxVersion(dbVersion);
+	const spaceSavingNoTextfieldNotExist = dataStaxVersion.length ? Number(dataStaxVersion) >=6 : false;
+	const profileForFilter = [spaceSavingNoTextfieldNotExist ? "spaceSavingNoTextfield" : ''];
 	
-	const isSpaceSavingAll = [
+	searchIndexProfiles = !Array.isArray(searchIndexProfiles) ? [searchIndexProfiles].filter(Boolean) : searchIndexProfiles;
+	
+	searchIndexProfiles = filterSpaceSaving(searchIndexProfiles, profileForFilter);
+
+	const spaceSavingAll = filterSpaceSaving([
 		"spaceSavingNoJoin",
 		"spaceSavingNoTextfield",
 		"spaceSavingSlowTriePrecision"
-	].every(item => searchIndexProfiles.includes(item));
+	], profileForFilter);
+
+	const isSpaceSavingAll = spaceSavingAll.every(item => searchIndexProfiles.includes(item));
 
 	if (isSpaceSavingAll) {
 		return ['spaceSavingAll'];

@@ -99,6 +99,8 @@ module.exports = {
 				const UDF = getUserDefinedFunctions(retrieveUDF(containerData));
 				const UDA = getUserDefinedAggregations(retrieveUDA(containerData));
 
+				const dbVersion = data.modelData[0].dbVersion;
+
 				cqlScriptData.push(
 					keyspace,
 					...generalUDT
@@ -140,13 +142,13 @@ module.exports = {
 						isKeyspaceActivated,
 					});
 					const indexes = getIndexes(
-						retrieveIndexes(entityData),
+						retrieveIndexes(entityData, dbVersion),
 						dataSources,
 						entityName,
 						containerName,
 						isEntityActivated,
 						isKeyspaceActivated,
-						data.modelData[0].dbVersion
+						dbVersion
 					);
 					
 					cqlScriptData.push(...internalUdt, table, indexes);

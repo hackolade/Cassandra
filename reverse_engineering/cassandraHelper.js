@@ -712,6 +712,8 @@ module.exports = (_) => {
 		return result;
 	};
 
+	const transformObjectToArray = schema => Array.isArray(schema) ? schema : [schema];
+
 	const getSearchIndexProfile = schema => {
 		const fields = transformObjectToArray(schema.fields.field);
 		const fieldTypes = transformObjectToArray(schema.types.fieldType);

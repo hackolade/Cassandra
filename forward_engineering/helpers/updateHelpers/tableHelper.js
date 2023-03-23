@@ -17,7 +17,7 @@ const setDependencies = ({ lodash }) => _ = lodash;
 const removeColumnStatement = columnName => `DROP "${columnName}";`;
 const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type}`;
 
-const alterTablePrefix = (tableName, keySpace) => 
+const alterTablePrefix = (tableName, keySpace) =>
 	keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"`;
 
 const getAdd = addData => {
@@ -88,7 +88,7 @@ const prepareField = (field, dataSources) => {
 	};
 
 	const fieldAfterTransform = propertiesFromArrayToObj(field);
-	
+
 	return eachField(fieldAfterTransform, (field) => {
 		if (field?.type !== 'reference' || _.isEmpty(field.refIdPath)) {
 			return field;
@@ -138,7 +138,7 @@ const getTableParameter = (item, key) => {
 const addToKeysHashType = (keysHash, keys) => {
 	return Object.entries(keysHash).reduce((keysHash, [id, key]) => {
 		const type = (keys.find(key => key.keyId === id) || {}).type;
-		
+
 		return {
 			...keysHash,
 			[id]: {
@@ -149,13 +149,34 @@ const addToKeysHashType = (keysHash, keys) => {
 	}, {});
 };
 
+const deleteFalseValuesIfNotPresentInOtherColumn = (targetColumn, columnToCompare) => {
+	const targetClone = { ...targetColumn };
+
+	for (const key of Object.keys(targetClone)) {
+		if (targetClone[key] === false && !columnToCompare[key]) {
+			delete targetClone[key];
+		}
+	}
+	return targetClone;
+}
+
+const areTableKeyColumnsEqual = (column1, column2) => {
+	if (typeof column1 !== 'object' || typeof column2 !== 'object') {
+		_.isEqual(column1, column2);
+	}
+	const comparedColumn1 = deleteFalseValuesIfNotPresentInOtherColumn(column1, column2);
+	const comparedColumn2 = deleteFalseValuesIfNotPresentInOtherColumn(column2, column1);
+
+	return _.isEqual(comparedColumn1, comparedColumn2);
+}
+
 const tableKeysIsEqual = ({ newKeys = [], oldKeys =[], dataSources }) => {
 	if (newKeys.length !== oldKeys.length) {
 		return false;
 	}
 	const newKeysHash = addToKeysHashType(getNamesByIds(newKeys.map(key => key.keyId), dataSources), newKeys);
 	const oldKeysHash = addToKeysHashType(getNamesByIds(oldKeys.map(key => key.keyId), dataSources), oldKeys);
-	const difference = _.differenceWith(_.values(newKeysHash), _.values(oldKeysHash), _.isEqual);
+	const difference = _.differenceWith(_.values(newKeysHash), _.values(oldKeysHash), areTableKeyColumnsEqual);
 
 	return _.isEmpty(difference);
 };
@@ -166,15 +187,15 @@ const isTableChange = ({ item, dataSources }) => {
 	const compMod = item?.role?.compMod || {};
 	const tableProperties = ['name', 'isActivated'];
 	const { compositeClusteringKey = {}, compositePartitionKey = {} } = compMod || {};
-	const compositeClusteringKeyIsEqual = tableKeysIsEqual({ 
-		newKeys: compositeClusteringKey.new, 
-		oldKeys: compositeClusteringKey.old, 
+	const compositeClusteringKeyIsEqual = tableKeysIsEqual({
+		newKeys: compositeClusteringKey.new,
+		oldKeys: compositeClusteringKey.old,
 		dataSources,
 	});
 
-	const compositePartitionKeyIsEqual = tableKeysIsEqual({ 
-		newKeys: compositePartitionKey.new, 
-		oldKeys: compositePartitionKey.old, 
+	const compositePartitionKeyIsEqual = tableKeysIsEqual({
+		newKeys: compositePartitionKey.new,
+		oldKeys: compositePartitionKey.old,
 		dataSources,
 	});
 

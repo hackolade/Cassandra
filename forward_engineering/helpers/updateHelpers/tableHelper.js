@@ -149,21 +149,9 @@ const addToKeysHashType = (keysHash, keys) => {
 	}, {});
 };
 
-const deleteFalseValuesIfNotPresentInOtherColumn = (targetColumn, columnToCompare) => {
-	const targetClone = { ...targetColumn };
-
-	for (const key of Object.keys(targetClone)) {
-		if (targetClone[key] === false && !columnToCompare[key]) {
-			delete targetClone[key];
-		}
-	}
-	return targetClone;
-}
+const deleteFalseValuesIfNotPresentInOtherColumn = (left, right) => _.omitBy(left, (value, key) => value === false && !right[key]);
 
 const areTableKeyColumnsEqual = (column1, column2) => {
-	if (typeof column1 !== 'object' || typeof column2 !== 'object') {
-		_.isEqual(column1, column2);
-	}
 	const comparedColumn1 = deleteFalseValuesIfNotPresentInOtherColumn(column1, column2);
 	const comparedColumn2 = deleteFalseValuesIfNotPresentInOtherColumn(column2, column1);
 

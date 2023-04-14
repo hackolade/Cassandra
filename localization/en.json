@@ -10,7 +10,7 @@
 	"MAIN_MENU___REVERSE_DB_COLLECTIONS": "Cassandra Tables...",
 	"MAIN_MENU___FORWARD_DB_COLLECTIONS": "CQL of Table",
 	"MAIN_MENU___FORWARD_CHANGE_COLLECTIONS": "CQL Alter Script",
-	"MAIN_MENU___FORWARD_DB_BUCKETS": "CQL of Keyspace",
+	"MAIN_MENU___FORWARD_DB_BUCKETS": "CQL of Keyspace...",
 	"TOOLBAR___ADD_BUCKET": "Add Keyspace",
 	"TOOLBAR___ADD_COLLECTION": "Add Table",
 	"TOOLBAR___ADD_RELATIONSHIP": "Add Relationship",

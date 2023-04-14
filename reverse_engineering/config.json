@@ -1,7 +1,7 @@
 [
 	{
 		"type": "file",
-		"menu_label": "CQL File",
+		"menu_label": "CQL File...",
 		"name": "cql",
 		"extensions": [
 			"cql"

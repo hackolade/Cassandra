@@ -4,6 +4,7 @@ const { tab, eachField } = require('../generalHelper');
 const { getTypeByData } = require('../typeHelper');
 const { checkIsOldModel, fieldTypeCompatible } = require('./generalHelper');
 const { getDelete } = require('./tableHelper');
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 
 let _;
 
@@ -135,7 +136,7 @@ const getUpdateScript = (item, data, udtMap) => {
 						modified: true,
 					}
 				];
-			};
+			}
 
 			if (itemNewName && itemOldName && itemOldName !== itemNewName) {
 				const renameScript = getRenameType({

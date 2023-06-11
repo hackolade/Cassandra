@@ -20,6 +20,7 @@ const {
 	getAddTable,
 } = require('./updateHelpers/tableHelper');
 const { getUdtMap } = require('./udtHelper');
+const { AlterScriptDto } = require("./types/AlterScriptDto");
 
 let _;
 
@@ -387,6 +388,9 @@ const columns = {
 }
 
 const generateScript = (child, udtMap, data, column, mode) => {
+	if (!child) {
+		return [];
+	}
 	const getScript = columns[column];
 
 	if (Array.isArray(child) && child.length) {
@@ -429,45 +433,68 @@ const getScript = (child, udtMap, data, column, mode, options = {}) => {
 };
 
 const getAlterTableScript = (child, udtMap, data) => {
-	let alterScript = [];
+// ======= START get entities alter script
+	const addedEntities = child?.properties?.entities?.properties?.added;
+	const modifiedEntities = child?.properties?.entities?.properties?.modified;
+	const deletedEntities = child?.properties?.entities?.properties?.deleted;
+	
+	const addedEntitiesScripts = handleChange(addedEntities, udtMap, getAdd, data)
+	const modifiedEntitiesScripts = handleChange(modifiedEntities, udtMap, getUpdate, data);
+	const modifiedEntitiesScript = handleChange(deletedEntities, udtMap, getDelete, data);
+// ======= END get entities alter script
 
-	if (objectContainsProp(child, 'properties')) {
-		alterScript = mergeArrays(alterScript, getAlterTableScript(child.properties, udtMap, data));
+// ======= START get containers alter script
+    const addedContainers = child?.properties?.containers?.properties?.added;
+    const modifiedContainers = child?.properties?.containers?.properties?.modified;
+    const deletedContainers = child?.properties?.containers?.properties?.deleted;
+
+	let addedContainersScripts = [];
+	let modifiedContainersScripts = [];
+	let deletedContainersScript = [];
+	if (!data?.scriptOptions?.containers?.skipModified) {
+		addedContainersScripts = generateScript(addedContainers?.items, udtMap, data, 'containers', 'add');
+		modifiedContainersScripts = generateScript(modifiedContainers?.items, udtMap, data, 'containers', 'update');
+		deletedContainersScript = generateScript(deletedContainers?.items, udtMap, data, 'containers', 'delete');
 	}
+// ======= END get containers alter script
 
-	if (objectContainsProp(child, 'items')) {
-		alterScript = mergeArrays(alterScript, getAlterTableScript(child.items, udtMap, data));
-	}
+// ======= START get views alter script
+    const addedViews = child?.properties?.views?.properties?.added;
+    const modifiedViews = child?.properties?.views?.properties?.modified;
+    const deletedViews = child?.properties?.views?.properties?.deleted;
+		
+    const addedViewsScripts = generateScript(addedViews?.items, udtMap, data, 'views', 'add');
+    const modifiedViewsScripts = generateScript(modifiedViews?.items, udtMap, data, 'views', 'update');
+    const deletedViewsScript = generateScript(deletedViews?.items, udtMap, data, 'views', 'delete');
+// ======= END get views alter script
 
-	if (objectContainsProp(child, 'entities')) {
-		alterScript = mergeArrays(alterScript, getAlterTableScript(child.entities, udtMap, data));
-	}
+// ======= START get modelDefinitions alter script
+    const modelDefinitions = child?.properties?.modelDefinitions;
+    const sortAddedUdtResult = sortAddedUdt(modelDefinitions);
+    const addedModelDefinitions = sortAddedUdtResult?.properties?.added;
+    const modifiedModelDefinitions = sortAddedUdtResult?.properties?.modified;
+    const deletedModelDefinitions = sortAddedUdtResult?.properties?.deleted;
+	
+    // const modelDefinitionsScripts = generateScript(sortAddedUdtResult, udtMap, data, 'udt', 'add');
 
-	if (objectContainsProp(child, 'views')) {
-		alterScript = mergeArrays(alterScript, getScript(child.views, udtMap, data, 'views'));
-	}
-
-	if (objectContainsProp(child, 'containers')) {
-		alterScript = mergeArrays(alterScript, getScript(child.containers, udtMap, data, 'containers', undefined, data.scriptOptions));
-	}
-
-	if (objectContainsProp(child, 'modelDefinitions')) {
-		alterScript = mergeArrays(alterScript, getScript(sortAddedUdt(child.modelDefinitions), udtMap, data, 'udt'));
-	}
-
-	if (objectContainsProp(child, 'modified')) {
-		alterScript = mergeArrays(alterScript, handleChange(child.modified, udtMap, getUpdate, data));
-	}
-
-	if (objectContainsProp(child, 'added')) {
-		alterScript = mergeArrays(alterScript, handleChange(child.added, udtMap, getAdd, data));
-	}
-
-	if (objectContainsProp(child, 'deleted')) {
-		alterScript = mergeArrays(alterScript, handleChange(child.deleted, udtMap, getDelete, data));
-	}
-
-	return alterScript;
+    const addedModelDefinitionsScripts = generateScript(addedModelDefinitions.items, udtMap, data, 'udt', 'add');
+    const modifiedModelDefinitionsScripts = generateScript(modifiedModelDefinitions.items, udtMap, data, 'udt', 'update');
+    const deletedModelDefinitionsScript = generateScript(deletedModelDefinitions.items, udtMap, data, 'udt', 'delete');
+// ======= END get modelDefinitions alter script
+	return [
+			...modifiedEntitiesScripts,
+			...addedEntitiesScripts,
+			...modifiedEntitiesScript,
+			...addedContainersScripts,
+			...modifiedContainersScripts,
+			...deletedContainersScript,
+			...modifiedViewsScripts,
+			...addedViewsScripts,
+			...deletedViewsScript,
+			...addedModelDefinitionsScripts,
+			...modifiedModelDefinitionsScripts,
+			...deletedModelDefinitionsScript
+	];
 }
 
 const getAlterScript = (child, udtMap, data) => {

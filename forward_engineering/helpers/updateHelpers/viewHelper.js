@@ -118,7 +118,7 @@ const getModifyView = child => {
 	}];
 }
 
-const getViewScript = ({ child, data, mode }) => {
+const getViewScript = ({ child, mode }) => {
 	setDependencies(dependencies);
 	
 	if (mode === 'add') {

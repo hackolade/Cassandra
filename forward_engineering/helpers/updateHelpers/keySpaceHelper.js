@@ -5,6 +5,7 @@ const { retrivePropertyFromConfig,
 	getUserDefinedAggregations,
 	tab,
 } = require('../generalHelper');
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;

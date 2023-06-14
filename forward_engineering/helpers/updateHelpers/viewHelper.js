@@ -1,16 +1,10 @@
 const { getViewScript: generateViewScript, getOptionsScript } = require('../viewHelper');
 const { tab } = require('../generalHelper');
 const { dependencies } = require('../appDependencies');
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
-
-const scriptData = {
-	added: false,
-	deleted: false,
-	modified: false,
-	view: 'view',
-};
 
 const getViewName = (keyspaceName, nameView) => `${keyspaceName ? `"${keyspaceName}".` : ''}"${nameView}"`;
 
@@ -94,15 +88,23 @@ const getModifyView = child => {
 		const dropViewName = compMod.code?.old || compMod.name?.old;
 		const dropScript = getDropView({ ...child, role: { ...child.role, code: dropViewName }});
 		const addScript = getAddView(child);
-		return [{
-				...scriptData,
-				script: dropScript,
-				deleted: true,
-			}, {
-				...scriptData,
-				script: addScript,
-				added: true,
-			}
+		return [
+			AlterScriptDto.getInstance(
+				[dropScript],
+				true,
+				true,
+				false,
+				false,
+				'view'
+			),
+			AlterScriptDto.getInstance(
+				[addScript],
+				true,
+				false,
+				false,
+				true,
+				'view'
+			)
 		];
 	}
 	const { comments, tableOptions } = getDifferentOptions(compMod.tableOptions, compMod.comments);
@@ -111,28 +113,42 @@ const getModifyView = child => {
 		comments,
 		tableOptions
 	};
-	return [{
-		...scriptData,
-		script: getAlterView(role),
-		modified: true,
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[getAlterView(role)],
+			true,
+			false,
+			true,
+			false,
+			'view'
+		)
+	];
 }
 
 const getViewScript = ({ child, mode }) => {
 	setDependencies(dependencies);
 	
 	if (mode === 'add') {
-		return [{
-			...scriptData,
-			added: true,
-			script: getAddView(child)
-		}];
+		return [AlterScriptDto.getInstance(
+			[getAddView(child)],
+			true,
+			false,
+			false,
+			true,
+			'view'
+		)
+		];
 	} else if (mode === 'delete') {
-		return [{
-			...scriptData,
-			deleted: true,
-			script: getDropView(child)
-		}];
+		return [
+			AlterScriptDto.getInstance(
+				[getDropView(child)],
+				true,
+				true,
+				false,
+				false,
+				'view'
+			)
+		];
 	}
 	return getModifyView(child);
 }

@@ -3,6 +3,7 @@ const { getNamesByIds } = require("../schemaHelper");
 const { dependencies } = require('../appDependencies');
 const { eachField, getTableNameStatement } = require('../generalHelper');
 const { getTableStatement } = require('../tableHelper');
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 
 let _;
 
@@ -26,27 +27,33 @@ const getAdd = addData => {
 	}
 
 	const script = `${alterTablePrefix(addData.tableName, addData.keyspaceName)} ${addColumnStatement(addData.columnData)};`;
-	return [{
-		deleted: false,
-		modified: false,
-		added: true,
-		script,
-		field: 'field',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			false, 
+			false, 
+			true, 
+			'field'
+		)
+	];
 };
 
 const getDelete = deleteData => {
 	if (isScriptExists(deleteData)) {
 		return [];
-	};
+	}
 	const script = `${alterTablePrefix(deleteData.tableName, deleteData.keyspaceName)} ${removeColumnStatement(deleteData.columnData.name)}`;
-	return [{
-		added: false,
-		modified: false,
-		deleted: true,
-		script,
-		field: 'field',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			true,
+			false,
+			false,
+			'field'
+		)
+	];
 };
 
 const generateFullName = data => {
@@ -198,13 +205,16 @@ const getDeleteTable = deleteData => {
 	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
 	const script = `DROP TABLE IF EXISTS ${tableStatement};`;
 	addScriptToExistScripts(deleteData, 'deleteTable')
-	return [{
-		modified: false,
-		added: false,
-		deleted: true,
-		script,
-		table: 'table',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			true,
+			false,
+			false,
+			'table'
+		)
+	];
 };
 
 const getAddTable = (addTableData) => {
@@ -234,13 +244,16 @@ const getAddTable = (addTableData) => {
 		isKeyspaceActivated: addTableData.isKeyspaceActivated,
 	});
 	addScriptToExistScripts(addTableData, 'addTable');
-	return [{
-		deleted: false,
-		modified: false,
-		added: true,
-		script,
-		table: 'table',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			false,
+			false,
+			true,
+			'table'
+		)
+	];
 }
 
 module.exports = {

@@ -5,7 +5,7 @@ const { getDiff } = require('./tableOptionService/getDiff');
 const { parseToString } = require('./tableOptionService/parseToString');
 const { dependencies } = require('./appDependencies');
 const { getKeySpaceScript } = require('./updateHelpers/keySpaceHelper');
-const { mergeArrays, checkIsOldModel, fieldTypeCompatible } = require('./updateHelpers/generalHelper');
+const { checkIsOldModel, fieldTypeCompatible } = require('./updateHelpers/generalHelper');
 const { getViewScript } = require('./updateHelpers/viewHelper');
 const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
@@ -35,13 +35,16 @@ const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "
 const getRenameColumn = renameData => {
 	const script = 
 	`${alterTablePrefix(renameData.tableName, renameData.keyspaceName)} ${renameColumnStatement(renameData.columnData)};`;
-	return [{
-		added: false,
-		deleted: false,
-		modified: true,
-		script,
-		field: 'field',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[script],
+			true,
+			false,
+			true,
+			false,
+			'field'
+		)
+	];
 };
 const objectContainsProp = (object, key) => object[key] ? true : false;
 
@@ -92,14 +95,17 @@ const getUpdateColumnProvider = {
 			if (!isFieldTypeCompatible) {
 				return this.alterDropCreate(hydratedColumn);
 			}
-		
-			return [{
-				script: getUpdateType(dataForScript),
-				added: false,
-				deleted: false,
-				modified: true,
-				field: 'field',
-			}];
+			const script = getUpdateType(dataForScript);
+			return [
+				AlterScriptDto.getInstance(
+					[script],
+					true,
+					false,
+					true,
+					false,
+					'field'
+				)
+			];
 		} 
 
 		return this.alterDropCreate(hydratedColumn);
@@ -177,15 +183,16 @@ const getUpdateTable = updateData => {
 		const tableName = updateData.tableName || oldName || newName;
 		const optionScript = getOptionsScript(item.role?.compMod || {}, tableName, updateData.isOptionScript);
 		return [
-			{
-				added: false,
-				deleted: false,
-				modified: true,
-				script: optionScript,
-				table: 'table',
-			},
-			...indexTableScript,
-			...propertiesScript
+				AlterScriptDto.getInstance(
+					[optionScript],
+					true,
+					false,
+					true,
+					false,
+					'table'
+				),
+				...indexTableScript,
+				...propertiesScript
 		];
 	}
 		
@@ -406,34 +413,7 @@ const generateScript = (child, udtMap, data, column, mode) => {
 	return getScript({ child: item, udtMap, data, mode });
 }
 
-const getScript = (child, udtMap, data, column, mode, options = {}) => {
-	let alterScript = [];
-
-	if (objectContainsProp(child, 'properties')) {
-		alterScript = mergeArrays(alterScript, getScript(child.properties, udtMap, data, column, undefined, options));
-	}
-
-	if (objectContainsProp(child, 'modified') && !options[column]?.skipModified) {
-		alterScript = mergeArrays(alterScript, getScript(child.modified, udtMap, data, column, 'update', options));
-	}
-
-	if (objectContainsProp(child, 'added')) {
-		alterScript = mergeArrays(alterScript, getScript(child.added, udtMap, data, column, 'add', options));
-	}
-
-	if (objectContainsProp(child, 'deleted')) {
-		alterScript = mergeArrays(alterScript, getScript(child.deleted, udtMap, data, column, 'delete', options));
-	}
-
-	if (objectContainsProp(child, 'items')) {
-		alterScript = mergeArrays(alterScript, generateScript(child.items, udtMap, data, column, mode));
-	}
-
-	return alterScript;
-};
-
 const getAlterTableScript = (child, udtMap, data) => {
-// ======= START get entities alter script
 	const addedEntities = child?.properties?.entities?.properties?.added;
 	const modifiedEntities = child?.properties?.entities?.properties?.modified;
 	const deletedEntities = child?.properties?.entities?.properties?.deleted;
@@ -441,9 +421,7 @@ const getAlterTableScript = (child, udtMap, data) => {
 	const addedEntitiesScripts = handleChange(addedEntities, udtMap, getAdd, data)
 	const modifiedEntitiesScripts = handleChange(modifiedEntities, udtMap, getUpdate, data);
 	const modifiedEntitiesScript = handleChange(deletedEntities, udtMap, getDelete, data);
-// ======= END get entities alter script
 
-// ======= START get containers alter script
     const addedContainers = child?.properties?.containers?.properties?.added;
     const modifiedContainers = child?.properties?.containers?.properties?.modified;
     const deletedContainers = child?.properties?.containers?.properties?.deleted;
@@ -451,14 +429,13 @@ const getAlterTableScript = (child, udtMap, data) => {
 	let addedContainersScripts = [];
 	let modifiedContainersScripts = [];
 	let deletedContainersScript = [];
+	
 	if (!data?.scriptOptions?.containers?.skipModified) {
 		addedContainersScripts = generateScript(addedContainers?.items, udtMap, data, 'containers', 'add');
 		modifiedContainersScripts = generateScript(modifiedContainers?.items, udtMap, data, 'containers', 'update');
 		deletedContainersScript = generateScript(deletedContainers?.items, udtMap, data, 'containers', 'delete');
 	}
-// ======= END get containers alter script
-
-// ======= START get views alter script
+	
     const addedViews = child?.properties?.views?.properties?.added;
     const modifiedViews = child?.properties?.views?.properties?.modified;
     const deletedViews = child?.properties?.views?.properties?.deleted;
@@ -466,21 +443,17 @@ const getAlterTableScript = (child, udtMap, data) => {
     const addedViewsScripts = generateScript(addedViews?.items, udtMap, data, 'views', 'add');
     const modifiedViewsScripts = generateScript(modifiedViews?.items, udtMap, data, 'views', 'update');
     const deletedViewsScript = generateScript(deletedViews?.items, udtMap, data, 'views', 'delete');
-// ======= END get views alter script
 
-// ======= START get modelDefinitions alter script
-    const modelDefinitions = child?.properties?.modelDefinitions;
+	const modelDefinitions = child?.properties?.modelDefinitions;
     const sortAddedUdtResult = sortAddedUdt(modelDefinitions);
     const addedModelDefinitions = sortAddedUdtResult?.properties?.added;
     const modifiedModelDefinitions = sortAddedUdtResult?.properties?.modified;
     const deletedModelDefinitions = sortAddedUdtResult?.properties?.deleted;
 	
-    // const modelDefinitionsScripts = generateScript(sortAddedUdtResult, udtMap, data, 'udt', 'add');
-
     const addedModelDefinitionsScripts = generateScript(addedModelDefinitions.items, udtMap, data, 'udt', 'add');
     const modifiedModelDefinitionsScripts = generateScript(modifiedModelDefinitions.items, udtMap, data, 'udt', 'update');
     const deletedModelDefinitionsScript = generateScript(deletedModelDefinitions.items, udtMap, data, 'udt', 'delete');
-// ======= END get modelDefinitions alter script
+	
 	return [
 			...modifiedEntitiesScripts,
 			...addedEntitiesScripts,
@@ -494,7 +467,7 @@ const getAlterTableScript = (child, udtMap, data) => {
 			...addedModelDefinitionsScripts,
 			...modifiedModelDefinitionsScripts,
 			...deletedModelDefinitionsScript
-	];
+	].filter(Boolean);
 }
 
 const getAlterScript = (child, udtMap, data) => {
@@ -516,13 +489,19 @@ const getCommentedDropScript = (scriptsData, data) => {
 	if (applyDropStatements) {
 		return scriptsData;
 	}
-	return scriptsData.map((scriptData = {}) => {
-		if (!scriptData.deleted || !scriptData.script) {
-			return scriptData;
+	return scriptsData.map((dto = {}) => {
+		if (!dto?.scripts[0]?.isDropScript || !dto?.scripts[0]?.script) {
+			return dto;
 		}
 		return {
-			...scriptData,
-			script: commentDeactivatedStatement(scriptData.script, false),
+			...dto,
+			scripts: dto.scripts.map(scriptObject => {
+				return {
+					...scriptObject,
+					script: commentDeactivatedStatement(scriptObject.script, false)
+				}
+				
+			})
 		};
 	})
 }
@@ -530,14 +509,15 @@ const getCommentedDropScript = (scriptsData, data) => {
 const isDropInStatements = (child, udtMap, data) => {
 	setDependencies(dependencies);
 	const scriptsData = getAlterTableScript(child, udtMap, data);
-	return scriptsData.some(scriptData => !!scriptData.script && scriptData.deleted);
+	return scriptsData.flatMap(dto => dto.scripts).some(scriptData => !!scriptData.script && scriptData.isDropScript);
 }
 
-const sortScript = (scriptData) => {
-	const filterProp = (key, prop, script = {}) => script[key] && script[prop];
-	const filter = (key, scriptData, keyProp) => {
+const sortScript = (scriptDto) => {
+	const scriptData = scriptDto.flatMap(dto => dto.scripts);
+	const filterProp = (key, prop, script = {}) => script[key] && script.modelLevel === prop;
+	const filter = (scriptType, scriptData, modelLevel) => {
 		return scriptData.reduce((scripts, currentScript) => {
-			if (filterProp(key, keyProp, currentScript)) {
+			if (filterProp(scriptType, modelLevel, currentScript)) {
 				scripts.scripts.push(currentScript);
 				return scripts;
 			}
@@ -549,31 +529,31 @@ const sortScript = (scriptData) => {
 	};
 
 	const orderForScripts = [
-		['keySpaces', 'added'],
-		['keySpaces', 'modified'],
-		['view', 'deleted'],
-		['index', 'deleted'],
-		['renewal', 'deleted'],
-		['table', 'deleted'],
-		['udt', 'deleted'],
-		['udt', 'added'],
-		['udt', 'modified'],
-		['table', 'added'],
-		['table', 'modified'],
-		['field', 'deleted'],
-		['field', 'added'],
-		['field', 'modified'],
-		['index', 'added'],
-		['index', 'modified'],
-		['renewal', 'added'],
-		['view', 'added'],
-		['view', 'modified'],
-		['udf', 'deleted'],
-		['udf', 'added'],
-		['keySpaces', 'deleted'],
+		['keySpaces', 'isAddScript'],
+		['keySpaces', 'isModifyScript'],
+		['view', 'isDropScript'],
+		['index', 'isDropScript'],
+		['renewal', 'isDropScript'],
+		['table', 'isDropScript'],
+		['udt', 'isDropScript'],
+		['udt', 'isAddScript'],
+		['udt', 'isModifyScript'],
+		['table', 'isAddScript'],
+		['table', 'isModifyScript'],
+		['field', 'isDropScript'],
+		['field', 'isAddScript'],
+		['field', 'isModifyScript'],
+		['index', 'isAddScript'],
+		['index', 'isModifyScript'],
+		['renewal', 'isAddScript'],
+		['view', 'isAddScript'],
+		['view', 'isModifyScript'],
+		['udf', 'isDropScript'],
+		['udf', 'isAddScript'],
+		['keySpaces', 'isDropScript'],
 	];
-	const sortedScripts = orderForScripts.reduce((script, [key, prop]) => {
-		const { scripts, filteredScripts } = filter(prop, script.filteredScripts, key);
+	const sortedScripts = orderForScripts.reduce((script, [modelLevel, scriptType]) => {
+		const { scripts, filteredScripts } = filter(scriptType, script.filteredScripts, modelLevel);
 		return {
 			sorted: [...script.sorted, ...scripts],
 			filteredScripts

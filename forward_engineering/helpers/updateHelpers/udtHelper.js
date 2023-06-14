@@ -25,11 +25,16 @@ const getRenameType = (renameData) =>
 	`${getAlterTypePrefix(renameData.keySpaceName)}."${renameData.udtName}" 
 	RENAME "${renameData.oldFieldName}" TO "${renameData.newFieldName}";`;
 
-const getDropUDT = (dropUDTData) => ([{
-	...scriptData,
-	script: `DROP TYPE IF EXISTS "${dropUDTData.keyspaceName}"."${dropUDTData.typeName}";`,
-	deleted: true,
-}]);
+const getDropUDT = (dropUDTData) => ([
+	AlterScriptDto.getInstance(
+		[`DROP TYPE IF EXISTS "${dropUDTData.keyspaceName}"."${dropUDTData.typeName}";`], 
+		true, 
+		true,
+		false,
+		false,
+		'udt'
+	)
+]);
 
 const getUpdateType = updateTypeData => 
 	`${getAlterTypePrefix(updateTypeData.keySpaceName)}."${updateTypeData.udtName}" 
@@ -37,12 +42,14 @@ const getUpdateType = updateTypeData =>
 
 const getAddToUDT = addToUDTData => {
 	const { keySpaces, udtName, name, type } = addToUDTData;
-	return Object.keys(keySpaces).map(keySpaceName => ({
-		...scriptData,
-		added: true,
-		script:
-		`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};`
-	})
+	return Object.keys(keySpaces).map(keySpaceName => AlterScriptDto.getInstance(
+			[`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};`], 
+			true,
+			false,
+			false,
+			true,
+			'udt'
+		)
 	);
 };
 
@@ -66,11 +73,14 @@ const getAddScript = (item, udtMap) => {
 		return Object.keys(keySpaces).map(currentKeyspace => {
 			const udtName = role.code || role.name || '';
 			const script = getCreateUdt({ keySpaceName: currentKeyspace, udtName, columnScript });
-			return {
-					...scriptData,
-					added: true,
-					script
-				};
+			return AlterScriptDto.getInstance(
+				[script],
+				true,
+				false,
+				false,
+				true,
+				'udt'
+			);
 		});
 	}
 
@@ -130,11 +140,14 @@ const getUpdateScript = (item, data, udtMap) => {
 				});
 				script = [
 					...script, 
-					{
-						...scriptData,
-						script: updateTypeScript,
-						modified: true,
-					}
+					AlterScriptDto.getInstance(
+						[updateTypeScript],
+						true,
+						false,
+						true,
+						false,
+						'udt'
+					)
 				];
 			}
 
@@ -145,11 +158,17 @@ const getUpdateScript = (item, data, udtMap) => {
 					newFieldName: itemNewName,
 					udtName,
 				})
-				script = [...script, {
-					...scriptData,
-					script: renameScript,
-					modified: true,
-				}];
+				script = [
+					...script, 
+					AlterScriptDto.getInstance(
+						[renameScript],
+						true,
+						false,
+						true,
+						false,
+						'udt'
+					)
+				];
 			}
 
 			return script;

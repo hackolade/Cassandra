@@ -41,11 +41,14 @@ class AlterScriptDto {
 
     /**
      * @param scripts {Array<string>}
-     * @param isActivated {boolean}
-     * @param isDropScripts {boolean}
+     * @param isActivated {!boolean}
+     * @param isDropScripts {!boolean}
+     * @param isModifyScript {!boolean}
+     * @param isAddScript {!boolean}
+     * @param modelLevel {?string} 'field' | 'index' | 'udt'
      * @return {AlterScriptDto | undefined}
      * */
-    static getInstance(scripts, isActivated, isDropScripts) {
+    static getInstance(scripts, isActivated, isDropScripts, isModifyScript, isAddScript, modelLevel ) {
         if (!scripts?.filter(Boolean)?.length) {
             return undefined;
         }
@@ -56,6 +59,9 @@ class AlterScriptDto {
                 .map(script => ({
                     isDropScript: isDropScripts,
                     script,
+                    isModifyScript,
+                    isAddScript,
+                    modelLevel
                 }))
         }
     }

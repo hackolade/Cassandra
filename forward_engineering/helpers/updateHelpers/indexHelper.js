@@ -9,6 +9,7 @@ const {
 	isEqualIndex,
 	prepareSearchIndexProfile,
 } = require('./indexService');
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
@@ -173,11 +174,14 @@ const getSearchConfigScript = (keyspaceName, tableName, config) => {
 	const dropScript = Object.entries(config.dropData).map(([key]) => {
 		const script = alterScript +
 			tab(`DROP ${key};`);
-		return {
-			...scriptData,
-			deleted: true,
-			script,
-		};
+		return AlterScriptDto.getInstance(
+			[script],
+			true,
+			true,
+			false,
+			false,
+			'index'
+		);
 	})
 	const modifyScript = Object.entries(config.modifyData)
 		.filter(([__, value]) => typeof value !== 'string' || Boolean(value))
@@ -185,11 +189,14 @@ const getSearchConfigScript = (keyspaceName, tableName, config) => {
 			const preparedValue = _.isString(value) ? `'${value}'` : value;
 			const script = alterScript +
 				tab(`SET ${key} = ${preparedValue};`);
-			return {
-				...scriptData,
-				modified: true,
-				script,
-			};
+			return AlterScriptDto.getInstance(
+				[script],
+				true,
+				false,
+				true,
+				false,
+				'index'
+			);
 		});
 
 	return [...modifyScript, ...dropScript];
@@ -201,34 +208,51 @@ const getSearchColumnsScript = (keyspaceName, tableName, columns) => {
 		tab(`ON ${tableNameStatement}\n`);
 	
 	const getScript = (alterScript, statement, scriptType, column) => {
+		const {
+			isDropScripts = false, 
+			isModifyScript = false,
+			isAddedScript = false
+		} = scriptType;
 		const script = alterScript +
 			tab(`${statement} "${column.name}";`);
-		return {
-			...scriptData,
-			...scriptType,
-			script
-		};
+		return AlterScriptDto.getInstance(
+			[script],
+			true,
+			isDropScripts,
+			isModifyScript,
+			isAddedScript,
+			'index'
+		);
 	};
 
-	const dropSearchScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { deleted: true }));
-	const addSearchScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { modified: true }));
+	const dropSearchScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { isDropScripts: true }));
+	const addSearchScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { isModifyScript: true }));
 	if (dropSearchScripts.length) {
-		dropSearchScripts.push(getRenewalScript(keyspaceName, tableName, 'RELOAD', 'deleted'));
+		dropSearchScripts.push(getRenewalScript(keyspaceName, tableName, 'RELOAD', {isDropScripts: true}));
 	}
 
 	return { dropSearchScripts, addSearchScripts };
 }
 
-const getRenewalScript = (keyspaceName, tableName, startStatement, key = 'added') => {
+const getRenewalScript = (keyspaceName, tableName, startStatement, scriptType) => {
+	debugger;
+	const {
+		isDropScripts = false,
+		isModifyScript = false,
+		isAddScript = false
+	} = scriptType; 
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const script = `${startStatement} SEARCH INDEX\n` +
 		tab(`ON ${tableNameStatement};`);
 	
-	return {
-		renewal: true,
-		[key]: true,
-		script
-	};
+	return AlterScriptDto.getInstance(
+		[script],
+		true,
+		isDropScripts,
+      	isModifyScript,
+      	isAddScript,
+		'renewal'
+	);
 }
 
 const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
@@ -239,7 +263,15 @@ const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
 		script = `DROP SEARCH INDEX ON ${tableNameStatement};`;
 		setNameCollectionsScript(keyspaceName, tableName, 'dropSearchIndexes');
 	}
-	return [{ ...scriptData, deleted: true, script}];
+	return [AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			true, 
+			false, 
+			false,
+			'index'
+		)
+	];
 }
 
 const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.map(index => {
@@ -251,9 +283,14 @@ const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.
 		script = `DROP INDEX IF EXISTS ${tableNameStatement};`;
 		setNameCollectionsScript(keyspaceName, tableIndexName, 'dropIndexes');
 	}
-	return {
-		...scriptData, deleted: true, script,
-	};
+	return AlterScriptDto.getInstance(
+		[script], 
+		true, 
+		true, 
+		false, 
+		false,
+		'index'
+	)
 })
 
 const getAddSearchIndexScript = data => {
@@ -273,7 +310,16 @@ const getAddSearchIndexScript = data => {
 		true,
 		dbVersion
 	);
-	return [{ ...dataIndexScript, script }];
+	return [
+		AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			false,
+			false,
+			true,
+			'index'
+		)
+	];
 }
 
 const getAddIndexScript = data => {
@@ -296,7 +342,15 @@ const getAddIndexScript = data => {
 		true,
 		dbVersion
 	);
-	return [{ ...scriptData, added: true, script }];
+	return [AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			false,
+			false,
+			true,
+			'index'
+		)
+	];
 }
 
 const getCreatedIndex = data => {
@@ -315,11 +369,15 @@ const getCreatedIndex = data => {
 		true,
 		dbVersion
 	);
-	return [{
-		...scriptData,
-		added: true,
-		script,
-	}]
+	return [AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			false,
+			false,
+			true,
+			'index'
+		)
+	]
 }
 
 const getDeletedIndex = data => {
@@ -373,7 +431,7 @@ const getUpdateSearchIndexScript = data => {
 		if (!value) {
 			return scripts;
 		}
-		return [...scripts, getRenewalScript(keyspaceName, tableName, key)];
+		return [...scripts, getRenewalScript(keyspaceName, tableName, key, {isAddScript: true})];
 	}, []);
 
 	return [...configScript, ...dropSearchScripts, ...addSearchScripts, ...renewalScripts];

@@ -9,14 +9,6 @@ const { AlterScriptDto } = require("../types/AlterScriptDto");
 let _;
 
 const setDependencies = ({ lodash }) => _ = lodash;
-
-const scriptData = {
-	added: false,
-	deleted: false,
-	modified: false,
-	keySpaces: 'keySpaces',
-}
-
 const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n`;
 const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}";`;
 const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
@@ -49,7 +41,6 @@ const parser = {
 		if (result && result[1]) {
 			return result[1].trim();
 		}
-		return;
 	},
 	getName(body, regex) {
 		const result = this.getResult(body, regex);
@@ -110,15 +101,27 @@ const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData })
 	const addScript = dataForAddScript.filter(ud => Object.entries(ud).every(([key, value]) => 
 			udData['requiredProps'].includes(key) ? !!value : true
 		))
-		.map(ud => ({
-			udf: 'udf',
-			added: true,
-			script: ud[udData.functionName]
-		}));
+		.map(ud => AlterScriptDto.getInstance(
+				[ud[udData.functionName]], 
+				true, 
+				false,
+				false,
+				true,
+				'udf'
+			)
+		);
 	
 	const dropScript = dataForDropScript
 		.filter(ud => !!ud.name)
-		.map(ud => ({ udf: 'udf', script: udData.getDropScript(ud), deleted: true }));
+		.map(ud => AlterScriptDto.getInstance(
+				[udData.getDropScript(ud)], 
+				true, 
+				true,
+				false,
+				false,
+				'udf'
+			)
+		); 
 
 	return [...dropScript, ...addScript];
 }
@@ -158,19 +161,27 @@ const getKeySpaceScript = ({ child, mode }) => {
 			udaScript ? udaScript : ''
 		].filter(Boolean).join('\n\n');
 
-		return [{
-			...scriptData,
-			script,
-			added: true,
-		}];
+		return [AlterScriptDto.getInstance(
+				[script], 
+				true, 
+				false,
+				false,
+				true,
+				'keySpaces'
+			)
+		];
 	} else if (mode === 'delete') {
 		const script = getDropKeyspace(keySpaceName);
 
-		return [{
-			...scriptData,
-			script,
-			deleted: true,
-		}];
+		return [AlterScriptDto.getInstance(
+				[script], 
+				true, 
+				true,
+				false,
+				false,
+				'keySpaces'
+			)
+		];
 	} 
 	const dataForUDFScript = compMod?.UDFs || {};
 	const dataForUDAScript = compMod?.UDAs || {};
@@ -188,11 +199,17 @@ const getKeySpaceScript = ({ child, mode }) => {
 		tab(`${replication}\n`) +
 		tab(`${durableWrites};`) : '';
 
-	return [{
-		...scriptData,
-		modified: true,
-		script,
-	}, ...modifyUDAScript, ...modifyUDFScript];
+	return [AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			false,
+			true,
+			false,
+			'keySpaces'
+		), 
+		...modifyUDAScript, 
+		...modifyUDFScript
+	];
 }
 
 module.exports = {

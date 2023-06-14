@@ -39,14 +39,12 @@ const getRenameColumn = renameData => {
 		AlterScriptDto.getInstance(
 			[script],
 			true,
-			false,
-			true,
-			false,
+			'modify',
 			'field'
 		)
 	];
 };
-const objectContainsProp = (object, key) => object[key] ? true : false;
+const objectContainsProp = (object, key) => !!object[key];
 
 const isCommentNew = comment => comment && comment.new && comment.new !== comment.old;
 const getChangeOption = ({ options, comment }) => {
@@ -100,9 +98,7 @@ const getUpdateColumnProvider = {
 				AlterScriptDto.getInstance(
 					[script],
 					true,
-					false,
-					true,
-					false,
+					'modify',
 					'field'
 				)
 			];
@@ -186,9 +182,7 @@ const getUpdateTable = updateData => {
 				AlterScriptDto.getInstance(
 					[optionScript],
 					true,
-					false,
-					true,
-					false,
+					'modify',
 					'table'
 				),
 				...indexTableScript,

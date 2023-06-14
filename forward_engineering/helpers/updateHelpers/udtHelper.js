@@ -29,9 +29,7 @@ const getDropUDT = (dropUDTData) => ([
 	AlterScriptDto.getInstance(
 		[`DROP TYPE IF EXISTS "${dropUDTData.keyspaceName}"."${dropUDTData.typeName}";`], 
 		true, 
-		true,
-		false,
-		false,
+		'deletion',
 		'udt'
 	)
 ]);
@@ -45,9 +43,7 @@ const getAddToUDT = addToUDTData => {
 	return Object.keys(keySpaces).map(keySpaceName => AlterScriptDto.getInstance(
 			[`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};`], 
 			true,
-			false,
-			false,
-			true,
+			'add',
 			'udt'
 		)
 	);
@@ -76,9 +72,7 @@ const getAddScript = (item, udtMap) => {
 			return AlterScriptDto.getInstance(
 				[script],
 				true,
-				false,
-				false,
-				true,
+				'add',
 				'udt'
 			);
 		});
@@ -114,17 +108,17 @@ const getUpdateScript = (item, data, udtMap) => {
 	}
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name;
-	const script = Object.entries(properties).reduce((script, [propertyName, property]) => {
+	return Object.entries(properties).reduce((script, [propertyName, property]) => {
 		const itemOldName = _.get(property, 'compMod.oldField.name');
 		const itemNewName = _.get(property, 'compMod.newField.name');
-		const { compMod = {} } = property
+		const {compMod = {}} = property
 
 		const oldFieldType = getTypeByData(prepareField(compMod.oldField, property), udtMap, 'newField');
 		const newFieldType = getTypeByData(prepareField(compMod.newField, property), udtMap, 'oldField');
 
 		const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
 		const newScript = Object.keys(keySpaces).reduce((script, keySpaceName) => {
-			const changeType = newFieldType && 
+			const changeType = newFieldType &&
 				oldFieldType &&
 				newFieldType !== oldFieldType &&
 				fieldTypeCompatible(oldFieldType, newFieldType) &&
@@ -139,13 +133,11 @@ const getUpdateScript = (item, data, udtMap) => {
 					}
 				});
 				script = [
-					...script, 
+					...script,
 					AlterScriptDto.getInstance(
 						[updateTypeScript],
 						true,
-						false,
-						true,
-						false,
+						'modify',
 						'udt'
 					)
 				];
@@ -159,13 +151,11 @@ const getUpdateScript = (item, data, udtMap) => {
 					udtName,
 				})
 				script = [
-					...script, 
+					...script,
 					AlterScriptDto.getInstance(
 						[renameScript],
 						true,
-						false,
-						true,
-						false,
+						'modify',
 						'udt'
 					)
 				];
@@ -175,7 +165,6 @@ const getUpdateScript = (item, data, udtMap) => {
 		}, []);
 		return [...script, ...newScript];
 	}, []);
-	return script;
 };
 
 const getDeleteScript = item => {
@@ -187,7 +176,7 @@ const getDeleteScript = item => {
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name || '';
 
-	const script = Object.entries(keySpaces)
+	return Object.entries(keySpaces)
 		.reduce((script, [keyspaceName, keySpace]) => {
 			const newScript = keySpace.reduce((script, table) => {
 				const dropColumnScript = getDelete({
@@ -205,9 +194,6 @@ const getDeleteScript = item => {
 			}, []);
 			return [...script, ...newScript];
 		}, []);
-
-
-	return script;
 };
 
 const getUdtScript = ({ child, mode, data, udtMap }) => {

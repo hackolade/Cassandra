@@ -177,9 +177,7 @@ const getSearchConfigScript = (keyspaceName, tableName, config) => {
 		return AlterScriptDto.getInstance(
 			[script],
 			true,
-			true,
-			false,
-			false,
+			'deletion',
 			'index'
 		);
 	})
@@ -192,9 +190,7 @@ const getSearchConfigScript = (keyspaceName, tableName, config) => {
 			return AlterScriptDto.getInstance(
 				[script],
 				true,
-				false,
-				true,
-				false,
+				'modify',
 				'index'
 			);
 		});
@@ -207,40 +203,28 @@ const getSearchColumnsScript = (keyspaceName, tableName, columns) => {
 	const alterScript = `ALTER SEARCH INDEX SCHEMA\n` +
 		tab(`ON ${tableNameStatement}\n`);
 	
-	const getScript = (alterScript, statement, scriptType, column) => {
-		const {
-			isDropScripts = false, 
-			isModifyScript = false,
-			isAddedScript = false
-		} = scriptType;
+	const getScript = (alterScript, statement, scriptPurpose, column) => {
 		const script = alterScript +
 			tab(`${statement} "${column.name}";`);
+		
 		return AlterScriptDto.getInstance(
 			[script],
 			true,
-			isDropScripts,
-			isModifyScript,
-			isAddedScript,
+			scriptPurpose,
 			'index'
 		);
 	};
 
-	const dropSearchScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, { isDropScripts: true }));
-	const addSearchScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, { isModifyScript: true }));
+	const dropSearchScripts = (columns.dropData || []).map(getScript.bind(null, alterScript, `DROP field`, 'deletion'));
+	const addSearchScripts = (columns.addData || []).map(getScript.bind(null, alterScript, `ADD field`, 'modify'));
 	if (dropSearchScripts.length) {
-		dropSearchScripts.push(getRenewalScript(keyspaceName, tableName, 'RELOAD', {isDropScripts: true}));
+		dropSearchScripts.push(getRenewalScript(keyspaceName, tableName, 'RELOAD', 'deletion'));
 	}
 
 	return { dropSearchScripts, addSearchScripts };
 }
 
-const getRenewalScript = (keyspaceName, tableName, startStatement, scriptType) => {
-	debugger;
-	const {
-		isDropScripts = false,
-		isModifyScript = false,
-		isAddScript = false
-	} = scriptType; 
+const getRenewalScript = (keyspaceName, tableName, startStatement, scriptPurpose) => {
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const script = `${startStatement} SEARCH INDEX\n` +
 		tab(`ON ${tableNameStatement};`);
@@ -248,9 +232,7 @@ const getRenewalScript = (keyspaceName, tableName, startStatement, scriptType) =
 	return AlterScriptDto.getInstance(
 		[script],
 		true,
-		isDropScripts,
-      	isModifyScript,
-      	isAddScript,
+		scriptPurpose,
 		'renewal'
 	);
 }
@@ -266,9 +248,7 @@ const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
 	return [AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			true, 
-			false, 
-			false,
+			'deletion', 
 			'index'
 		)
 	];
@@ -284,11 +264,9 @@ const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.
 		setNameCollectionsScript(keyspaceName, tableIndexName, 'dropIndexes');
 	}
 	return AlterScriptDto.getInstance(
-		[script], 
-		true, 
-		true, 
-		false, 
-		false,
+		[script],
+		true,
+		'deletion',
 		'index'
 	)
 })
@@ -314,9 +292,7 @@ const getAddSearchIndexScript = data => {
 		AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			false,
-			false,
-			true,
+			'add',
 			'index'
 		)
 	];
@@ -345,9 +321,7 @@ const getAddIndexScript = data => {
 	return [AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			false,
-			false,
-			true,
+			'add',
 			'index'
 		)
 	];
@@ -372,9 +346,7 @@ const getCreatedIndex = data => {
 	return [AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			false,
-			false,
-			true,
+			'add',
 			'index'
 		)
 	]
@@ -431,7 +403,7 @@ const getUpdateSearchIndexScript = data => {
 		if (!value) {
 			return scripts;
 		}
-		return [...scripts, getRenewalScript(keyspaceName, tableName, key, {isAddScript: true})];
+		return [...scripts, getRenewalScript(keyspaceName, tableName, key, 'add')];
 	}, []);
 
 	return [...configScript, ...dropSearchScripts, ...addSearchScripts, ...renewalScripts];

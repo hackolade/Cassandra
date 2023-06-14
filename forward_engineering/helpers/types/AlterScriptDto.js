@@ -8,6 +8,16 @@ class ModificationScript {
      * @type boolean
      * */
     isDropScript
+
+    /**
+     * @type boolean
+     * */
+    isModifyScript
+
+    /**
+     * @type boolean
+     * */
+    isAddScript
 }
 
 class AlterScriptDto {
@@ -23,44 +33,49 @@ class AlterScriptDto {
 
     /**
      * @param scripts {Array<string>}
-     * @param isActivated {boolean}
-     * @param isDropScripts {boolean}
+     * @param isActivated {!boolean}
+     * @param scriptPurpose {string}  'deletion' | 'add' | 'modify'
+     * @param modelLevel {?string} 'index' | 'field' | 'udt' | 'renewal' | 'udf' | 'keySpaces' | 'table' | 'view'
      * @return {Array<AlterScriptDto>}
      * */
-    static getInstances(scripts, isActivated, isDropScripts) {
+    static getInstances(scripts, isActivated, scriptPurpose, modelLevel) {
         return (scripts || [])
             .filter(Boolean)
-            .map(script => ({
-                isActivated,
-                scripts: [{
-                    isDropScript: isDropScripts,
-                    script
-                }]
-            }));
+            .map(script => this.getInstance([script], isActivated, scriptPurpose, modelLevel));
     }
 
     /**
      * @param scripts {Array<string>}
      * @param isActivated {!boolean}
-     * @param isDropScripts {!boolean}
-     * @param isModifyScript {!boolean}
-     * @param isAddScript {!boolean}
-     * @param modelLevel {?string} 'field' | 'index' | 'udt'
+     * @param scriptPurpose {string}  'deletion' | 'add' | 'modify'
+     * @param modelLevel {?string} 'index' | 'field' | 'udt' | 'renewal' | 'udf' | 'keySpaces' | 'table' | 'view'
      * @return {AlterScriptDto | undefined}
      * */
-    static getInstance(scripts, isActivated, isDropScripts, isModifyScript, isAddScript, modelLevel ) {
+    static getInstance(scripts, isActivated, scriptPurpose, modelLevel ) {
         if (!scripts?.filter(Boolean)?.length) {
             return undefined;
         }
+        const scriptPurposes = {
+            deletion: false,
+            add: false,
+            modify: false
+        };
+        
+        if (scriptPurposes[scriptPurpose] === undefined) {
+            throw new Error(`Unsupported scriptPurpose provided: ${scriptPurpose}`);
+        }
+        
+        scriptPurposes[scriptPurpose] = true;
+        
         return {
             isActivated,
             scripts: scripts
                 .filter(Boolean)
                 .map(script => ({
-                    isDropScript: isDropScripts,
+                    isDropScript: scriptPurposes.deletion,
                     script,
-                    isModifyScript,
-                    isAddScript,
+                    isModifyScript: scriptPurposes.modify,
+                    isAddScript: scriptPurposes.add,
                     modelLevel
                 }))
         }

@@ -104,9 +104,7 @@ const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData })
 		.map(ud => AlterScriptDto.getInstance(
 				[ud[udData.functionName]], 
 				true, 
-				false,
-				false,
-				true,
+				'add',
 				'udf'
 			)
 		);
@@ -116,9 +114,7 @@ const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData })
 		.map(ud => AlterScriptDto.getInstance(
 				[udData.getDropScript(ud)], 
 				true, 
-				true,
-				false,
-				false,
+				'deletion',
 				'udf'
 			)
 		); 
@@ -129,11 +125,10 @@ const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData })
 const replicationProps = ['replStrategy', 'replFactory', 'dataCenters'];
 
 const getIsModifyKeysSpace = (keySpaceData, props) => {
-	const differentReplication = props.some(prop => {
-		const { new: newElements, old: oldElements } = keySpaceData[prop] || {};
+	return props.some(prop => {
+		const {new: newElements, old: oldElements} = keySpaceData[prop] || {};
 		return newElements && oldElements && !_.isEqual(newElements, oldElements);
 	});
-	return differentReplication;
 }
 
 const getKeySpaceScript = ({ child, mode }) => {
@@ -164,9 +159,7 @@ const getKeySpaceScript = ({ child, mode }) => {
 		return [AlterScriptDto.getInstance(
 				[script], 
 				true, 
-				false,
-				false,
-				true,
+				'add',
 				'keySpaces'
 			)
 		];
@@ -176,9 +169,7 @@ const getKeySpaceScript = ({ child, mode }) => {
 		return [AlterScriptDto.getInstance(
 				[script], 
 				true, 
-				true,
-				false,
-				false,
+				'deletion',
 				'keySpaces'
 			)
 		];
@@ -202,9 +193,7 @@ const getKeySpaceScript = ({ child, mode }) => {
 	return [AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			false,
-			true,
-			false,
+			'modify',
 			'keySpaces'
 		), 
 		...modifyUDAScript, 

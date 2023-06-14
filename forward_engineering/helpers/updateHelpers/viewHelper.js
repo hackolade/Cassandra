@@ -92,17 +92,13 @@ const getModifyView = child => {
 			AlterScriptDto.getInstance(
 				[dropScript],
 				true,
-				true,
-				false,
-				false,
+				'deletion',
 				'view'
 			),
 			AlterScriptDto.getInstance(
 				[addScript],
 				true,
-				false,
-				false,
-				true,
+				'add',
 				'view'
 			)
 		];
@@ -117,9 +113,7 @@ const getModifyView = child => {
 		AlterScriptDto.getInstance(
 			[getAlterView(role)],
 			true,
-			false,
-			true,
-			false,
+			'modify',
 			'view'
 		)
 	];
@@ -132,9 +126,7 @@ const getViewScript = ({ child, mode }) => {
 		return [AlterScriptDto.getInstance(
 			[getAddView(child)],
 			true,
-			false,
-			false,
-			true,
+			'add',
 			'view'
 		)
 		];
@@ -143,9 +135,7 @@ const getViewScript = ({ child, mode }) => {
 			AlterScriptDto.getInstance(
 				[getDropView(child)],
 				true,
-				true,
-				false,
-				false,
+				'deletion',
 				'view'
 			)
 		];

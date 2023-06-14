@@ -31,9 +31,7 @@ const getAdd = addData => {
 		AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			false, 
-			false, 
-			true, 
+			'add', 
 			'field'
 		)
 	];
@@ -48,9 +46,7 @@ const getDelete = deleteData => {
 		AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			true,
-			false,
-			false,
+			'deletion',
 			'field'
 		)
 	];
@@ -209,9 +205,7 @@ const getDeleteTable = deleteData => {
 		AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			true,
-			false,
-			false,
+			'deletion',
 			'table'
 		)
 	];
@@ -248,9 +242,7 @@ const getAddTable = (addTableData) => {
 		AlterScriptDto.getInstance(
 			[script], 
 			true, 
-			false,
-			false,
-			true,
+			'add',
 			'table'
 		)
 	];

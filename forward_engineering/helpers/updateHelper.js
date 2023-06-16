@@ -46,7 +46,7 @@ const getRenameColumn = renameData => {
 };
 const objectContainsProp = (object, key) => !!object[key];
 
-const isCommentNew = comment => comment && comment.new && comment.new !== comment.old;
+const isCommentNew = comment => comment?.new && comment.new !== comment.old;
 const getChangeOption = ({ options, comment }) => {
 	const optionsDiff = getDiff(options.new || {}, options.old || {});
 	const configOptionsWithValues = mergeValuesWithConfigOptions(optionsDiff);
@@ -339,11 +339,11 @@ const handleItem = (item, udtMap, generator, data) => {
 const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data, item, dataSources }) => {
 	return Object.keys(tableProperties)
 		.reduce((alterTableScript, columnName) => {
-			const property = tableProperties[columnName];
+			const property = tableProperties[columnName] || {};
 			if (generator.name !== 'getUpdate' && (property.compositePartitionKey || property.compositeClusteringKey)) {
 				return alterTableScript;
 			}
-			if (generator.name === 'getAdd' && (property || {}).hasOwnProperty('compMod')) {
+			if (generator.name === 'getAdd' && property.hasOwnProperty('compMod')) {
 				return alterTableScript;
 			}
 			let columnType = getTypeByData(property, udtMap, columnName);
@@ -406,64 +406,108 @@ const generateScript = (child, udtMap, data, column, mode) => {
 
 	return getScript({ child: item, udtMap, data, mode });
 }
-
-const getAlterTableScript = (child, udtMap, data) => {
+/**
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap {Object}
+ * @param data {Object}
+ * @returns {Array<AlterScriptDto | undefined>}
+ */
+const getEntitiesDto = (child, udtMap, data) => {
 	const addedEntities = child?.properties?.entities?.properties?.added;
 	const modifiedEntities = child?.properties?.entities?.properties?.modified;
 	const deletedEntities = child?.properties?.entities?.properties?.deleted;
-	
-	const addedEntitiesScripts = handleChange(addedEntities, udtMap, getAdd, data)
-	const modifiedEntitiesScripts = handleChange(modifiedEntities, udtMap, getUpdate, data);
-	const modifiedEntitiesScript = handleChange(deletedEntities, udtMap, getDelete, data);
 
-    const addedContainers = child?.properties?.containers?.properties?.added;
-    const modifiedContainers = child?.properties?.containers?.properties?.modified;
-    const deletedContainers = child?.properties?.containers?.properties?.deleted;
+	const addedEntitiesDto = handleChange(addedEntities, udtMap, getAdd, data)
+	const modifiedEntitiesDto = handleChange(modifiedEntities, udtMap, getUpdate, data);
+	const deletedEntitiesDto = handleChange(deletedEntities, udtMap, getDelete, data);
 
-	let addedContainersScripts = [];
-	let modifiedContainersScripts = [];
-	let deletedContainersScript = [];
-	
-	if (!data?.scriptOptions?.containers?.skipModified) {
-		addedContainersScripts = generateScript(addedContainers?.items, udtMap, data, 'containers', 'add');
-		modifiedContainersScripts = generateScript(modifiedContainers?.items, udtMap, data, 'containers', 'update');
-		deletedContainersScript = generateScript(deletedContainers?.items, udtMap, data, 'containers', 'delete');
-	}
-	
-    const addedViews = child?.properties?.views?.properties?.added;
-    const modifiedViews = child?.properties?.views?.properties?.modified;
-    const deletedViews = child?.properties?.views?.properties?.deleted;
-		
-    const addedViewsScripts = generateScript(addedViews?.items, udtMap, data, 'views', 'add');
-    const modifiedViewsScripts = generateScript(modifiedViews?.items, udtMap, data, 'views', 'update');
-    const deletedViewsScript = generateScript(deletedViews?.items, udtMap, data, 'views', 'delete');
-
-	const modelDefinitions = child?.properties?.modelDefinitions;
-    const sortAddedUdtResult = sortAddedUdt(modelDefinitions);
-    const addedModelDefinitions = sortAddedUdtResult?.properties?.added;
-    const modifiedModelDefinitions = sortAddedUdtResult?.properties?.modified;
-    const deletedModelDefinitions = sortAddedUdtResult?.properties?.deleted;
-	
-    const addedModelDefinitionsScripts = generateScript(addedModelDefinitions.items, udtMap, data, 'udt', 'add');
-    const modifiedModelDefinitionsScripts = generateScript(modifiedModelDefinitions.items, udtMap, data, 'udt', 'update');
-    const deletedModelDefinitionsScript = generateScript(deletedModelDefinitions.items, udtMap, data, 'udt', 'delete');
-	
 	return [
-			...modifiedEntitiesScripts,
-			...addedEntitiesScripts,
-			...modifiedEntitiesScript,
-			...addedContainersScripts,
-			...modifiedContainersScripts,
-			...deletedContainersScript,
-			...modifiedViewsScripts,
-			...addedViewsScripts,
-			...deletedViewsScript,
-			...addedModelDefinitionsScripts,
-			...modifiedModelDefinitionsScripts,
-			...deletedModelDefinitionsScript
-	].filter(Boolean);
+		...modifiedEntitiesDto,
+		...addedEntitiesDto,
+		...deletedEntitiesDto
+	];
 }
 
+/**
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap {Object}
+ * @param data {Object}
+ * @returns {Array<AlterScriptDto | undefined>}
+ */
+const getContainersDto = (child, udtMap, data) => {
+	const addedContainers = child?.properties?.containers?.properties?.added;
+	const modifiedContainers = child?.properties?.containers?.properties?.modified;
+	const deletedContainers = child?.properties?.containers?.properties?.deleted;
+
+	let addedContainersDto = [];
+	let modifiedContainersDto = [];
+	let deletedContainersDto = [];
+
+	if (!data?.scriptOptions?.containers?.skipModified) {
+		addedContainersDto = generateScript(addedContainers?.items, udtMap, data, 'containers', 'add');
+		modifiedContainersDto = generateScript(modifiedContainers?.items, udtMap, data, 'containers', 'update');
+		deletedContainersDto = generateScript(deletedContainers?.items, udtMap, data, 'containers', 'delete');
+	}
+	
+	return [
+		...addedContainersDto,
+		...modifiedContainersDto,
+		...deletedContainersDto
+	];
+}
+
+/**
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap {Object}
+ * @param data {Object}
+ * @returns {Array<AlterScriptDto | undefined>}
+ */
+const getViewsDto = (child, udtMap, data) => {
+	const addedViews = child?.properties?.views?.properties?.added;
+	const modifiedViews = child?.properties?.views?.properties?.modified;
+	const deletedViews = child?.properties?.views?.properties?.deleted;
+
+	const addedViewsDto = generateScript(addedViews?.items, udtMap, data, 'views', 'add');
+	const modifiedViewsDto = generateScript(modifiedViews?.items, udtMap, data, 'views', 'update');
+	const deletedViewsDto = generateScript(deletedViews?.items, udtMap, data, 'views', 'delete');
+	
+	return [
+		...modifiedViewsDto,
+		...addedViewsDto,
+		...deletedViewsDto
+	];
+}
+
+/**
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap {Object}
+ * @param data {Object}
+ * @returns {Array<AlterScriptDto | undefined>}
+ */
+const getModelDefinitionsDto = (child, udtMap, data) => {
+	const modelDefinitions = child?.properties?.modelDefinitions;
+	const sortAddedUdtResult = sortAddedUdt(modelDefinitions);
+	const addedModelDefinitions = sortAddedUdtResult?.properties?.added;
+	const modifiedModelDefinitions = sortAddedUdtResult?.properties?.modified;
+	const deletedModelDefinitions = sortAddedUdtResult?.properties?.deleted;
+
+	const addedModelDefinitionsDto = generateScript(addedModelDefinitions.items, udtMap, data, 'udt', 'add');
+	const modifiedModelDefinitionsDto = generateScript(modifiedModelDefinitions.items, udtMap, data, 'udt', 'update');
+	const deletedModelDefinitionsDto = generateScript(deletedModelDefinitions.items, udtMap, data, 'udt', 'delete');
+	
+	return [
+		...addedModelDefinitionsDto,
+		...modifiedModelDefinitionsDto,
+		...deletedModelDefinitionsDto
+	];
+}
+
+/**
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap {Object}
+ * @param data {Object}
+ * @returns {string}
+ */
 const getAlterScript = (child, udtMap, data) => {
 	setDependencies(dependencies);
 	const generalUdtTypeMap = Object.assign(
@@ -471,19 +515,31 @@ const getAlterScript = (child, udtMap, data) => {
 		udtMap,
 		getUdtMap([child])
 	);
-	let scriptData = getAlterTableScript(child, generalUdtTypeMap, data);
-	scriptData = _.uniqWith(scriptData, _.isEqual);
-	scriptData = getCommentedDropScript(scriptData, data);
-	scriptData = sortScript(scriptData);
+	let scriptDtos = [
+		...getEntitiesDto(child, generalUdtTypeMap, data),
+		...getContainersDto(child, generalUdtTypeMap, data),
+		...getViewsDto(child, generalUdtTypeMap, data),
+		...getModelDefinitionsDto(child, generalUdtTypeMap, data)
+	].filter(Boolean);
+	scriptDtos = _.uniqWith(scriptDtos, _.isEqual);
+	scriptDtos = getCommentedDropScript(scriptDtos, data);
+	const scriptData = sortScript(scriptDtos);
+	
 	return scriptData.filter(Boolean).join('\n\n');
 }
 
-const getCommentedDropScript = (scriptsData, data) => {
+/**
+ * 
+ * @param scriptDtos {Array<AlterScriptDto>}
+ * @param data
+ * @returns {Array<AlterScriptDto>}
+ */
+const getCommentedDropScript = (scriptDtos, data) => {
 	const applyDropStatements = getApplyDropStatement(data);
 	if (applyDropStatements) {
-		return scriptsData;
+		return scriptDtos;
 	}
-	return scriptsData.map((dto = {}) => {
+	return scriptDtos.map((dto = {}) => {
 		if (!dto?.scripts[0]?.isDropScript || !dto?.scripts[0]?.script) {
 			return dto;
 		}
@@ -500,10 +556,23 @@ const getCommentedDropScript = (scriptsData, data) => {
 	})
 }
 
+/**
+ * 
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap
+ * @param data
+ * @returns {boolean}
+ */
 const isDropInStatements = (child, udtMap, data) => {
-	setDependencies(dependencies);
-	const scriptsData = getAlterTableScript(child, udtMap, data);
-	return scriptsData.flatMap(dto => dto.scripts).some(scriptData => !!scriptData.script && scriptData.isDropScript);
+	return [
+		...getEntitiesDto(child, udtMap, data),
+		...getContainersDto(child, udtMap, data),
+		...getViewsDto(child, udtMap, data),
+		...getModelDefinitionsDto(child, udtMap, data)
+	]
+		.filter(Boolean)
+		.flatMap(dto => dto.scripts)
+		.some(scriptData => !!scriptData.script && scriptData.isDropScript);
 }
 
 const sortScript = (scriptDto) => {

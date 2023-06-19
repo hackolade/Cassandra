@@ -14,9 +14,6 @@ const { getEntityLevelConfig } = require('./generalHelper');
 const { parseToString, addId, addClustering } = require('./tableOptionService/parseToString');
 const { inlineComment } = require('./commentsHelper');
 const { dependencies } = require('./appDependencies');
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
 
 const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options, ifNotExist) => {
 	const items = [];
@@ -35,8 +32,6 @@ const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, prim
 };
 
 const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActivated) => {
-	setDependencies(dependencies);
-
 	const partitionKeys = getPartitionKeys(partitionKeysHash, isParentActivated);
 	const clusteringKeys = getClusteringKeys(clusteringKeysHash, isParentActivated);
 	const keys = [];
@@ -111,7 +106,7 @@ const commentDeactivatedKeys = (keysIds, keysHash, isParentActivated) => {
 		return `"${joinKeys(keysIds)}"`;
 	}
 
-	const [activatedKeys, deactivatedKeys] = _.partition(keysIds, id => keysHash[id].isActivated !== false);
+	const [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(keysIds, id => keysHash[id].isActivated !== false);
 	if (deactivatedKeys.length === 0) {
 		return `"${joinKeys(activatedKeys)}"`;
 	} else if (activatedKeys.length === 0) {
@@ -131,8 +126,6 @@ module.exports = {
 		udtTypeMap,
 		isKeyspaceActivated
 	}) {
-		setDependencies(dependencies);
-
 		const keyspaceName = retrieveContainerName(keyspaceMetaData);
 		const tableName = retrieveEntityName(tableMetaData);
 		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);

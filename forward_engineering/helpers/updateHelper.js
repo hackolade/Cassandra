@@ -22,10 +22,6 @@ const {
 const { getUdtMap } = require('./udtHelper');
 const { AlterScriptDto } = require("./types/AlterScriptDto");
 
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
-
 const getUpdateType = updateTypeData => 
 	`${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} 
 	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
@@ -125,14 +121,14 @@ const getUpdate = updateData => {
 };
 
 const getIsColumnInIndex = (item, columnName, data) => {
-	const itemData = { properties: item.properties || {}, ..._.omit(item.role || {}, ['properties']) };
+	const itemData = { properties: item.properties || {}, ...dependencies.lodash.omit(item.role || {}, ['properties']) };
 
 	const dataSources = [itemData, data.modelDefinitions];
-	const secIndexes = _.get(item, 'role.SecIndxs', [])
+	const secIndexes = dependencies.lodash.get(item, 'role.SecIndxs', [])
 		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index, key: 'SecIndxKey' }))
 		.map(index => index.name)
 		.filter(Boolean);
-	const searchIndexes = _.get(item, 'role.searchIndexColumns', [])
+	const searchIndexes = dependencies.lodash.get(item, 'role.searchIndexColumns', [])
 		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index }))
 		.map(index => index.name)
 		.filter(Boolean);
@@ -248,13 +244,13 @@ const handleItem = (item, udtMap, generator, data) => {
 		return alterTableScript;
 	}
 
-	const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
+	const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
 	const itemProperties = item.properties;
 
 	alterTableScript = Object.keys(itemProperties)
 		.reduce((alterTableScript, tableKey) => {
 			const itemCompModData = itemProperties[tableKey].role.compMod;
-			const codeName = _.get(itemProperties, `${tableKey}.role.code`, '');
+			const codeName = dependencies.lodash.get(itemProperties, `${tableKey}.role.code`, '');
 			const tableName = codeName.length ? codeName : tableKey;
 
 			if (!itemCompModData) {
@@ -282,9 +278,9 @@ const handleItem = (item, udtMap, generator, data) => {
 				data.internalDefinitions,
 				data.externalDefinitions,
 				{ properties: tableProperties },
-				{ properties: _.get(itemProperties[tableKey], 'role.properties', [])},
-				{ properties: _.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
-				{ properties: _.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) }
+				{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.properties', [])},
+				{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
+				{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) }
 			];
 
 			if (itemCompModData.created) {
@@ -349,7 +345,7 @@ const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData,
 			let columnType = getTypeByData(property, udtMap, columnName);
 			
 			if (property.$ref && !columnType) {
-				columnType = _.last(property.$ref.split('/'));
+				columnType = dependencies.lodash.last(property.$ref.split('/'));
 			}
 
 			if (!columnType) {
@@ -509,7 +505,6 @@ const getModelDefinitionsDto = (child, udtMap, data) => {
  * @returns {string}
  */
 const getAlterScript = (child, udtMap, data) => {
-	setDependencies(dependencies);
 	const generalUdtTypeMap = Object.assign(
 		{},
 		udtMap,
@@ -521,7 +516,7 @@ const getAlterScript = (child, udtMap, data) => {
 		...getViewsDto(child, generalUdtTypeMap, data),
 		...getModelDefinitionsDto(child, generalUdtTypeMap, data)
 	].filter(Boolean);
-	scriptDtos = _.uniqWith(scriptDtos, _.isEqual);
+	scriptDtos = dependencies.lodash.uniqWith(scriptDtos, dependencies.lodash.isEqual);
 	scriptDtos = getCommentedDropScript(scriptDtos, data);
 	const scriptData = sortScript(scriptDtos);
 	

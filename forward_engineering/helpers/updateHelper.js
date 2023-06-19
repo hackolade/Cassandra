@@ -28,7 +28,12 @@ const getUpdateType = updateTypeData =>
 
 const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
 
-const getRenameColumn = renameData => {
+/**
+ * 
+ * @param renameData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
+const getRenameColumnDto = renameData => {
 	const script = 
 	`${alterTablePrefix(renameData.tableName, renameData.keyspaceName)} ${renameColumnStatement(renameData.columnData)};`;
 	return [
@@ -60,6 +65,11 @@ const getCollectionName = compMod => {
 }
 
 const getUpdateColumnProvider = {
+	/**
+	 *
+	 * @param paramsObject: {Object}
+	 * @returns {[(AlterScriptDto|undefined)]}
+	 */
 	alterDropCreate({ dataForScript, oldName, newName }) {
 		const getData = columnData => ({ ...dataForScript, columnData: { ...dataForScript.columnData, ...columnData }});
 		const deletePropertyScript = getDelete(getData({ name: oldName }));
@@ -67,7 +77,12 @@ const getUpdateColumnProvider = {
 		return [...deletePropertyScript, ...addPropertyScript];
 	},
 
-	alterName(hydratedColumn) {
+	/**
+	 * 
+	 * @param hydratedColumn: {Object}
+	 * @returns {[(AlterScriptDto|undefined)]}
+	 */
+	alterNameDto(hydratedColumn) {
 		const { newName, oldName, dataForScript, property, isTypeChange } = hydratedColumn;
 		if (property.primaryKey && isTypeChange) {
 			return [];
@@ -75,9 +90,14 @@ const getUpdateColumnProvider = {
 		if (!property.primaryKey) {
 			return this.alterDropCreate(hydratedColumn);
 		}
-		return getRenameColumn({ ...dataForScript, columnData: { oldName, newName } }); 
+		return getRenameColumnDto({ ...dataForScript, columnData: { oldName, newName } }); 
 	},
 
+	/**
+	 * 
+	 * @param hydratedColumn: {Object}
+	 * @returns {[(AlterScriptDto|undefined)]}
+	 */
 	alterType(hydratedColumn) {
 		const { isOldModel, oldType, newType, dataForScript, property } = hydratedColumn;
 		if (!oldType || !newType || property.primaryKey) {
@@ -111,7 +131,7 @@ const getUpdate = updateData => {
 		return [];
 	}
 	if (hydratedColumn.isNameChange) {
-		return getUpdateColumnProvider.alterName(hydratedColumn);
+		return getUpdateColumnProvider.alterNameDto(hydratedColumn);
 	} else if (hydratedColumn.isTypeChange) {
 		return getUpdateColumnProvider.alterType(hydratedColumn);
 	}
@@ -153,9 +173,14 @@ const getPropertiesForUpdateTable = (properties = [])=> {
 		return [name, value];
 	})
 	return Object.fromEntries(newProperties);
-} 
+}
 
-const getUpdateTable = updateData => {
+/**
+ *
+ * @param updateData: {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
+const getUpdateTableDto = updateData => {
 	const { item, propertiesScript = [] } = updateData;
 	const { oldName, newName } = getCollectionName(item.role?.compMod);
 
@@ -299,7 +324,7 @@ const handleItem = (item, udtMap, generator, data) => {
 			}
 
 			if (itemCompModData.modified) {
-				const updateTableScript = getUpdateTable({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true, tableName, dataSources });
+				const updateTableScript = getUpdateTableDto({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true, tableName, dataSources });
 
 				return [...alterTableScript, ...updateTableScript];
 			}
@@ -316,7 +341,7 @@ const handleItem = (item, udtMap, generator, data) => {
 				dataSources,
 			});
 
-			const updateTableScript = getUpdateTable({ 
+			const updateTableScript = getUpdateTableDto({ 
 				item: itemProperties[tableKey], 
 				isOptionScript: generator.name === 'getUpdate',
 				propertiesScript,
@@ -406,7 +431,7 @@ const generateScript = (child, udtMap, data, column, mode) => {
  * @param child {PersistenceSchemaChild}
  * @param udtMap {Object}
  * @param data {Object}
- * @returns {Array<AlterScriptDto | undefined>}
+ * @returns {[(AlterScriptDto|undefined)]}
  */
 const getEntitiesDto = (child, udtMap, data) => {
 	const addedEntities = child?.properties?.entities?.properties?.added;
@@ -428,7 +453,7 @@ const getEntitiesDto = (child, udtMap, data) => {
  * @param child {PersistenceSchemaChild}
  * @param udtMap {Object}
  * @param data {Object}
- * @returns {Array<AlterScriptDto | undefined>}
+ * @returns {[(AlterScriptDto|undefined)]}
  */
 const getContainersDto = (child, udtMap, data) => {
 	const addedContainers = child?.properties?.containers?.properties?.added;
@@ -456,7 +481,7 @@ const getContainersDto = (child, udtMap, data) => {
  * @param child {PersistenceSchemaChild}
  * @param udtMap {Object}
  * @param data {Object}
- * @returns {Array<AlterScriptDto | undefined>}
+ * @returns {[(AlterScriptDto|undefined)]}
  */
 const getViewsDto = (child, udtMap, data) => {
 	const addedViews = child?.properties?.views?.properties?.added;
@@ -478,7 +503,7 @@ const getViewsDto = (child, udtMap, data) => {
  * @param child {PersistenceSchemaChild}
  * @param udtMap {Object}
  * @param data {Object}
- * @returns {Array<AlterScriptDto | undefined>}
+ * @returns {[(AlterScriptDto|undefined)]}
  */
 const getModelDefinitionsDto = (child, udtMap, data) => {
 	const modelDefinitions = child?.properties?.modelDefinitions;
@@ -527,7 +552,7 @@ const getAlterScript = (child, udtMap, data) => {
  * 
  * @param scriptDtos {Array<AlterScriptDto>}
  * @param data
- * @returns {Array<AlterScriptDto>}
+ * @returns {[(AlterScriptDto|undefined)]}
  */
 const getCommentedDropScript = (scriptDtos, data) => {
 	const applyDropStatements = getApplyDropStatement(data);

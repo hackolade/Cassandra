@@ -27,7 +27,7 @@ const getRenameType = (renameData) =>
 
 const getDropUDT = (dropUDTData) => ([
 	AlterScriptDto.getInstance(
-		[`DROP TYPE IF EXISTS "${dropUDTData.keyspaceName}"."${dropUDTData.typeName}";`], 
+		[dependencies.provider.dropType({keyspaceName: dropUDTData.keyspaceName, typeName: dropUDTData.typeName})],
 		true, 
 		'deletion',
 		'udt'

@@ -16,7 +16,7 @@ const {
 	isTableChange, 
 	addScriptToExistScripts,
 	getAdd,
-	getDeleteTable,
+	getDeleteTableDto,
 	getAddTable,
 } = require('./updateHelpers/tableHelper');
 const { getUdtMap } = require('./udtHelper');
@@ -26,19 +26,16 @@ const getUpdateType = updateTypeData =>
 	`${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} 
 	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
 
-const renameColumnStatement = columnData => `RENAME "${columnData.oldName}" TO "${columnData.newName}"`;
-
 /**
  * 
  * @param renameData {Object}
  * @returns {[(AlterScriptDto|undefined)]}
  */
 const getRenameColumnDto = renameData => {
-	const script = 
-	`${alterTablePrefix(renameData.tableName, renameData.keyspaceName)} ${renameColumnStatement(renameData.columnData)};`;
+	
 	return [
 		AlterScriptDto.getInstance(
-			[script],
+			[dependencies.provider.renameColumn(renameData)],
 			true,
 			'modify',
 			'field'
@@ -90,6 +87,7 @@ const getUpdateColumnProvider = {
 		if (!property.primaryKey) {
 			return this.alterDropCreate(hydratedColumn);
 		}
+		
 		return getRenameColumnDto({ ...dataForScript, columnData: { oldName, newName } }); 
 	},
 
@@ -229,7 +227,7 @@ const getUpdateTableDto = updateData => {
 		isKeyspaceActivated: true,
 		dataSources: updateData.dataSources,
 	};
-	const deleteScript = getDeleteTable({ ...data, tableName: oldName });
+	const deleteScript = getDeleteTableDto({ ...data, tableName: oldName });
 	const addScript = getAddTable({ ...data, tableName: newName});
 	return [...deleteScript, ...addScript, ...indexTableScript];
 }
@@ -290,7 +288,7 @@ const handleItem = (item, udtMap, generator, data) => {
 				const deletedIndexScript = getIndexTable(itemProperties[tableKey], data);
 				return [ 
 					...alterTableScript, 
-					...getDeleteTable({
+					...getDeleteTableDto({
 						keyspaceName,
 						tableName
 					}),

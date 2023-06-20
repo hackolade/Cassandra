@@ -3,6 +3,7 @@
 const { commentDeactivatedStatement, inlineComment } = require('./commentsHelper');
 const { tab, getTableNameStatement } = require('./generalHelper');
 const { getNamesByIds } = require('./schemaHelper');
+const {dependencies} = require("./appDependencies");
 
 const getIndexes = (indexData, dataSources, tableName, keyspaceName, isTableActivated, isKeyspaceActivated, dbVersion) => {
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
@@ -28,7 +29,7 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 		const isIndexKeyActivated = index.isActivated && isIndexColumnKeyActivated(index.SecIndxKey, dataSources);
 		const columnStatement = getIndexColumnStatement(index.SecIndxKey, dataSources);
 		if (index.indexType === 'custom') {
-			indexStatement = getCustomIndex({
+			indexStatement = dependencies.provider.createCustomIndex({
 				name: index.name,
 				tableName: tableNameStatement,
 				column: columnStatement,
@@ -37,12 +38,12 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 				ifNotExist: index.indexIfNotExist
 			});
 		} else {
-			indexStatement =  getIndex(
-				index.name,
-				tableNameStatement,
-				columnStatement,
-				index.indexIfNotExist
-			);
+			indexStatement =  dependencies.provider.createIndex({
+				name: index.name,
+				tableName: tableNameStatement,
+				column: columnStatement,
+          		ifNotExist: index.indexIfNotExist
+			});
 		}
 
 		return {
@@ -92,17 +93,6 @@ const uniqueByName = (columns) => {
 		return result.concat(column);
 	}, []);
 };
-
-const getIndex = (name, tableName, indexColumnStatement, ifNotExist) => (
-	`CREATE INDEX ${ifNotExist ? `IF NOT EXISTS ` : ``}${name ? `"${name}"` : ``}\n${tab(`ON ${tableName} (${indexColumnStatement});`)}`	
-);
-
-const getCustomIndex = ({ name, tableName, column, using, options, ifNotExist }) => (
-	`CREATE CUSTOM INDEX ${ifNotExist ? `IF NOT EXISTS ` : ``}${name ? `"${name}"` : ``}\n` +
-	`${tab(`ON ${tableName} (${column})`)}\n` +
-	`${tab(`USING '${using || 'StorageAttachedIndex'}'`)}` +
-	`${Object.keys(options).length ? '\n' + tab(`WITH OPTIONS = {\n${tab(serializeOptions(options).join(',\n'))}\n}`) : ''};`	
-);
 
 const getIndexColumnStatement = (key, dataSources) => {
 	const { name } = getNamesByIds([key.keyId], dataSources)[key.keyId] || {};
@@ -233,10 +223,8 @@ const getSearchIndex = ({ tableName, columns, index, isActivated, ifNotExist }) 
 	const config = indexConfig ? `\n${tab(`AND CONFIG ${indexConfig}`)}` : '';
 	const indexOptions = getSearchIndexOptions(index.options);
 	const options = indexOptions ? `\n${tab(`AND OPTIONS ${indexOptions}`)}` : '';
-	return `CREATE SEARCH INDEX ${ifNotExist ? `IF NOT EXISTS `:``}ON ${tableName}\n` + 
-		`${tab(`WITH COLUMNS\n${tab(columnsStatement)}`)}` + 
-		profiles + config + options +
-		';';
+	
+	return dependencies.provider.createSearchIndex({ifNotExist, tableName, columnsStatement: tab(columnsStatement, 2), profiles, config, options});
 };
 
 const getSearchIndexColumns = columns => {
@@ -357,5 +345,6 @@ const getSearchIndexOptions = (options = {}) => {
 };
 
 module.exports = {
-	getIndexes
+	getIndexes,
+	serializeOptions,
 };

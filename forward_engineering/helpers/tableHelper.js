@@ -1,7 +1,6 @@
 'use strict'
 
 const { 
-	tab,
 	retrieveContainerName,
 	retrieveEntityName,
 	retrivePropertyFromConfig,
@@ -15,6 +14,16 @@ const { parseToString, addId, addClustering } = require('./tableOptionService/pa
 const { inlineComment } = require('./commentsHelper');
 const { dependencies } = require('./appDependencies');
 
+/**
+ * 
+ * @param keyspaceName
+ * @param tableName
+ * @param columnDefinition
+ * @param primaryKeys
+ * @param options
+ * @param ifNotExist
+ * @returns {string}
+ */
 const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options, ifNotExist) => {
 	const items = [];
 
@@ -25,10 +34,14 @@ const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, prim
 	if (primaryKeys) {
 		items.push(`PRIMARY KEY (${primaryKeys})`);
 	}
-
-	return `CREATE TABLE ${ifNotExist? `IF NOT EXISTS `:``}${getTableNameStatement(keyspaceName, tableName)} (\n` + 
-		items.map(item => tab(item)).join(',\n') + '\n' +
-	`)${options};`;
+	
+	
+	return dependencies.provider.createTable({
+		ifNotExist,
+		databaseName: getTableNameStatement(keyspaceName, tableName),
+		items,
+		options
+	});
 };
 
 const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActivated) => {

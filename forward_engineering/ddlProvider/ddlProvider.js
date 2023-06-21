@@ -1,5 +1,5 @@
 const templates = require('./ddlTemplates');
-const { tab } = require("../helpers/generalHelper");
+const { tab, getTableNameStatement} = require("../helpers/generalHelper");
 const { serializeOptions } = require("../helpers/indexHelper");
 const { alterTablePrefix } = require("../helpers/updateHelpers/tableHelper");
 const { getAlterTypePrefix } = require("../helpers/updateHelpers/udtHelper");
@@ -149,6 +149,30 @@ module.exports = app => {
             return optionsStatement 
                 ? assignTemplates(templates.updateTableOptions, {alterTablePrefixStatement, optionsStatement: tab(optionsStatement)}) 
                 : '';
+        },
+
+        dropSearchIndexConfig(keyspaceName, tableName, indexName) {
+            const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+
+            return assignTemplates(templates.dropSearchIndexConfig, {tableNameStatement, indexName});
+        },
+
+        modifySearchIndex(keyspaceName, tableName, key, value) {
+            const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+
+            return assignTemplates(templates.modifySearchIndex, {tableNameStatement, key, value});
+        },
+
+        dropSearchIndex(keyspaceName, tableName) {
+            const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+
+            return assignTemplates(templates.dropSearchIndex, {tableNameStatement});
+        },
+
+        dropIndex(keyspaceName, tableName) {
+            const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
+
+            return assignTemplates(templates.dropIndex, {tableNameStatement});
         },
 
     }

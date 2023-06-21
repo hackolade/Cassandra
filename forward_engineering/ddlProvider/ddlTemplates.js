@@ -32,4 +32,12 @@ module.exports = {
 	updateType: '${alterTablePrefixStatement} \n\tALTER "${name}" TYPE "${type}";',
 
 	updateTableOptions: '${alterTablePrefixStatement}${optionsStatement};',
+
+	dropSearchIndexConfig: 'ALTER SEARCH INDEX CONFIG\n  ON ${tableNameStatement}\n    DROP ${indexName};',
+
+	modifySearchIndex: 'ALTER SEARCH INDEX CONFIG\n  ON ${tableNameStatement}\n    SET ${key} = ${value};',
+	
+	dropSearchIndex: 'DROP SEARCH INDEX ON ${tableNameStatement};',
+	
+	dropIndex: 'DROP INDEX IF EXISTS ${tableNameStatement};',
 };

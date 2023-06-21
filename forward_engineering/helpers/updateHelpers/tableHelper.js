@@ -232,8 +232,6 @@ const getAddTable = (addTableData) => {
 		isActivated: table.role.isActivated,
 	}];
 
-	// here
-	// const script = dependencies.provider.createTable(tableStatement);
 	const script = getTableStatement({
 		tableData: table,
 		tableMetaData: entityData,

@@ -163,28 +163,21 @@ const getDataForSearchIndexColumns = (item, dataSources) => {
 }
 
 const getSearchConfigScript = (keyspaceName, tableName, config) => {
-	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
-	const alterScript = `ALTER SEARCH INDEX CONFIG\n` +
-		tab(`ON ${tableNameStatement}\n`);
-	
-	const dropScript = Object.entries(config.dropData).map(([key]) => {
-		const script = alterScript +
-			tab(`DROP ${key};`);
-		return AlterScriptDto.getInstance(
-			[script],
+	const dropScript = Object.entries(config.dropData).map(([key]) => 
+		AlterScriptDto.getInstance(
+			[dependencies.provider.dropSearchIndexConfig(keyspaceName, tableName, key)],
 			true,
 			'deletion',
 			'index'
-		);
-	})
+		)
+	);
 	const modifyScript = Object.entries(config.modifyData)
 		.filter(([__, value]) => typeof value !== 'string' || Boolean(value))
 		.map(([key, value]) => {
 			const preparedValue = dependencies.lodash.isString(value) ? `'${value}'` : value;
-			const script = alterScript +
-				tab(`SET ${key} = ${preparedValue};`);
+			
 			return AlterScriptDto.getInstance(
-				[script],
+				[dependencies.provider.modifySearchIndex(keyspaceName, tableName, key, preparedValue)],
 				true,
 				'modify',
 				'index'
@@ -234,11 +227,10 @@ const getRenewalScript = (keyspaceName, tableName, startStatement, scriptPurpose
 }
 
 const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
-	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const isExistScript = checkExistsScript(keyspaceName, tableName, 'dropSearchIndexes');
 	let script = '';
 	if (!!isDrop && !isExistScript) {
-		script = `DROP SEARCH INDEX ON ${tableNameStatement};`;
+		script = dependencies.provider.dropSearchIndex(keyspaceName, tableName,)
 		setNameCollectionsScript(keyspaceName, tableName, 'dropSearchIndexes');
 	}
 	return [AlterScriptDto.getInstance(
@@ -251,12 +243,11 @@ const getDropSearchIndexScript = (keyspaceName, tableName, isDrop) => {
 }
 
 const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.map(index => {
-	const tableNameStatement = getTableNameStatement(keyspaceName, index.name);
 	const tableIndexName = `${tableName}.${index.name}`;
 	const isExistScript = checkExistsScript(keyspaceName, tableIndexName, 'dropIndexes');
 	let script = '';
 	if (index.name && !isExistScript) {
-		script = `DROP INDEX IF EXISTS ${tableNameStatement};`;
+		script = dependencies.provider.dropIndex(keyspaceName, index.name);
 		setNameCollectionsScript(keyspaceName, tableIndexName, 'dropIndexes');
 	}
 	return AlterScriptDto.getInstance(
@@ -477,7 +468,6 @@ const createDataSources = (item, data) => {
 	];
 };
 
-// here
 const getIndexTable = (item, data, tableIsChange) => {
 	const dataSources = createDataSources(item, data);
 	const tableName = item.role?.code || item.role?.name;
@@ -495,16 +485,13 @@ const getIndexTable = (item, data, tableIsChange) => {
 	}
 
 	if (compMod.created) {
-		// here 
 		return getCreatedIndex({ item, dataSources, tableName, keyspaceName, isActivated, dbVersion });
 	}
 
 	if (compMod.deleted) {
-		// here
 		return getDeletedIndex({ item, keyspaceName, tableName });
 	}
 	
-	// here
 	return getUpdateIndex({ item, keyspaceName, tableName, dataSources, isActivated, dbVersion });
 }
 

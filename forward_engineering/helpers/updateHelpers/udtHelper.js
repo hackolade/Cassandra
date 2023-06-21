@@ -1,14 +1,10 @@
 const { dependencies } = require('../appDependencies');
 const { getColumnDefinition } = require('../columnHelper');
-const { tab, eachField } = require('../generalHelper');
+const { eachField } = require('../generalHelper');
 const { getTypeByData } = require('../typeHelper');
 const { checkIsOldModel, fieldTypeCompatible } = require('./generalHelper');
 const { getDelete } = require('./tableHelper');
 const { AlterScriptDto } = require("../types/AlterScriptDto");
-
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
 
 const DEFAULT_KEY_SPACE = { 'Default_Keyspace': [] };
 
@@ -34,14 +30,11 @@ const getDropUDT = (dropUDTData) => ([
 	)
 ]);
 
-const getUpdateType = updateTypeData => 
-	`${getAlterTypePrefix(updateTypeData.keySpaceName)}."${updateTypeData.udtName}" 
-	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
-
 const getAddToUDT = addToUDTData => {
 	const { keySpaces, udtName, name, type } = addToUDTData;
+	
 	return Object.keys(keySpaces).map(keySpaceName => AlterScriptDto.getInstance(
-			[`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};`], 
+			[dependencies.provider.addPropertyToUdt({keySpaceName, udtName, name, type})], 
 			true,
 			'add',
 			'udt'
@@ -49,14 +42,9 @@ const getAddToUDT = addToUDTData => {
 	);
 };
 
-const getCreateUdt = (createData) => 
-	`CREATE TYPE IF NOT EXISTS "${createData.keySpaceName}"."${createData.udtName}" (\n` +
-	`${tab(createData.columnScript)} \n` + 
-	');' ;
-
 const getKeySpaces = role => {
 	const keySpaces = role.compMod?.bucketsWithCurrentDefinition;
-	return !_.isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
+	return !dependencies.lodash.isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
 };
 
 const getAddScript = (item, udtMap) => {
@@ -68,9 +56,9 @@ const getAddScript = (item, udtMap) => {
 
 		return Object.keys(keySpaces).map(currentKeyspace => {
 			const udtName = role.code || role.name || '';
-			const script = getCreateUdt({ keySpaceName: currentKeyspace, udtName, columnScript });
+			
 			return AlterScriptDto.getInstance(
-				[script],
+				[dependencies.provider.createUdt({ keySpaceName: currentKeyspace, udtName, columnScript })],
 				true,
 				'add',
 				'udt'
@@ -109,14 +97,14 @@ const getUpdateScript = (item, data, udtMap) => {
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name;
 	return Object.entries(properties).reduce((script, [propertyName, property]) => {
-		const itemOldName = _.get(property, 'compMod.oldField.name');
-		const itemNewName = _.get(property, 'compMod.newField.name');
+		const itemOldName = dependencies.lodash.get(property, 'compMod.oldField.name');
+		const itemNewName = dependencies.lodash.get(property, 'compMod.newField.name');
 		const {compMod = {}} = property
 
 		const oldFieldType = getTypeByData(prepareField(compMod.oldField, property), udtMap, 'newField');
 		const newFieldType = getTypeByData(prepareField(compMod.newField, property), udtMap, 'oldField');
 
-		const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
+		const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
 		const newScript = Object.keys(keySpaces).reduce((script, keySpaceName) => {
 			const changeType = newFieldType &&
 				oldFieldType &&
@@ -124,7 +112,7 @@ const getUpdateScript = (item, data, udtMap) => {
 				fieldTypeCompatible(oldFieldType, newFieldType) &&
 				isOldModel;
 			if (changeType) {
-				const updateTypeScript = getUpdateType({
+				const updateTypeScript = dependencies.provider.updateType({
 					keySpaceName,
 					udtName,
 					columnData: {
@@ -197,8 +185,6 @@ const getDeleteScript = item => {
 };
 
 const getUdtScript = ({ child, mode, data, udtMap }) => {
-	setDependencies(dependencies);
-
 	if (mode === 'add') {
 		return getAddScript(child, udtMap);
 	} else if (mode === 'update') {
@@ -209,7 +195,6 @@ const getUdtScript = ({ child, mode, data, udtMap }) => {
 };
 
 const sortAddedUdt = udt => {
-	setDependencies(dependencies);
 	const items = udt.properties.added?.items;
 	if (!items || !Array.isArray(items)) {
 		return udt;
@@ -220,7 +205,7 @@ const sortAddedUdt = udt => {
 		return child.compMod?.created;
 	});
 
-	const otherUdt = _.xorWith(items, createdUdt, _.isEqual);
+	const otherUdt = dependencies.lodash.xorWith(items, createdUdt, dependencies.lodash.isEqual);
 	createdUdt = createdUdt.map(item => {
 		const itemName = Object.keys(item.properties)[0];
 		return [ itemName, item ];
@@ -268,5 +253,6 @@ const sortAddedUdt = udt => {
 
 module.exports = {
 	getUdtScript,
-	sortAddedUdt
+	sortAddedUdt,
+	getAlterTypePrefix,
 }

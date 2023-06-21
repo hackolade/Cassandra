@@ -203,11 +203,10 @@ const getDeleteTableDto = deleteData => {
 		return [];
 	}
 	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-	const script = dependencies.provider.dropTable(tableStatement);
 	addScriptToExistScripts(deleteData, 'deleteTable')
 	return [
 		AlterScriptDto.getInstance(
-			[script], 
+			[dependencies.provider.dropTable(tableStatement)], 
 			true, 
 			'deletion',
 			'table'

@@ -20,4 +20,10 @@ module.exports = {
 	addEntity: '${alterTablePrefixStatement} ADD "${name}" ${type};',
 
 	deleteEntity: '${alterTablePrefixStatement} DROP "${name}";',
+
+	addPropertyToUdt: '${alterTypePrefixStatement}."${udtName}" ADD "${name}" ${type};',
+
+	createUdt: 'CREATE TYPE IF NOT EXISTS "${keySpaceName}"."${udtName}" (\n${columnScript} \n);',
+
+	updateType: '${alterTypePrefixStatement}."${udtName}"\nALTER "${name}" TYPE ${type};',
 };

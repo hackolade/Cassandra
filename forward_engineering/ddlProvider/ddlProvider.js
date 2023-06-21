@@ -2,6 +2,7 @@ const templates = require('./ddlTemplates');
 const { tab } = require("../helpers/generalHelper");
 const { serializeOptions } = require("../helpers/indexHelper");
 const { alterTablePrefix } = require("../helpers/updateHelpers/tableHelper");
+const {getAlterTypePrefix} = require("../helpers/updateHelpers/udtHelper");
 
 module.exports = app => {
     const {assignTemplates} = app.require('@hackolade/ddl-fe-utils');
@@ -94,14 +95,24 @@ module.exports = app => {
             return assignTemplates(templates.deleteEntity, {alterTablePrefixStatement, name: columnData.name});
         },
 
+        addPropertyToUdt(modelData) {
+            const { keySpaceName, udtName, name, type } = modelData;
+            const alterTypePrefixStatement = getAlterTypePrefix(keySpaceName);
 
-        alterSerDeProperties({properties, serDe, name}) {
-            if (!name || !serDe) {
-                return '';
-            }
-            const serDeProperties = properties ? assignTemplates(templates.serDeProperties, {properties}) : '';
+            return assignTemplates(templates.addPropertyToUdt, {alterTypePrefixStatement, udtName, name, type});
+        },
 
-            return assignTemplates(templates.alterSerDeProperties, {name, serDeProperties, serDe});
+        createUdt(modelData) {
+            const { keySpaceName, udtName, columnScript } = modelData;
+
+            return assignTemplates(templates.createUdt, {keySpaceName, udtName, columnScript: tab(columnScript)});
+        },
+
+        updateType(modelData) {
+            const { keySpaceName, udtName, columnData } = modelData;
+            const alterTypePrefixStatement = getAlterTypePrefix(keySpaceName);
+
+            return assignTemplates(templates.updateType, {alterTypePrefixStatement, udtName, name: columnData.name, type: columnData.type});
         },
     }
 };

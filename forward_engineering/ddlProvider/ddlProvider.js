@@ -114,5 +114,12 @@ module.exports = app => {
 
             return assignTemplates(templates.updateType, {alterTypePrefixStatement, udtName, name: columnData.name, type: columnData.type});
         },
+
+        renameType(modelData) {
+            const { keySpaceName, udtName, oldFieldName, newFieldName } = modelData;
+            const alterTypePrefixStatement = getAlterTypePrefix(keySpaceName);
+
+            return assignTemplates(templates.renameType, {alterTypePrefixStatement, udtName, oldFieldName, newFieldName});
+        },
     }
 };

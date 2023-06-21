@@ -17,10 +17,6 @@ const scriptData = {
 
 const getAlterTypePrefix = keySpaceName => `ALTER TYPE "${keySpaceName}"`;
 
-const getRenameType = (renameData) => 
-	`${getAlterTypePrefix(renameData.keySpaceName)}."${renameData.udtName}" 
-	RENAME "${renameData.oldFieldName}" TO "${renameData.newFieldName}";`;
-
 const getDropUDT = (dropUDTData) => ([
 	AlterScriptDto.getInstance(
 		[dependencies.provider.dropType({keyspaceName: dropUDTData.keyspaceName, typeName: dropUDTData.typeName})],
@@ -132,12 +128,13 @@ const getUpdateScript = (item, data, udtMap) => {
 			}
 
 			if (itemNewName && itemOldName && itemOldName !== itemNewName) {
-				const renameScript = getRenameType({
+				const renameScript = dependencies.provider.renameType({
 					keySpaceName,
 					oldFieldName: itemOldName,
 					newFieldName: itemNewName,
 					udtName,
-				})
+				});
+				
 				script = [
 					...script,
 					AlterScriptDto.getInstance(

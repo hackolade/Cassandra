@@ -25,7 +25,11 @@ module.exports = {
 
 	createUdt: 'CREATE TYPE IF NOT EXISTS "${keySpaceName}"."${udtName}" (\n${columnScript} \n);',
 
-	updateType: '${alterTypePrefixStatement}."${udtName}"\nALTER "${name}" TYPE ${type};',
+	updateUdtType: '${alterTypePrefixStatement}."${udtName}"\nALTER "${name}" TYPE ${type};',
 	
 	renameType: '${alterTypePrefixStatement}."${udtName}" \n\tRENAME "${oldFieldName}" TO "${newFieldName}";',
+
+	updateType: '${alterTablePrefixStatement} \n\tALTER "${name}" TYPE "${type}";',
+
+	updateTableOptions: '${alterTablePrefixStatement}${optionsStatement};',
 };

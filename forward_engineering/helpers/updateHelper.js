@@ -10,7 +10,6 @@ const { getViewScript } = require('./updateHelpers/viewHelper');
 const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
 const { 
-	alterTablePrefix, 
 	getDelete, 
 	hydrateColumn, 
 	isTableChange, 
@@ -21,10 +20,6 @@ const {
 } = require('./updateHelpers/tableHelper');
 const { getUdtMap } = require('./udtHelper');
 const { AlterScriptDto } = require("./types/AlterScriptDto");
-
-const getUpdateType = updateTypeData => 
-	`${alterTablePrefix(updateTypeData.tableName, updateTypeData.keySpace)} 
-	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
 
 /**
  * 
@@ -43,15 +38,6 @@ const getRenameColumnDto = renameData => {
 	];
 };
 const objectContainsProp = (object, key) => !!object[key];
-
-const isCommentNew = comment => comment?.new && comment.new !== comment.old;
-const getChangeOption = ({ options, comment }) => {
-	const optionsDiff = getDiff(options.new || {}, options.old || {});
-	const configOptionsWithValues = mergeValuesWithConfigOptions(optionsDiff);
-	return isCommentNew(comment)
-		? parseToString(configOptionsWithValues, comment.new)
-		: parseToString(configOptionsWithValues);
-};
 
 const getCollectionName = compMod => {
 	const { collectionName = {}, code = {} } = compMod;
@@ -107,10 +93,10 @@ const getUpdateColumnProvider = {
 			if (!isFieldTypeCompatible) {
 				return this.alterDropCreate(hydratedColumn);
 			}
-			const script = getUpdateType(dataForScript);
+			
 			return [
 				AlterScriptDto.getInstance(
-					[script],
+					[dependencies.provider.updateType(dataForScript)],
 					true,
 					'modify',
 					'field'
@@ -122,6 +108,11 @@ const getUpdateColumnProvider = {
 	}
 };
 
+/**
+ * 
+ * @param updateData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getUpdate = updateData => {
 	const hydratedColumn = hydrateColumn(updateData);
 	const { newName, oldName } = hydratedColumn;
@@ -196,10 +187,10 @@ const getUpdateTableDto = updateData => {
 
 	if (!tableIsChange) {
 		const tableName = updateData.tableName || oldName || newName;
-		const optionScript = getOptionsScript(item.role?.compMod || {}, tableName, updateData.isOptionScript);
+		
 		return [
 				AlterScriptDto.getInstance(
-					[optionScript],
+					[dependencies.provider.updateTableOptions(item.role?.compMod || {}, tableName, updateData.isOptionScript)],
 					true,
 					'modify',
 					'table'
@@ -232,32 +223,27 @@ const getUpdateTableDto = updateData => {
 	return [...deleteScript, ...addScript, ...indexTableScript];
 }
 
-const getOptionsScript = (compMod, tableName, isGetOptionScript) => {
-	if (!isGetOptionScript || !compMod || !compMod.tableOptions) {
-		return '';
-	}
-	
-	const script = getChangeOption({
-		options: compMod.tableOptions,
-		comment: compMod.comments
-	});
-
-	return script ? `${alterTablePrefix(tableName, compMod.keyspaceName)}${tab(script)};` : '';
-}
-
+/**
+ * 
+ * @param child {Object}
+ * @param udtMap {Object}
+ * @param generator {Object}
+ * @param data {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const handleChange = (child, udtMap, generator, data) => {
-	let alterTableScript = [];
+	let alterTableScriptDto = [];
 
 	if (objectContainsProp(child, 'items') && child.items.length) {
 		const alterScript = child.items.reduce((result, current) => {
 			return result.concat(handleItem(current, udtMap, generator, data));
 		}, []);
-		alterTableScript = alterTableScript.concat(alterScript);
+		alterTableScriptDto = alterTableScriptDto.concat(alterScript);
 	} else if (objectContainsProp(child, 'items')) {
-		alterTableScript = alterTableScript.concat(handleItem(child.items, udtMap, generator, data));
+		alterTableScriptDto = alterTableScriptDto.concat(handleItem(child.items, udtMap, generator, data));
 	}
 
-	return alterTableScript;
+	return alterTableScriptDto;
 }
 
 const handleItem = (item, udtMap, generator, data) => {

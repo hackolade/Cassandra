@@ -2,7 +2,10 @@ const templates = require('./ddlTemplates');
 const { tab } = require("../helpers/generalHelper");
 const { serializeOptions } = require("../helpers/indexHelper");
 const { alterTablePrefix } = require("../helpers/updateHelpers/tableHelper");
-const {getAlterTypePrefix} = require("../helpers/updateHelpers/udtHelper");
+const { getAlterTypePrefix } = require("../helpers/updateHelpers/udtHelper");
+const { getDiff } = require("../helpers/tableOptionService/getDiff");
+const { mergeValuesWithConfigOptions } = require("../helpers/tableHelper");
+const { parseToString } = require("../helpers/tableOptionService/parseToString");
 
 module.exports = app => {
     const {assignTemplates} = app.require('@hackolade/ddl-fe-utils');
@@ -108,7 +111,7 @@ module.exports = app => {
             return assignTemplates(templates.createUdt, {keySpaceName, udtName, columnScript: tab(columnScript)});
         },
 
-        updateType(modelData) {
+        updateUdtType(modelData) {
             const { keySpaceName, udtName, columnData } = modelData;
             const alterTypePrefixStatement = getAlterTypePrefix(keySpaceName);
 
@@ -121,5 +124,32 @@ module.exports = app => {
 
             return assignTemplates(templates.renameType, {alterTypePrefixStatement, udtName, oldFieldName, newFieldName});
         },
+
+        updateType(modelData) {
+            const {  tableName, keyspaceName, columnData } = modelData;
+            const alterTablePrefixStatement = alterTablePrefix(tableName, keyspaceName);
+
+            return assignTemplates(templates.updateType, {alterTablePrefixStatement, name: columnData.name, type: columnData.type});
+        },
+
+        updateTableOptions(compMod, tableName, isGetOptionScript) {
+            if (!isGetOptionScript || !compMod || !compMod.tableOptions) {
+                return '';
+            }
+            const { keyspaceName, tableOptions, comments } = compMod;
+            const isCommentNew = comment => comment?.new && comment.new !== comment.old;
+            const alterTablePrefixStatement = alterTablePrefix(tableName, keyspaceName);
+
+            const optionsDiff = getDiff(tableOptions.new || {}, tableOptions.old || {});
+            const configOptionsWithValues = mergeValuesWithConfigOptions(optionsDiff);
+            const optionsStatement = isCommentNew(comments)
+                ? parseToString(configOptionsWithValues, comments.new)
+                : parseToString(configOptionsWithValues);
+            
+            return optionsStatement 
+                ? assignTemplates(templates.updateTableOptions, {alterTablePrefixStatement, optionsStatement: tab(optionsStatement)}) 
+                : '';
+        },
+
     }
 };

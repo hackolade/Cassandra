@@ -15,8 +15,18 @@ const scriptData = {
 	udt: 'udt',
 };
 
+/**
+ * 
+ * @param keySpaceName {String}
+ * @returns {`ALTER TYPE "${string}"`}
+ */
 const getAlterTypePrefix = keySpaceName => `ALTER TYPE "${keySpaceName}"`;
 
+/**
+ * 
+ * @param dropUDTData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getDropUDT = (dropUDTData) => ([
 	AlterScriptDto.getInstance(
 		[dependencies.provider.dropType({keyspaceName: dropUDTData.keyspaceName, typeName: dropUDTData.typeName})],
@@ -26,6 +36,11 @@ const getDropUDT = (dropUDTData) => ([
 	)
 ]);
 
+/**
+ * 
+ * @param addToUDTData {Object}
+ * @returns [{(AlterScriptDto|undefined)}]
+ */
 const getAddToUDT = addToUDTData => {
 	const { keySpaces, udtName, name, type } = addToUDTData;
 	
@@ -43,6 +58,12 @@ const getKeySpaces = role => {
 	return !dependencies.lodash.isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
 };
 
+/**
+ * 
+ * @param item {Object}
+ * @param udtMap {Object}
+ * @returns {(AlterScriptDto|undefined)}
+ */
 const getAddScript = (item, udtMap) => {
 	const { role = {}, compMod = {}, properties = {} } = item;
 	const keySpaces = getKeySpaces(role);
@@ -85,6 +106,13 @@ const prepareField = (field, property) => {
 	}
 };
 
+/**
+ * 
+ * @param item {Object}
+ * @param data {Object}
+ * @param udtMap {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getUpdateScript = (item, data, udtMap) => {
 	const { role = {}, properties } = item;
 	if (!properties) {
@@ -108,7 +136,7 @@ const getUpdateScript = (item, data, udtMap) => {
 				fieldTypeCompatible(oldFieldType, newFieldType) &&
 				isOldModel;
 			if (changeType) {
-				const updateTypeScript = dependencies.provider.updateType({
+				const updateTypeScript = dependencies.provider.updateUdtType({
 					keySpaceName,
 					udtName,
 					columnData: {
@@ -152,6 +180,11 @@ const getUpdateScript = (item, data, udtMap) => {
 	}, []);
 };
 
+/**
+ * 
+ * @param item {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getDeleteScript = item => {
 	const { properties, compMod = {}, role = {} } = item;
 
@@ -181,6 +214,14 @@ const getDeleteScript = item => {
 		}, []);
 };
 
+/**
+ * 
+ * @param child {Object}
+ * @param mode {Object}
+ * @param data {Object}
+ * @param udtMap {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getUdtScript = ({ child, mode, data, udtMap }) => {
 	if (mode === 'add') {
 		return getAddScript(child, udtMap);

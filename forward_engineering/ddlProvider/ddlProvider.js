@@ -1,5 +1,5 @@
 const templates = require('./ddlTemplates');
-const { tab, getTableNameStatement} = require("../helpers/generalHelper");
+const { tab, getTableNameStatement, getUserDefinedFunctions, getUserDefinedAggregations} = require("../helpers/generalHelper");
 const { serializeOptions } = require("../helpers/indexHelper");
 const { alterTablePrefix } = require("../helpers/updateHelpers/tableHelper");
 const { getAlterTypePrefix } = require("../helpers/updateHelpers/udtHelper");
@@ -173,6 +173,23 @@ module.exports = app => {
             const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 
             return assignTemplates(templates.dropIndex, {tableNameStatement});
+        },
+
+        dropKeySpace(keySpaceName) {
+
+            return assignTemplates(templates.dropKeySpace, {keySpaceName});
+        },
+
+        createKeySpace(keySpaceName, replication, durableWrites, udfData, udaData) {
+            const udfScript = getUserDefinedFunctions(udfData);
+            const udaScript = getUserDefinedAggregations(udaData);
+
+            return assignTemplates(templates.createKeySpace, {keySpaceName, replication: tab(replication), durableWrites: tab(durableWrites), udfScript, udaScript});
+        },
+        
+        alterKeySpaceReplication(keySpaceName, replication, durableWrites) {
+
+            return assignTemplates(templates.alterKeySpaceReplication, {keySpaceName, replication: tab(replication), durableWrites: tab(durableWrites, 2)});
         },
 
     }

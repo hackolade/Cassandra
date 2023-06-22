@@ -40,4 +40,10 @@ module.exports = {
 	dropSearchIndex: 'DROP SEARCH INDEX ON ${tableNameStatement};',
 	
 	dropIndex: 'DROP INDEX IF EXISTS ${tableNameStatement};',
+
+	dropKeySpace: 'DROP KEYSPACE IF EXISTS "${keySpaceName}";',
+
+	createKeySpace: 'CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n${replication}\n${durableWrites}${udfScript}${udaScript};',
+
+	alterKeySpaceReplication: 'ALTER KEYSPACE "${keySpaceName}" \n${replication}\n${durableWrites};',
 };

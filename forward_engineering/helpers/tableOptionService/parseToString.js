@@ -1,8 +1,5 @@
 const { inlineComment } = require("../commentsHelper");
 const { dependencies } = require('../appDependencies');
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
 
 const NUMERIC = 'numeric';
 const TEXT = 'text';
@@ -177,7 +174,6 @@ const addId = (tableId, options) => {
 }
 
 const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActivated) => {
-	setDependencies(dependencies);
 	const validClusteredKeys = clusteringKeys.filter(key => clusteringKeysHash[key && key.keyId]);
 	if (!validClusteredKeys.length) {
 		return options;
@@ -192,9 +188,9 @@ const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActi
 			});
 	};
 
-	let [activatedKeys, deactivatedKeys] = _.partition(
+	let [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(
 		validClusteredKeys,
-		({ keyId }) => _.get(clusteringKeysHash, `${keyId}.isActivated`) !== false
+		({ keyId }) => dependencies.lodash.get(clusteringKeysHash, `${keyId}.isActivated`) !== false
 	);
 	activatedKeys = mapKeys(activatedKeys);
 	deactivatedKeys = mapKeys(deactivatedKeys);

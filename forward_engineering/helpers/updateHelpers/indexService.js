@@ -1,9 +1,5 @@
 const { dependencies } = require('../appDependencies');
 
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
-
 const REDUNDANT_OPTIONS = ['id'];
 
 const REDUNDANT_PROPERTIES_FOR_INDEX = ['SecIndxComments', 'SecIndxDescription'];
@@ -37,7 +33,7 @@ const SEARCH_INDEX_PROFILES_DATA_FOR_PREPARE = {
 	},
 };
 
-const isDiff = (oldValue, newValue) => !_.isEqual(oldValue, newValue);
+const isDiff = (oldValue, newValue) => !dependencies.lodash.isEqual(oldValue, newValue);
 
 const getModifiedProperties = (oldProperties, newProperties) => {
 	
@@ -62,7 +58,7 @@ const getDeletedProperties = (oldProperties, newProperties) =>
 
 const getDefaultPropertiesByName = (propertiesNames, oldProperties, defaultProperties) => {
 	return propertiesNames.reduce((acc, propertyName) => {
-		if (defaultProperties.hasOwnProperty(propertyName) && isDiff(_.get(oldProperties, propertyName), defaultProperties[propertyName])) {
+		if (defaultProperties.hasOwnProperty(propertyName) && isDiff(dependencies.lodash.get(oldProperties, propertyName), defaultProperties[propertyName])) {
 			return Object.assign({}, acc, { [propertyName]: defaultProperties[propertyName] });
 		}
 
@@ -87,14 +83,13 @@ const getDropProperties = (oldData, newData, defaultData = {}) => {
 				...acc,
 				[property]: newData[property]
 			}
-		};
+		}
 
 		return acc;
 	}, {})
 };
 
 const getDiffOptions = defaultData => (oldData = {}, newData = {}) => {
-	setDependencies(dependencies);
 	const modifyData = getModifiedProperties(Object.assign({}, defaultData, oldData), Object.assign({}, defaultData, newData));
 	const deleteDataProperties = getDeletedProperties(oldData, Object.assign({}, defaultData, newData));
 
@@ -105,7 +100,6 @@ const getDiffOptions = defaultData => (oldData = {}, newData = {}) => {
 };
 
 const getDiff = defaultData => (oldData = {}, newData = {}) => {
-	setDependencies(dependencies);
 	const modifyData = getModifiedProperties(Object.assign({}, defaultData, oldData), Object.assign({}, defaultData, newData));
 
 	return {
@@ -115,13 +109,12 @@ const getDiff = defaultData => (oldData = {}, newData = {}) => {
 };
 
 const isEqualIndex = (defaultData, redundantProperty) => (oldData = {}, newData = {}) => {
-	setDependencies(dependencies);
 	newData = Object.assign({}, defaultData, newData);
 	oldData = Object.assign({}, defaultData, oldData);
-	const keys = _.uniq([..._.keys(newData), ..._.keys(oldData)]).filter(key => !redundantProperty.includes(key));
+	const keys = dependencies.lodash.uniq([...dependencies.lodash.keys(newData), ...dependencies.lodash.keys(oldData)]).filter(key => !redundantProperty.includes(key));
 	return keys.reduce(
 		(isEqual, key) => 
-		isEqual && _.isEqual(newData[key], oldData[key]) ? isEqual : false, true);
+		isEqual && dependencies.lodash.isEqual(newData[key], oldData[key]) ? isEqual : false, true);
 };
 
 const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumns = []) => {

@@ -6,9 +6,11 @@ const { getAlterTypePrefix } = require("../helpers/updateHelpers/udtHelper");
 const { getDiff } = require("../helpers/tableOptionService/getDiff");
 const { mergeValuesWithConfigOptions } = require("../helpers/tableHelper");
 const { parseToString } = require("../helpers/tableOptionService/parseToString");
+const { getViewName } = require("../helpers/updateHelpers/viewHelper");
+const { getOptionsScript } = require("../helpers/viewHelper");
 
 module.exports = app => {
-    const {assignTemplates} = app.require('@hackolade/ddl-fe-utils');
+    const { assignTemplates } = app.require('@hackolade/ddl-fe-utils');
     return {
 
         dropTable(name) {
@@ -192,5 +194,28 @@ module.exports = app => {
             return assignTemplates(templates.alterKeySpaceReplication, {keySpaceName, replication: tab(replication), durableWrites: tab(durableWrites, 2)});
         },
 
+        dropView(modelData) {
+            const { compMod, name, code } = modelData.role;
+            const viewName = getViewName(compMod.keyspaceName, code || name);
+
+            return assignTemplates(templates.dropView, {viewName});
+        },
+        
+        alterView(role) {
+            const viewData = [role];
+            const optionScript = getOptionsScript({
+                collectionRefsDefinitionsMap: role.compMod.collectionData?.collectionRefsDefinitionsMap || {},
+                viewData
+            });
+            const viewName = role.name || role.code;
+            const keyspaceName = role.compMod.keyspaceName;
+            if (optionScript) {
+                const keySpaceViewName = getViewName(keyspaceName, viewName);
+                
+                return assignTemplates(templates.alterView, {keySpaceViewName, optionScript: tab(optionScript)});
+            }
+            
+            return '';
+        },
     }
 };

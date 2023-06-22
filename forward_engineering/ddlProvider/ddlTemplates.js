@@ -46,4 +46,9 @@ module.exports = {
 	createKeySpace: 'CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n${replication}\n${durableWrites}${udfScript}${udaScript};',
 
 	alterKeySpaceReplication: 'ALTER KEYSPACE "${keySpaceName}" \n${replication}\n${durableWrites};',
+
+	dropView: 'DROP MATERIALIZED VIEW IF EXISTS ${viewName};',
+
+	alterView: 'ALTER MATERIALIZED VIEW ${keySpaceViewName}\n${optionScript};',
+	
 };

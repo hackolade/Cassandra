@@ -15,12 +15,13 @@ const { getTableStatement } = require('./helpers/tableHelper');
 const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
-const { getAlterScript, isDropInStatements } = require('./helpers/updateHelper');
+const { isDropInStatements } = require('./helpers/alterScriptFromDeltaHelper');
 const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
 const { getScriptOptions } = require('./helpers/getScriptOptions');
+const {buildContainerLevelAlterScript} = require("./helpers/alterScriptBuilder");
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
@@ -34,7 +35,7 @@ module.exports = {
 			if (data.isUpdateScript) {
 				data.scriptOptions = getScriptOptions(data);
 
-				callback(null, getAlterScript(data.jsonSchema, udtTypeMap, data));
+				callback(null, buildContainerLevelAlterScript(data.jsonSchema, udtTypeMap, data));
 			} else {
 				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, true)}`;
 				callback(null, script);
@@ -77,7 +78,7 @@ module.exports = {
 				const scripts = data.entities.map(entityId => {
 					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
-					return getAlterScript(jsonSchema, data.udtTypeMap, data);
+					return buildContainerLevelAlterScript(jsonSchema, data.udtTypeMap, data);
 				})
 				callback(null, scripts.filter(Boolean).join('\n\n'));
 			} else {

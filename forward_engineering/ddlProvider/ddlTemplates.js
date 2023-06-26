@@ -7,29 +7,29 @@ module.exports = {
 	
 	dropDatabase: 'DROP DATABASE IF EXISTS ${name};',
 	
-	createCustomIndex: 'CREATE CUSTOM INDEX ${ifNotExistStatement}"${name}"\n  ON ${tableName} (${column})\n  USING \'${usingStatement}\'${optionsStatement};',
+	createCustomIndex: 'CREATE CUSTOM INDEX ${ifNotExistStatement}${name}\n  ON ${tableName} (${column})\n  USING \'${usingStatement}\'${optionsStatement};',
 
 	createIndex: 'CREATE INDEX ${ifNotExistStatement}${nameStatement}\n  ON ${tableName} (${column});',
 
 	createSearchIndex: 'CREATE SEARCH INDEX ${ifNotExistStatement}ON ${tableName}\n  WITH COLUMNS\n${columnsStatement}${profiles}${config}${options};',
 
-	dropType: 'DROP TYPE IF EXISTS "${keyspaceName}"."${typeName}";',
+	dropType: 'DROP TYPE IF EXISTS ${keyspaceName}.${typeName};',
 
-	renameColumn: '${alterTablePrefixStatement} RENAME "${oldName}" TO "${newName}";',
+	renameColumn: '${alterTablePrefixStatement} RENAME ${oldName} TO ${newName};',
 
-	addEntity: '${alterTablePrefixStatement} ADD "${name}" ${type};',
+	addEntity: '${alterTablePrefixStatement} ADD ${name} ${type};',
 
-	deleteEntity: '${alterTablePrefixStatement} DROP "${name}";',
+	deleteEntity: '${alterTablePrefixStatement} DROP ${name};',
 
-	addPropertyToUdt: '${alterTypePrefixStatement}."${udtName}" ADD "${name}" ${type};',
+	addPropertyToUdt: '${alterTypePrefixStatement}.${udtName} ADD ${name} ${type};',
 
-	createUdt: 'CREATE TYPE IF NOT EXISTS "${keySpaceName}"."${udtName}" (\n${columnScript} \n);',
+	createUdt: 'CREATE TYPE IF NOT EXISTS ${keySpaceName}.${udtName} (\n${columnScript} \n);',
 
-	updateUdtType: '${alterTypePrefixStatement}."${udtName}"\nALTER "${name}" TYPE ${type};',
+	updateUdtType: '${alterTypePrefixStatement}.${udtName}\nALTER ${name} TYPE ${type};',
 	
-	renameType: '${alterTypePrefixStatement}."${udtName}" \n\tRENAME "${oldFieldName}" TO "${newFieldName}";',
+	renameType: '${alterTypePrefixStatement}.${udtName} \n	RENAME ${oldFieldName} TO ${newFieldName};',
 
-	updateType: '${alterTablePrefixStatement} \n\tALTER "${name}" TYPE "${type}";',
+	updateType: '${alterTablePrefixStatement} \n	ALTER ${name} TYPE ${type};',
 
 	updateTableOptions: '${alterTablePrefixStatement}${optionsStatement};',
 
@@ -41,11 +41,11 @@ module.exports = {
 	
 	dropIndex: 'DROP INDEX IF EXISTS ${tableNameStatement};',
 
-	dropKeySpace: 'DROP KEYSPACE IF EXISTS "${keySpaceName}";',
+	dropKeySpace: 'DROP KEYSPACE IF EXISTS ${keySpaceName};',
 
-	createKeySpace: 'CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n${replication}\n${durableWrites}${udfScript}${udaScript};',
+	createKeySpace: 'CREATE KEYSPACE IF NOT EXISTS ${keySpaceName} \n${replication}\n${durableWrites}${udfScript}${udaScript};',
 
-	alterKeySpaceReplication: 'ALTER KEYSPACE "${keySpaceName}" \n${replication}\n${durableWrites};',
+	alterKeySpaceReplication: 'ALTER KEYSPACE ${keySpaceName} \n${replication}\n${durableWrites};',
 
 	dropView: 'DROP MATERIALIZED VIEW IF EXISTS ${viewName};',
 

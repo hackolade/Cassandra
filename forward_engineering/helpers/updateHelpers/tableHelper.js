@@ -11,9 +11,6 @@ let existScripts = {
 	deleteTable: [],
 };
 
-const alterTablePrefix = (tableName, keySpace) =>
-	keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"`;
-
 /**
  * 
  * @param addData {Object}
@@ -54,6 +51,11 @@ const getDelete = deleteData => {
 	];
 };
 
+/**
+ * 
+ * @param data {Object}
+ * @returns {string}
+ */
 const generateFullName = data => {
 	const { tableName, keyspaceName, columnData } = data;
 	const fulTableName = getTableNameStatement(keyspaceName, tableName);
@@ -254,7 +256,6 @@ const getAddTable = (addTableData) => {
 module.exports = {
 	getDelete,
 	getAdd,
-	alterTablePrefix,
 	hydrateColumn,
 	isTableChange,
 	getTableParameter,

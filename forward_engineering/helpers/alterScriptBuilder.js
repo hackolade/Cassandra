@@ -96,6 +96,19 @@ const buildContainerLevelAlterScript = (jsonSchema, udtMap, data) => {
     return scriptData.filter(Boolean).join('\n\n');
 }
 
+/**
+ *
+ * @param child {PersistenceSchemaChild}
+ * @param udtMap {Object}
+ * @param data {Object}
+ * @returns {boolean}
+ */
+const isDropInStatements = (child, udtMap, data) => {
+    return getAlterScriptDtos(child, udtMap, data)
+        .some(dto => dto.isActivated && dto.scripts.some(script => script.isDropScript));
+}
+
 module.exports = {
-    buildContainerLevelAlterScript
+    buildContainerLevelAlterScript,
+    isDropInStatements
 }

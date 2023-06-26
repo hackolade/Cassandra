@@ -524,27 +524,6 @@ const getAlterScriptDtos = (child, udtMap, data) => {
 	].filter(Boolean);
 }
 
-
-
-/**
- * 
- * @param child {PersistenceSchemaChild}
- * @param udtMap {Object}
- * @param data {Object}
- * @returns {boolean}
- */
-const isDropInStatements = (child, udtMap, data) => {
-	return [
-		...getEntitiesDto(child, udtMap, data),
-		...getContainersDto(child, udtMap, data),
-		...getViewsDto(child, udtMap, data),
-		...getModelDefinitionsDto(child, udtMap, data)
-	]
-		.filter(Boolean)
-		.some(dto => dto.isActivated && dto.scripts.some(script => script.isDropScript));
-}
-
 module.exports = {
 	getAlterScriptDtos,
-	isDropInStatements
 };

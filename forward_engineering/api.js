@@ -15,13 +15,12 @@ const { getTableStatement } = require('./helpers/tableHelper');
 const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('./helpers/udtHelper');
 const { getIndexes } = require('./helpers/indexHelper');
 const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
-const { isDropInStatements } = require('./helpers/alterScriptFromDeltaHelper');
 const { getViewScript } = require('./helpers/viewHelper');
 const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
 const { getScriptOptions } = require('./helpers/getScriptOptions');
-const {buildContainerLevelAlterScript} = require("./helpers/alterScriptBuilder");
+const { buildContainerLevelAlterScript, isDropInStatements } = require("./helpers/alterScriptBuilder");
 
 module.exports = {
 	generateScript(data, logger, callback, app) {

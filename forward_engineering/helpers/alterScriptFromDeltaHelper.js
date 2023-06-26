@@ -541,8 +541,7 @@ const isDropInStatements = (child, udtMap, data) => {
 		...getModelDefinitionsDto(child, udtMap, data)
 	]
 		.filter(Boolean)
-		.flatMap(dto => dto.scripts)
-		.some(scriptData => !!scriptData.script && scriptData.isDropScript);
+		.some(dto => dto.isActivated && dto.scripts.some(script => script.isDropScript));
 }
 
 module.exports = {

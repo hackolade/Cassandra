@@ -3,8 +3,7 @@ const { getNamesByIds } = require("../schemaHelper");
 const { dependencies } = require('../appDependencies');
 const { eachField, getTableNameStatement } = require('../generalHelper');
 const { getTableStatement } = require('../tableHelper');
-
-let _;
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 
 let existScripts = {
 	modifiedColumn: [],
@@ -12,43 +11,51 @@ let existScripts = {
 	deleteTable: [],
 };
 
-const setDependencies = ({ lodash }) => _ = lodash;
-
-const removeColumnStatement = columnName => `DROP "${columnName}";`;
-const addColumnStatement = columnData => `ADD "${columnData.name}" ${columnData.type}`;
-
-const alterTablePrefix = (tableName, keySpace) =>
-	keySpace ? `ALTER TABLE "${keySpace}"."${tableName}"` : `ALTER TABLE "${tableName}"`;
-
+/**
+ * 
+ * @param addData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getAdd = addData => {
 	if (isScriptExists(addData)) {
 		return [];
 	}
-
-	const script = `${alterTablePrefix(addData.tableName, addData.keyspaceName)} ${addColumnStatement(addData.columnData)};`;
-	return [{
-		deleted: false,
-		modified: false,
-		added: true,
-		script,
-		field: 'field',
-	}];
+	
+	return [
+		AlterScriptDto.getInstance(
+			[dependencies.provider.addEntity(addData)], 
+			true, 
+			'add', 
+			'field'
+		)
+	];
 };
 
+/**
+ * 
+ * @param deleteData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getDelete = deleteData => {
 	if (isScriptExists(deleteData)) {
 		return [];
-	};
-	const script = `${alterTablePrefix(deleteData.tableName, deleteData.keyspaceName)} ${removeColumnStatement(deleteData.columnData.name)}`;
-	return [{
-		added: false,
-		modified: false,
-		deleted: true,
-		script,
-		field: 'field',
-	}];
+	}
+	
+	return [
+		AlterScriptDto.getInstance(
+			[dependencies.provider.deleteEntity(deleteData)], 
+			true, 
+			'deletion',
+			'field'
+		)
+	];
 };
 
+/**
+ * 
+ * @param data {Object}
+ * @returns {string}
+ */
 const generateFullName = data => {
 	const { tableName, keyspaceName, columnData } = data;
 	const fulTableName = getTableNameStatement(keyspaceName, tableName);
@@ -90,11 +97,11 @@ const prepareField = (field, dataSources) => {
 	const fieldAfterTransform = propertiesFromArrayToObj(field);
 
 	return eachField(fieldAfterTransform, (field) => {
-		if (field?.type !== 'reference' || _.isEmpty(field.refIdPath)) {
+		if (field?.type !== 'reference' || dependencies.lodash.isEmpty(field.refIdPath)) {
 			return field;
 		}
 
-		const preparedField = getNamesByIds([_.last(field.refIdPath)], dataSources)[_.last(field.refIdPath)] || {};
+		const preparedField = getNamesByIds([dependencies.lodash.last(field.refIdPath)], dataSources)[dependencies.lodash.last(field.refIdPath)] || {};
 		return {
 			...field,
 			...preparedField,
@@ -103,7 +110,6 @@ const prepareField = (field, dataSources) => {
 };
 
 const hydrateColumn = ({ tableName, keyspaceName, isOldModel, property, udtMap, dataSources }) => {
-	setDependencies(dependencies);
 	const { oldField = {}, newField = {} } = property?.compMod || {};
 	const preparedOldField = prepareField(oldField, dataSources);
 	const newType = getTypeByData(property, udtMap, newField.name);
@@ -142,20 +148,20 @@ const addToKeysHashType = (keysHash, keys) => {
 		return {
 			...keysHash,
 			[id]: {
-				..._.omit(key, 'type'),
+				...dependencies.lodash.omit(key, 'type'),
 				...(type ? { type } : {})
 			}
 		};
 	}, {});
 };
 
-const deleteFalseValuesIfNotPresentInOtherColumn = (left, right) => _.omitBy(left, (value, key) => value === false && !right[key]);
+const deleteFalseValuesIfNotPresentInOtherColumn = (left, right) => dependencies.lodash.omitBy(left, (value, key) => value === false && !right[key]);
 
 const areTableKeyColumnsEqual = (column1, column2) => {
 	const comparedColumn1 = deleteFalseValuesIfNotPresentInOtherColumn(column1, column2);
 	const comparedColumn2 = deleteFalseValuesIfNotPresentInOtherColumn(column2, column1);
 
-	return _.isEqual(comparedColumn1, comparedColumn2);
+	return dependencies.lodash.isEqual(comparedColumn1, comparedColumn2);
 }
 
 const tableKeysIsEqual = ({ newKeys = [], oldKeys =[], dataSources }) => {
@@ -164,14 +170,12 @@ const tableKeysIsEqual = ({ newKeys = [], oldKeys =[], dataSources }) => {
 	}
 	const newKeysHash = addToKeysHashType(getNamesByIds(newKeys.map(key => key.keyId), dataSources), newKeys);
 	const oldKeysHash = addToKeysHashType(getNamesByIds(oldKeys.map(key => key.keyId), dataSources), oldKeys);
-	const difference = _.differenceWith(_.values(newKeysHash), _.values(oldKeysHash), areTableKeyColumnsEqual);
+	const difference = dependencies.lodash.differenceWith(dependencies.lodash.values(newKeysHash), dependencies.lodash.values(oldKeysHash), areTableKeyColumnsEqual);
 
-	return _.isEmpty(difference);
+	return dependencies.lodash.isEmpty(difference);
 };
 
 const isTableChange = ({ item, dataSources }) => {
-	setDependencies(dependencies);
-
 	const compMod = item?.role?.compMod || {};
 	const tableProperties = ['name', 'isActivated'];
 	const { compositeClusteringKey = {}, compositePartitionKey = {} } = compMod || {};
@@ -188,23 +192,28 @@ const isTableChange = ({ item, dataSources }) => {
 	});
 
 	return !compositeClusteringKeyIsEqual || !compositePartitionKeyIsEqual ||
-		tableProperties.some(property => !_.isEqual(compMod[property]?.new, compMod[property]?.old));
+		tableProperties.some(property => !dependencies.lodash.isEqual(compMod[property]?.new, compMod[property]?.old));
 };
 
-const getDeleteTable = deleteData => {
+/**
+ * 
+ * @param deleteData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
+const getDeleteTableDto = deleteData => {
 	if (isScriptExists(deleteData, 'deleteTable')) {
 		return [];
 	}
 	const tableStatement = getTableNameStatement(deleteData.keyspaceName, deleteData.tableName);
-	const script = `DROP TABLE IF EXISTS ${tableStatement};`;
 	addScriptToExistScripts(deleteData, 'deleteTable')
-	return [{
-		modified: false,
-		added: false,
-		deleted: true,
-		script,
-		table: 'table',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[dependencies.provider.dropTable(tableStatement)], 
+			true, 
+			'deletion',
+			'table'
+		)
+	];
 };
 
 const getAddTable = (addTableData) => {
@@ -234,23 +243,23 @@ const getAddTable = (addTableData) => {
 		isKeyspaceActivated: addTableData.isKeyspaceActivated,
 	});
 	addScriptToExistScripts(addTableData, 'addTable');
-	return [{
-		deleted: false,
-		modified: false,
-		added: true,
-		script,
-		table: 'table',
-	}];
+	return [
+		AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			'add',
+			'table'
+		)
+	];
 }
 
 module.exports = {
 	getDelete,
 	getAdd,
-	alterTablePrefix,
 	hydrateColumn,
 	isTableChange,
 	getTableParameter,
 	addScriptToExistScripts,
-	getDeleteTable,
+	getDeleteTableDto,
 	getAddTable,
 }

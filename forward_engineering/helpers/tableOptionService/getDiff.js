@@ -1,12 +1,9 @@
-let _;
 const { dependencies } = require('../appDependencies');
 const CACHING = 'caching';
 const COMPACTION = 'compaction';
 const COMPRESSION = 'compression';
 const ID = 'id';
 const REDUNDANT_OPTIONS = [ID];
-
-const setDependencies = ({ lodash }) => _ = lodash;
 
 const optionDefaultValues = {
 	localReadRepairChance: 0,
@@ -41,14 +38,14 @@ const isDiffParsedJsonString = (oldValue, value) => {
 	const jsonOld = JSON.parse(oldValue.replace(/[\'']/g, '\"'));
 	const jsonNew = JSON.parse(value.replace(/[\'']/g, '\"'));
 
-	return !_.isEqual(jsonOld, jsonNew);
+	return !dependencies.lodash.isEqual(jsonOld, jsonNew);
 };
 
 const isDiffCaching = (oldValue, value) => {
 	const updateKeys = caches => {
-		const perPartitionValue = _.get(caches, 'rowsPerPartition');
+		const perPartitionValue = dependencies.lodash.get(caches, 'rowsPerPartition');
 		if (perPartitionValue) {
-			return { ..._.omit(caches, 'rowsPerPartition'), 'rows_per_partition': perPartitionValue };
+			return { ...dependencies.lodash.omit(caches, 'rowsPerPartition'), 'rows_per_partition': perPartitionValue };
 		}
 
 		return caches;
@@ -57,11 +54,11 @@ const isDiffCaching = (oldValue, value) => {
 	const jsonOld = Object.assign({}, updateKeys(oldValue), { id: null });
 	const jsonNew = Object.assign({}, updateKeys(value), { id: null });
 
-	return !_.isEqual(jsonOld, jsonNew);
+	return !dependencies.lodash.isEqual(jsonOld, jsonNew);
 };
 
 const getModifiedAndNewOptions = (newOptions, oldOptions) => {
-	oldOptions = _.isEmpty(oldOptions) ? optionDefaultValues : oldOptions;
+	oldOptions = dependencies.lodash.isEmpty(oldOptions) ? optionDefaultValues : oldOptions;
 	
 	return Object.entries(newOptions).reduce((acc, [name, value]) => {
 		if (REDUNDANT_OPTIONS.includes(name)) {
@@ -77,14 +74,14 @@ const getModifiedAndNewOptions = (newOptions, oldOptions) => {
 };
 
 const getDeletedOptions = (newOptions, oldOptions) => {
-	newOptions = _.isEmpty(newOptions) ? optionDefaultValues : newOptions;
+	newOptions = dependencies.lodash.isEmpty(newOptions) ? optionDefaultValues : newOptions;
 
 	return Object.keys(oldOptions).filter(oldOptionKey => !newOptions.hasOwnProperty(oldOptionKey));
 };
 
 const getDefaultOptionsByName = (optionNames, oldOptions) => {
 	return optionNames.reduce((acc, optionName) => {
-		if (optionDefaultValues.hasOwnProperty(optionName) && isDiff(_.get(oldOptions, optionName), optionDefaultValues[optionName], optionName)) {
+		if (optionDefaultValues.hasOwnProperty(optionName) && isDiff(dependencies.lodash.get(oldOptions, optionName), optionDefaultValues[optionName], optionName)) {
 			return Object.assign({}, acc, { [optionName]: optionDefaultValues[optionName] });
 		}
 
@@ -94,7 +91,6 @@ const getDefaultOptionsByName = (optionNames, oldOptions) => {
 
 module.exports = {
 	getDiff(newOptions, oldOptions) {
-		setDependencies(dependencies);
 		const modifiedAndNewOptions = getModifiedAndNewOptions(newOptions, oldOptions);
 		const deletedOptionNames = getDeletedOptions(newOptions, oldOptions);
 		return Object.assign({}, modifiedAndNewOptions, getDefaultOptionsByName(deletedOptionNames, oldOptions));

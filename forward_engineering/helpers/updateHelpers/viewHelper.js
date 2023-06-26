@@ -1,16 +1,6 @@
-const { getViewScript: generateViewScript, getOptionsScript } = require('../viewHelper');
-const { tab } = require('../generalHelper');
+const { getViewScript: generateViewScript } = require('../viewHelper');
 const { dependencies } = require('../appDependencies');
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
-
-const scriptData = {
-	added: false,
-	deleted: false,
-	modified: false,
-	view: 'view',
-};
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 
 const getViewName = (keyspaceName, nameView) => `${keyspaceName ? `"${keyspaceName}".` : ''}"${nameView}"`;
 
@@ -18,7 +8,7 @@ const modifyProperties = ['code', 'name'];
 const getIsOnlyOptionsModify = compMod => {
 	const isModifyProperties = modifyProperties.some(property => {
 		const { new: newProperty, old: oldProperty } = compMod[property] || {};
-		return !_.isEqual(newProperty, oldProperty);
+		return !dependencies.lodash.isEqual(newProperty, oldProperty);
 	});
 
 	const { tableOptions = {}, comments = {} } = compMod;
@@ -32,7 +22,7 @@ const getIsOnlyOptionsModify = compMod => {
 }
 
 const getProperty = (newProperty, oldProperty) => {
-	if (!oldProperty || !_.isEqual(newProperty, oldProperty)) {
+	if (!oldProperty || !dependencies.lodash.isEqual(newProperty, oldProperty)) {
 		return newProperty;
 	} else if (!newProperty) {
 		return oldProperty;
@@ -68,41 +58,26 @@ const getAddView = child => {
 	return generateViewScript(dataForScript);
 }
 
-const getDropView = child => {
-	const { compMod, name, code } = child.role;
-
-	return `DROP MATERIALIZED VIEW IF EXISTS ${getViewName(compMod.keyspaceName, code || name)};`;
-}
-
-const getAlterView = role => {
-	const viewData = [role];
-	const optionScript = getOptionsScript({ 
-		collectionRefsDefinitionsMap: role.compMod.collectionData?.collectionRefsDefinitionsMap || {}, 
-		viewData 
-	});
-	const viewName = role.name || role.code;
-	const keyspaceName = role.compMod.keyspaceName;
-	if (optionScript) {
-		return `ALTER MATERIALIZED VIEW ${getViewName(keyspaceName, viewName)}\n${tab(optionScript)};`;
-	}
-}
-
 const getModifyView = child => {
 	const compMod = child.role?.compMod || {};
 	const isOnlyOptionsModify = getIsOnlyOptionsModify(compMod);
 	if (!isOnlyOptionsModify) {
 		const dropViewName = compMod.code?.old || compMod.name?.old;
-		const dropScript = getDropView({ ...child, role: { ...child.role, code: dropViewName }});
+		const dropScript = dependencies.provider.dropView({ ...child, role: { ...child.role, code: dropViewName }});
 		const addScript = getAddView(child);
-		return [{
-				...scriptData,
-				script: dropScript,
-				deleted: true,
-			}, {
-				...scriptData,
-				script: addScript,
-				added: true,
-			}
+		return [
+			AlterScriptDto.getInstance(
+				[dropScript],
+				true,
+				'deletion',
+				'view'
+			),
+			AlterScriptDto.getInstance(
+				[addScript],
+				true,
+				'add',
+				'view'
+			)
 		];
 	}
 	const { comments, tableOptions } = getDifferentOptions(compMod.tableOptions, compMod.comments);
@@ -111,32 +86,40 @@ const getModifyView = child => {
 		comments,
 		tableOptions
 	};
-	return [{
-		...scriptData,
-		script: getAlterView(role),
-		modified: true,
-	}];
+	
+	return [
+		AlterScriptDto.getInstance(
+			[dependencies.provider.alterView(role)],
+			true,
+			'modify',
+			'view'
+		)
+	];
 }
 
-const getViewScript = ({ child, data, mode }) => {
-	setDependencies(dependencies);
-	
+const getViewScript = ({ child, mode }) => {
 	if (mode === 'add') {
-		return [{
-			...scriptData,
-			added: true,
-			script: getAddView(child)
-		}];
+		return [AlterScriptDto.getInstance(
+			[getAddView(child)],
+			true,
+			'add',
+			'view'
+		)
+		];
 	} else if (mode === 'delete') {
-		return [{
-			...scriptData,
-			deleted: true,
-			script: getDropView(child)
-		}];
+		return [
+			AlterScriptDto.getInstance(
+				[dependencies.provider.dropView(child)],
+				true,
+				'deletion',
+				'view'
+			)
+		];
 	}
 	return getModifyView(child);
 }
 
 module.exports = {
 	getViewScript,
+	getViewName,
 }

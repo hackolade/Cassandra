@@ -1,7 +1,6 @@
 'use strict'
 
 const { 
-	tab,
 	retrieveContainerName,
 	retrieveEntityName,
 	retrivePropertyFromConfig,
@@ -14,10 +13,17 @@ const { getEntityLevelConfig } = require('./generalHelper');
 const { parseToString, addId, addClustering } = require('./tableOptionService/parseToString');
 const { inlineComment } = require('./commentsHelper');
 const { dependencies } = require('./appDependencies');
-let _;
 
-const setDependencies = ({ lodash }) => _ = lodash;
-
+/**
+ * 
+ * @param keyspaceName
+ * @param tableName
+ * @param columnDefinition
+ * @param primaryKeys
+ * @param options
+ * @param ifNotExist
+ * @returns {string}
+ */
 const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, primaryKeys, options, ifNotExist) => {
 	const items = [];
 
@@ -28,15 +34,17 @@ const getCreateTableStatement = (keyspaceName, tableName, columnDefinition, prim
 	if (primaryKeys) {
 		items.push(`PRIMARY KEY (${primaryKeys})`);
 	}
-
-	return `CREATE TABLE ${ifNotExist? `IF NOT EXISTS `:``}${getTableNameStatement(keyspaceName, tableName)} (\n` + 
-		items.map(item => tab(item)).join(',\n') + '\n' +
-	`)${options};`;
+	
+	
+	return dependencies.provider.createTable({
+		ifNotExist,
+		databaseName: getTableNameStatement(keyspaceName, tableName),
+		items,
+		options
+	});
 };
 
 const getPrimaryKeyList = (partitionKeysHash, clusteringKeysHash, isParentActivated) => {
-	setDependencies(dependencies);
-
 	const partitionKeys = getPartitionKeys(partitionKeysHash, isParentActivated);
 	const clusteringKeys = getClusteringKeys(clusteringKeysHash, isParentActivated);
 	const keys = [];
@@ -111,7 +119,7 @@ const commentDeactivatedKeys = (keysIds, keysHash, isParentActivated) => {
 		return `"${joinKeys(keysIds)}"`;
 	}
 
-	const [activatedKeys, deactivatedKeys] = _.partition(keysIds, id => keysHash[id].isActivated !== false);
+	const [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(keysIds, id => keysHash[id].isActivated !== false);
 	if (deactivatedKeys.length === 0) {
 		return `"${joinKeys(activatedKeys)}"`;
 	} else if (activatedKeys.length === 0) {
@@ -131,8 +139,6 @@ module.exports = {
 		udtTypeMap,
 		isKeyspaceActivated
 	}) {
-		setDependencies(dependencies);
-
 		const keyspaceName = retrieveContainerName(keyspaceMetaData);
 		const tableName = retrieveEntityName(tableMetaData);
 		const partitionKeys = retrivePropertyFromConfig(tableMetaData, 0, "compositePartitionKey", []);

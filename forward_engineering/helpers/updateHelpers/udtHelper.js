@@ -1,13 +1,10 @@
 const { dependencies } = require('../appDependencies');
 const { getColumnDefinition } = require('../columnHelper');
-const { tab, eachField } = require('../generalHelper');
+const { eachField } = require('../generalHelper');
 const { getTypeByData } = require('../typeHelper');
 const { checkIsOldModel, fieldTypeCompatible } = require('./generalHelper');
 const { getDelete } = require('./tableHelper');
-
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 
 const DEFAULT_KEY_SPACE = { 'Default_Keyspace': [] };
 
@@ -18,43 +15,55 @@ const scriptData = {
 	udt: 'udt',
 };
 
+/**
+ * 
+ * @param keySpaceName {String}
+ * @returns {`ALTER TYPE "${string}"`}
+ */
 const getAlterTypePrefix = keySpaceName => `ALTER TYPE "${keySpaceName}"`;
 
-const getRenameType = (renameData) => 
-	`${getAlterTypePrefix(renameData.keySpaceName)}."${renameData.udtName}" 
-	RENAME "${renameData.oldFieldName}" TO "${renameData.newFieldName}";`;
+/**
+ * 
+ * @param dropUDTData {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
+const getDropUDT = (dropUDTData) => ([
+	AlterScriptDto.getInstance(
+		[dependencies.provider.dropType({keyspaceName: dropUDTData.keyspaceName, typeName: dropUDTData.typeName})],
+		true, 
+		'deletion',
+		'udt'
+	)
+]);
 
-const getDropUDT = (dropUDTData) => ([{
-	...scriptData,
-	script: `DROP TYPE IF EXISTS "${dropUDTData.keyspaceName}"."${dropUDTData.typeName}";`,
-	deleted: true,
-}]);
-
-const getUpdateType = updateTypeData => 
-	`${getAlterTypePrefix(updateTypeData.keySpaceName)}."${updateTypeData.udtName}" 
-	ALTER "${updateTypeData.columnData.name}" TYPE ${updateTypeData.columnData.type};`;
-
+/**
+ * 
+ * @param addToUDTData {Object}
+ * @returns [{(AlterScriptDto|undefined)}]
+ */
 const getAddToUDT = addToUDTData => {
 	const { keySpaces, udtName, name, type } = addToUDTData;
-	return Object.keys(keySpaces).map(keySpaceName => ({
-		...scriptData,
-		added: true,
-		script:
-		`${getAlterTypePrefix(keySpaceName)}."${udtName}" ADD "${name}" ${type};`
-	})
+	
+	return Object.keys(keySpaces).map(keySpaceName => AlterScriptDto.getInstance(
+			[dependencies.provider.addPropertyToUdt({keySpaceName, udtName, name, type})], 
+			true,
+			'add',
+			'udt'
+		)
 	);
 };
 
-const getCreateUdt = (createData) => 
-	`CREATE TYPE IF NOT EXISTS "${createData.keySpaceName}"."${createData.udtName}" (\n` +
-	`${tab(createData.columnScript)} \n` + 
-	');' ;
-
 const getKeySpaces = role => {
 	const keySpaces = role.compMod?.bucketsWithCurrentDefinition;
-	return !_.isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
+	return !dependencies.lodash.isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
 };
 
+/**
+ * 
+ * @param item {Object}
+ * @param udtMap {Object}
+ * @returns {(AlterScriptDto|undefined)}
+ */
 const getAddScript = (item, udtMap) => {
 	const { role = {}, compMod = {}, properties = {} } = item;
 	const keySpaces = getKeySpaces(role);
@@ -64,12 +73,13 @@ const getAddScript = (item, udtMap) => {
 
 		return Object.keys(keySpaces).map(currentKeyspace => {
 			const udtName = role.code || role.name || '';
-			const script = getCreateUdt({ keySpaceName: currentKeyspace, udtName, columnScript });
-			return {
-					...scriptData,
-					added: true,
-					script
-				};
+			
+			return AlterScriptDto.getInstance(
+				[dependencies.provider.createUdt({ keySpaceName: currentKeyspace, udtName, columnScript })],
+				true,
+				'add',
+				'udt'
+			);
 		});
 	}
 
@@ -96,6 +106,13 @@ const prepareField = (field, property) => {
 	}
 };
 
+/**
+ * 
+ * @param item {Object}
+ * @param data {Object}
+ * @param udtMap {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getUpdateScript = (item, data, udtMap) => {
 	const { role = {}, properties } = item;
 	if (!properties) {
@@ -103,23 +120,23 @@ const getUpdateScript = (item, data, udtMap) => {
 	}
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name;
-	const script = Object.entries(properties).reduce((script, [propertyName, property]) => {
-		const itemOldName = _.get(property, 'compMod.oldField.name');
-		const itemNewName = _.get(property, 'compMod.newField.name');
-		const { compMod = {} } = property
+	return Object.entries(properties).reduce((script, [propertyName, property]) => {
+		const itemOldName = dependencies.lodash.get(property, 'compMod.oldField.name');
+		const itemNewName = dependencies.lodash.get(property, 'compMod.newField.name');
+		const {compMod = {}} = property
 
 		const oldFieldType = getTypeByData(prepareField(compMod.oldField, property), udtMap, 'newField');
 		const newFieldType = getTypeByData(prepareField(compMod.newField, property), udtMap, 'oldField');
 
-		const isOldModel = checkIsOldModel(_.get(data, 'modelData'));
+		const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
 		const newScript = Object.keys(keySpaces).reduce((script, keySpaceName) => {
-			const changeType = newFieldType && 
+			const changeType = newFieldType &&
 				oldFieldType &&
 				newFieldType !== oldFieldType &&
 				fieldTypeCompatible(oldFieldType, newFieldType) &&
 				isOldModel;
 			if (changeType) {
-				const updateTypeScript = getUpdateType({
+				const updateTypeScript = dependencies.provider.updateUdtType({
 					keySpaceName,
 					udtName,
 					columnData: {
@@ -128,36 +145,46 @@ const getUpdateScript = (item, data, udtMap) => {
 					}
 				});
 				script = [
-					...script, 
-					{
-						...scriptData,
-						script: updateTypeScript,
-						modified: true,
-					}
+					...script,
+					AlterScriptDto.getInstance(
+						[updateTypeScript],
+						true,
+						'modify',
+						'udt'
+					)
 				];
-			};
+			}
 
 			if (itemNewName && itemOldName && itemOldName !== itemNewName) {
-				const renameScript = getRenameType({
+				const renameScript = dependencies.provider.renameType({
 					keySpaceName,
 					oldFieldName: itemOldName,
 					newFieldName: itemNewName,
 					udtName,
-				})
-				script = [...script, {
-					...scriptData,
-					script: renameScript,
-					modified: true,
-				}];
+				});
+				
+				script = [
+					...script,
+					AlterScriptDto.getInstance(
+						[renameScript],
+						true,
+						'modify',
+						'udt'
+					)
+				];
 			}
 
 			return script;
 		}, []);
 		return [...script, ...newScript];
 	}, []);
-	return script;
 };
 
+/**
+ * 
+ * @param item {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getDeleteScript = item => {
 	const { properties, compMod = {}, role = {} } = item;
 
@@ -167,7 +194,7 @@ const getDeleteScript = item => {
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name || '';
 
-	const script = Object.entries(keySpaces)
+	return Object.entries(keySpaces)
 		.reduce((script, [keyspaceName, keySpace]) => {
 			const newScript = keySpace.reduce((script, table) => {
 				const dropColumnScript = getDelete({
@@ -185,14 +212,17 @@ const getDeleteScript = item => {
 			}, []);
 			return [...script, ...newScript];
 		}, []);
-
-
-	return script;
 };
 
+/**
+ * 
+ * @param child {Object}
+ * @param mode {Object}
+ * @param data {Object}
+ * @param udtMap {Object}
+ * @returns {[(AlterScriptDto|undefined)]}
+ */
 const getUdtScript = ({ child, mode, data, udtMap }) => {
-	setDependencies(dependencies);
-
 	if (mode === 'add') {
 		return getAddScript(child, udtMap);
 	} else if (mode === 'update') {
@@ -203,7 +233,6 @@ const getUdtScript = ({ child, mode, data, udtMap }) => {
 };
 
 const sortAddedUdt = udt => {
-	setDependencies(dependencies);
 	const items = udt.properties.added?.items;
 	if (!items || !Array.isArray(items)) {
 		return udt;
@@ -214,7 +243,7 @@ const sortAddedUdt = udt => {
 		return child.compMod?.created;
 	});
 
-	const otherUdt = _.xorWith(items, createdUdt, _.isEqual);
+	const otherUdt = dependencies.lodash.xorWith(items, createdUdt, dependencies.lodash.isEqual);
 	createdUdt = createdUdt.map(item => {
 		const itemName = Object.keys(item.properties)[0];
 		return [ itemName, item ];
@@ -262,5 +291,6 @@ const sortAddedUdt = udt => {
 
 module.exports = {
 	getUdtScript,
-	sortAddedUdt
+	sortAddedUdt,
+	getAlterTypePrefix,
 }

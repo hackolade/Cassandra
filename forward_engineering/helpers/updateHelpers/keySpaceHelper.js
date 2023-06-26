@@ -1,24 +1,7 @@
 const { dependencies } = require('../appDependencies');
 const { getReplication, getDurableWrites } = require('../keyspaceHelper');
-const { retrivePropertyFromConfig, 
-	getUserDefinedFunctions, 
-	getUserDefinedAggregations,
-	tab,
-} = require('../generalHelper');
-let _;
-
-const setDependencies = ({ lodash }) => _ = lodash;
-
-const scriptData = {
-	added: false,
-	deleted: false,
-	modified: false,
-	keySpaces: 'keySpaces',
-}
-
-const getAddKeyspacePrefix = (keySpaceName) => `CREATE KEYSPACE IF NOT EXISTS "${keySpaceName}" \n`;
-const getDropKeyspace = (keySpaceName) => `DROP KEYSPACE IF EXISTS "${keySpaceName}";`;
-const alterKeyspacePrefix = keyspaceName => `ALTER KEYSPACE "${keyspaceName}" \n`;
+const { retrivePropertyFromConfig } = require('../generalHelper');
+const { AlterScriptDto } = require("../types/AlterScriptDto");
 
 const getDropUDFScript = udfData => udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name};` : '';
 const getDropUDAScript = udfData => udfData.name ? `DROP AGGREGATE IF EXISTS ${udfData.name};` : '';
@@ -45,10 +28,8 @@ const parser = {
 	regExpUDAForName: /^.+aggregate(.+?)\(/is,
 	getResult(body, reg) {
 		const result = body.match(reg);
-		if (result && result[1]) {
-			return result[1].trim();
-		}
-		return;
+		
+		return result?.[1]?.trim();
 	},
 	getName(body, regex) {
 		const result = this.getResult(body, regex);
@@ -81,11 +62,11 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	} else if (!newElements.length) {
 		dataForDropScript = oldElements;
 	} else {
-		const difference = (newElement, oldElement) => requiredProps.every(prop => _.isEqual(newElement[prop], oldElement[prop]));
+		const difference = (newElement, oldElement) => requiredProps.every(prop => dependencies.lodash.isEqual(newElement[prop], oldElement[prop]));
 
-		const equalElements = _.intersectionWith(newElements, oldElements, difference);
-		dataForAddScript = _.xorWith(newElements, equalElements, difference);
-		dataForDropScript = _.xorWith(oldElements, equalElements, difference);
+		const equalElements = dependencies.lodash.intersectionWith(newElements, oldElements, difference);
+		dataForAddScript = dependencies.lodash.xorWith(newElements, equalElements, difference);
+		dataForDropScript = dependencies.lodash.xorWith(oldElements, equalElements, difference);
 	}
 	return {
 		dataForAddScript,
@@ -109,15 +90,23 @@ const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData })
 	const addScript = dataForAddScript.filter(ud => Object.entries(ud).every(([key, value]) => 
 			udData['requiredProps'].includes(key) ? !!value : true
 		))
-		.map(ud => ({
-			udf: 'udf',
-			added: true,
-			script: ud[udData.functionName]
-		}));
+		.map(ud => AlterScriptDto.getInstance(
+				[ud[udData.functionName]], 
+				true, 
+				'add',
+				'udf'
+			)
+		);
 	
 	const dropScript = dataForDropScript
 		.filter(ud => !!ud.name)
-		.map(ud => ({ udf: 'udf', script: udData.getDropScript(ud), deleted: true }));
+		.map(ud => AlterScriptDto.getInstance(
+				[udData.getDropScript(ud)], 
+				true, 
+				'deletion',
+				'udf'
+			)
+		); 
 
 	return [...dropScript, ...addScript];
 }
@@ -125,15 +114,13 @@ const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData })
 const replicationProps = ['replStrategy', 'replFactory', 'dataCenters'];
 
 const getIsModifyKeysSpace = (keySpaceData, props) => {
-	const differentReplication = props.some(prop => {
-		const { new: newElements, old: oldElements } = keySpaceData[prop] || {};
-		return newElements && oldElements && !_.isEqual(newElements, oldElements);
+	return props.some(prop => {
+		const {new: newElements, old: oldElements} = keySpaceData[prop] || {};
+		return newElements && oldElements && !dependencies.lodash.isEqual(newElements, oldElements);
 	});
-	return differentReplication;
 }
 
 const getKeySpaceScript = ({ child, mode }) => {
-	setDependencies(dependencies);
 	const keyspaceData = [child.role];
 	const keySpaceName = child.role.code || child.role.name;
 	const replicationStrategyProp = retrivePropertyFromConfig(keyspaceData, 0, "replStrategy", "");
@@ -148,28 +135,23 @@ const getKeySpaceScript = ({ child, mode }) => {
 	if (mode === 'add') {
 		const udfData = retrivePropertyFromConfig(keyspaceData, 0, 'UDFs', []);
 		const udaData = retrivePropertyFromConfig(keyspaceData, 0, 'UDAs', []);
-		const udfScript = getUserDefinedFunctions(udfData);
-		const udaScript = getUserDefinedAggregations(udaData);
-
-		const script = [
-			getAddKeyspacePrefix(keySpaceName) + `${tab(replication)}\n${tab(durableWrites)};`,
-			udfScript ? udfScript : '',
-			udaScript ? udaScript : ''
-		].filter(Boolean).join('\n\n');
-
-		return [{
-			...scriptData,
-			script,
-			added: true,
-		}];
+		
+		return [AlterScriptDto.getInstance(
+				[dependencies.provider.createKeySpace(keySpaceName, replication, durableWrites, udfData, udaData)], 
+				true, 
+				'add',
+				'keySpaces'
+			)
+		];
 	} else if (mode === 'delete') {
-		const script = getDropKeyspace(keySpaceName);
 
-		return [{
-			...scriptData,
-			script,
-			deleted: true,
-		}];
+		return [AlterScriptDto.getInstance(
+				[dependencies.provider.dropKeySpace(keySpaceName)], 
+				true, 
+				'deletion',
+				'keySpaces'
+			)
+		];
 	} 
 	const dataForUDFScript = compMod?.UDFs || {};
 	const dataForUDAScript = compMod?.UDAs || {};
@@ -182,16 +164,19 @@ const getKeySpaceScript = ({ child, mode }) => {
 		udData: udaData,
 	});
 	const isModifyReplication = getIsModifyKeysSpace(compMod, replicationProps);
-	const script = isModifyReplication ? 
-		alterKeyspacePrefix(keySpaceName) +
-		tab(`${replication}\n`) +
-		tab(`${durableWrites};`) : '';
-
-	return [{
-		...scriptData,
-		modified: true,
-		script,
-	}, ...modifyUDAScript, ...modifyUDFScript];
+	const script = isModifyReplication 
+		? dependencies.provider.alterKeySpaceReplication(keySpaceName, replication, durableWrites) 
+		: '';
+	
+	return [AlterScriptDto.getInstance(
+			[script], 
+			true, 
+			'modify',
+			'keySpaces'
+		), 
+		...modifyUDAScript, 
+		...modifyUDFScript
+	];
 }
 
 module.exports = {

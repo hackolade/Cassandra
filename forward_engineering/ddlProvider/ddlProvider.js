@@ -95,7 +95,7 @@ module.exports = app => {
             const alterTablePrefixStatement = alterTablePrefix(tableName, keyspaceName);
             
 
-            return assignTemplates(templates.addEntity, {alterTablePrefixStatement, name: wrapInQuotes(columnData.name), type: wrapInQuotes(columnData.type)});
+            return assignTemplates(templates.addEntity, {alterTablePrefixStatement, name: wrapInQuotes(columnData.name), type: columnData.type});
         },
 
         deleteEntity(modelData) {
@@ -122,7 +122,7 @@ module.exports = app => {
             const { keySpaceName, udtName, columnData } = modelData;
             const alterTypePrefixStatement = getAlterTypePrefix(keySpaceName);
 
-            return assignTemplates(templates.updateType, {alterTypePrefixStatement, udtName: wrapInQuotes(udtName), name: wrapInQuotes(columnData.name), type: columnData.type});
+            return assignTemplates(templates.updateUdtType, {alterTypePrefixStatement, udtName: wrapInQuotes(udtName), name: wrapInQuotes(columnData.name), type: columnData.type});
         },
 
         renameType(modelData) {
@@ -141,7 +141,7 @@ module.exports = app => {
             const {  tableName, keyspaceName, columnData } = modelData;
             const alterTablePrefixStatement = alterTablePrefix(tableName, keyspaceName);
 
-            return assignTemplates(templates.updateType, {alterTablePrefixStatement, name: wrapInQuotes(columnData.name), type: wrapInQuotes(columnData.type)});
+            return assignTemplates(templates.updateType, {alterTablePrefixStatement, name: wrapInQuotes(columnData.name), type: columnData.type});
         },
 
         updateTableOptions(compMod, tableName, isGetOptionScript) {

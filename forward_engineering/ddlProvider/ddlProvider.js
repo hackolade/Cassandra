@@ -33,7 +33,7 @@ module.exports = app => {
                 options
             } = modelData;
 
-            const ifNotExistStatement = ifNotExist? `IF NOT EXISTS `:``;
+            const ifNotExistStatement = ifNotExist ? `IF NOT EXISTS `:``;
 
             return assignTemplates(templates.createTable, {
                 ifNotExistStatement,

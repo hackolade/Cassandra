@@ -3,7 +3,7 @@ module.exports = {
 	dropTable: 'DROP TABLE IF EXISTS ${name};',
 
 	createTable:
-		'CREATE TABLE ${ifNotExists}${name}${items}${options};',
+		'CREATE TABLE ${ifNotExistStatement}${name}${items}${options};',
 	
 	dropDatabase: 'DROP DATABASE IF EXISTS ${name};',
 	

@@ -126,7 +126,7 @@ module.exports = {
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;
 		const includeEmptyCollection = data.includeEmptyCollection;
-		const recordSamplingSettings = { ...data.recordSamplingSettings, isTerminal: data.isTerminal };
+		const recordSamplingSettings = data.recordSamplingSettings;
 	
 		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
 			const entityNames = cassandra.splitEntityNames(tables[keyspaceName]);

@@ -528,54 +528,49 @@ module.exports = (_) => {
 	};
 	
 	const scanRecords = (keyspace, table, recordSamplingSettings, logger) => {
-        return getSizeOfRows(keyspace, table, recordSamplingSettings).then(
-            (size) =>
-                new Promise((resolve, reject) => {
+		return getSizeOfRows(keyspace, table, recordSamplingSettings).then(
+			size =>
+				new Promise((resolve, reject) => {
 					let rows = [];
-					
+
 					logger.log('info', { table: `${keyspace}.${table}`, limit: size }, 'Scan records');
 
-                    if (!size) {
-                        return resolve(rows);
+					if (!size) {
+						return resolve(rows);
 					}
 
-                    const options = { prepare: true, autoPage: true, retry: new CassandraRetryPolicy(logger) };
-                    const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
+					const options = { prepare: true, autoPage: true, retry: new CassandraRetryPolicy(logger) };
+					const selQuery = `SELECT * FROM "${keyspace}"."${table}" LIMIT ${size}`;
 
-                    state.client.eachRow(
-                        selQuery,
-                        [],
-                        options,
-                        function (n, row) {
-                            rows.push(row);
-                        },
-                        (err, rs) => {
-                            return err ? reject(err) : resolve(rows);
-                        }
-                    );
-                })
-        );
-    };
+					state.client.eachRow(
+						selQuery,
+						[],
+						options,
+						function (n, row) {
+							rows.push(row);
+						},
+						(err, rs) => {
+							return err ? reject(err) : resolve(rows);
+						},
+					);
+				}),
+		);
+	};
 
 	const getSizeOfRows = (keyspace, table, recordSamplingSettings) => {
-		if(recordSamplingSettings.active === 'absolute') {
-			return Promise.resolve(recordSamplingSettings.absolute.value)
+		if (recordSamplingSettings.active === 'absolute') {
+			return Promise.resolve(Number(recordSamplingSettings.absolute.value));
 		}
 
-		const defaultCount = 1000;
 		const countQueryLimit = getCountLimit(recordSamplingSettings);
 		const query = `SELECT COUNT(*) FROM "${keyspace}"."${table}" LIMIT ${countQueryLimit}`;
 
 		return execute(query).then(count => {
-			const rowsCount = _.get(count, 'rows[0].count.low', defaultCount);
+			const rowsCount = _.get(count, 'rows[0].count.low', recordSamplingSettings.maxValue);
 
-			if (!rowsCount) {
-				return 0;
-			}
-
-			return getSampleDocSize(rowsCount, recordSamplingSettings)
-		})
-	}
+			return getSampleDocSize(rowsCount, recordSamplingSettings);
+		});
+	};
 	
 	
 	const getEntityLevelData = (table, tableName, searchIndex) => {
@@ -1061,10 +1056,9 @@ module.exports = (_) => {
 	
 	
 	const getSampleDocSize = (count, recordSamplingSettings) => {
-		const per = recordSamplingSettings.relative.value;
-		return (recordSamplingSettings.active === 'absolute')
-			? recordSamplingSettings.absolute.value
-				: Math.round( count/100 * per);
+		const limit = Math.ceil((count * recordSamplingSettings.relative.value) / 100);
+
+		return Math.min(limit, recordSamplingSettings.maxValue);
 	};
 
 	const cleanOutComments = (script) => {
@@ -1154,7 +1148,7 @@ module.exports = (_) => {
 
 	const getCountLimit = (recordSamplingSettings) => {
         const per = recordSamplingSettings.relative.value;
-        const max = recordSamplingSettings.isTerminal ? 100000 : 10000;
+        const max = recordSamplingSettings.maxValue;
 
         return Math.round((max / per) * 100);
     };

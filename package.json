@@ -1,7 +1,7 @@
 {
 	"name": "Cassandra",
-	"version": "0.1.126",
-	"versionDate": "2023-06-30",
+	"version": "0.1.127",
+	"versionDate": "2023-07-20",
 	"author": "hackolade",
 	"engines": {
 		"hackolade": "5.4.7",

@@ -145,10 +145,10 @@ module.exports = app => {
         },
 
         updateTableOptions(compMod, tableName, isGetOptionScript) {
-            if (!isGetOptionScript || !compMod || !compMod.tableOptions) {
+            if (!isGetOptionScript || !compMod) {
                 return '';
             }
-            const { keyspaceName, tableOptions, comments } = compMod;
+            const { keyspaceName, tableOptions = {}, comments } = compMod;
             const isCommentNew = comment => comment?.new && comment.new !== comment.old;
             const alterTablePrefixStatement = alterTablePrefix(tableName, keyspaceName);
 

@@ -323,7 +323,7 @@ const handleItem = (item, udtMap, generator, data) => {
 
 			const updateTableScript = getUpdateTableDto({ 
 				item: itemProperties[tableKey], 
-				isOptionScript: generator.name === 'getUpdate',
+				isOptionScript: generator.name === 'getUpdate' || generator.name === 'getAdd',
 				propertiesScript,
 				keyspaceName,
 				tableName,

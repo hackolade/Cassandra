@@ -59,5 +59,13 @@
 				"type": "blob"
 			}
 		}
+	],
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "integer"
+			},
+			"mode": "smallint"
+		}
 	]
 }

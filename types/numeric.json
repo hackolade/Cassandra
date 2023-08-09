@@ -63,9 +63,54 @@
 	"descriptor": [
 		{
 			"schema": {
-				"mode": "integer"
+				"mode": "smallint"
 			},
 			"mode": "smallint"
+		},
+		{
+			"schema": {
+				"mode": "integer"
+			},
+			"capacity": 4
+		},
+		{
+			"schema": {
+				"mode": "bigint"
+			},
+			"capacity": 8
+		},
+		{
+			"schema": {
+				"mode": "smallint"
+			},
+			"capacity": 2
+		},
+		{
+			"schema": {
+				"mode": "tinyint"
+			},
+			"capacity": 1
+		},
+		{
+			"schema": {
+				"mode": "decimal"
+			},
+			"capacity": 16,
+			"mode": "decimal"
+		},
+		{
+			"schema": {
+				"mode": "double"
+			},
+			"capacity": 8,
+			"mode": "floating"
+		},
+		{
+			"schema": {
+				"mode": "float"
+			},
+			"capacity": 4,
+			"mode": "floating"
 		}
 	]
 }

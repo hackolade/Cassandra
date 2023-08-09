@@ -18,28 +18,22 @@
 	"subtypes": {
 		"object": {
 			"parentType": "jsonObject",
-			"childValueType": [
-				"jsonString",
-				"jsonNumber",
-				"jsonObject",
-				"jsonArray",
-				"jsonBoolean",
-				"jsonNull"
-			]
+			"childValueType": ["jsonString", "jsonNumber", "jsonObject", "jsonArray", "jsonBoolean", "jsonNull"]
 		},
 		"array": {
 			"parentType": "jsonArray",
-			"childValueType": [
-				"jsonString",
-				"jsonNumber",
-				"jsonObject",
-				"jsonArray",
-				"jsonBoolean",
-				"jsonNull"
-			]
+			"childValueType": ["jsonString", "jsonNumber", "jsonObject", "jsonArray", "jsonBoolean", "jsonNull"]
 		},
 		"blb": {
 			"parentType": "binary"
 		}
-	}
+	},
+	"descriptor": [
+		{
+			"schema": {
+				"mode": "blb"
+			},
+			"mode": "binary"
+		}
+	]
 }

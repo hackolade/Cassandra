@@ -26,7 +26,8 @@
 				"geospatial",
 				"uuid",
 				"timeuuid",
-				"udt"
+				"udt",
+				"vector"
 			]
 		}
 	}

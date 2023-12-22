@@ -1309,15 +1309,21 @@ making sure that you maintain a proper JSON format.
 			"schemaId",
 			"refPath",
 			"description",
-			"type",
+			{
+				"propertyKeyword": "type",
+				"typeDecorator": {
+					"value": "vctr",
+					"useAsTypeName": true
+				}
+			},
 			{
 				"propertyName": "Subtype",
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,
 				"propertyType": "select",
 				"typeDecorator": {
-					"value": "vctr<flt>",
-					"useAsTypeName": true,
+					"value": "flt",
+					"useAngleBrackets": true,
 					"dependency": {
 						"key": "subtype",
 						"value": "float"

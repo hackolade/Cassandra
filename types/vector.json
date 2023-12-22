@@ -13,7 +13,8 @@
 		"maxItems": "",
 		"uniqueItems": false,
 		"subtype": "float",
-		"dimension": 1
+		"dimension": 1,
+		"snippet": "vector-float"
 	},
 	"subtypes": {
 		"float": {

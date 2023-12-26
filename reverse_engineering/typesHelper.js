@@ -24,7 +24,7 @@ module.exports = (_) => {
 	};
 
 	const getRef = (column) => {
-		const name = _.get(column, 'type.info.name', 
+		const name = _.get(column, 'type.info.name',
 			_.get(column, 'info.name', column.name)
 		);
 
@@ -40,6 +40,8 @@ module.exports = (_) => {
 			return handleTuple(appType, column, sample, udtHash);
 		} else if (cassandraType === 'set' || cassandraType === 'list') {
 			return handleList(appType, column, sample, udtHash);
+		} else if (cassandraType === 'custom') {
+			return handleVector(appType, column, sample, udtHash);
 		} else {
 			return appType;
 		}
@@ -56,7 +58,7 @@ module.exports = (_) => {
 		const keyType = handledKeyData.type;
 		const valueType = getChildTypeByProperties(properties);
 		const subtype = getSubType(appType.type, valueType);
-		
+
 		return Object.assign({}, appType, keySubtype, {
 			keyType,
 			subtype,
@@ -88,12 +90,27 @@ module.exports = (_) => {
 		});
 	};
 
+	const handleVector = (appType, column, sample, udtHash) => {
+		const valueData = (column.info || column.type.info);
+		const dimension = valueData.dimensions;
+		const allItems = getItems(valueData.subtype, sample, udtHash);
+		const items = _.uniqWith(allItems, _.isEqual);
+		const subtype = (items[0] || { mode: 'float' }).mode;
+
+		return {
+			...appType,
+			dimension,
+			subtype,
+			items,
+		};
+	};
+
 	const getAppType = (type) => {
-		switch(type) {
+		switch (type) {
 			case "int":
 				return {
 					type: "numeric",
-					mode: "integer"	
+					mode: "integer"
 				};
 			case "smallint":
 			case "tinyint":
@@ -105,7 +122,7 @@ module.exports = (_) => {
 			case "varint":
 				return {
 					type: "numeric",
-					mode: type	
+					mode: type
 				};
 			case "text":
 			case "varchar":
@@ -131,6 +148,8 @@ module.exports = (_) => {
 			case "set":
 			case "map":
 				return { type };
+			case "custom":
+				return { type: "vector" };
 			default:
 				return {
 					type: 'char'
@@ -164,7 +183,7 @@ module.exports = (_) => {
 	};
 
 	const getJsonType = (type) => {
-		switch(type) {
+		switch (type) {
 			case "smallint":
 			case "tinyint":
 			case "int":
@@ -240,5 +259,5 @@ module.exports = (_) => {
 		}
 	};
 
-    return { getColumnType };
+	return { getColumnType };
 };

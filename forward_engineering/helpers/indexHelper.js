@@ -160,6 +160,10 @@ const getCustomOptions = (options, isSASI) => {
 		result.ascii = 'true';
 	}
 
+	if (options.similarity_function && !isSASI) {
+		result.similarity_function = `${options.similarity_function}`;
+	}
+
 	if(!isSASI){
 		return result;
 	}

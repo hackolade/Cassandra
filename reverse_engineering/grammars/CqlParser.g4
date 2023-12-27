@@ -897,10 +897,11 @@ dataTypeName
    | K_VARINT
    | K_TIMESTAMP
    | K_UUID
+   | K_VECTOR
    ;
 
 dataTypeDefinition
-   : syntaxBracketLa dataType (syntaxComma dataType)* syntaxBracketRa
+   : syntaxBracketLa dataType (syntaxComma (dataType | decimalLiteral))* syntaxBracketRa
    ;
 
 orderDirection
@@ -1738,5 +1739,6 @@ id
    K_TUPLE |
    K_VARCHAR |
    K_VARINT |
-   K_USERS
+   K_USERS |
+   K_VECTOR
 ;

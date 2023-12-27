@@ -1266,3 +1266,7 @@ OPERATOR_GTE
 K_USERS
    : U S E R S | 'USERS'
    ;
+
+K_VECTOR
+   : V E C T O R | 'VECTOR'
+   ;

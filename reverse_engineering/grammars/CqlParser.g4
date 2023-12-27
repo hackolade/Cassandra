@@ -528,6 +528,7 @@ customIndexOption
    | kwAnalyzerClass COLON analyzerClassOption=stringLiteral COMMA?
    | kwTokenizationLocale COLON tokenizationLocaleOption=stringLiteral COMMA?
    | kwTokenizationSkipStopWords COLON tokenizationSkipStopWordsOption=stringLiteral COMMA?
+   | kwSimilarityFunction COLON similarityFunctionOption=stringLiteral COMMA?
    ;
 
 createSearchIndex
@@ -1302,6 +1303,10 @@ kwEncrypted
 kwCaseSensitive
    : K_CASE_SENITIVE
    ;   
+
+kwSimilarityFunction
+   : K_SIMILARITY_FUNCTION
+   ;
 
 kwInitcond
    : K_INITCOND

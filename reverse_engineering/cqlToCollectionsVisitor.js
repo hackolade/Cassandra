@@ -175,6 +175,9 @@ class Visitor extends CqlParserVisitor {
 		if(ctx.analyzedOption){
 			return {analyzed: ctx.analyzedOption.getText().toLowerCase() === `'true'`}
 		}
+		if(ctx.similarityFunctionOption){
+			return {similarity_function: ctx.similarityFunctionOption.getText().replaceAll('\'','')}
+		}
 		if(ctx.isLiteralOption){
 			return {isLiteral: ctx.isLiteralOption.getText().toLowerCase() === `'true'`}
 		}

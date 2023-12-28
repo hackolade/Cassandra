@@ -6,7 +6,7 @@
   "dependencies": {
     "antlr4": "^4.8.0",
     "cassandra-driver": "^4.7.2",
-    "fast-xml-parser": "^3.19.0",
+    "fast-xml-parser": "^4.2.5",
     "jks-js": "^1.0.0",
     "tunnel-ssh": "github:hackolade/tunnel-ssh"
   },

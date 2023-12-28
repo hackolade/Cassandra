@@ -648,6 +648,7 @@ module.exports = (_) => {
 				customOptions.case_sensitive = item.options.case_sensitive === 'true';
 				customOptions.normalize = item.options.normalize === 'true';
 				customOptions.ascii = item.options.ascii === 'true';
+				customOptions.similarity_function = item.options.similarity_function || '';
 			}
 
 			return {
@@ -922,7 +923,7 @@ module.exports = (_) => {
 			documents: data.records,
 		};
 	
-		if (data.table.columns && data.table.columns.length) {
+		if (data?.table?.columns?.length) {
 			packageData.bucketInfo = getKeyspaceInfo(data.keyspaceName);
 			packageData.bucketInfo.UDFs = data.UDFs;
 			packageData.bucketInfo.UDAs = data.UDAs;

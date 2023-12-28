@@ -413,6 +413,43 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "ascii",
 								"propertyType": "checkbox",
 								"propertyTooltip": "When set to true, SAI converts alphabetic, numeric, and symbolic characters that are not in the Basic Latin Unicode block (the first 127 ASCII characters) to the ASCII equivalent, if one exists."
+							},
+							{
+								"propertyName": "similarity_function",
+								"propertyKeyword": "similarity_function",
+								"propertyType": "select",
+								"propertyTooltip": "Vector search relies on computing the similarity or distance between vectors to identify relevant matches. The similarity function is used to compute the similarity between two vectors.",
+								"options": [
+									"",
+									"EUCLIDEAN",
+									"DOT_PRODUCT",
+									"COSINE"
+								],
+								"dependency": {
+									"type": "not",
+									"values": [
+										{
+											"level": "model",
+											"key": "dbVersion",
+											"value": "2.x"
+										},
+										{
+											"level": "model",
+											"key": "dbVersion",
+											"value": "3.x"
+										},
+										{
+											"level": "model",
+											"key": "dbVersion",
+											"value": "4.x"
+										},
+										{
+											"level": "model",
+											"key": "dbVersion",
+											"value": "DSE 4.x"
+										}
+									]
+								}
 							}
 						]
 					},

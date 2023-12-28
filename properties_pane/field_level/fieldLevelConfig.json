@@ -1302,6 +1302,117 @@ making sure that you maintain a proper JSON format.
 			"additionalItems",
 			"comments"
 		],
+		"vector": [
+			"name",
+			"code",
+			"sampleName",
+			"schemaId",
+			"refPath",
+			"description",
+			{
+				"propertyKeyword": "type",
+				"typeDecorator": {
+					"value": "vctr",
+					"useAsTypeName": true
+				}
+			},
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "subtype",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"typeDecorator": {
+					"value": "flt",
+					"useAngleBrackets": true,
+					"dependency": {
+						"key": "subtype",
+						"value": "float"
+					}
+				},
+				"typeable": true,
+				"options": [
+					"float"
+				]
+			},
+			{
+				"propertyName": "Dimension",
+				"propertyKeyword": "dimension",
+				"propertyType": "numeric",
+				"valueType": "integer",
+				"allowNegative": false,
+				"typeDecorator": true,
+				"defaultValue": 1,
+				"maxValue": 8192
+			},
+			{
+				"propertyName": "Frozen",
+				"propertyKeyword": "frozen",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean"
+			},
+			"dependencies",
+			{
+				"propertyName": "Required",
+				"propertyKeyword": "required",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
+			},
+			{
+				"propertyName": "Primary key",
+				"propertyKeyword": "primaryKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"hidden": true
+			},
+			{
+				"propertyName": "Clustering key",
+				"propertyKeyword": "compositeClusteringKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositeClusteringKey",
+					"value": true
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
+			},
+			{
+				"propertyName": "Partition key",
+				"propertyKeyword": "compositePartitionKey",
+				"shouldValidate": false,
+				"propertyType": "checkbox",
+				"valueType": "boolean",
+				"dependency": {
+					"key": "compositePartitionKey",
+					"value": true
+				},
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
+			},
+			"minItems",
+			"maxItems",
+			"uniqueItems",
+			"additionalItems",
+			"comments"
+		],
 		"___3": [],
 		"geospatial": [
 			"name",

@@ -158,10 +158,18 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 		return `map<${keyType}, ${valueType}>`;
 	};
 
+	const vector = (propertyData, propertyName) => {
+		const valueType = getValueTypeFromArray(propertyData, "float", udtTypeMap, propertyName)
+		const dimension =  getVectorDimension(propertyData);
+
+		return `vector<${valueType}, ${dimension}>`
+	};
+
 	return ifType(type)
 		("map", setFrozen(map))
 		("list", setFrozen(list))
 		("set", setFrozen(typeSet))
+		("vector", setFrozen(vector))
 		("tuple", tuple)
 		();
 };
@@ -219,6 +227,16 @@ const getTypeByData = (propertyData, udtTypeMap, propertyName) => {
 	const type = getTypeByPropertyData(propertyData);
 
 	return getHandlerByType(type, udtTypeMap)(propertyData, propertyName);
+};
+
+const getVectorDimension = (propertyData) => {
+	if (!isNaN(+propertyData.dimension)) {
+		return propertyData.dimension
+	}
+
+	const config = getFieldConfig(propertyData.type, "dimension");
+
+	return config?.defaultValue;
 };
 
 module.exports = {

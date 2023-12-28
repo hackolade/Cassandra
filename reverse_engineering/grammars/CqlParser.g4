@@ -528,6 +528,7 @@ customIndexOption
    | kwAnalyzerClass COLON analyzerClassOption=stringLiteral COMMA?
    | kwTokenizationLocale COLON tokenizationLocaleOption=stringLiteral COMMA?
    | kwTokenizationSkipStopWords COLON tokenizationSkipStopWordsOption=stringLiteral COMMA?
+   | kwSimilarityFunction COLON similarityFunctionOption=stringLiteral COMMA?
    ;
 
 createSearchIndex
@@ -897,10 +898,11 @@ dataTypeName
    | K_VARINT
    | K_TIMESTAMP
    | K_UUID
+   | K_VECTOR
    ;
 
 dataTypeDefinition
-   : syntaxBracketLa dataType (syntaxComma dataType)* syntaxBracketRa
+   : syntaxBracketLa dataType (syntaxComma (dataType | decimalLiteral))* syntaxBracketRa
    ;
 
 orderDirection
@@ -1301,6 +1303,10 @@ kwEncrypted
 kwCaseSensitive
    : K_CASE_SENITIVE
    ;   
+
+kwSimilarityFunction
+   : K_SIMILARITY_FUNCTION
+   ;
 
 kwInitcond
    : K_INITCOND
@@ -1738,5 +1744,6 @@ id
    K_TUPLE |
    K_VARCHAR |
    K_VARINT |
-   K_USERS
+   K_USERS |
+   K_VECTOR
 ;

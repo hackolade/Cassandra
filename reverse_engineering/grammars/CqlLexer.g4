@@ -729,6 +729,11 @@ K_NORMALIZE
    : SQUOTE N O R M A L I Z E SQUOTE
    ;
 
+K_SIMILARITY_FUNCTION
+   : S I M I L A R I T Y '_' F U N C T I O N
+   | SQUOTE S I M I L A R I T Y '_' F U N C T I O N SQUOTE
+   ;
+
 K_ANALYZED
    : SQUOTE A N A L Y Z E D SQUOTE
    ;
@@ -1265,4 +1270,8 @@ OPERATOR_GTE
 
 K_USERS
    : U S E R S | 'USERS'
+   ;
+
+K_VECTOR
+   : V E C T O R | 'VECTOR'
    ;

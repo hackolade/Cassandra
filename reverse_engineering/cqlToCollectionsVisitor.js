@@ -175,6 +175,9 @@ class Visitor extends CqlParserVisitor {
 		if(ctx.analyzedOption){
 			return {analyzed: ctx.analyzedOption.getText().toLowerCase() === `'true'`}
 		}
+		if(ctx.similarityFunctionOption){
+			return {similarity_function: ctx.similarityFunctionOption.getText().replaceAll('\'','')}
+		}
 		if(ctx.isLiteralOption){
 			return {isLiteral: ctx.isLiteralOption.getText().toLowerCase() === `'true'`}
 		}
@@ -678,7 +681,7 @@ class Visitor extends CqlParserVisitor {
 
 	visitDataType(ctx) {
 		const type = this.visit(ctx.dataTypeName());
-		const COMPLEX_TYPES = ['map', 'tuple', 'list', 'set'];
+		const COMPLEX_TYPES = ['map', 'tuple', 'list', 'set', 'vector'];
 		const hackoladeType = getTargetType(type);
 
 		const typeDescription = ctx.dataTypeDefinition();
@@ -710,6 +713,21 @@ class Visitor extends CqlParserVisitor {
 				keySubtype: description2.mode,
 				subtype: `map<${complexTypeMapper(description2.type || '')}>`,
 				properties: [Object.assign({ name: 'New column' }, description2)],
+			};
+		}
+
+		if (hackoladeType.type === 'vector') {
+			const decimalLiteralContext = typeDescription.decimalLiteral();
+			const [dimension] = decimalLiteralContext ? this.visit(decimalLiteralContext) : [1];
+
+			return {
+				...hackoladeType,
+				subtype: description1.mode,
+				dimension: dimension,
+				properties: [{
+					...description1,
+					name: 'New column',
+				}],
 			};
 		}
 
@@ -807,6 +825,10 @@ class Visitor extends CqlParserVisitor {
 
 	visitDataTypeDefinition(ctx) {
 		return this.visit(ctx.dataType());
+	}
+
+	visitDecimalLiteral(ctx) {
+		return +ctx.getText();
 	}
 
 	visitBooleanLiteral(ctx) {
@@ -975,6 +997,7 @@ const getTargetType = (type) => {
 		case "list":
 		case "set":
 		case "map":
+		case "vector":
 			return { type };
 		default:
 			return;
@@ -995,6 +1018,7 @@ const complexTypeMapper = type => {
 		case "list":
 		case "set":
 		case "map":
+		case "vector":
 			return type;
 		default:
 			return "udt";

@@ -148,8 +148,6 @@ module.exports = (_) => {
 			case "set":
 			case "map":
 				return { type };
-			case "custom":
-				return { type: "vector" };
 			default:
 				return {
 					type: 'char'

@@ -40,7 +40,7 @@ module.exports = (_) => {
 			return handleTuple(appType, column, sample, udtHash);
 		} else if (cassandraType === 'set' || cassandraType === 'list') {
 			return handleList(appType, column, sample, udtHash);
-		} else if (cassandraType === 'custom') {
+		} else if (cassandraType === 'custom' && isVector(column)) {
 			return handleVector(appType, column, sample, udtHash);
 		} else {
 			return appType;
@@ -257,6 +257,12 @@ module.exports = (_) => {
 		} else {
 			return 'text';
 		}
+	};
+
+	const isVector = (column) => {
+		const valueData = (column.info || column.type.info);
+		const dimension = valueData?.dimensions;
+		return !isNaN(+dimension);
 	};
 
 	return { getColumnType };

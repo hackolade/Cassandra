@@ -923,7 +923,7 @@ module.exports = (_) => {
 			documents: data.records,
 		};
 	
-		if (data.table.columns && data.table.columns.length) {
+		if (data?.table?.columns?.length) {
 			packageData.bucketInfo = getKeyspaceInfo(data.keyspaceName);
 			packageData.bucketInfo.UDFs = data.UDFs;
 			packageData.bucketInfo.UDAs = data.UDAs;

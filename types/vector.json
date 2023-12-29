@@ -13,12 +13,12 @@
 		"maxItems": "",
 		"uniqueItems": false,
 		"subtype": "float",
-		"dimension": 1,
-		"snippet": "vector-float"
+		"dimension": 1
 	},
 	"subtypes": {
 		"float": {
-			"childValueType": "numeric"
+			"childValueType": "numeric",
+			"childValueMode": "float"
 		}
 	},
 	"dependency": {

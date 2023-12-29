@@ -1,8 +1,0 @@
-{
-	"name": "vector-float",
-	"parentType": "array",
-	"properties": [{
-		"type": "numeric",
-    "mode": "float"
-	}]
-}

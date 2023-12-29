@@ -253,7 +253,77 @@ making sure that you maintain a proper JSON format.
 				],
 				"data": "options",
 				"valueType": "string",
-				"typeable": true
+				"typeable": true,
+				"dependency": {
+					"type": "not",
+					"values": [
+						{
+							"level": "parent",
+							"key": "childType",
+							"value": "vector"
+						}
+					]
+				}
+			},
+			{
+				"propertyName": "Subtype",
+				"propertyKeyword": "mode",
+				"shouldValidate": false,
+				"propertyType": "select",
+				"options": [
+					{
+						"name": "integer",
+						"value": "integer",
+						"isDisabled": true
+					},
+					{
+						"name": "bigint",
+						"value": "bigint",
+						"isDisabled": true
+					},
+					{
+						"name": "smallint",
+						"value": "smallint",
+						"isDisabled": true
+					},
+					{
+						"name": "tinyint",
+						"value": "tinyint",
+						"isDisabled": true
+					},
+					{
+						"name": "counter",
+						"value": "counter",
+						"isDisabled": true
+					},
+					{
+						"name": "decimal",
+						"value": "decimal",
+						"isDisabled": true
+					},
+					{
+						"name": "double",
+						"value": "double",
+						"isDisabled": true
+					},
+					{
+						"name": "float",
+						"value": "float"
+					},
+					{
+						"name": "varint",
+						"value": "varint",
+						"isDisabled": true
+					}
+				],
+				"data": "options",
+				"valueType": "string",
+				"typeable": true,
+				"dependency": {
+					"level": "parent",
+					"key": "childType",
+					"value": "vector"
+				}
 			},
 			"dependencies",
 			{

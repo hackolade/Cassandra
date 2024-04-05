@@ -261,9 +261,8 @@ const getDropIndexScript = (keyspaceName, tableName, secIndxs = []) => secIndxs.
 const getAddSearchIndexScript = data => {
 	const { keyspaceName, tableName, searchIndex, dataSources, isActivated, dbVersion } = data;
 	const isExistScript = checkExistsScript(keyspaceName, tableName, 'createSearchIndexes');
-	const dataIndexScript = { ...scriptData, added: true, script: '' };
 	if (isExistScript) {
-		return [dataIndexScript];
+		return [];
 	}
 	setNameCollectionsScript(keyspaceName, tableName, 'createSearchIndexes');
 	const script = getIndexes(
@@ -468,9 +467,11 @@ const createDataSources = (item, data) => {
 	];
 };
 
+const getTableNameFromCompMod = table => table.role?.compMod?.collectionName?.new ?? table.role?.compMod?.collectionName?.old
+
 const getIndexTable = (item, data, tableIsChange) => {
 	const dataSources = createDataSources(item, data);
-	const tableName = item.role?.code || item.role?.name;
+	const tableName = item.role?.code || item.role?.name || getTableNameFromCompMod(item);
 	const keyspaceName = item.role.compMod?.keyspaceName;
 	const dbVersion = data.modelData[0].dbVersion;
 	const isActivated = item.role?.isActivated;

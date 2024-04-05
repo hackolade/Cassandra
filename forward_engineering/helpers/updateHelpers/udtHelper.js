@@ -116,7 +116,7 @@ const prepareField = (field, property) => {
 const getUpdateScript = (item, data, udtMap) => {
 	const { role = {}, properties } = item;
 	if (!properties) {
-		return [scriptData];
+		return [];
 	}
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name;

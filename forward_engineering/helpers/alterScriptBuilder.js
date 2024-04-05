@@ -14,7 +14,7 @@ const getCommentedDropScript = (scriptDtos, data) => {
         return scriptDtos;
     }
     return scriptDtos.map((dto = {}) => {
-        if (!dto?.scripts[0]?.isDropScript || !dto?.scripts[0]?.script) {
+        if (!dto?.scripts?.[0]?.isDropScript || !dto?.scripts?.[0]?.script) {
             return dto;
         }
         return {

@@ -255,13 +255,13 @@ const handleItem = (item, udtMap, generator, data) => {
 	alterTableScript = Object.keys(itemProperties)
 		.reduce((alterTableScript, tableKey) => {
 			const itemCompModData = itemProperties[tableKey].role.compMod;
-			const codeName = dependencies.lodash.get(itemProperties, `${tableKey}.role.code`, '');
-			const tableName = codeName.length ? codeName : tableKey;
 
 			if (!itemCompModData) {
 				return alterTableScript;
 			}
 
+			const codeName = dependencies.lodash.get(itemProperties, `${tableKey}.role.code`, '');
+			const tableName = codeName.length ? codeName : tableKey;
 			const tableProperties = itemProperties[tableKey].properties || {};
 
 			const keyspaceName = itemCompModData.keyspaceName;

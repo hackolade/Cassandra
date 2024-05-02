@@ -24,6 +24,15 @@ module.exports = (_) => {
 
 		return handlerRecords.some(record => record === undefined) ? [] : handlerRecords; 
 	};
+
+	const handleMap = ({ properties, records }) => {
+		return Object.entries(properties).reduce((result, [propertyName, propertyValue]) => {
+			return {
+				...result,
+				[propertyName]: filterUdt(propertyValue?.properties, records?.[propertyName])
+			}
+		}, {});
+	};
 	
 	const filterUdt = (properties, records) => {
 		if (!_.isPlainObject(records)) {
@@ -45,7 +54,7 @@ module.exports = (_) => {
 			} else if (type === 'map' && propertyValue.properties) {
 				return {
 					...records,
-					[recordName]: filterUdt(propertyValue.properties, recordValues),
+					[recordName]: handleMap({ properties: propertyValue.properties, records: recordValues }),
 				}
 			}
 	

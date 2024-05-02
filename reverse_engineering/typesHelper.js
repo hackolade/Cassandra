@@ -51,7 +51,7 @@ module.exports = (_) => {
 		const keyData = (column.info || column.type.info)[0];
 		const valueData = (column.info || column.type.info)[1];
 		const handledKeyData = getColumnType(keyData);
-		const properties = getProperties(valueData, sample, udtHash);
+		const properties = getMapProperties({ valueData, sample, udtHash });
 		const keySubtype = handledKeyData.mode
 			? { keySubtype: handledKeyData.mode }
 			: {};
@@ -176,9 +176,23 @@ module.exports = (_) => {
 		const name = handledValueData.refName || defaultColumnName;
 
 		return {
-			[name]: _.omit(handledValueData, 'refName')
+			[name]: _.omit(handledValueData, "refName"),
 		};
 	};
+
+	const getMapProperties = ({ valueData, sample, udtHash }) => {
+    const properties = getProperties(valueData, sample, udtHash);
+    const propertyPairs = Object.entries(properties);
+    const uniqueProperties = _.uniqWith(
+      propertyPairs,
+      ([, propertyA], [, propertyB]) =>
+        propertyA.type === propertyB.type &&
+        propertyA.$ref === propertyB.$ref &&
+        propertyA.mode === propertyB.mode
+    );
+
+    return Object.fromEntries(uniqueProperties);
+  };
 
 	const getJsonType = (type) => {
 		switch (type) {

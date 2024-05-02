@@ -176,23 +176,23 @@ module.exports = (_) => {
 		const name = handledValueData.refName || defaultColumnName;
 
 		return {
-			[name]: _.omit(handledValueData, "refName"),
+			[name]: _.omit(handledValueData, 'refName'),
 		};
 	};
 
 	const getMapProperties = ({ valueData, sample, udtHash }) => {
-    const properties = getProperties(valueData, sample, udtHash);
-    const propertyPairs = Object.entries(properties);
-    const uniqueProperties = _.uniqWith(
-      propertyPairs,
-      ([, propertyA], [, propertyB]) =>
-        propertyA.type === propertyB.type &&
-        propertyA.$ref === propertyB.$ref &&
-        propertyA.mode === propertyB.mode
-    );
+		const properties = getProperties(valueData, sample, udtHash);
+		const propertyPairs = Object.entries(properties);
+		const uniqueProperties = _.uniqWith(
+			propertyPairs,
+			([, propertyA], [, propertyB]) =>
+				propertyA.type === propertyB.type &&
+				propertyA.$ref === propertyB.$ref &&
+				propertyA.mode === propertyB.mode
+		);
 
-    return Object.fromEntries(uniqueProperties);
-  };
+		return Object.fromEntries(uniqueProperties);
+	};
 
 	const getJsonType = (type) => {
 		switch (type) {

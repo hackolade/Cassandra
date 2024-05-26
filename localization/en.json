@@ -87,7 +87,6 @@
 	"MODAL_WINDOW___CONTAIN_COLLECTIONS": "tables",
 	"MODAL_WINDOW___CONTAIN_BUCKET": "keyspaces",
 	"MODAL_WINDOW___CONTAIN_COLLECTION": "tables",
-	"MODAL_WINDOW___DB_CONNECTION_PROCESS": "Cassandra Reverse-Engineering Process",
 	"PROGRESS_BAR___DATABASE": "Keyspace",
 	"PROGRESS_BAR___COLLECTION": "Table",
 	"PROGRESS_BAR___PROCESS": "Process",

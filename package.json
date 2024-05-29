@@ -68,5 +68,11 @@
         "lint-staged": "14.0.1",
         "prettier": "3.2.5",
         "simple-git-hooks": "2.11.1"
+    },
+    "overrides": {
+        "tunnel-ssh": {
+            "cpu-features": "npm:-@0.0.1",
+            "ssh2": "npm:-@0.0.1"
+        }
     }
 }

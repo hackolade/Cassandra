@@ -22,7 +22,5 @@
         "system_traces",
         "system_views",
         "system_virtual_schema"
-    ],
-    "type": "multi",
-    "installed": true
+    ]
 }

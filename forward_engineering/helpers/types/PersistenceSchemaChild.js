@@ -1,50 +1,50 @@
 class PersistenceSchemaChild {
-    /**
-     * JSON Schema version
-     * @type string
-     * */
-    $schema
+	/**
+	 * JSON Schema version
+	 * @type string
+	 * */
+	$schema;
 
-    /**
-     * Type of PersistenceSchemaChild
-     * @type string
-     * */
-    type
+	/**
+	 * Type of PersistenceSchemaChild
+	 * @type string
+	 * */
+	type;
 
-    /**
-     *
-     * @type string
-     * */
-    title
+	/**
+	 *
+	 * @type string
+	 * */
+	title;
 
-    /**
-     *
-     * @type object
-     * */
-    properties
-    
-    /**
-     * @type boolean
-     * */
-    isActivated
+	/**
+	 *
+	 * @type object
+	 * */
+	properties;
 
-    /**
-     * @type boolean
-     * */
-    additionalProperties
+	/**
+	 * @type boolean
+	 * */
+	isActivated;
 
-    /**
-     * @type boolean
-     * */
-    tableIfNotExist
+	/**
+	 * @type boolean
+	 * */
+	additionalProperties;
 
-    /**
-     * @type boolean
-     * */
-    searchIndexIfNotExist
+	/**
+	 * @type boolean
+	 * */
+	tableIfNotExist;
 
-    /**
-     * @type string
-     * */
-    GUID
+	/**
+	 * @type boolean
+	 * */
+	searchIndexIfNotExist;
+
+	/**
+	 * @type string
+	 * */
+	GUID;
 }

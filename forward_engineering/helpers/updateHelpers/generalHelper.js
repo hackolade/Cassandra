@@ -1,15 +1,29 @@
-const {dependencies} = require("../appDependencies");
-const {ReservedWordsAsArray} = require("../enums/reservedWords");
+const { dependencies } = require('../appDependencies');
+const { ReservedWordsAsArray } = require('../enums/reservedWords');
 const mergeArrays = (first, sec) => {
 	return [...first, ...sec];
 };
 
 const typesCompatibility = {
-	blob: ['ascii', 'bigint', 'boolean', 'decimal', 'double', 'float', 'inet', 'int', 'timestamp', 'timeuuid', 'uuid', 'varchar', 'varint'],
+	blob: [
+		'ascii',
+		'bigint',
+		'boolean',
+		'decimal',
+		'double',
+		'float',
+		'inet',
+		'int',
+		'timestamp',
+		'timeuuid',
+		'uuid',
+		'varchar',
+		'varint',
+	],
 	varint: ['int'],
 	varchar: ['text'],
 	uuid: ['timeuuid'],
-	text: ['varchar']
+	text: ['varchar'],
 };
 
 const checkIsOldModel = modelData => {
@@ -39,16 +53,17 @@ const fieldTypeCompatible = (oldType, newType) => {
 		return false;
 	}
 
-	return true
+	return true;
 };
 
 const wrapInQuotes = name =>
-	/\s|\W/.test(name) || dependencies.lodash.includes(ReservedWordsAsArray, dependencies.lodash.toUpper(name)) ? `"${name}"` : name;
-
+	/\s|\W/.test(name) || dependencies.lodash.includes(ReservedWordsAsArray, dependencies.lodash.toUpper(name))
+		? `"${name}"`
+		: name;
 
 module.exports = {
 	mergeArrays,
 	checkIsOldModel,
 	fieldTypeCompatible,
-	wrapInQuotes
-}
+	wrapInQuotes,
+};

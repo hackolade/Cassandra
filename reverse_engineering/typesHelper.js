@@ -4,11 +4,11 @@ const abbrHash = {
 	numeric: 'num',
 	char: 'str',
 	timestamp: 'ts',
-	reference: 'udt'
+	reference: 'udt',
 };
 const defaultColumnName = defaultData.field.name;
 
-module.exports = (_) => {
+module.exports = _ => {
 	const getColumnType = (column, udtHash, sample) => {
 		const fullCassandraType = types.getDataTypeNameByCode(column.type || column);
 		const cassandraType = fullCassandraType.split('<')[0];
@@ -16,17 +16,15 @@ module.exports = (_) => {
 		if (udtHash && cassandraType === 'udt') {
 			udtHash.push({
 				udt: column,
-				sample
+				sample,
 			});
 			return getRef(column);
 		}
 		return getType(cassandraType, column, sample, udtHash);
 	};
 
-	const getRef = (column) => {
-		const name = _.get(column, 'type.info.name',
-			_.get(column, 'info.name', column.name)
-		);
+	const getRef = column => {
+		const name = _.get(column, 'type.info.name', _.get(column, 'info.name', column.name));
 
 		return { type: 'reference', $ref: `#/definitions/${name}`, refName: name };
 	};
@@ -52,9 +50,7 @@ module.exports = (_) => {
 		const valueData = (column.info || column.type.info)[1];
 		const handledKeyData = getColumnType(keyData);
 		const properties = getMapProperties({ valueData, sample, udtHash });
-		const keySubtype = handledKeyData.mode
-			? { keySubtype: handledKeyData.mode }
-			: {};
+		const keySubtype = handledKeyData.mode ? { keySubtype: handledKeyData.mode } : {};
 		const keyType = handledKeyData.type;
 		const valueType = getChildTypeByProperties(properties);
 		const subtype = getSubType(appType.type, valueType);
@@ -62,7 +58,7 @@ module.exports = (_) => {
 		return Object.assign({}, appType, keySubtype, {
 			keyType,
 			subtype,
-			properties
+			properties,
 		});
 	};
 
@@ -80,18 +76,19 @@ module.exports = (_) => {
 	};
 
 	const handleList = (appType, column, sample, udtHash) => {
-		const valueData = (column.info || column.type.info);
+		const valueData = column.info || column.type.info;
 		const items = getItems(valueData, sample, udtHash);
 		const valueType = (items[0] || { type: 'text' }).type;
 		const subtype = getSubType(appType.type, valueType);
 
 		return Object.assign({}, appType, {
-			items: _.uniqWith(items, _.isEqual), subtype
+			items: _.uniqWith(items, _.isEqual),
+			subtype,
 		});
 	};
 
 	const handleVector = (appType, column, sample, udtHash) => {
-		const valueData = (column.info || column.type.info);
+		const valueData = column.info || column.type.info;
 		const dimension = valueData.dimensions;
 		const allItems = getItems(valueData.subtype, sample, udtHash);
 		const items = _.uniqWith(allItems, _.isEqual);
@@ -105,59 +102,59 @@ module.exports = (_) => {
 		};
 	};
 
-	const getAppType = (type) => {
+	const getAppType = type => {
 		switch (type) {
-			case "int":
+			case 'int':
 				return {
-					type: "numeric",
-					mode: "integer"
+					type: 'numeric',
+					mode: 'integer',
 				};
-			case "smallint":
-			case "tinyint":
-			case "bigint":
-			case "counter":
-			case "decimal":
-			case "double":
-			case "float":
-			case "varint":
+			case 'smallint':
+			case 'tinyint':
+			case 'bigint':
+			case 'counter':
+			case 'decimal':
+			case 'double':
+			case 'float':
+			case 'varint':
 				return {
-					type: "numeric",
-					mode: type
+					type: 'numeric',
+					mode: type,
 				};
-			case "text":
-			case "varchar":
-			case "ascii":
-			case "inet":
+			case 'text':
+			case 'varchar':
+			case 'ascii':
+			case 'inet':
 				return {
-					type: "char",
-					mode: type
+					type: 'char',
+					mode: type,
 				};
-			case "boolean":
+			case 'boolean':
 				return {
-					type: 'bool'
+					type: 'bool',
 				};
-			case "timestamp":
-			case "timeuuid":
-			case "blob":
-			case "date":
-			case "time":
-			case "uuid":
+			case 'timestamp':
+			case 'timeuuid':
+			case 'blob':
+			case 'date':
+			case 'time':
+			case 'uuid':
 				return { type };
-			case "tuple":
-			case "list":
-			case "set":
-			case "map":
+			case 'tuple':
+			case 'list':
+			case 'set':
+			case 'map':
 				return { type };
 			default:
 				return {
-					type: 'char'
+					type: 'char',
 				};
 		}
-	}
+	};
 
 	const getSubType = (type, subType) => {
 		return `${type}<${abbrHash[subType] || subType}>`;
-	}
+	};
 
 	const getProperties = (valueData, sample, udtHash) => {
 		if (!sample || typeof sample !== 'object') {
@@ -166,8 +163,8 @@ module.exports = (_) => {
 
 		return Object.keys(sample).reduce((result, propertyName) => {
 			return Object.assign({}, result, {
-				[propertyName]: getColumnType(valueData, udtHash, sample[propertyName])
-			})
+				[propertyName]: getColumnType(valueData, udtHash, sample[propertyName]),
+			});
 		}, {});
 	};
 
@@ -188,42 +185,42 @@ module.exports = (_) => {
 			([, propertyA], [, propertyB]) =>
 				propertyA.type === propertyB.type &&
 				propertyA.$ref === propertyB.$ref &&
-				propertyA.mode === propertyB.mode
+				propertyA.mode === propertyB.mode,
 		);
 
 		return Object.fromEntries(uniqueProperties);
 	};
 
-	const getJsonType = (type) => {
+	const getJsonType = type => {
 		switch (type) {
-			case "smallint":
-			case "tinyint":
-			case "int":
-			case "bigint":
-			case "counter":
-			case "decimal":
-			case "double":
-			case "float":
-			case "varint":
+			case 'smallint':
+			case 'tinyint':
+			case 'int':
+			case 'bigint':
+			case 'counter':
+			case 'decimal':
+			case 'double':
+			case 'float':
+			case 'varint':
 				return 'number';
-			case "text":
-			case "varchar":
-			case "ascii":
-			case "inet":
-			case "timestamp":
-			case "timeuuid":
-			case "blob":
-			case "date":
-			case "time":
-			case "uuid":
+			case 'text':
+			case 'varchar':
+			case 'ascii':
+			case 'inet':
+			case 'timestamp':
+			case 'timeuuid':
+			case 'blob':
+			case 'date':
+			case 'time':
+			case 'uuid':
 				return 'string';
-			case "boolean":
+			case 'boolean':
 				return 'boolean';
-			case "tuple":
-			case "list":
-			case "set":
+			case 'tuple':
+			case 'list':
+			case 'set':
 				return 'array';
-			case "map":
+			case 'map':
 				return 'object';
 			default:
 				return 'string';
@@ -260,7 +257,7 @@ module.exports = (_) => {
 		return [handledValueData];
 	};
 
-	const getChildTypeByProperties = (properties) => {
+	const getChildTypeByProperties = properties => {
 		const key = Object.keys(properties).pop();
 		const type = (properties[key] || {}).type;
 
@@ -271,8 +268,8 @@ module.exports = (_) => {
 		}
 	};
 
-	const isVector = (column) => {
-		const valueData = (column.info || column.type.info);
+	const isVector = column => {
+		const valueData = column.info || column.type.info;
 		const dimension = valueData?.dimensions;
 		return !isNaN(+dimension);
 	};

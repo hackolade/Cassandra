@@ -5,21 +5,24 @@
 	"parentType": "string",
 	"useSample": true,
 	"hiddenOnEntity": "view",
-	"sample":"08:45:12.123123",
+	"sample": "08:45:12.123123",
 	"defaultValues": {
 		"primaryKey": false,
 		"default": "",
 		"minLength": "",
 		"maxLength": "",
 		"enum": [],
-		"sample":"",
+		"sample": "",
 		"pattern": "",
-		"comments":"",
+		"comments": "",
 		"format": ""
 	},
-	"descriptor": [{
-		"format": "hh:mm:ss"
-	}, {
-		"format": "hh:mm:ss.nnn"
-	}]
+	"descriptor": [
+		{
+			"format": "hh:mm:ss"
+		},
+		{
+			"format": "hh:mm:ss.nnn"
+		}
+	]
 }

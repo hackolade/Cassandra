@@ -3,9 +3,7 @@
 		"type": "file",
 		"menu_label": "CQL File...",
 		"name": "cql",
-		"extensions": [
-			"cql"
-		],
+		"extensions": ["cql"],
 		"useMultipleFileReverse": true
 	},
 	{
@@ -14,14 +12,8 @@
 			"NO_DATABASES": "There is no databases in Datastax instance",
 			"WRONG_CONNECTION": "Can not connect to DataStax instance"
 		},
-		"excludeDocKind": [
-			"id"
-		],
-		"connectionList": [
-			"name",
-			"localDataCenter",
-			"user"
-		],
+		"excludeDocKind": ["id"],
+		"connectionList": ["name", "localDataCenter", "user"],
 		"widestColumn": "name",
 		"helpUrl": "https://hackolade.com/help/ConnecttoaCassandrainstance.html"
 	}

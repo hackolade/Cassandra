@@ -1,10 +1,10 @@
 const { dependencies } = require('../appDependencies');
 const { getReplication, getDurableWrites } = require('../keyspaceHelper');
 const { retrivePropertyFromConfig } = require('../generalHelper');
-const { AlterScriptDto } = require("../types/AlterScriptDto");
+const { AlterScriptDto } = require('../types/AlterScriptDto');
 
-const getDropUDFScript = udfData => udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name};` : '';
-const getDropUDAScript = udfData => udfData.name ? `DROP AGGREGATE IF EXISTS ${udfData.name};` : '';
+const getDropUDFScript = udfData => (udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name};` : '');
+const getDropUDAScript = udfData => (udfData.name ? `DROP AGGREGATE IF EXISTS ${udfData.name};` : '');
 
 const requiredPropsForUDF = ['functionBody'];
 const requiredPropsForUDA = ['storedProcFunction'];
@@ -28,7 +28,7 @@ const parser = {
 	regExpUDAForName: /^.+aggregate(.+?)\(/is,
 	getResult(body, reg) {
 		const result = body.match(reg);
-		
+
 		return result?.[1]?.trim();
 	},
 	getName(body, regex) {
@@ -44,7 +44,7 @@ const parser = {
 	getUDAName(body) {
 		return this.getName(body, this.regExpUDAForName);
 	},
-}
+};
 
 const getDataForScript = (newElements, oldElements, requiredProps) => {
 	let dataForAddScript = [];
@@ -53,7 +53,7 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	if (!newElements.length && !oldElements.length) {
 		return {
 			dataForAddScript,
-			dataForDropScript
+			dataForDropScript,
 		};
 	}
 
@@ -62,7 +62,8 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	} else if (!newElements.length) {
 		dataForDropScript = oldElements;
 	} else {
-		const difference = (newElement, oldElement) => requiredProps.every(prop => dependencies.lodash.isEqual(newElement[prop], oldElement[prop]));
+		const difference = (newElement, oldElement) =>
+			requiredProps.every(prop => dependencies.lodash.isEqual(newElement[prop], oldElement[prop]));
 
 		const equalElements = dependencies.lodash.intersectionWith(newElements, oldElements, difference);
 		dataForAddScript = dependencies.lodash.xorWith(newElements, equalElements, difference);
@@ -70,115 +71,96 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 	}
 	return {
 		dataForAddScript,
-		dataForDropScript
+		dataForDropScript,
 	};
-}
+};
 
 const getModifyUDFA = ({ new: newElements = [], old: oldElements = [], udData }) => {
 	newElements = newElements.map(element => ({
 		...element,
-		name: parser[udData.parser](element[udData.functionName])
+		name: parser[udData.parser](element[udData.functionName]),
 	}));
 	oldElements = oldElements.map(element => ({
 		...element,
-		name: parser[udData.parser](element[udData.functionName])
+		name: parser[udData.parser](element[udData.functionName]),
 	}));
 
 	const { dataForAddScript, dataForDropScript } = getDataForScript(newElements, oldElements, udData.requiredProps);
 
+	const addScript = dataForAddScript
+		.filter(ud =>
+			Object.entries(ud).every(([key, value]) => (udData['requiredProps'].includes(key) ? !!value : true)),
+		)
+		.map(ud => AlterScriptDto.getInstance([ud[udData.functionName]], true, 'add', 'udf'));
 
-	const addScript = dataForAddScript.filter(ud => Object.entries(ud).every(([key, value]) => 
-			udData['requiredProps'].includes(key) ? !!value : true
-		))
-		.map(ud => AlterScriptDto.getInstance(
-				[ud[udData.functionName]], 
-				true, 
-				'add',
-				'udf'
-			)
-		);
-	
 	const dropScript = dataForDropScript
 		.filter(ud => !!ud.name)
-		.map(ud => AlterScriptDto.getInstance(
-				[udData.getDropScript(ud)], 
-				true, 
-				'deletion',
-				'udf'
-			)
-		); 
+		.map(ud => AlterScriptDto.getInstance([udData.getDropScript(ud)], true, 'deletion', 'udf'));
 
 	return [...dropScript, ...addScript];
-}
+};
 
 const replicationProps = ['replStrategy', 'replFactory', 'dataCenters'];
 
 const getIsModifyKeysSpace = (keySpaceData, props) => {
 	return props.some(prop => {
-		const {new: newElements, old: oldElements} = keySpaceData[prop] || {};
+		const { new: newElements, old: oldElements } = keySpaceData[prop] || {};
 		return newElements && oldElements && !dependencies.lodash.isEqual(newElements, oldElements);
 	});
-}
+};
 
 const getKeySpaceScript = ({ child, mode }) => {
 	const keyspaceData = [child.role];
 	const keySpaceName = child.role.code || child.role.name;
-	const replicationStrategyProp = retrivePropertyFromConfig(keyspaceData, 0, "replStrategy", "");
-	const replicationFactorProp = retrivePropertyFromConfig(keyspaceData, 0, "replFactor", undefined);
-	const dataCentersProp = retrivePropertyFromConfig(keyspaceData, 0, "dataCenters", []);
-	const durableWritesProp = retrivePropertyFromConfig(keyspaceData, 0, "durableWrites", false);
+	const replicationStrategyProp = retrivePropertyFromConfig(keyspaceData, 0, 'replStrategy', '');
+	const replicationFactorProp = retrivePropertyFromConfig(keyspaceData, 0, 'replFactor', undefined);
+	const dataCentersProp = retrivePropertyFromConfig(keyspaceData, 0, 'dataCenters', []);
+	const durableWritesProp = retrivePropertyFromConfig(keyspaceData, 0, 'durableWrites', false);
 	const compMod = retrivePropertyFromConfig(keyspaceData, 0, 'compMod', {});
 
 	const replication = getReplication(replicationStrategyProp, replicationFactorProp, dataCentersProp);
 	const durableWrites = getDurableWrites(durableWritesProp);
-	
+
 	if (mode === 'add') {
 		const udfData = retrivePropertyFromConfig(keyspaceData, 0, 'UDFs', []);
 		const udaData = retrivePropertyFromConfig(keyspaceData, 0, 'UDAs', []);
-		
-		return [AlterScriptDto.getInstance(
-				[dependencies.provider.createKeySpace(keySpaceName, replication, durableWrites, udfData, udaData)], 
-				true, 
+
+		return [
+			AlterScriptDto.getInstance(
+				[dependencies.provider.createKeySpace(keySpaceName, replication, durableWrites, udfData, udaData)],
+				true,
 				'add',
-				'keySpaces'
-			)
+				'keySpaces',
+			),
 		];
 	} else if (mode === 'delete') {
-
-		return [AlterScriptDto.getInstance(
-				[dependencies.provider.dropKeySpace(keySpaceName)], 
-				true, 
+		return [
+			AlterScriptDto.getInstance(
+				[dependencies.provider.dropKeySpace(keySpaceName)],
+				true,
 				'deletion',
-				'keySpaces'
-			)
+				'keySpaces',
+			),
 		];
-	} 
+	}
 	const dataForUDFScript = compMod?.UDFs || {};
 	const dataForUDAScript = compMod?.UDAs || {};
 	const modifyUDFScript = getModifyUDFA({
-		...dataForUDFScript, 
+		...dataForUDFScript,
 		udData: udfData,
 	});
 	const modifyUDAScript = getModifyUDFA({
-		...dataForUDAScript, 
+		...dataForUDAScript,
 		udData: udaData,
 	});
 	const isModifyReplication = getIsModifyKeysSpace(compMod, replicationProps);
-	const script = isModifyReplication 
-		? dependencies.provider.alterKeySpaceReplication(keySpaceName, replication, durableWrites) 
+	const script = isModifyReplication
+		? dependencies.provider.alterKeySpaceReplication(keySpaceName, replication, durableWrites)
 		: '';
-	
-	return [AlterScriptDto.getInstance(
-			[script], 
-			true, 
-			'modify',
-			'keySpaces'
-		), 
-		...modifyUDAScript, 
-		...modifyUDFScript
-	];
-}
+
+	return [AlterScriptDto.getInstance([script], true, 'modify', 'keySpaces'), ...modifyUDAScript, ...modifyUDFScript];
+};
 
 module.exports = {
-	getKeySpaceScript
-}
+	getKeySpaceScript,
+};

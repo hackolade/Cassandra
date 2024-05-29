@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const { tab, getNameWithKeyspace, eachField } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
@@ -15,9 +15,9 @@ const getUdtScripts = (keyspaceName, sources, udtMap, isParentActivated) => {
 	}, []);
 };
 
-const setFrozenForAllUdt = (udtTypeMap) => {
+const setFrozenForAllUdt = udtTypeMap => {
 	return Object.keys(udtTypeMap).reduce((typeMap, typeName) => {
-		return Object.assign(typeMap, { [typeName]: Object.assign({}, udtTypeMap[typeName], { frozen: true }) })
+		return Object.assign(typeMap, { [typeName]: Object.assign({}, udtTypeMap[typeName], { frozen: true }) });
 	}, {});
 };
 
@@ -30,23 +30,23 @@ const getName = (name, property) => {
 };
 
 const getCreateTypeStatement = (keyspaceName, typeName, fieldsDefinitions) => {
-	return `CREATE TYPE IF NOT EXISTS ${getNameWithKeyspace(keyspaceName, typeName)} (\n${tab(fieldsDefinitions)}\n);`
+	return `CREATE TYPE IF NOT EXISTS ${getNameWithKeyspace(keyspaceName, typeName)} (\n${tab(fieldsDefinitions)}\n);`;
 };
 
-const getUdtMap = (udtSources) => {
+const getUdtMap = udtSources => {
 	return udtSources.reduce((map, source) => {
 		eachField(source, (field, fieldName) => {
 			if (field.type === 'udt') {
 				const name = getName(fieldName, field);
 				map[name] = {
 					name,
-					frozen: field.frozen
+					frozen: field.frozen,
 				};
 			}
 
 			return field;
 		});
-		
+
 		return map;
 	}, {});
 };
@@ -58,7 +58,7 @@ const getAllUdt = (jsonSchema, udtTypeMap, isParentActivated) => {
 		if (field.type === 'udt' && field.properties) {
 			udts.push({
 				name: getName(fieldName, field),
-				definition: getColumnDefinition(field.properties, udtTypeMap, isParentActivated)
+				definition: getColumnDefinition(field.properties, udtTypeMap, isParentActivated),
 			});
 		}
 
@@ -68,21 +68,21 @@ const getAllUdt = (jsonSchema, udtTypeMap, isParentActivated) => {
 	return udts;
 };
 
-const sortUdt = (definitionJsonSchema) => {
+const sortUdt = definitionJsonSchema => {
 	if (!definitionJsonSchema.properties) {
 		return definitionJsonSchema;
 	}
 
 	const udtNames = Object.keys(definitionJsonSchema.properties);
 	let orderedUdtNames = [];
-	
+
 	udtNames.forEach(udtName => {
 		let references = [];
 
-		eachField(definitionJsonSchema.properties[udtName], (field) => {
+		eachField(definitionJsonSchema.properties[udtName], field => {
 			if (field.$ref) {
 				const udtName = field.$ref.split('/').pop();
-				
+
 				if (references.indexOf(udtName) === -1) {
 					references.push(udtName);
 				}
@@ -101,7 +101,6 @@ const sortUdt = (definitionJsonSchema) => {
 			}
 		}
 	});
-
 
 	udtNames.forEach(udtName => {
 		if (orderedUdtNames.indexOf(udtName) === -1) {
@@ -127,7 +126,7 @@ const prepareDefinitions = data => {
 	const externalDefinitions = JSON.parse(data.externalDefinitions);
 	const udtTypeMap = getUdtMap([modelDefinitions, externalDefinitions]);
 	return { udtTypeMap, modelDefinitions, externalDefinitions };
-}
+};
 
 module.exports = {
 	getUdtScripts,

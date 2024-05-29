@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const { getFieldConfig, getTypeConfig, canTypeHaveSubtype } = require('./generalHelper');
 
@@ -20,17 +20,20 @@ const ifType = type => {
 
 const getModeType = (type, defaultType, udtTypeMap) => {
 	if (type) {
-		const mode = getFieldConfig(type, "mode");
-		const definedType = (mode && mode.options) ? mode.options[0] : type;
+		const mode = getFieldConfig(type, 'mode');
+		const definedType = mode && mode.options ? mode.options[0] : type;
 
-		return getHandlerByType(type, udtTypeMap)({
+		return getHandlerByType(
+			type,
+			udtTypeMap,
+		)({
 			type: type,
 			mode: definedType,
 			frozen: true,
-			keyType: "char",
-			keySubtype: "text",
-			items: { type: "char", mode: "varchar" },
-			properties: { field: { type: "char", mode: "varchar" } }
+			keyType: 'char',
+			keySubtype: 'text',
+			items: { type: 'char', mode: 'varchar' },
+			properties: { field: { type: 'char', mode: 'varchar' } },
 		});
 	}
 
@@ -38,39 +41,32 @@ const getModeType = (type, defaultType, udtTypeMap) => {
 };
 
 const getScalarType = (type, udtTypeMap) => {
-	const simpleType = (propertyData) => propertyData.type;
-	const geoSpatialType = (propertyData) => `'${propertyData.subType || "PointType"}'`;
-	const getJsonType = (propertyData) => {
+	const simpleType = propertyData => propertyData.type;
+	const geoSpatialType = propertyData => `'${propertyData.subType || 'PointType'}'`;
+	const getJsonType = propertyData => {
 		if (propertyData.physicalType) {
-			return getHandlerByType(propertyData.physicalType)(Object.assign(propertyData, { type: propertyData.physicalType }));
+			return getHandlerByType(propertyData.physicalType)(
+				Object.assign(propertyData, { type: propertyData.physicalType }),
+			);
 		}
 	};
 
-	return ifType(type)
-		("char", (propertyData) => (propertyData.mode || "text"))
-		("numeric", (propertyData) => { 
-			const type = (propertyData.mode || "integer");
-	
-			return (type === "integer") ? "int" : type;
-		})
-		("binary", () => "blob")
-		("bool", () => "boolean")
-		("blob", simpleType)
-		("timestamp", simpleType)
-		("date", simpleType)
-		("time", simpleType)
-		("duration", simpleType)
-		("uuid", simpleType)
-		("timeuuid", simpleType)
-		("DseExecutorStateType", (propertyData) => `'${simpleType(propertyData)}'`)
-		("DateRangeType", (propertyData) => `'${simpleType(propertyData)}'`)
-		("geospatial", geoSpatialType)
-		("udt", (propertyData, propertyName) => {
+	return ifType(type)('char', propertyData => propertyData.mode || 'text')('numeric', propertyData => {
+		const type = propertyData.mode || 'integer';
+
+		return type === 'integer' ? 'int' : type;
+	})('binary', () => 'blob')('bool', () => 'boolean')('blob', simpleType)('timestamp', simpleType)(
+		'date',
+		simpleType,
+	)('time', simpleType)('duration', simpleType)('uuid', simpleType)('timeuuid', simpleType)(
+		'DseExecutorStateType',
+		propertyData => `'${simpleType(propertyData)}'`,
+	)('DateRangeType', propertyData => `'${simpleType(propertyData)}'`)('geospatial', geoSpatialType)(
+		'udt',
+		(propertyData, propertyName) => {
 			return getUDTHandler(propertyName, udtTypeMap)();
-		})
-		("jsonObject", getJsonType)
-		("jsonArray", getJsonType)
-		();
+		},
+	)('jsonObject', getJsonType)('jsonArray', getJsonType)();
 };
 
 const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
@@ -84,7 +80,8 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 	const getValueTypeFromArray = (arraySchema, defaultType, udtTypeMap, propertyName) => {
 		if (arraySchema.items) {
 			if (Array.isArray(arraySchema.items)) {
-				const name = arraySchema.items[0]?.code || arraySchema.items[0]?.name || arraySchema.items[0]?.displayName;
+				const name =
+					arraySchema.items[0]?.code || arraySchema.items[0]?.name || arraySchema.items[0]?.displayName;
 				return complexType(arraySchema.items[0], isFrozen(arraySchema), name || 0);
 			} else {
 				const name = arraySchema.items?.code || arraySchema.items?.name || arraySchema.items?.displayName;
@@ -106,10 +103,10 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 	const getValueTypeFromObject = (objectSchema, defaultType, udtTypeMap) => {
 		if (objectSchema.properties) {
 			const propertyName = Object.keys(objectSchema.properties)[0];
-			
+
 			if (propertyName) {
 				const nestedPropertyData = objectSchema.properties[propertyName];
-				
+
 				return complexType(nestedPropertyData, isFrozen(objectSchema), propertyName);
 			}
 		} else {
@@ -127,21 +124,28 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 
 	const complexType = ((isNeedToBeFrozen, udtTypeMap) => (nestedPropertyData, isParentFrozen, propertyName) => {
 		if (nestedPropertyData) {
-			const nestedType = getNestedTypeByData(nestedPropertyData, !isParentFrozen && isNeedToBeFrozen, udtTypeMap, propertyName);
-			
+			const nestedType = getNestedTypeByData(
+				nestedPropertyData,
+				!isParentFrozen && isNeedToBeFrozen,
+				udtTypeMap,
+				propertyName,
+			);
+
 			if (nestedType !== undefined) {
 				return nestedType;
 			} else {
-				'';
+				('');
 			}
 		} else {
-			return "text";
+			return 'text';
 		}
 	})(isNeedToBeFrozen, udtTypeMap);
 
-	const typeSet = (propertyData, propertyName) => `set<${getValueTypeFromArray(propertyData, "varchar", udtTypeMap, propertyName)}>`;
+	const typeSet = (propertyData, propertyName) =>
+		`set<${getValueTypeFromArray(propertyData, 'varchar', udtTypeMap, propertyName)}>`;
 
-	const list = (propertyData, propertyName) => `list<${getValueTypeFromArray(propertyData, "text", udtTypeMap, propertyName)}>`;
+	const list = (propertyData, propertyName) =>
+		`list<${getValueTypeFromArray(propertyData, 'text', udtTypeMap, propertyName)}>`;
 
 	const tuple = (propertyData, propertyName) => {
 		let items = Array.isArray(propertyData.items) ? propertyData.items : [propertyData.items];
@@ -152,31 +156,28 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 	const map = (propertyData, propertyName) => {
 		const keyType = canTypeHaveSubtype(propertyData.keyType, propertyData.keySubtype)
 			? propertyData.keySubtype
-			: getModeType(propertyData.keyType, "text", udtTypeMap);
-		const valueType = getValueTypeFromObject(propertyData, "text", udtTypeMap, propertyName);
+			: getModeType(propertyData.keyType, 'text', udtTypeMap);
+		const valueType = getValueTypeFromObject(propertyData, 'text', udtTypeMap, propertyName);
 
 		return `map<${keyType}, ${valueType}>`;
 	};
 
 	const vector = (propertyData, propertyName) => {
-		const valueType = getValueTypeFromArray(propertyData, "float", udtTypeMap, propertyName)
-		const dimension =  getVectorDimension(propertyData);
+		const valueType = getValueTypeFromArray(propertyData, 'float', udtTypeMap, propertyName);
+		const dimension = getVectorDimension(propertyData);
 
-		return `vector<${valueType}, ${dimension}>`
+		return `vector<${valueType}, ${dimension}>`;
 	};
 
-	return ifType(type)
-		("map", setFrozen(map))
-		("list", setFrozen(list))
-		("set", setFrozen(typeSet))
-		("vector", setFrozen(vector))
-		("tuple", tuple)
-		();
+	return ifType(type)('map', setFrozen(map))('list', setFrozen(list))('set', setFrozen(typeSet))(
+		'vector',
+		setFrozen(vector),
+	)('tuple', tuple)();
 };
 
 const getUDTHandler = (type, udtTypeMap, parentIsFrozen) => {
 	return () => {
-		const data = (udtTypeMap[type] || {});
+		const data = udtTypeMap[type] || {};
 
 		if (data.frozen && !parentIsFrozen) {
 			return getFrozen(data.name);
@@ -186,15 +187,12 @@ const getUDTHandler = (type, udtTypeMap, parentIsFrozen) => {
 	};
 };
 
-const getFrozen = (typeDefinition) => typeDefinition === undefined ? undefined : `frozen<${typeDefinition}>`;
+const getFrozen = typeDefinition => (typeDefinition === undefined ? undefined : `frozen<${typeDefinition}>`);
 
-const getHandlerByType = (type, udtTypeMap) => (
-	getScalarType(type, udtTypeMap)
-	||
-	getStructuralTypeHandler(type, true, udtTypeMap)
-	||
-	getUDTHandler(type, udtTypeMap)
-);
+const getHandlerByType = (type, udtTypeMap) =>
+	getScalarType(type, udtTypeMap) ||
+	getStructuralTypeHandler(type, true, udtTypeMap) ||
+	getUDTHandler(type, udtTypeMap);
 
 const getNestedTypeByData = (propertyData, isNeedToBeFrozen, udtTypeMap, propertyName) => {
 	const type = getTypeByPropertyData(propertyData);
@@ -205,21 +203,19 @@ const getNestedTypeByData = (propertyData, isNeedToBeFrozen, udtTypeMap, propert
 	}
 
 	const freezingType = (
-		getStructuralTypeHandler(type, false, udtTypeMap)
-		||
-		getUDTHandler(type, udtTypeMap, isNeedToBeFrozen)
+		getStructuralTypeHandler(type, false, udtTypeMap) || getUDTHandler(type, udtTypeMap, isNeedToBeFrozen)
 	)(propertyData, propertyName);
 
-	return (isNeedToBeFrozen) ? getFrozen(freezingType) : freezingType;
+	return isNeedToBeFrozen ? getFrozen(freezingType) : freezingType;
 };
 
-const getTypeByPropertyData = (propertyData) => {
+const getTypeByPropertyData = propertyData => {
 	if (propertyData.$ref) {
 		return propertyData.$ref.split('/definitions/').pop();
 	} else if (propertyData.type) {
 		return propertyData.type;
 	} else {
-		return "char";
+		return 'char';
 	}
 };
 
@@ -229,16 +225,16 @@ const getTypeByData = (propertyData, udtTypeMap, propertyName) => {
 	return getHandlerByType(type, udtTypeMap)(propertyData, propertyName);
 };
 
-const getVectorDimension = (propertyData) => {
+const getVectorDimension = propertyData => {
 	if (!isNaN(+propertyData.dimension)) {
-		return propertyData.dimension
+		return propertyData.dimension;
 	}
 
-	const config = getFieldConfig(propertyData.type, "dimension");
+	const config = getFieldConfig(propertyData.type, 'dimension');
 
 	return config?.defaultValue;
 };
 
 module.exports = {
-	getTypeByData
+	getTypeByData,
 };

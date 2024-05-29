@@ -11,12 +11,10 @@ const CqlParser = require('./parser/CqlParser.js');
 const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
 const ExprErrorListener = require('./antlrErrorListener');
 
-
 const handleFileData = filePath => {
 	return new Promise((resolve, reject) => {
-
 		fs.readFile(filePath, 'utf-8', (err, content) => {
-			if(err) {
+			if (err) {
 				reject(err);
 			} else {
 				resolve(content);
@@ -26,9 +24,13 @@ const handleFileData = filePath => {
 };
 
 module.exports = {
-	connect: function(connectionInfo, logger, cb, app){
-		cassandraHelper(app.require('lodash')).connect(app, logger)(connectionInfo)
-			.then(cb, (error) => {
+	connect: function (connectionInfo, logger, cb, app) {
+		cassandraHelper(app.require('lodash'))
+			.connect(
+				app,
+				logger,
+			)(connectionInfo)
+			.then(cb, error => {
 				logger.log('error', error, 'Connection error');
 				cb(error);
 			});
@@ -51,7 +53,7 @@ module.exports = {
 
 			const result = commandsService.convertCommandsToReDocs(cqlsTree.accept(cqlToCollectionsGenerator));
 			callback(null, result, {}, [], 'multipleSchema');
-		} catch(err) {
+		} catch (err) {
 			const { error, title, name } = err;
 			const handledError = handleErrorObject(error || err, title || name);
 			logger.log('error', handledError, title);
@@ -59,180 +61,223 @@ module.exports = {
 		}
 	},
 
-	disconnect: function(connectionInfo, cb, app){
+	disconnect: function (connectionInfo, cb, app) {
 		cassandraHelper(app.require('lodash')).close();
 		cb();
 	},
 
-	testConnection: function(connectionInfo, logger, cb, app){
+	testConnection: function (connectionInfo, logger, cb, app) {
 		logInfo('Test connection', connectionInfo, logger);
 
-		this.connect(connectionInfo, logger, (error) => {
-			if (error) {
-				logger.log('info', 'Connection failed', 'Test connection');
-			} else {
-				logger.log('info', 'Connection successful', 'Test connection');
-			}
+		this.connect(
+			connectionInfo,
+			logger,
+			error => {
+				if (error) {
+					logger.log('info', 'Connection failed', 'Test connection');
+				} else {
+					logger.log('info', 'Connection successful', 'Test connection');
+				}
 
-			this.disconnect(connectionInfo, () => {}, app);
+				this.disconnect(connectionInfo, () => {}, app);
 
-			return cb(cassandraHelper(app.require('lodash')).prepareError(error));
-		}, app);
+				return cb(cassandraHelper(app.require('lodash')).prepareError(error));
+			},
+			app,
+		);
 	},
 
-	getDbCollectionsNames: function(connectionInfo, logger, cb, app) {
+	getDbCollectionsNames: function (connectionInfo, logger, cb, app) {
 		const async = app.require('async');
 
 		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
 		const cassandra = cassandraHelper(app.require('lodash'));
 
-		cassandra.connect(app, logger)(connectionInfo).then(() => {
+		cassandra
+			.connect(
+				app,
+				logger,
+			)(connectionInfo)
+			.then(() => {
 				let keyspaces = cassandra.getKeyspacesNames();
 
 				if (!includeSystemCollection) {
 					keyspaces = cassandra.filterKeyspaces(keyspaces, systemKeyspaces);
 				}
 
-				async.map(keyspaces, (keyspace, next) => {
-					cassandra.getTablesNames(keyspace)
-						.then(tablesData => {
-							const table_name_selector = cassandra.isOldVersion() ? 'columnfamily_name' : 'table_name';
-							const tableNames = tablesData.rows.map(table => table[table_name_selector]);
+				async.map(
+					keyspaces,
+					(keyspace, next) => {
+						cassandra
+							.getTablesNames(keyspace)
+							.then(tablesData => {
+								const table_name_selector = cassandra.isOldVersion()
+									? 'columnfamily_name'
+									: 'table_name';
+								const tableNames = tablesData.rows.map(table => table[table_name_selector]);
 
-							return tableNames; 
-						})
-						.then(tableNames => {
-							return cassandra.getViewsNames(keyspace).then(
-								views => next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, views)),
-								() => next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, []))
-							)
-						})
-						.catch(next);
-				}, (err, result) => {
-					return cb(err, result);
-				});
-			}).catch((error) => {
+								return tableNames;
+							})
+							.then(tableNames => {
+								return cassandra.getViewsNames(keyspace).then(
+									views =>
+										next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, views)),
+									() => next(null, cassandra.prepareConnectionDataItem(keyspace, tableNames, [])),
+								);
+							})
+							.catch(next);
+					},
+					(err, result) => {
+						return cb(err, result);
+					},
+				);
+			})
+			.catch(error => {
 				logger.log('error', error, 'Retrieving keyspaces and tables information');
 				return cb(cassandra.prepareError(error) || 'error');
 			});
 	},
 
-	getDbCollectionsData: function(data, logger, cb, app){
+	getDbCollectionsData: function (data, logger, cb, app) {
 		const async = app.require('async');
 		const cassandra = cassandraHelper(app.require('lodash'));
 		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
-	
+
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;
 		const includeEmptyCollection = data.includeEmptyCollection;
 		const recordSamplingSettings = data.recordSamplingSettings;
-	
-		async.map(keyspacesNames, (keyspaceName, keyspaceCallback) => {
-			const entityNames = cassandra.splitEntityNames(tables[keyspaceName]);
-			const viewNames = entityNames.views;
-			const tableNames = entityNames.tables;
 
-			let udfData = [];
-			let udaData = [];
-			
-			cassandra.getUDF(keyspaceName)
-			.then(udf => {
-				progress(logger, keyspaceName, '', 'UDF has loaded');
+		async.map(
+			keyspacesNames,
+			(keyspaceName, keyspaceCallback) => {
+				const entityNames = cassandra.splitEntityNames(tables[keyspaceName]);
+				const viewNames = entityNames.views;
+				const tableNames = entityNames.tables;
 
-				udfData = cassandra.handleUDF(udf);
-				return cassandra.getUDA(keyspaceName)
-			})
-			.then(uda => {
-				progress(logger, keyspaceName, '', 'UDA has loaded');
+				let udfData = [];
+				let udaData = [];
 
-				udaData = cassandra.handleUDA(uda);
+				cassandra
+					.getUDF(keyspaceName)
+					.then(udf => {
+						progress(logger, keyspaceName, '', 'UDF has loaded');
 
-				return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames, logger);
-			})
-			.then(views => {
-				pipeline(udaData, udfData, views);
-			}, err => {
-				pipeline([], [], []);
-			})
-			.catch(err => {
-				logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
-				keyspaceCallback(err);
-			});
+						udfData = cassandra.handleUDF(udf);
+						return cassandra.getUDA(keyspaceName);
+					})
+					.then(uda => {
+						progress(logger, keyspaceName, '', 'UDA has loaded');
 
-			const pipeline = (UDAs, UDFs, views) => {
-				if (!tableNames.length) {
-					let packageData = {
-						dbName: keyspaceName,
-						emptyBucket: true
-					};
+						udaData = cassandra.handleUDA(uda);
 
-					packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
-					packageData.bucketInfo.UDFs = UDFs;
-					packageData.bucketInfo.UDAs = UDAs;
-					return keyspaceCallback(null, packageData);
-				} else {
-					async.map(tableNames, (tableName, tableCallback) => {
+						return cassandra.getViews(recordSamplingSettings, keyspaceName, viewNames, logger);
+					})
+					.then(
+						views => {
+							pipeline(udaData, udfData, views);
+						},
+						err => {
+							pipeline([], [], []);
+						},
+					)
+					.catch(err => {
+						logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
+						keyspaceCallback(err);
+					});
+
+				const pipeline = (UDAs, UDFs, views) => {
+					if (!tableNames.length) {
 						let packageData = {
 							dbName: keyspaceName,
-							collectionName: tableName,
-							documents: []
+							emptyBucket: true,
 						};
-						const loadProgress = progress.bind(null, logger, keyspaceName, tableName);
-						const exec = (promise, startMessage, finishMessage) => {
-							loadProgress(startMessage);
-							return promise.then(result => {
-								loadProgress(finishMessage);
 
-								return result;
-							});
-						};
-	
-						Promise.all([
-							exec(cassandra.getTableMetadata(keyspaceName, tableName), 'Load meta data...', 'Meta data has loaded'),
-							exec(cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings, logger), 'Load records...', 'Records have loaded'),
-							cassandra.describeSearchIndexes(keyspaceName, tableName)
-						]).then(([table, records, searchIndex]) => {
-							loadProgress('Records and Meta data have loaded');
+						packageData.bucketInfo = cassandra.getKeyspaceInfo(keyspaceName);
+						packageData.bucketInfo.UDFs = UDFs;
+						packageData.bucketInfo.UDAs = UDAs;
+						return keyspaceCallback(null, packageData);
+					} else {
+						async.map(
+							tableNames,
+							(tableName, tableCallback) => {
+								let packageData = {
+									dbName: keyspaceName,
+									collectionName: tableName,
+									documents: [],
+								};
+								const loadProgress = progress.bind(null, logger, keyspaceName, tableName);
+								const exec = (promise, startMessage, finishMessage) => {
+									loadProgress(startMessage);
+									return promise.then(result => {
+										loadProgress(finishMessage);
 
-							packageData = cassandra.getPackageData({
-								records: cassandra.filterNullItems(JSON.parse(JSON.stringify(records))),
-								keyspaceName,
-								table,
-								tableName,
-								UDFs,
-								UDAs,
-								views,
-								searchIndex,
-							}, includeEmptyCollection);
+										return result;
+									});
+								};
 
-							return packageData;
-						})
-						.then(
-							packageData => tableCallback(null, packageData),
-							err => tableCallback({...err, table: tableName})
+								Promise.all([
+									exec(
+										cassandra.getTableMetadata(keyspaceName, tableName),
+										'Load meta data...',
+										'Meta data has loaded',
+									),
+									exec(
+										cassandra.scanRecords(keyspaceName, tableName, recordSamplingSettings, logger),
+										'Load records...',
+										'Records have loaded',
+									),
+									cassandra.describeSearchIndexes(keyspaceName, tableName),
+								])
+									.then(([table, records, searchIndex]) => {
+										loadProgress('Records and Meta data have loaded');
+
+										packageData = cassandra.getPackageData(
+											{
+												records: cassandra.filterNullItems(JSON.parse(JSON.stringify(records))),
+												keyspaceName,
+												table,
+												tableName,
+												UDFs,
+												UDAs,
+												views,
+												searchIndex,
+											},
+											includeEmptyCollection,
+										);
+
+										return packageData;
+									})
+									.then(
+										packageData => tableCallback(null, packageData),
+										err => tableCallback({ ...err, table: tableName }),
+									);
+							},
+							(err, res) => {
+								if (err) {
+									logger.log('error', cassandra.prepareError(err), 'Retrieving schema');
+								}
+
+								return keyspaceCallback(err, res);
+							},
 						);
-					}, (err, res) => {
-						if (err) {
-							logger.log('error', cassandra.prepareError(err), "Retrieving schema");
-						}
+					}
+				};
+			},
+			(err, res) => {
+				err = cassandra.prepareError(err);
 
-						return keyspaceCallback(err, res)
-					});
+				if (!err) {
+					logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
+				} else {
+					logger.log('error', err, 'Retrieving schema');
 				}
-			};
-		}, (err, res) => {
-			err = cassandra.prepareError(err);
 
-			if (!err) {
-				logger.progress({ message: 'Reverse-Engineering complete!', containerName: '', entityName: '' });
-			} else {
-				logger.log('error', err, 'Retrieving schema');
-			}
-
-			return cb(err, res);
-		});
-	}
+				return cb(err, res);
+			},
+		);
+	},
 };
 
 const logInfo = (step, connectionInfo, logger) => {
@@ -245,13 +290,16 @@ const progress = (logger, keyspace, table, message) => {
 	logger.progress({
 		containerName: keyspace,
 		entityName: table,
-		message: message
+		message: message,
 	});
 	logger.log('info', { keyspace, table, message }, 'Retrieving schema ...');
-}
+};
 
 const handleErrorObject = (error, title) => {
-	const errorProperties = Object.getOwnPropertyNames(error).reduce((accumulator, key) => ({ ...accumulator, [key]: error[key] }), {});
+	const errorProperties = Object.getOwnPropertyNames(error).reduce(
+		(accumulator, key) => ({ ...accumulator, [key]: error[key] }),
+		{},
+	);
 
-	return { title , ...errorProperties };
+	return { title, ...errorProperties };
 };

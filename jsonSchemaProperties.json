@@ -10,8 +10,5 @@
 		"compositePartitionKey",
 		"compositeKey"
 	],
-	"removeIfPropsNegative": [
-		"partitionKey",
-		"sortKey"
-	]
+	"removeIfPropsNegative": ["partitionKey", "sortKey"]
 }

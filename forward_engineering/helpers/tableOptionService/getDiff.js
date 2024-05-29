@@ -7,8 +7,9 @@ const REDUNDANT_OPTIONS = [ID];
 
 const optionDefaultValues = {
 	localReadRepairChance: 0,
-	caching: {'keys': 'ALL', 'rows_per_partition': 'NONE'},
-	compaction: "{'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}",
+	caching: { 'keys': 'ALL', 'rows_per_partition': 'NONE' },
+	compaction:
+		"{'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}",
 	compression: "{'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}",
 	readRepairChance: 0,
 	gcGraceSeconds: 864000,
@@ -19,14 +20,17 @@ const optionDefaultValues = {
 	maxIndexInterval: 2048,
 	crcCheckChance: 1,
 	memtableFlushPeriod: 0,
-}
+};
 
 const isDiff = (oldValue, value, optionName) => {
-	switch(optionName) {
+	switch (optionName) {
 		case COMPRESSION:
-		case COMPACTION: return isDiffParsedJsonString(oldValue, value);
-		case CACHING: return isDiffCaching(oldValue, value);
-		default: return oldValue !== value;
+		case COMPACTION:
+			return isDiffParsedJsonString(oldValue, value);
+		case CACHING:
+			return isDiffCaching(oldValue, value);
+		default:
+			return oldValue !== value;
 	}
 };
 
@@ -35,8 +39,8 @@ const isDiffParsedJsonString = (oldValue, value) => {
 		return oldValue !== value;
 	}
 
-	const jsonOld = JSON.parse(oldValue.replace(/[\'']/g, '\"'));
-	const jsonNew = JSON.parse(value.replace(/[\'']/g, '\"'));
+	const jsonOld = JSON.parse(oldValue.replace(/[\'']/g, '"'));
+	const jsonNew = JSON.parse(value.replace(/[\'']/g, '"'));
 
 	return !dependencies.lodash.isEqual(jsonOld, jsonNew);
 };
@@ -59,16 +63,16 @@ const isDiffCaching = (oldValue, value) => {
 
 const getModifiedAndNewOptions = (newOptions, oldOptions) => {
 	oldOptions = dependencies.lodash.isEmpty(oldOptions) ? optionDefaultValues : oldOptions;
-	
+
 	return Object.entries(newOptions).reduce((acc, [name, value]) => {
 		if (REDUNDANT_OPTIONS.includes(name)) {
 			return acc;
 		}
-	
+
 		if (!oldOptions.hasOwnProperty(name) || isDiff(oldOptions[name], value, name)) {
-			return Object.assign({}, acc, { [name]: value })
+			return Object.assign({}, acc, { [name]: value });
 		}
-	
+
 		return acc;
 	}, {});
 };
@@ -81,7 +85,10 @@ const getDeletedOptions = (newOptions, oldOptions) => {
 
 const getDefaultOptionsByName = (optionNames, oldOptions) => {
 	return optionNames.reduce((acc, optionName) => {
-		if (optionDefaultValues.hasOwnProperty(optionName) && isDiff(dependencies.lodash.get(oldOptions, optionName), optionDefaultValues[optionName], optionName)) {
+		if (
+			optionDefaultValues.hasOwnProperty(optionName) &&
+			isDiff(dependencies.lodash.get(oldOptions, optionName), optionDefaultValues[optionName], optionName)
+		) {
 			return Object.assign({}, acc, { [optionName]: optionDefaultValues[optionName] });
 		}
 

@@ -1,18 +1,25 @@
 {
 	"name": "geo-polygon",
 	"parentType": "array",
-	"properties": [{
-		"type": "list",
-		"subtype": "list<set>",
-		"frozen": true,
-		"properties": [{
-			"type": "set",
-			"subtype": "set<num>",
-			"properties": [{
-				"type": "numeric"
-			}, {
-				"type": "numeric"
-			}]
-		}]
-	}]
+	"properties": [
+		{
+			"type": "list",
+			"subtype": "list<set>",
+			"frozen": true,
+			"properties": [
+				{
+					"type": "set",
+					"subtype": "set<num>",
+					"properties": [
+						{
+							"type": "numeric"
+						},
+						{
+							"type": "numeric"
+						}
+					]
+				}
+			]
+		}
+	]
 }

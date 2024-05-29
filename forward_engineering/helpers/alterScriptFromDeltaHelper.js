@@ -5,33 +5,25 @@ const { checkIsOldModel, fieldTypeCompatible } = require('./updateHelpers/genera
 const { getViewScript } = require('./updateHelpers/viewHelper');
 const { getIndexTable, getDataColumnIndex } = require('./updateHelpers/indexHelper');
 const { getUdtScript, sortAddedUdt } = require('./updateHelpers/udtHelper');
-const { 
-	getDelete, 
-	hydrateColumn, 
-	isTableChange, 
+const {
+	getDelete,
+	hydrateColumn,
+	isTableChange,
 	addScriptToExistScripts,
 	getAdd,
 	getDeleteTableDto,
 	getAddTable,
 } = require('./updateHelpers/tableHelper');
 const { getUdtMap } = require('./udtHelper');
-const { AlterScriptDto } = require("./types/AlterScriptDto");
+const { AlterScriptDto } = require('./types/AlterScriptDto');
 
 /**
- * 
+ *
  * @param renameData {Object}
  * @returns {[(AlterScriptDto|undefined)]}
  */
 const getRenameColumnDto = renameData => {
-	
-	return [
-		AlterScriptDto.getInstance(
-			[dependencies.provider.renameColumn(renameData)],
-			true,
-			'modify',
-			'field'
-		)
-	];
+	return [AlterScriptDto.getInstance([dependencies.provider.renameColumn(renameData)], true, 'modify', 'field')];
 };
 const objectContainsProp = (object, key) => !!object[key];
 
@@ -40,8 +32,8 @@ const getCollectionName = compMod => {
 	return {
 		oldName: code.old || collectionName.old,
 		newName: code.new || collectionName.new,
-	}
-}
+	};
+};
 
 const getUpdateColumnProvider = {
 	/**
@@ -50,14 +42,17 @@ const getUpdateColumnProvider = {
 	 * @returns {[(AlterScriptDto|undefined)]}
 	 */
 	alterDropCreate({ dataForScript, oldName, newName }) {
-		const getData = columnData => ({ ...dataForScript, columnData: { ...dataForScript.columnData, ...columnData }});
+		const getData = columnData => ({
+			...dataForScript,
+			columnData: { ...dataForScript.columnData, ...columnData },
+		});
 		const deletePropertyScript = getDelete(getData({ name: oldName }));
 		const addPropertyScript = getAdd(getData({ name: newName }));
 		return [...deletePropertyScript, ...addPropertyScript];
 	},
 
 	/**
-	 * 
+	 *
 	 * @param hydratedColumn: {Object}
 	 * @returns {[(AlterScriptDto|undefined)]}
 	 */
@@ -69,12 +64,12 @@ const getUpdateColumnProvider = {
 		if (!property.primaryKey) {
 			return this.alterDropCreate(hydratedColumn);
 		}
-		
-		return getRenameColumnDto({ ...dataForScript, columnData: { oldName, newName } }); 
+
+		return getRenameColumnDto({ ...dataForScript, columnData: { oldName, newName } });
 	},
 
 	/**
-	 * 
+	 *
 	 * @param hydratedColumn: {Object}
 	 * @returns {[(AlterScriptDto|undefined)]}
 	 */
@@ -84,28 +79,23 @@ const getUpdateColumnProvider = {
 			return [];
 		}
 		const isFieldTypeCompatible = fieldTypeCompatible(oldType, newType);
-		
+
 		if (isOldModel) {
 			if (!isFieldTypeCompatible) {
 				return this.alterDropCreate(hydratedColumn);
 			}
-			
+
 			return [
-				AlterScriptDto.getInstance(
-					[dependencies.provider.updateType(dataForScript)],
-					true,
-					'modify',
-					'field'
-				)
+				AlterScriptDto.getInstance([dependencies.provider.updateType(dataForScript)], true, 'modify', 'field'),
 			];
-		} 
+		}
 
 		return this.alterDropCreate(hydratedColumn);
-	}
+	},
 };
 
 /**
- * 
+ *
  * @param updateData {Object}
  * @returns {[(AlterScriptDto|undefined)]}
  */
@@ -126,21 +116,26 @@ const getUpdate = updateData => {
 };
 
 const getIsColumnInIndex = (item, columnName, data) => {
-	const itemData = { properties: item.properties || {}, ...dependencies.lodash.omit(item.role || {}, ['properties']) };
+	const itemData = {
+		properties: item.properties || {},
+		...dependencies.lodash.omit(item.role || {}, ['properties']),
+	};
 
 	const dataSources = [itemData, data.modelDefinitions];
-	const secIndexes = dependencies.lodash.get(item, 'role.SecIndxs', [])
+	const secIndexes = dependencies.lodash
+		.get(item, 'role.SecIndxs', [])
 		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index, key: 'SecIndxKey' }))
 		.map(index => index.name)
 		.filter(Boolean);
-	const searchIndexes = dependencies.lodash.get(item, 'role.searchIndexColumns', [])
+	const searchIndexes = dependencies.lodash
+		.get(item, 'role.searchIndexColumns', [])
 		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index }))
 		.map(index => index.name)
 		.filter(Boolean);
 	return [...searchIndexes, ...secIndexes].includes(columnName);
 };
 
-const getPropertiesForUpdateTable = (properties = [])=> {
+const getPropertiesForUpdateTable = (properties = []) => {
 	const newProperties = Object.entries(properties).map(([name, value]) => {
 		if (!value.compMod) {
 			return [name, value];
@@ -154,11 +149,11 @@ const getPropertiesForUpdateTable = (properties = [])=> {
 			if (keyNewField === 'name' && oldField[keyNewField] !== valueNewField) {
 				name = valueNewField;
 			}
-		})
+		});
 		return [name, value];
-	})
+	});
 	return Object.fromEntries(newProperties);
-}
+};
 
 /**
  *
@@ -169,11 +164,11 @@ const getUpdateTableDto = updateData => {
 	const { item, propertiesScript = [] } = updateData;
 	const { oldName, newName } = getCollectionName(item.role?.compMod);
 
-	const compModeWithName = { ...item.role?.compMod || {}, name: { new: newName, old: oldName } }
+	const compModeWithName = { ...(item.role?.compMod || {}), name: { new: newName, old: oldName } };
 
-	const tableIsChange = isTableChange({ 
-		item: { 
-			...item, 
+	const tableIsChange = isTableChange({
+		item: {
+			...item,
 			role: { ...item.role, compMod: compModeWithName },
 		},
 		data: updateData.data,
@@ -183,24 +178,30 @@ const getUpdateTableDto = updateData => {
 
 	if (!tableIsChange) {
 		const tableName = updateData.tableName || oldName || newName;
-		
+
 		return [
-				AlterScriptDto.getInstance(
-					[dependencies.provider.updateTableOptions(item.role?.compMod || {}, tableName, updateData.isOptionScript)],
-					true,
-					'modify',
-					'table'
-				),
-				...indexTableScript,
-				...propertiesScript
+			AlterScriptDto.getInstance(
+				[
+					dependencies.provider.updateTableOptions(
+						item.role?.compMod || {},
+						tableName,
+						updateData.isOptionScript,
+					),
+				],
+				true,
+				'modify',
+				'table',
+			),
+			...indexTableScript,
+			...propertiesScript,
 		];
 	}
-		
+
 	if (!oldName || !newName) {
 		return [];
 	}
 
-	const data = { 
+	const data = {
 		keyspaceName: updateData.keyspaceName,
 		data: updateData.data,
 		item: {
@@ -209,18 +210,18 @@ const getUpdateTableDto = updateData => {
 			role: {
 				...(item?.role || {}),
 				tableOptions: item?.role?.compMod?.['tableOptions'] || {},
-			}
+			},
 		},
 		isKeyspaceActivated: true,
 		dataSources: updateData.dataSources,
 	};
 	const deleteScript = getDeleteTableDto({ ...data, tableName: oldName });
-	const addScript = getAddTable({ ...data, tableName: newName});
+	const addScript = getAddTable({ ...data, tableName: newName });
 	return [...deleteScript, ...addScript, ...indexTableScript];
-}
+};
 
 /**
- * 
+ *
  * @param child {Object}
  * @param udtMap {Object}
  * @param generator {Object}
@@ -240,7 +241,7 @@ const handleChange = (child, udtMap, generator, data) => {
 	}
 
 	return alterTableScriptDto;
-}
+};
 
 const handleItem = (item, udtMap, generator, data) => {
 	let alterTableScript = [];
@@ -252,142 +253,157 @@ const handleItem = (item, udtMap, generator, data) => {
 	const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
 	const itemProperties = item.properties;
 
-	alterTableScript = Object.keys(itemProperties)
-		.reduce((alterTableScript, tableKey) => {
-			const itemCompModData = itemProperties[tableKey].role.compMod;
+	alterTableScript = Object.keys(itemProperties).reduce((alterTableScript, tableKey) => {
+		const itemCompModData = itemProperties[tableKey].role.compMod;
 
-			if (!itemCompModData) {
-				return alterTableScript;
-			}
+		if (!itemCompModData) {
+			return alterTableScript;
+		}
 
-			const codeName = dependencies.lodash.get(itemProperties, `${tableKey}.role.code`, '');
-			const tableName = codeName.length ? codeName : tableKey;
-			const tableProperties = itemProperties[tableKey].properties || {};
+		const codeName = dependencies.lodash.get(itemProperties, `${tableKey}.role.code`, '');
+		const tableName = codeName.length ? codeName : tableKey;
+		const tableProperties = itemProperties[tableKey].properties || {};
 
-			const keyspaceName = itemCompModData.keyspaceName;
+		const keyspaceName = itemCompModData.keyspaceName;
 
-			if (itemCompModData.deleted) {
-				const deletedIndexScript = getIndexTable(itemProperties[tableKey], data);
-				return [ 
-					...alterTableScript, 
-					...getDeleteTableDto({
-						keyspaceName,
-						tableName
-					}),
-					...deletedIndexScript,
-				];
-			}
-
-			const dataSources = [
-				data.modelDefinitions,
-				data.internalDefinitions,
-				data.externalDefinitions,
-				{ properties: tableProperties },
-				{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.properties', [])},
-				{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
-				{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) }
+		if (itemCompModData.deleted) {
+			const deletedIndexScript = getIndexTable(itemProperties[tableKey], data);
+			return [
+				...alterTableScript,
+				...getDeleteTableDto({
+					keyspaceName,
+					tableName,
+				}),
+				...deletedIndexScript,
 			];
+		}
 
-			if (itemCompModData.created) {
-				const addedIndexScript = getIndexTable(itemProperties[tableKey], data);
-				return [ 
-					...alterTableScript, 
-					...getAddTable({
-						item: itemProperties[tableKey], 
-						keyspaceName,
-						data, 
-						tableName,
-						dataSources,
-					}),
-					...addedIndexScript,
-				];
-			}
+		const dataSources = [
+			data.modelDefinitions,
+			data.internalDefinitions,
+			data.externalDefinitions,
+			{ properties: tableProperties },
+			{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.properties', []) },
+			{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
+			{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) },
+		];
 
-			if (itemCompModData.modified) {
-				const updateTableScript = getUpdateTableDto({ keyspaceName, data, item: itemProperties[tableKey], isOptionScript: true, tableName, dataSources });
+		if (itemCompModData.created) {
+			const addedIndexScript = getIndexTable(itemProperties[tableKey], data);
+			return [
+				...alterTableScript,
+				...getAddTable({
+					item: itemProperties[tableKey],
+					keyspaceName,
+					data,
+					tableName,
+					dataSources,
+				}),
+				...addedIndexScript,
+			];
+		}
 
-				return [...alterTableScript, ...updateTableScript];
-			}
-
-			const propertiesScript = handleProperties({ 
-				item: itemProperties[tableKey],
-				generator,
-				tableProperties, 
-				udtMap, 
-				itemCompModData, 
-				tableName, 
-				isOldModel,
+		if (itemCompModData.modified) {
+			const updateTableScript = getUpdateTableDto({
+				keyspaceName,
 				data,
+				item: itemProperties[tableKey],
+				isOptionScript: true,
+				tableName,
 				dataSources,
 			});
 
-			const updateTableScript = getUpdateTableDto({ 
-				item: itemProperties[tableKey], 
-				isOptionScript: generator.name === 'getUpdate' || generator.name === 'getAdd',
-				propertiesScript,
-				keyspaceName,
-				tableName,
-				data,
-				dataSources,
-			})
-
 			return [...alterTableScript, ...updateTableScript];
-		}, []);
+		}
+
+		const propertiesScript = handleProperties({
+			item: itemProperties[tableKey],
+			generator,
+			tableProperties,
+			udtMap,
+			itemCompModData,
+			tableName,
+			isOldModel,
+			data,
+			dataSources,
+		});
+
+		const updateTableScript = getUpdateTableDto({
+			item: itemProperties[tableKey],
+			isOptionScript: generator.name === 'getUpdate' || generator.name === 'getAdd',
+			propertiesScript,
+			keyspaceName,
+			tableName,
+			data,
+			dataSources,
+		});
+
+		return [...alterTableScript, ...updateTableScript];
+	}, []);
 
 	return alterTableScript;
-}
+};
 
-const handleProperties = ({ generator, tableProperties, udtMap, itemCompModData, tableName, isOldModel, data, item, dataSources }) => {
-	return Object.keys(tableProperties)
-		.reduce((alterTableScript, columnName) => {
-			const property = tableProperties[columnName] || {};
-			if (generator.name !== 'getUpdate' && (property.compositePartitionKey || property.compositeClusteringKey)) {
-				return alterTableScript;
-			}
-			if (generator.name === 'getAdd' && property.hasOwnProperty('compMod')) {
-				return alterTableScript;
-			}
-			let columnType = getTypeByData(property, udtMap, columnName);
-			
-			if (property.$ref && !columnType) {
-				columnType = dependencies.lodash.last(property.$ref.split('/'));
-			}
+const handleProperties = ({
+	generator,
+	tableProperties,
+	udtMap,
+	itemCompModData,
+	tableName,
+	isOldModel,
+	data,
+	item,
+	dataSources,
+}) => {
+	return Object.keys(tableProperties).reduce((alterTableScript, columnName) => {
+		const property = tableProperties[columnName] || {};
+		if (generator.name !== 'getUpdate' && (property.compositePartitionKey || property.compositeClusteringKey)) {
+			return alterTableScript;
+		}
+		if (generator.name === 'getAdd' && property.hasOwnProperty('compMod')) {
+			return alterTableScript;
+		}
+		let columnType = getTypeByData(property, udtMap, columnName);
 
-			if (!columnType) {
-				return alterTableScript;
-			}
+		if (property.$ref && !columnType) {
+			columnType = dependencies.lodash.last(property.$ref.split('/'));
+		}
 
-			const keyspaceName = itemCompModData?.keyspaceName;
+		if (!columnType) {
+			return alterTableScript;
+		}
 
-			const isColumnInIndex = getIsColumnInIndex(item, columnName, data);
+		const keyspaceName = itemCompModData?.keyspaceName;
 
-			if (generator.name === 'getUpdate' && (!property.compMod || isColumnInIndex)) {
-				return alterTableScript;
-			}
+		const isColumnInIndex = getIsColumnInIndex(item, columnName, data);
 
-			return [
-				...alterTableScript,
-				...generator({
-					keyspaceName,
-					tableName,
-					columnData: {
-						name: columnName,
-						type: columnType
-					},
-					property,
-					isOldModel,
-					udtMap,
-					dataSources,
-				})
-			];
-		}, []);
-}
+		if (generator.name === 'getUpdate' && (!property.compMod || isColumnInIndex)) {
+			return alterTableScript;
+		}
+
+		return [
+			...alterTableScript,
+			...generator({
+				keyspaceName,
+				tableName,
+				columnData: {
+					name: columnName,
+					type: columnType,
+				},
+				property,
+				isOldModel,
+				udtMap,
+				dataSources,
+			}),
+		];
+	}, []);
+};
 
 const columns = {
 	views: getViewScript,
 	containers: getKeySpaceScript,
 	udt: getUdtScript,
-}
+};
 
 const generateScript = (child, udtMap, data, column, mode) => {
 	if (!child) {
@@ -396,17 +412,20 @@ const generateScript = (child, udtMap, data, column, mode) => {
 	const getScript = columns[column];
 
 	if (Array.isArray(child) && child.length) {
-		return child.reduce((scriptsData, item) => 
-			([...scriptsData, 
-				...getScript({ child: item.properties[Object.keys(item.properties)[0]], udtMap, data, mode })]), 
-			[]);
+		return child.reduce(
+			(scriptsData, item) => [
+				...scriptsData,
+				...getScript({ child: item.properties[Object.keys(item.properties)[0]], udtMap, data, mode }),
+			],
+			[],
+		);
 	}
 	const properties = child.properties;
 	const itemKey = Object.keys(properties)[0];
 	const item = properties[itemKey];
 
 	return getScript({ child: item, udtMap, data, mode });
-}
+};
 /**
  * @param child {PersistenceSchemaChild}
  * @param udtMap {Object}
@@ -418,16 +437,12 @@ const getEntitiesDto = (child, udtMap, data) => {
 	const modifiedEntities = child?.properties?.entities?.properties?.modified;
 	const deletedEntities = child?.properties?.entities?.properties?.deleted;
 
-	const addedEntitiesDto = handleChange(addedEntities, udtMap, getAdd, data)
+	const addedEntitiesDto = handleChange(addedEntities, udtMap, getAdd, data);
 	const modifiedEntitiesDto = handleChange(modifiedEntities, udtMap, getUpdate, data);
 	const deletedEntitiesDto = handleChange(deletedEntities, udtMap, getDelete, data);
 
-	return [
-		...modifiedEntitiesDto,
-		...addedEntitiesDto,
-		...deletedEntitiesDto
-	];
-}
+	return [...modifiedEntitiesDto, ...addedEntitiesDto, ...deletedEntitiesDto];
+};
 
 /**
  * @param child {PersistenceSchemaChild}
@@ -449,13 +464,9 @@ const getContainersDto = (child, udtMap, data) => {
 		modifiedContainersDto = generateScript(modifiedContainers?.items, udtMap, data, 'containers', 'update');
 		deletedContainersDto = generateScript(deletedContainers?.items, udtMap, data, 'containers', 'delete');
 	}
-	
-	return [
-		...addedContainersDto,
-		...modifiedContainersDto,
-		...deletedContainersDto
-	];
-}
+
+	return [...addedContainersDto, ...modifiedContainersDto, ...deletedContainersDto];
+};
 
 /**
  * @param child {PersistenceSchemaChild}
@@ -471,13 +482,9 @@ const getViewsDto = (child, udtMap, data) => {
 	const addedViewsDto = generateScript(addedViews?.items, udtMap, data, 'views', 'add');
 	const modifiedViewsDto = generateScript(modifiedViews?.items, udtMap, data, 'views', 'update');
 	const deletedViewsDto = generateScript(deletedViews?.items, udtMap, data, 'views', 'delete');
-	
-	return [
-		...modifiedViewsDto,
-		...addedViewsDto,
-		...deletedViewsDto
-	];
-}
+
+	return [...modifiedViewsDto, ...addedViewsDto, ...deletedViewsDto];
+};
 
 /**
  * @param child {PersistenceSchemaChild}
@@ -495,13 +502,9 @@ const getModelDefinitionsDto = (child, udtMap, data) => {
 	const addedModelDefinitionsDto = generateScript(addedModelDefinitions.items, udtMap, data, 'udt', 'add');
 	const modifiedModelDefinitionsDto = generateScript(modifiedModelDefinitions.items, udtMap, data, 'udt', 'update');
 	const deletedModelDefinitionsDto = generateScript(deletedModelDefinitions.items, udtMap, data, 'udt', 'delete');
-	
-	return [
-		...addedModelDefinitionsDto,
-		...modifiedModelDefinitionsDto,
-		...deletedModelDefinitionsDto
-	];
-}
+
+	return [...addedModelDefinitionsDto, ...modifiedModelDefinitionsDto, ...deletedModelDefinitionsDto];
+};
 
 /**
  * @param child {PersistenceSchemaChild}
@@ -510,19 +513,15 @@ const getModelDefinitionsDto = (child, udtMap, data) => {
  * @returns {[(AlterScriptDto|undefined)]}
  */
 const getAlterScriptDtos = (child, udtMap, data) => {
-	const generalUdtTypeMap = Object.assign(
-		{},
-		udtMap,
-		getUdtMap([child])
-	);
-	
+	const generalUdtTypeMap = Object.assign({}, udtMap, getUdtMap([child]));
+
 	return [
 		...getEntitiesDto(child, generalUdtTypeMap, data),
 		...getContainersDto(child, generalUdtTypeMap, data),
 		...getViewsDto(child, generalUdtTypeMap, data),
-		...getModelDefinitionsDto(child, generalUdtTypeMap, data)
+		...getModelDefinitionsDto(child, generalUdtTypeMap, data),
 	].filter(Boolean);
-}
+};
 
 module.exports = {
 	getAlterScriptDtos,

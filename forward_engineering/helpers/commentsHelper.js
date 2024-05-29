@@ -5,14 +5,14 @@ const MULTILINE = 'MULTILINE';
 const insertBeforeEachLine = (statement, insertValue = '-- ') =>
 	statement
 		.split('\n')
-		.map((line) => line && `${insertValue}${line}`)
+		.map(line => line && `${insertValue}${line}`)
 		.join('\n');
 
-const multiLineComment = (statement) => {
+const multiLineComment = statement => {
 	return `/*\n${insertBeforeEachLine(statement, '  ')}\n*/`;
 };
 
-const inlineComment = (statement) => {
+const inlineComment = statement => {
 	return `/* ${statement} */`;
 };
 
@@ -20,7 +20,7 @@ const commentDeactivatedStatement = (
 	statement,
 	isActivated = true,
 	isParentActivated = true,
-	commentType = MULTILINE
+	commentType = MULTILINE,
 ) => {
 	if (isActivated || !isParentActivated || !statement) {
 		return statement;

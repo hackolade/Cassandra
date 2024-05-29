@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const attributesForReturn = ['isActivated', 'type', 'compositePartitionKey'];
 
@@ -8,13 +8,13 @@ const getAttributes = (field = {}, allAttributes = false) => {
 	}
 	return attributesForReturn.reduce((fieldAttributes, attribute) => {
 		if (!field.hasOwnProperty(attribute) || field[attribute] === undefined) {
-			return fieldAttributes
+			return fieldAttributes;
 		}
 
 		return {
 			...fieldAttributes,
 			[attribute]: field[attribute],
-		}
+		};
 	}, {});
 };
 
@@ -28,7 +28,7 @@ const getPathById = (schema, id, path) => {
 			if (newPath) {
 				return newPath;
 			} else {
-				const property = schema.properties[propertyName]
+				const property = schema.properties[propertyName];
 				return getPathById(property, id, [...path, property.GUID || property.id]);
 			}
 		}, undefined);
@@ -48,10 +48,15 @@ const getPathById = (schema, id, path) => {
 };
 
 const getRootItemMetadataById = (id, properties, allAttributes) => {
-	const propertyName = Object.keys(properties).find(propertyName => (properties[propertyName].GUID === id || properties[propertyName].id === id));
+	const propertyName = Object.keys(properties).find(
+		propertyName => properties[propertyName].GUID === id || properties[propertyName].id === id,
+	);
 	const propertyValue = properties[propertyName];
 	if (propertyValue && (propertyValue.code || propertyValue.name)) {
-		return { name: propertyValue.code || propertyValue.name, ...getAttributes(properties[propertyName], allAttributes) };
+		return {
+			name: propertyValue.code || propertyValue.name,
+			...getAttributes(properties[propertyName], allAttributes),
+		};
 	}
 
 	return { name: propertyName, ...getAttributes(properties[propertyName], allAttributes) };
@@ -63,7 +68,7 @@ const findFieldMetadataById = (id, source, allAttributes) => {
 	if (path) {
 		return getRootItemMetadataById(path[0], source.properties, allAttributes);
 	} else {
-		return { name: "" };
+		return { name: '' };
 	}
 };
 
@@ -73,7 +78,7 @@ const getAttributesDataByIds = (ids, sources, allAttributes) => {
 			const fieldData = findFieldMetadataById(id, sources[i], allAttributes);
 
 			if (fieldData?.name) {
-				return Object.assign({}, hash, { [id]: fieldData});
+				return Object.assign({}, hash, { [id]: fieldData });
 			}
 		}
 

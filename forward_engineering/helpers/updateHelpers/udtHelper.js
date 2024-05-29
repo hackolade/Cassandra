@@ -4,7 +4,7 @@ const { eachField } = require('../generalHelper');
 const { getTypeByData } = require('../typeHelper');
 const { checkIsOldModel, fieldTypeCompatible } = require('./generalHelper');
 const { getDelete } = require('./tableHelper');
-const { AlterScriptDto } = require("../types/AlterScriptDto");
+const { AlterScriptDto } = require('../types/AlterScriptDto');
 
 const DEFAULT_KEY_SPACE = { 'Default_Keyspace': [] };
 
@@ -16,40 +16,41 @@ const scriptData = {
 };
 
 /**
- * 
+ *
  * @param keySpaceName {String}
  * @returns {`ALTER TYPE "${string}"`}
  */
 const getAlterTypePrefix = keySpaceName => `ALTER TYPE "${keySpaceName}"`;
 
 /**
- * 
+ *
  * @param dropUDTData {Object}
  * @returns {[(AlterScriptDto|undefined)]}
  */
-const getDropUDT = (dropUDTData) => ([
+const getDropUDT = dropUDTData => [
 	AlterScriptDto.getInstance(
-		[dependencies.provider.dropType({keyspaceName: dropUDTData.keyspaceName, typeName: dropUDTData.typeName})],
-		true, 
+		[dependencies.provider.dropType({ keyspaceName: dropUDTData.keyspaceName, typeName: dropUDTData.typeName })],
+		true,
 		'deletion',
-		'udt'
-	)
-]);
+		'udt',
+	),
+];
 
 /**
- * 
+ *
  * @param addToUDTData {Object}
  * @returns [{(AlterScriptDto|undefined)}]
  */
 const getAddToUDT = addToUDTData => {
 	const { keySpaces, udtName, name, type } = addToUDTData;
-	
-	return Object.keys(keySpaces).map(keySpaceName => AlterScriptDto.getInstance(
-			[dependencies.provider.addPropertyToUdt({keySpaceName, udtName, name, type})], 
+
+	return Object.keys(keySpaces).map(keySpaceName =>
+		AlterScriptDto.getInstance(
+			[dependencies.provider.addPropertyToUdt({ keySpaceName, udtName, name, type })],
 			true,
 			'add',
-			'udt'
-		)
+			'udt',
+		),
 	);
 };
 
@@ -59,7 +60,7 @@ const getKeySpaces = role => {
 };
 
 /**
- * 
+ *
  * @param item {Object}
  * @param udtMap {Object}
  * @returns {(AlterScriptDto|undefined)}
@@ -73,26 +74,28 @@ const getAddScript = (item, udtMap) => {
 
 		return Object.keys(keySpaces).map(currentKeyspace => {
 			const udtName = role.code || role.name || '';
-			
+
 			return AlterScriptDto.getInstance(
 				[dependencies.provider.createUdt({ keySpaceName: currentKeyspace, udtName, columnScript })],
 				true,
 				'add',
-				'udt'
+				'udt',
 			);
 		});
 	}
 
-	return Object.entries(properties)
-		.reduce((scripts, [name, property]) => ([
+	return Object.entries(properties).reduce(
+		(scripts, [name, property]) => [
 			...scripts,
 			...getAddToUDT({
 				type: getTypeByData(property, udtMap),
 				name,
 				keySpaces,
 				udtName: role.code || role.name || '',
-			})
-		]), [])
+			}),
+		],
+		[],
+	);
 };
 
 const prepareField = (field, property) => {
@@ -103,11 +106,11 @@ const prepareField = (field, property) => {
 	return {
 		...field,
 		$ref: property.$ref,
-	}
+	};
 };
 
 /**
- * 
+ *
  * @param item {Object}
  * @param data {Object}
  * @param udtMap {Object}
@@ -123,14 +126,15 @@ const getUpdateScript = (item, data, udtMap) => {
 	return Object.entries(properties).reduce((script, [propertyName, property]) => {
 		const itemOldName = dependencies.lodash.get(property, 'compMod.oldField.name');
 		const itemNewName = dependencies.lodash.get(property, 'compMod.newField.name');
-		const {compMod = {}} = property
+		const { compMod = {} } = property;
 
 		const oldFieldType = getTypeByData(prepareField(compMod.oldField, property), udtMap, 'newField');
 		const newFieldType = getTypeByData(prepareField(compMod.newField, property), udtMap, 'oldField');
 
 		const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
 		const newScript = Object.keys(keySpaces).reduce((script, keySpaceName) => {
-			const changeType = newFieldType &&
+			const changeType =
+				newFieldType &&
 				oldFieldType &&
 				newFieldType !== oldFieldType &&
 				fieldTypeCompatible(oldFieldType, newFieldType) &&
@@ -141,18 +145,10 @@ const getUpdateScript = (item, data, udtMap) => {
 					udtName,
 					columnData: {
 						name: propertyName,
-						type: newFieldType
-					}
+						type: newFieldType,
+					},
 				});
-				script = [
-					...script,
-					AlterScriptDto.getInstance(
-						[updateTypeScript],
-						true,
-						'modify',
-						'udt'
-					)
-				];
+				script = [...script, AlterScriptDto.getInstance([updateTypeScript], true, 'modify', 'udt')];
 			}
 
 			if (itemNewName && itemOldName && itemOldName !== itemNewName) {
@@ -162,16 +158,8 @@ const getUpdateScript = (item, data, udtMap) => {
 					newFieldName: itemNewName,
 					udtName,
 				});
-				
-				script = [
-					...script,
-					AlterScriptDto.getInstance(
-						[renameScript],
-						true,
-						'modify',
-						'udt'
-					)
-				];
+
+				script = [...script, AlterScriptDto.getInstance([renameScript], true, 'modify', 'udt')];
 			}
 
 			return script;
@@ -181,7 +169,7 @@ const getUpdateScript = (item, data, udtMap) => {
 };
 
 /**
- * 
+ *
  * @param item {Object}
  * @returns {[(AlterScriptDto|undefined)]}
  */
@@ -194,28 +182,27 @@ const getDeleteScript = item => {
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name || '';
 
-	return Object.entries(keySpaces)
-		.reduce((script, [keyspaceName, keySpace]) => {
-			const newScript = keySpace.reduce((script, table) => {
-				const dropColumnScript = getDelete({
-					tableName: table.collectionName || table.code,
-					keyspaceName,
-					columnData: {
-						name: udtName
-					}
-				});
-				const dropUdtScript = getDropUDT({
-					keyspaceName,
-					typeName: udtName
-				});
-				return [...script, ...dropColumnScript, ...dropUdtScript];
-			}, []);
-			return [...script, ...newScript];
+	return Object.entries(keySpaces).reduce((script, [keyspaceName, keySpace]) => {
+		const newScript = keySpace.reduce((script, table) => {
+			const dropColumnScript = getDelete({
+				tableName: table.collectionName || table.code,
+				keyspaceName,
+				columnData: {
+					name: udtName,
+				},
+			});
+			const dropUdtScript = getDropUDT({
+				keyspaceName,
+				typeName: udtName,
+			});
+			return [...script, ...dropColumnScript, ...dropUdtScript];
 		}, []);
+		return [...script, ...newScript];
+	}, []);
 };
 
 /**
- * 
+ *
  * @param child {Object}
  * @param mode {Object}
  * @param data {Object}
@@ -229,7 +216,6 @@ const getUdtScript = ({ child, mode, data, udtMap }) => {
 		return getUpdateScript(child, data, udtMap);
 	}
 	return getDeleteScript(child);
-
 };
 
 const sortAddedUdt = udt => {
@@ -246,7 +232,7 @@ const sortAddedUdt = udt => {
 	const otherUdt = dependencies.lodash.xorWith(items, createdUdt, dependencies.lodash.isEqual);
 	createdUdt = createdUdt.map(item => {
 		const itemName = Object.keys(item.properties)[0];
-		return [ itemName, item ];
+		return [itemName, item];
 	});
 
 	const createdUdtNames = createdUdt.map(([itemName, __]) => itemName);
@@ -256,20 +242,21 @@ const sortAddedUdt = udt => {
 		const referencesName = new Set();
 		const child = item.properties[itemName];
 
-		eachField(child || {}, (field) => {
+		eachField(child || {}, field => {
 			if (field.$ref) {
 				const udtName = field.$ref.split('/').pop();
-				referencesName.add(udtName)
+				referencesName.add(udtName);
 			}
 		});
 
-		const referencesNameInUdt = Array.from(referencesName)
-			.filter(name => createdUdtNames.includes(name) && !sortedCreatedUdtNames.includes(name));
+		const referencesNameInUdt = Array.from(referencesName).filter(
+			name => createdUdtNames.includes(name) && !sortedCreatedUdtNames.includes(name),
+		);
 
 		sortedCreatedUdtNames.push(...referencesNameInUdt);
 
 		if (!referencesNameInUdt.length) {
-			const index = sortedCreatedUdtNames.indexOf(itemName)
+			const index = sortedCreatedUdtNames.indexOf(itemName);
 
 			if (index === -1) {
 				sortedCreatedUdtNames.unshift(itemName);
@@ -277,7 +264,7 @@ const sortAddedUdt = udt => {
 				sortedCreatedUdtNames.unshift(...sortedCreatedUdtNames.splice(index, 1));
 			}
 		}
-	})
+	});
 
 	const notSortedUdtNames = createdUdtNames.filter(name => !sortedCreatedUdtNames.includes(name));
 
@@ -285,7 +272,7 @@ const sortAddedUdt = udt => {
 	createdUdt = [...sortedCreatedUdtNames, ...notSortedUdtNames].map(name => createdUdt[name]).filter(Boolean);
 
 	udt.properties.added.items = [...createdUdt, ...otherUdt];
-	
+
 	return udt;
 };
 
@@ -293,4 +280,4 @@ module.exports = {
 	getUdtScript,
 	sortAddedUdt,
 	getAlterTypePrefix,
-}
+};

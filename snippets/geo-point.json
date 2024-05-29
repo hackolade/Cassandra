@@ -1,9 +1,12 @@
 {
 	"name": "geo-point",
 	"parentType": "array",
-	"properties": [{
-		"type": "numeric"
-	}, {
-		"type": "numeric"
-	}]
+	"properties": [
+		{
+			"type": "numeric"
+		},
+		{
+			"type": "numeric"
+		}
+	]
 }

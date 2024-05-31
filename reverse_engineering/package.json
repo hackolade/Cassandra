@@ -1,5 +1,6 @@
 {
     "name": "Cassandra",
+    "description": "custom attributes to drive application behavior",
     "systemKeyspaces": [
         "cfs",
         "cfs_archive",
@@ -20,6 +21,5 @@
         "system_views",
         "system_virtual_schema"
     ],
-    "type": "multi",
-    "installed": true
+    "type": "multi"
 }

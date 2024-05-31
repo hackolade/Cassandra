@@ -1,8 +1,5 @@
 {
-    "name": "Datastax",
-    "version": "1.0.0",
-    "description": "",
-    "author": "Hackolade",
+    "name": "Cassandra",
     "systemKeyspaces": [
         "cfs",
         "cfs_archive",
@@ -22,5 +19,7 @@
         "system_traces",
         "system_views",
         "system_virtual_schema"
-    ]
+    ],
+    "type": "multi",
+    "installed": true
 }

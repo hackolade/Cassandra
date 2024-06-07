@@ -2,16 +2,15 @@ const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
 let _;
 const fs = require('fs');
-const ssh = require('tunnel-ssh');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 const xmlParser = require('fast-xml-parser');
 const filterComplexUdt = require('./helpers/filterComplexUdt');
 
-let state = {
+const state = {
 	client: null,
-	sshTunnel: null,
+	isSshTunnel: null,
 };
 
 const COLUMNS_TO_FILTER_OUT = ['solr_query'];
@@ -282,92 +281,56 @@ module.exports = (_) => {
 		}
 	};
 
-	const getSshConfig = (info) => {
-		if (!Array.isArray(info.hosts)) {
-			throw new Error('Hosts were not defined');
+	const connect = (app, logger) => async (info) => {
+		if (state.client) {
+			return state.client.connect();
 		}
 
-		const host = info.hosts[0];
-		const config = {
-			username: info.ssh_user,
-			host: info.ssh_host,
-			port: info.ssh_port,
-			dstHost: host.host,
-			dstPort: host.port,
-			localHost: '127.0.0.1',
-			localPort: host.port,
-			keepAlive: true
-		};
+		if (info.ssh) {
+			const sshService = app.require('@hackolade/ssh-service');
+			const host = info.hosts[0];
 
-		if (info.ssh_method === 'privateKey') {
-			return Object.assign({}, config, {
-				privateKey: fs.readFileSync(info.ssh_key_file),
-				passphrase: info.ssh_key_passphrase
+			const { options } = await sshService.openTunnel({
+				sshAuthMethod: info.ssh_method === 'privateKey' ? 'IDENTITY_FILE' : 'USER_PASSWORD',
+				sshTunnelHostname: info.ssh_host,
+				sshTunnelPort: info.ssh_port,
+				sshTunnelUsername: info.ssh_user,
+				sshTunnelPassword: info.ssh_password,
+				sshTunnelIdentityFile: info.ssh_key_file,
+				sshTunnelPassphrase: info.ssh_key_passphrase,
+				host: host.host,
+				port: host.port,
 			});
-		} else {
-			return Object.assign({}, config, {
-				password: info.ssh_password
-			});
-		}
-	};
 
-	const connectViaSsh = (info) => new Promise((resolve, reject) => {
-		if (!info.ssh) {
-			return resolve({
-				tunnel: null,
-				info
-			});
+			state.isSshTunnel = true;
+			info = {
+				...info,
+				hosts: [options],
+			};
 		}
-		
-		ssh(getSshConfig(info), (err, tunnel) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve({
-					tunnel,
-					info: Object.assign({}, info, {
-						hosts: info.hosts.map(host => ({
-							...host,
-							host: '127.0.0.1'
-						})),
-					})
-				});
+
+		state.client = await getClient(app, info, logger);
+
+		state.client.on('log', (type, name, info, furtherInfo) => {
+			if (logger) {
+				const message = '[' + type + '] ' + name + ': ' + info + '. ' + furtherInfo;
+				logger.log('info', { message }, 'Cassandra Info');
 			}
 		});
-	});
 
-	const connect = (app, logger) => (info) => {
-		if (!state.client) {
-			return connectViaSsh(info).then(({ info, tunnel }) => {
-				state.sshTunnel = tunnel;
-
-				return getClient(app, info, logger);
-			})
-				.then((client) => {
-					state.client = client;
-
-					client.on('log', (type, name, info, furtherInfo) => {
-						if (logger) {
-							logger.log('info', { message: '[' + type + '] ' + name + ': ' + info + '. ' + furtherInfo }, 'Cassandra Info');
-						}
-					});
-	
-					return state.client.connect();
-				});
-		}
-		
 		return state.client.connect();
 	};
 	
-	const close = () => {
+	const close = async (app) => {
 		if (state.client) {
 			state.client.shutdown();
 			state.client = null;
 		}
 
-		if (state.sshTunnel) {
-			state.sshTunnel.close();
-			state.sshTunnel = null;
+		if (state.isSshTunnel) {
+			const sshService = app.require('@hackolade/ssh-service');
+			await sshService.closeConsumer();
+			state.isSshTunnel = false;
 		}
 	};
 	
@@ -587,17 +550,7 @@ module.exports = (_) => {
 			tableOptions: getTableOptions(table)
 		};
 	};
-	
-	const changeQuotes = (str) => {
-		return String(str).replace(/\"/g, '\'');
-	};
-	
-	const getCompaction = (data) => {
-		return Object.assign({}, data.compactionOptions, {
-			class: data.compactionClass
-		});
-	};
-	
+
 	const getOptionsFromTab = config => {
 		const optionsBlock = config.structure.find(prop => prop.propertyName === 'Options');
 		return optionsBlock.structure;

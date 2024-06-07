@@ -60,7 +60,7 @@ module.exports = {
 	},
 
 	disconnect: function(connectionInfo, cb, app){
-		cassandraHelper(app.require('lodash')).close();
+		cassandraHelper(app.require('lodash')).close(app);
 		cb();
 	},
 

@@ -2,7 +2,9 @@
 .vscode
 .idea
 node_modules
+reverse_engineering/grammars
 reverse_engineering/node_modules
+reverse_engineering/parser
 forward_engineering/node_modules
 build
 release

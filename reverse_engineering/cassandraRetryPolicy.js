@@ -7,8 +7,8 @@ class CassandraRetryPolicy extends cassandra.policies.retry.RetryPolicy {
 	}
 
 	onReadTimeout(info, consistency, received, blockFor, isDataPresent) {
-		var totalRetry = 2;
-		var currentRetry = info.nbRetry;
+		const totalRetry = 2;
+		const currentRetry = info.nbRetry;
 
 		if (this.hackoladeLogger) {
 			this.hackoladeLogger.log(

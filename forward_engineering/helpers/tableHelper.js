@@ -9,7 +9,7 @@ const {
 } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 const { getNamesByIds } = require('./schemaHelper');
-const { getEntityLevelConfig } = require('./generalHelper');
+const { getEntityLevelConfig } = require('../../helpers/levelConfigHelper');
 const { parseToString, addId, addClustering } = require('./tableOptionService/parseToString');
 const { inlineComment } = require('./commentsHelper');
 const { dependencies } = require('./appDependencies');

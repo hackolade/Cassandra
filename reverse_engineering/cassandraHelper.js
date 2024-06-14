@@ -3,7 +3,7 @@ const typesHelper = require('./typesHelper');
 let _;
 const fs = require('fs');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
-const { getEntityLevelConfig } = require('../forward_engineering/helpers/generalHelper');
+const { getEntityLevelConfig } = require('../helpers/levelConfigHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 const xmlParser = require('fast-xml-parser');
 const filterComplexUdt = require('./helpers/filterComplexUdt');

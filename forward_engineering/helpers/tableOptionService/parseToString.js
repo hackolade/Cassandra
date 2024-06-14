@@ -1,4 +1,4 @@
-const { inlineComment } = require("../commentsHelper");
+const { inlineComment } = require('../commentsHelper');
 const { dependencies } = require('../appDependencies');
 
 const NUMERIC = 'numeric';
@@ -10,8 +10,8 @@ const OTHER = 'otherProperties';
 const CACHING = 'caching';
 const specialOptions = [CACHING, OTHER];
 
-const getStringStart = str => str === '' ? '\nWITH' : '  AND';
-const changeQuotes = str => String(str || '').replace(/[\"\`]/g, '\'');
+const getStringStart = str => (str === '' ? '\nWITH' : '  AND');
+const changeQuotes = str => String(str || '').replace(/[\"\`]/g, "'");
 
 const tableOptionsHashMap = {
 	localReadRepairChance: 'dclocal_read_repair_chance',
@@ -24,7 +24,7 @@ const tableOptionsHashMap = {
 	maxIndexInterval: 'max_index_interval',
 	crcCheckChance: 'crc_check_chance',
 	memtableFlushPeriod: 'memtable_flush_period_in_ms',
-}
+};
 
 const convertKeywordToTableOptionName = keyword => {
 	if (tableOptionsHashMap.hasOwnProperty(keyword)) {
@@ -32,34 +32,41 @@ const convertKeywordToTableOptionName = keyword => {
 	}
 
 	return keyword;
-}
+};
 
-const transformOption = (option) => {
+const transformOption = option => {
 	if (specialOptions.includes(option.propertyKeyword)) {
 		return transformSpecialOption(option);
 	}
 
 	return transformOptionByPropertyType(option);
-
 };
 
 const transformSpecialOption = option => {
 	switch (option.propertyKeyword) {
-		case CACHING: return transformCachingOption(option);
-		case OTHER: return transformOtherOptions(option);
-		default: return null;
+		case CACHING:
+			return transformCachingOption(option);
+		case OTHER:
+			return transformOtherOptions(option);
+		default:
+			return null;
 	}
-}
+};
 
 const transformOptionByPropertyType = option => {
 	switch (option.propertyType) {
-		case TEXT: return transformTextOption(option);
-		case CHECKBOX: return transformBooleanOption(option);
-		case NUMERIC: return transformNumericOption(option);
-		case DETAILS: return transformDetailsOptions(option);
-		default: return null;
+		case TEXT:
+			return transformTextOption(option);
+		case CHECKBOX:
+			return transformBooleanOption(option);
+		case NUMERIC:
+			return transformNumericOption(option);
+		case DETAILS:
+			return transformDetailsOptions(option);
+		default:
+			return null;
 	}
-}
+};
 
 const transformTextOption = option =>
 	`${convertKeywordToTableOptionName(option['propertyKeyword'])} = '${option.value}'`;
@@ -74,11 +81,11 @@ const transformDetailsOptions = option => {
 		}
 
 		return value;
-	}
+	};
 	const stringValue = getStringValue(option.value);
 	const trimmedValue = stringValue.replace(/\n/g, '');
 	return `${convertKeywordToTableOptionName(option['propertyKeyword'])} = ${changeQuotes(trimmedValue)}`;
-}
+};
 
 const transformOtherOptions = option => {
 	const subOptionArray = option.value;
@@ -93,7 +100,7 @@ const transformOtherOptions = option => {
 			return optionString.concat(`${start} ${name} = '${value}'\n`);
 		}, '')
 		.replace(/\n$/, '');
-}
+};
 
 const transformBooleanOption = option => {
 	const keyword = option['propertyKeyword'];
@@ -110,10 +117,10 @@ const transformBooleanOption = option => {
 	}
 
 	return null;
-}
+};
 
 const transformCachingOption = option => {
-	const validateKeys = value => allowedValues.includes(value) ? value : null;
+	const validateKeys = value => (allowedValues.includes(value) ? value : null);
 	const validateRows = value => {
 		if (allowedValues.includes(value)) {
 			return value;
@@ -125,11 +132,7 @@ const transformCachingOption = option => {
 
 		return null;
 	};
-	const createValueObject = (keys, rows) => Object.assign(
-		{},
-		keys && { keys },
-		rows && { rows_per_partition: rows }
-	);
+	const createValueObject = (keys, rows) => Object.assign({}, keys && { keys }, rows && { rows_per_partition: rows });
 	const allowedValues = ['ALL', 'NONE'];
 	const keys = validateKeys(option.value['keys']);
 	const rows = validateRows(option.value['rowsPerPartition']);
@@ -139,7 +142,7 @@ const transformCachingOption = option => {
 
 	const stringValue = JSON.stringify(createValueObject(keys, rows));
 	return `caching = ${changeQuotes(stringValue)}`;
-}
+};
 
 const generateOptionsStringReducer = (str, option) => {
 	if (!option.value && typeof option.value !== 'number') {
@@ -153,7 +156,7 @@ const generateOptionsStringReducer = (str, option) => {
 
 	const start = getStringStart(str);
 	return str.concat(`${start} ${optionString}\n`);
-}
+};
 
 const addCommentToOptionString = (optionString, comment) => {
 	if (comment) {
@@ -162,7 +165,7 @@ const addCommentToOptionString = (optionString, comment) => {
 	}
 
 	return optionString;
-}
+};
 
 const addId = (tableId, options) => {
 	if (!tableId) {
@@ -171,7 +174,7 @@ const addId = (tableId, options) => {
 
 	const start = getStringStart(options);
 	return options.concat(`${start} ID = '${tableId}'\n`);
-}
+};
 
 const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActivated) => {
 	const validClusteredKeys = clusteringKeys.filter(key => clusteringKeysHash[key && key.keyId]);
@@ -179,18 +182,17 @@ const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActi
 		return options;
 	}
 	const mapKeys = keys => {
-		return keys
-			.map((key) => {
-				const { keyId, type } = key;
-				const { name } = clusteringKeysHash[keyId];
-				const order = type === 'descending' ? 'DESC' : 'ASC';
-				return `"${name}" ${order}`;
-			});
+		return keys.map(key => {
+			const { keyId, type } = key;
+			const { name } = clusteringKeysHash[keyId];
+			const order = type === 'descending' ? 'DESC' : 'ASC';
+			return `"${name}" ${order}`;
+		});
 	};
 
 	let [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(
 		validClusteredKeys,
-		({ keyId }) => dependencies.lodash.get(clusteringKeysHash, `${keyId}.isActivated`) !== false
+		({ keyId }) => dependencies.lodash.get(clusteringKeysHash, `${keyId}.isActivated`) !== false,
 	);
 	activatedKeys = mapKeys(activatedKeys);
 	deactivatedKeys = mapKeys(deactivatedKeys);
@@ -207,7 +209,7 @@ const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActi
 
 	const start = getStringStart(options);
 	return options.concat(`${start} CLUSTERING ORDER BY (${fields})\n`);
-}
+};
 
 module.exports = {
 	parseToString(options, comment) {

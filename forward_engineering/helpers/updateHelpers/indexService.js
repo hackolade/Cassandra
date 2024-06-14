@@ -16,7 +16,7 @@ const SEARCH_INDEX_CONFIG_DEFAULT = {
 	filterCacheHighWaterMark: 2048,
 	mergeFactor: 10,
 	ramBufferSize: 512,
-	realtime: false
+	realtime: false,
 };
 
 const INDEX_CONFIG_DEFAULT = {
@@ -36,29 +36,30 @@ const SEARCH_INDEX_PROFILES_DATA_FOR_PREPARE = {
 const isDiff = (oldValue, newValue) => !dependencies.lodash.isEqual(oldValue, newValue);
 
 const getModifiedProperties = (oldProperties, newProperties) => {
-	
 	return Object.entries(newProperties).reduce((acc, [name, value]) => {
 		if (REDUNDANT_OPTIONS.includes(name)) {
 			return acc;
 		}
-	
+
 		if (!oldProperties.hasOwnProperty(name) || isDiff(oldProperties[name], value)) {
-			return Object.assign({}, acc, { [name]: value })
+			return Object.assign({}, acc, { [name]: value });
 		}
-	
+
 		return acc;
 	}, {});
 };
 
 const isEmptyValue = value => typeof value !== 'boolean' && !Boolean(value);
 
-const getDeletedProperties = (oldProperties, newProperties) => 
-	Object.keys(oldProperties)
-		.filter(oldPropertyKey => !newProperties.hasOwnProperty(oldPropertyKey));
+const getDeletedProperties = (oldProperties, newProperties) =>
+	Object.keys(oldProperties).filter(oldPropertyKey => !newProperties.hasOwnProperty(oldPropertyKey));
 
 const getDefaultPropertiesByName = (propertiesNames, oldProperties, defaultProperties) => {
 	return propertiesNames.reduce((acc, propertyName) => {
-		if (defaultProperties.hasOwnProperty(propertyName) && isDiff(dependencies.lodash.get(oldProperties, propertyName), defaultProperties[propertyName])) {
+		if (
+			defaultProperties.hasOwnProperty(propertyName) &&
+			isDiff(dependencies.lodash.get(oldProperties, propertyName), defaultProperties[propertyName])
+		) {
 			return Object.assign({}, acc, { [propertyName]: defaultProperties[propertyName] });
 		}
 
@@ -67,7 +68,7 @@ const getDefaultPropertiesByName = (propertiesNames, oldProperties, defaultPrope
 };
 
 const getNotDefaultProperties = (properties = [], defaultProperties = []) => {
-	return properties.reduce((acc, property) => defaultProperties.includes(property) ? acc : [...acc, property], []);
+	return properties.reduce((acc, property) => (defaultProperties.includes(property) ? acc : [...acc, property]), []);
 };
 
 const getDropProperties = (oldData, newData, defaultData = {}) => {
@@ -81,41 +82,56 @@ const getDropProperties = (oldData, newData, defaultData = {}) => {
 		if (oldData.hasOwnProperty(property) && isEmptyValue(newData[property]) && !isEmptyValue(oldData[property])) {
 			return {
 				...acc,
-				[property]: newData[property]
-			}
+				[property]: newData[property],
+			};
 		}
 
 		return acc;
-	}, {})
+	}, {});
 };
 
-const getDiffOptions = defaultData => (oldData = {}, newData = {}) => {
-	const modifyData = getModifiedProperties(Object.assign({}, defaultData, oldData), Object.assign({}, defaultData, newData));
-	const deleteDataProperties = getDeletedProperties(oldData, Object.assign({}, defaultData, newData));
+const getDiffOptions =
+	defaultData =>
+	(oldData = {}, newData = {}) => {
+		const modifyData = getModifiedProperties(
+			Object.assign({}, defaultData, oldData),
+			Object.assign({}, defaultData, newData),
+		);
+		const deleteDataProperties = getDeletedProperties(oldData, Object.assign({}, defaultData, newData));
 
-	return {
-		modifyData,
-		dropData: getDefaultPropertiesByName(deleteDataProperties, oldData, defaultData),
+		return {
+			modifyData,
+			dropData: getDefaultPropertiesByName(deleteDataProperties, oldData, defaultData),
+		};
 	};
-};
 
-const getDiff = defaultData => (oldData = {}, newData = {}) => {
-	const modifyData = getModifiedProperties(Object.assign({}, defaultData, oldData), Object.assign({}, defaultData, newData));
+const getDiff =
+	defaultData =>
+	(oldData = {}, newData = {}) => {
+		const modifyData = getModifiedProperties(
+			Object.assign({}, defaultData, oldData),
+			Object.assign({}, defaultData, newData),
+		);
 
-	return {
-		modifyData,
-		dropData: getDropProperties(oldData, newData, defaultData)
-	}
-};
+		return {
+			modifyData,
+			dropData: getDropProperties(oldData, newData, defaultData),
+		};
+	};
 
-const isEqualIndex = (defaultData, redundantProperty) => (oldData = {}, newData = {}) => {
-	newData = Object.assign({}, defaultData, newData);
-	oldData = Object.assign({}, defaultData, oldData);
-	const keys = dependencies.lodash.uniq([...dependencies.lodash.keys(newData), ...dependencies.lodash.keys(oldData)]).filter(key => !redundantProperty.includes(key));
-	return keys.reduce(
-		(isEqual, key) => 
-		isEqual && dependencies.lodash.isEqual(newData[key], oldData[key]) ? isEqual : false, true);
-};
+const isEqualIndex =
+	(defaultData, redundantProperty) =>
+	(oldData = {}, newData = {}) => {
+		newData = Object.assign({}, defaultData, newData);
+		oldData = Object.assign({}, defaultData, oldData);
+		const keys = dependencies.lodash
+			.uniq([...dependencies.lodash.keys(newData), ...dependencies.lodash.keys(oldData)])
+			.filter(key => !redundantProperty.includes(key));
+		return keys.reduce(
+			(isEqual, key) => (isEqual && dependencies.lodash.isEqual(newData[key], oldData[key]) ? isEqual : false),
+			true,
+		);
+	};
 
 const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumns = []) => {
 	return Object.entries(SEARCH_INDEX_PROFILES_DATA_FOR_PREPARE).reduce((oldProfiles, [profile, profileData]) => {
@@ -131,7 +147,7 @@ const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumn
 			return keyValues.some(value => keysOldColumns.includes(value));
 		}, false);
 
-		return profileIsNotExist ? oldProfiles: [...oldProfiles, profile];
+		return profileIsNotExist ? oldProfiles : [...oldProfiles, profile];
 	}, oldProfiles);
 };
 
@@ -142,4 +158,4 @@ module.exports = {
 	isEqualIndex: isEqualIndex(INDEX_CONFIG_DEFAULT, [...REDUNDANT_OPTIONS, ...REDUNDANT_PROPERTIES_FOR_INDEX]),
 	prepareSearchIndexProfile,
 	REDUNDANT_OPTIONS,
-}
+};

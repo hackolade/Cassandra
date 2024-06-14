@@ -4,5 +4,5 @@ const testConnection = require('./testConnection.js')(cassandra);
 
 module.exports = {
 	applyToInstance,
-	testConnection
+	testConnection,
 };

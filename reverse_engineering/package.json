@@ -1,14 +1,6 @@
 {
   "name": "Datastax",
-  "version": "1.0.0",
-  "description": "",
-  "author": "Hackolade",
-  "dependencies": {
-    "antlr4": "^4.8.0",
-    "cassandra-driver": "^4.7.2",
-    "fast-xml-parser": "^3.19.0",
-    "jks-js": "^1.0.0"
-  },
+  "description": "custom attributes to drive application behavior",
   "systemKeyspaces": [
     "cfs",
     "cfs_archive",

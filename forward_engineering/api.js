@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const {
 	retrieveContainerName,
@@ -20,7 +20,7 @@ const { getCreateTableScript } = require('./helpers/createHelper');
 const { setDependencies } = require('./helpers/appDependencies');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
 const { getScriptOptions } = require('./helpers/getScriptOptions');
-const { buildContainerLevelAlterScript, isDropInStatements } = require("./helpers/alterScriptBuilder");
+const { buildContainerLevelAlterScript, isDropInStatements } = require('./helpers/alterScriptBuilder');
 
 module.exports = {
 	generateScript(data, logger, callback, app) {
@@ -60,10 +60,10 @@ module.exports = {
 			entityData: data.entityData,
 			containerData: data.containerData,
 			collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap,
-			ifNotExist: viewSchema.viewIfNotExist
+			ifNotExist: viewSchema.viewIfNotExist,
 		});
 
-		callback(null, script)
+		callback(null, script);
 	},
 
 	generateContainerScript(data, logger, callback, app) {
@@ -73,12 +73,12 @@ module.exports = {
 				const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
 				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
 				data.scriptOptions = getScriptOptions(data);
-				
+
 				const scripts = data.entities.map(entityId => {
 					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 					data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
 					return buildContainerLevelAlterScript(jsonSchema, data.udtTypeMap, data);
-				})
+				});
 				callback(null, scripts.filter(Boolean).join('\n\n'));
 			} else {
 				const modelDefinitions = sortUdt(JSON.parse(data.modelDefinitions));
@@ -89,49 +89,43 @@ module.exports = {
 				const containerName = retrieveContainerName(containerData);
 				const keyspace = getKeyspaceStatement(containerData);
 				const isKeyspaceActivated = retrieveIsItemActivated(containerData);
-				
+
 				const generalUdtTypeMap = getUdtMap([modelDefinitions, externalDefinitions]);
-				let generalUDT = getUdtScripts(containerName, [
-					externalDefinitions,
-					modelDefinitions
-				], generalUdtTypeMap, isKeyspaceActivated);
+				let generalUDT = getUdtScripts(
+					containerName,
+					[externalDefinitions, modelDefinitions],
+					generalUdtTypeMap,
+					isKeyspaceActivated,
+				);
 
 				const UDF = getUserDefinedFunctions(retrieveUDF(containerData));
 				const UDA = getUserDefinedAggregations(retrieveUDA(containerData));
 
 				const dbVersion = data.modelData[0].dbVersion;
 
-				cqlScriptData.push(
-					keyspace,
-					...generalUDT
-				);
+				cqlScriptData.push(keyspace, ...generalUDT);
 
-				data.entities.forEach((entityId) => {
-					const internalDefinitions = sortUdt(
-						JSON.parse(data.internalDefinitions[entityId])
-					);
+				data.entities.forEach(entityId => {
+					const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
 					const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 					const entityData = data.entityData[entityId];
 					const udtTypeMap = Object.assign(
 						{},
 						generalUdtTypeMap,
-						getUdtMap([internalDefinitions, jsonSchema])
+						getUdtMap([internalDefinitions, jsonSchema]),
 					);
 
 					const entityName = retrieveEntityName(entityData);
 					const isEntityActivated = retrieveIsItemActivated(entityData);
-					const dataSources = [
-						jsonSchema,
-						modelDefinitions,
-						internalDefinitions,
-						externalDefinitions,
-					];
+					const dataSources = [jsonSchema, modelDefinitions, internalDefinitions, externalDefinitions];
 					const internalUdt = getUdtScripts(
 						containerName,
 						[internalDefinitions, jsonSchema],
 						udtTypeMap,
-						isKeyspaceActivated && isEntityActivated
-					).map(udtStatement => commentDeactivatedStatement(udtStatement, isEntityActivated, isKeyspaceActivated));
+						isKeyspaceActivated && isEntityActivated,
+					).map(udtStatement =>
+						commentDeactivatedStatement(udtStatement, isEntityActivated, isKeyspaceActivated),
+					);
 
 					const table = getTableStatement({
 						tableData: jsonSchema,
@@ -148,25 +142,27 @@ module.exports = {
 						containerName,
 						isEntityActivated,
 						isKeyspaceActivated,
-						dbVersion
+						dbVersion,
 					);
-					
+
 					cqlScriptData.push(...internalUdt, table, indexes);
 				});
 
-				cqlScriptData = cqlScriptData.concat(data.views.map(viewId => {
-					const viewSchema = JSON.parse(data.jsonSchema[viewId] || '{}');
+				cqlScriptData = cqlScriptData.concat(
+					data.views.map(viewId => {
+						const viewSchema = JSON.parse(data.jsonSchema[viewId] || '{}');
 
-					return getViewScript({
-						schema: viewSchema,
-						viewData: data.viewData[viewId],
-						entityData: data.entityData[viewSchema.viewOn],
-						containerData: data.containerData,
-						collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap,
-						isKeyspaceActivated,
-						ifNotExist: viewSchema.viewIfNotExist
-					})
-				}));
+						return getViewScript({
+							schema: viewSchema,
+							viewData: data.viewData[viewId],
+							entityData: data.entityData[viewSchema.viewOn],
+							containerData: data.containerData,
+							collectionRefsDefinitionsMap: data.collectionRefsDefinitionsMap,
+							isKeyspaceActivated,
+							ifNotExist: viewSchema.viewIfNotExist,
+						});
+					}),
+				);
 
 				cqlScriptData.push(UDF, UDA);
 
@@ -195,11 +191,7 @@ module.exports = {
 	},
 
 	testConnection(connectionInfo, logger, callback, app) {
-		testConnection(connectionInfo, app)
-			.then(
-				callback,
-				callback
-			);
+		testConnection(connectionInfo, app).then(callback, callback);
 	},
 
 	isDropInStatements(data, logger, callback, app) {
@@ -207,10 +199,11 @@ module.exports = {
 			setDependencies(app);
 			let result;
 			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
-			
+
 			if (data.level === 'container') {
 				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
-				result = data.entities.map(entityId => {
+				result = data.entities
+					.map(entityId => {
 						const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 						data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
 						return isDropInStatements(jsonSchema, data.udtTypeMap, data);
@@ -220,16 +213,16 @@ module.exports = {
 				const jsonSchema = JSON.parse(data.jsonSchema);
 				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
 				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
-				result = isDropInStatements(data.jsonSchema, data.udtTypeMap, data)
+				result = isDropInStatements(data.jsonSchema, data.udtTypeMap, data);
 			}
 
 			callback(null, result);
-		}	catch (e) {
+		} catch (e) {
 			callback({ message: e.message, stack: e.stack });
 		}
 	},
 };
 
-const getScript = (structure) => {
+const getScript = structure => {
 	return structure.filter(item => item).join('\n\n');
 };

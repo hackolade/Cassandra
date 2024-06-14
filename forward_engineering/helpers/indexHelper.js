@@ -1,23 +1,32 @@
-'use strict'
+'use strict';
 
 const { commentDeactivatedStatement, inlineComment } = require('./commentsHelper');
 const { tab, getTableNameStatement } = require('./generalHelper');
 const { getNamesByIds } = require('./schemaHelper');
-const {dependencies} = require("./appDependencies");
+const { dependencies } = require('./appDependencies');
 
-const getIndexes = (indexData, dataSources, tableName, keyspaceName, isTableActivated, isKeyspaceActivated, dbVersion) => {
+const getIndexes = (
+	indexData,
+	dataSources,
+	tableName,
+	keyspaceName,
+	isTableActivated,
+	isKeyspaceActivated,
+	dbVersion,
+) => {
 	const tableNameStatement = getTableNameStatement(keyspaceName, tableName);
 	const isParentActivated = isTableActivated && isKeyspaceActivated;
 	const generalIndexes = getGeneralIndexes(tableNameStatement, dataSources, indexData.indexes);
-	const searchIndex = dbVersion === 'Astra DB' ? [] : getSearchIndexStatement(tableNameStatement, dataSources, isParentActivated, indexData.searchIndex);	
-	
-	const indexStatements = [...generalIndexes, ...searchIndex].map(index => {
-		return commentDeactivatedStatement(
-			index.statement,
-			index.isActivated,
-			isParentActivated
-		);
-	}).join('\n\n');
+	const searchIndex =
+		dbVersion === 'Astra DB'
+			? []
+			: getSearchIndexStatement(tableNameStatement, dataSources, isParentActivated, indexData.searchIndex);
+
+	const indexStatements = [...generalIndexes, ...searchIndex]
+		.map(index => {
+			return commentDeactivatedStatement(index.statement, index.isActivated, isParentActivated);
+		})
+		.join('\n\n');
 
 	return indexStatements;
 };
@@ -35,14 +44,14 @@ const getGeneralIndexes = (tableNameStatement, dataSources, indexes = []) => {
 				column: columnStatement,
 				using: index.isSASI ? 'org.apache.cassandra.index.sasi.SASIIndex' : 'StorageAttachedIndex',
 				options: getCustomOptions(index.customOptions, index.isSASI),
-				ifNotExist: index.indexIfNotExist
+				ifNotExist: index.indexIfNotExist,
 			});
 		} else {
-			indexStatement =  dependencies.provider.createIndex({
+			indexStatement = dependencies.provider.createIndex({
 				name: index.name,
 				tableName: tableNameStatement,
 				column: columnStatement,
-          		ifNotExist: index.indexIfNotExist
+				ifNotExist: index.indexIfNotExist,
 			});
 		}
 
@@ -58,12 +67,16 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 		return [];
 	}
 	let columns = [];
-	if(searchIndex.columns){
-			columns = uniqueByName(searchIndex.columns.filter(column => Array.isArray(column.key) && column.key.length).map(column => ({
-		...column,
-		name: getIndexColumnStatement(column.key[0], dataSources),
-		isActivated: isIndexColumnKeyActivated(column.key[0], dataSources),
-	})));
+	if (searchIndex.columns) {
+		columns = uniqueByName(
+			searchIndex.columns
+				.filter(column => Array.isArray(column.key) && column.key.length)
+				.map(column => ({
+					...column,
+					name: getIndexColumnStatement(column.key[0], dataSources),
+					isActivated: isIndexColumnKeyActivated(column.key[0], dataSources),
+				})),
+		);
 	}
 
 	const activatedColumns = columns.filter(column => column.isActivated);
@@ -73,16 +86,18 @@ const getSearchIndexStatement = (tableNameStatement, dataSources, isParentActiva
 		isActivated: isActivated && isParentActivated,
 		index: searchIndex,
 		columns,
-		ifNotExist: searchIndex.ifNotExist
+		ifNotExist: searchIndex.ifNotExist,
 	});
 
-	return [{
-		isActivated,
-		statement,
-	}];
+	return [
+		{
+			isActivated,
+			statement,
+		},
+	];
 };
 
-const uniqueByName = (columns) => {
+const uniqueByName = columns => {
 	return columns.reduce((result, column) => {
 		const exists = result.find(c => c.name === column.name);
 
@@ -126,18 +141,21 @@ const isIndexColumnKeyActivated = (key, dataSources) => {
 	return isActivated !== false;
 };
 
-const unwindIndexes = (indexes) => {
+const unwindIndexes = indexes => {
 	return indexes.reduce((result, index) => {
-		return [...result, ...(index.SecIndxKey || []).map((key, i) => {
-			return Object.assign({}, index, {
-				name: i > 0 ? index.name + '_' + i : index.name,
-				SecIndxKey: key
-			});
-		})];
+		return [
+			...result,
+			...(index.SecIndxKey || []).map((key, i) => {
+				return Object.assign({}, index, {
+					name: i > 0 ? index.name + '_' + i : index.name,
+					SecIndxKey: key,
+				});
+			}),
+		];
 	}, []);
 };
 
-const serializeOptions = (options) => {
+const serializeOptions = options => {
 	return Object.keys(options).map(option => `'${option}': '${options[option]}'`);
 };
 
@@ -164,10 +182,9 @@ const getCustomOptions = (options, isSASI) => {
 		result.similarity_function = `${options.similarity_function}`;
 	}
 
-	if(!isSASI){
+	if (!isSASI) {
 		return result;
 	}
-
 
 	if (options.analyzed) {
 		result.analyzed = 'true';
@@ -227,8 +244,15 @@ const getSearchIndex = ({ tableName, columns, index, isActivated, ifNotExist }) 
 	const config = indexConfig ? `\n${tab(`AND CONFIG ${indexConfig}`)}` : '';
 	const indexOptions = getSearchIndexOptions(index.options);
 	const options = indexOptions ? `\n${tab(`AND OPTIONS ${indexOptions}`)}` : '';
-	
-	return dependencies.provider.createSearchIndex({ifNotExist, tableName, columnsStatement: tab(columnsStatement, 2), profiles, config, options});
+
+	return dependencies.provider.createSearchIndex({
+		ifNotExist,
+		tableName,
+		columnsStatement: tab(columnsStatement, 2),
+		profiles,
+		config,
+		options,
+	});
 };
 
 const getSearchIndexColumns = columns => {
@@ -265,7 +289,14 @@ const getSearchIndexColumns = columns => {
 const getSearchIndexColumnStatements = (columns, isParentActivated) => {
 	const commentedColumns = !isParentActivated ? [] : columns.filter(column => !column.isActivated);
 	const othersColumns = !isParentActivated ? columns : columns.filter(column => column.isActivated);
-	const commented = commentedColumns.length ? commentedColumns.map(({ statement }) => statement).join(',\n').split('\n').map(inlineComment).join('\n') : '';
+	const commented = commentedColumns.length
+		? commentedColumns
+				.map(({ statement }) => statement)
+				.join(',\n')
+				.split('\n')
+				.map(inlineComment)
+				.join('\n')
+		: '';
 	const others = othersColumns.map(({ statement }) => statement).join(',\n');
 
 	if (commented && others) {

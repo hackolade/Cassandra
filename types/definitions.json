@@ -19,7 +19,7 @@
 	},
 	"subtypes": {
 		"udts": {
-			"childValueType": [ "udt" ]
+			"childValueType": ["udt"]
 		}
 	}
 }

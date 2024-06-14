@@ -127,7 +127,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "compositePartitionKey",
 				"propertyType": "primaryKeySetter",
 				"abbr": "pk,PK"
-			}, 
+			},
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",

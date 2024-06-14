@@ -5,10 +5,10 @@ module.exports = cassandraHelper => (connectionInfo, app) => {
 		.connect(app)(connectionInfo)
 		.then(
 			() => {
-				cassandra.close();
+				cassandra.close(app);
 			},
 			err => {
-				cassandra.close();
+				cassandra.close(app);
 				return Promise.reject(cassandra.prepareError(err));
 			},
 		);

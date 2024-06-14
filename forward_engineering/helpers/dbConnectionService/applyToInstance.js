@@ -42,9 +42,7 @@ const applyToInstance = cassandraHelper => (connectionInfo, logger, app) => {
 					'Cassandra script',
 				);
 
-				cassandra.close();
-
-				return;
+				cassandra.close(app);
 			},
 			commonError => {
 				if (!commonError.query) {
@@ -73,7 +71,7 @@ const applyToInstance = cassandraHelper => (connectionInfo, logger, app) => {
 			},
 		)
 		.catch(err => {
-			cassandra.close();
+			cassandra.close(app);
 
 			return Promise.reject(cassandra.prepareError(err));
 		});

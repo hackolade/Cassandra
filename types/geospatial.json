@@ -8,7 +8,7 @@
 	"defaultValues": {
 		"required": false,
 		"primaryKey": false,
-		"comments":"",
+		"comments": "",
 		"properties": [],
 		"relationshipType": "",
 		"parentRelationship": "",
@@ -23,6 +23,5 @@
 			{ "name": "LineStringType", "snippet": "geo-line" },
 			{ "name": "PolygonType", "snippet": "geo-polygon" }
 		]
-
 	}
 }

@@ -40,9 +40,8 @@
  * }
  */
 
- {
+{
 	"add": {
 		"container": ["addToCqlScript"]
 	}
-  }
-  
+}

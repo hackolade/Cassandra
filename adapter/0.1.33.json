@@ -41,7 +41,7 @@
  */
 
 {
-  "modify": {
-    "entity": ["transformTableOptionsFromStringToObject"]
-  }
+	"modify": {
+		"entity": ["transformTableOptionsFromStringToObject"]
+	}
 }

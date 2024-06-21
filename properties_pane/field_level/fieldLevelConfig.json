@@ -128,12 +128,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "mode",
 				"shouldValidate": false,
 				"propertyType": "select",
-				"options": [
-					"text",
-					"varchar",
-					"ascii",
-					"inet"
-				],
+				"options": ["text", "varchar", "ascii", "inet"],
 				"data": "options",
 				"valueType": "string",
 				"cleanDependency": true,
@@ -166,10 +161,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -189,10 +186,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -204,10 +203,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -332,10 +333,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -355,10 +358,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -370,10 +375,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -411,10 +418,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -434,10 +443,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -449,10 +460,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -504,10 +517,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -527,10 +542,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -542,10 +559,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -571,10 +590,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -594,10 +615,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -609,10 +632,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -639,10 +664,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -662,10 +689,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -677,10 +706,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -710,10 +741,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -733,10 +766,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -748,10 +783,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -781,10 +818,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -804,10 +843,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -819,10 +860,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -852,10 +895,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -875,10 +920,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -890,10 +937,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -922,10 +971,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -945,10 +996,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -960,10 +1013,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -1020,10 +1075,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1043,10 +1100,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1058,10 +1117,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			"minItems",
 			"maxItems",
@@ -1110,10 +1171,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1133,10 +1196,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1148,10 +1213,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			"minItems",
 			"maxItems",
@@ -1193,12 +1260,7 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "select",
 				"typeable": true,
-				"options": [
-					"text",
-					"varchar",
-					"ascii",
-					"inet"
-				],
+				"options": ["text", "varchar", "ascii", "inet"],
 				"dependency": {
 					"key": "keyType",
 					"value": "char"
@@ -1227,7 +1289,6 @@ making sure that you maintain a proper JSON format.
 				}
 			},
 			{
-
 				"propertyName": "Value type",
 				"propertyKeyword": "subtype",
 				"shouldValidate": false,
@@ -1260,10 +1321,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1283,10 +1346,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1298,10 +1363,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			"minProperties",
 			"maxProperties",
@@ -1323,10 +1390,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1346,10 +1415,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1361,10 +1432,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			"minItems",
 			"maxItems",
@@ -1400,9 +1473,7 @@ making sure that you maintain a proper JSON format.
 					}
 				},
 				"typeable": true,
-				"options": [
-					"float"
-				]
+				"options": ["float"]
 			},
 			{
 				"propertyName": "Dimension",
@@ -1496,10 +1567,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1519,10 +1592,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1534,10 +1609,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			"foreignCollection",
 			"foreignField",
@@ -1561,10 +1638,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1584,10 +1663,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1599,10 +1680,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -1626,7 +1709,7 @@ making sure that you maintain a proper JSON format.
 				"regex": "^[0-9a-fA-F]{8}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{4}\\-[0-9a-fA-F]{12}$"
 			},
 			"comments"
-		],   
+		],
 		"timeuuid": [
 			"name",
 			"code",
@@ -1642,10 +1725,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1665,10 +1750,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositeClusteringKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositeClusteringKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositeClusteringKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Partition key",
@@ -1680,10 +1767,12 @@ making sure that you maintain a proper JSON format.
 					"key": "compositePartitionKey",
 					"value": true
 				},
-				"disabledOnCondition": [{
-					"key": "compositePartitionKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "compositePartitionKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Static",
@@ -1716,10 +1805,12 @@ making sure that you maintain a proper JSON format.
 				"shouldValidate": false,
 				"propertyType": "checkbox",
 				"valueType": "boolean",
-				"disabledOnCondition": [{
-					"key": "primaryKey",
-					"value": true
-				}]
+				"disabledOnCondition": [
+					{
+						"key": "primaryKey",
+						"value": true
+					}
+				]
 			},
 			{
 				"propertyName": "Primary key",
@@ -1742,4 +1833,4 @@ making sure that you maintain a proper JSON format.
 			"comments"
 		]
 	}
-} 
+}

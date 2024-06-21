@@ -129,7 +129,7 @@ making sure that you maintain a proper JSON format.
 				"propertyKeyword": "compositePartitionKey",
 				"propertyType": "primaryKeySetter",
 				"abbr": "pk,PK"
-			}, 
+			},
 			{
 				"propertyName": "Clustering key",
 				"propertyKeyword": "compositeClusteringKey",
@@ -346,13 +346,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "SecIndxKey",
 						"propertyType": "fieldList",
 						"template": "orderedList",
-						"attributeList": [
-							"",
-							"keys",
-							"values",
-							"entries",
-							"full"
-						],
+						"attributeList": ["", "keys", "values", "entries", "full"],
 						"templateOptions": {
 							"maxFields": 1
 						}
@@ -369,7 +363,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "isSASI",
 						"defaultValue": false,
 						"propertyType": "checkbox",
-						"dependency":{
+						"dependency": {
 							"key": "indexType",
 							"value": "custom"
 						}
@@ -380,17 +374,18 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "customOptions",
 						"dependency": {
 							"type": "and",
-							"values":[
+							"values": [
 								{
 									"key": "indexType",
 									"value": "custom"
 								},
-								
+
 								{
 									"type": "not",
 									"values": {
 										"key": "isSASI",
-										"value": true									}
+										"value": true
+									}
 								}
 							]
 						},
@@ -419,12 +414,7 @@ making sure that you maintain a proper JSON format.
 								"propertyKeyword": "similarity_function",
 								"propertyType": "select",
 								"propertyTooltip": "Vector search relies on computing the similarity or distance between vectors to identify relevant matches. The similarity function is used to compute the similarity between two vectors.",
-								"options": [
-									"",
-									"EUCLIDEAN",
-									"DOT_PRODUCT",
-									"COSINE"
-								],
+								"options": ["", "EUCLIDEAN", "DOT_PRODUCT", "COSINE"],
 								"dependency": {
 									"type": "not",
 									"values": [
@@ -459,7 +449,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "customOptions",
 						"dependency": {
 							"type": "and",
-							"values":[
+							"values": [
 								{
 									"key": "indexType",
 									"value": "custom"
@@ -587,7 +577,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Search Index",
 				"propertyKeyword": "searchIndexDivider",
 				"propertyType": "empty",
-				"dependency":{
+				"dependency": {
 					"type": "not",
 					"values": {
 						"level": "model",
@@ -600,7 +590,7 @@ making sure that you maintain a proper JSON format.
 				"propertyName": "Enable",
 				"propertyType": "checkbox",
 				"propertyKeyword": "searchIndex",
-				"dependency":{
+				"dependency": {
 					"type": "not",
 					"values": {
 						"level": "model",
@@ -617,7 +607,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"dependency": {
 					"type": "and",
-					"values":[
+					"values": [
 						{
 							"key": "searchIndex",
 							"value": true
@@ -682,7 +672,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"dependency": {
 					"type": "and",
-					"values":[
+					"values": [
 						{
 							"key": "searchIndex",
 							"value": true
@@ -697,11 +687,7 @@ making sure that you maintain a proper JSON format.
 						}
 					]
 				},
-				"options": [
-					"spaceSavingNoJoin",
-					"spaceSavingNoTextfield",
-					"spaceSavingSlowTriePrecision"
-				]
+				"options": ["spaceSavingNoJoin", "spaceSavingNoTextfield", "spaceSavingSlowTriePrecision"]
 			},
 			{
 				"propertyName": "If not exists",
@@ -711,7 +697,7 @@ making sure that you maintain a proper JSON format.
 				"propertyType": "checkbox",
 				"dependency": {
 					"type": "and",
-					"values":[
+					"values": [
 						{
 							"key": "searchIndex",
 							"value": true
@@ -734,7 +720,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"dependency": {
 					"type": "and",
-					"values":[
+					"values": [
 						{
 							"key": "searchIndex",
 							"value": true
@@ -769,11 +755,7 @@ making sure that you maintain a proper JSON format.
 						"propertyKeyword": "directoryFactory",
 						"propertyType": "select",
 						"propertyTooltip": "Can be used as an alternative to the directoryFactoryClass option",
-						"options": [
-							"",
-							"standard",
-							"encrypted"
-						]
+						"options": ["", "standard", "encrypted"]
 					},
 					{
 						"propertyName": "filterCacheLowWaterMark",
@@ -835,7 +817,7 @@ making sure that you maintain a proper JSON format.
 				"propertyTooltip": "",
 				"dependency": {
 					"type": "and",
-					"values":[
+					"values": [
 						{
 							"key": "searchIndex",
 							"value": true

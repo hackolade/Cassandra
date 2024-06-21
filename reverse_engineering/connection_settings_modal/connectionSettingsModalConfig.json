@@ -16,20 +16,22 @@
 				"inputKeyword": "name",
 				"inputType": "text",
 				"inputPlaceholder": "Name"
-				
 			},
 			{
 				"inputLabel": "Installation",
 				"inputKeyword": "clusterType",
 				"inputType": "select",
 				"defaultValue": "",
-				"options": [{
-					"label": "Private",
-					"value": ""
-				}, {
-					"label": "DataStax Astra",
-					"value": "apolloCloud"
-				}]
+				"options": [
+					{
+						"label": "Private",
+						"value": ""
+					},
+					{
+						"label": "DataStax Astra",
+						"value": "apolloCloud"
+					}
+				]
 			},
 			{
 				"inputLabel": "Hosts",
@@ -87,7 +89,8 @@
 				}
 			}
 		]
-	}, {
+	},
+	{
 		"lowerTab": "Authentication",
 		"helpUrl": "https://hackolade.com/help/Usernamepassword1.html",
 		"structure": [
@@ -96,13 +99,16 @@
 				"inputKeyword": "authType",
 				"inputType": "select",
 				"defaultValue": "credentials",
-				"options": [{
-					"label": "Credentials",
-					"value": "credentials"
-				}, {
-					"label": "Token-based",
-					"value": "tokenBased"
-				}]
+				"options": [
+					{
+						"label": "Credentials",
+						"value": "credentials"
+					},
+					{
+						"label": "Token-based",
+						"value": "tokenBased"
+					}
+				]
 			},
 			{
 				"inputLabel": "Username",
@@ -124,8 +130,7 @@
 					"key": "authType",
 					"value": "credentials"
 				}
-			}
-			,
+			},
 			{
 				"inputLabel": "Astra token",
 				"inputKeyword": "astraToken",
@@ -137,8 +142,9 @@
 					"value": "tokenBased"
 				}
 			}
-		]	
-	}, {
+		]
+	},
+	{
 		"lowerTab": "SSL",
 		"helpUrl": "https://hackolade.com/help/LDAP2.html",
 		"disable": {
@@ -150,16 +156,20 @@
 				"inputLabel": "SSL Type",
 				"inputKeyword": "ssl",
 				"inputType": "select",
-				"options": [{
-					"label": "None",
-					"value": false
-				}, {
-					"label": "Java Keystore",
-					"value": "jks"
-				}, {
-					"label": "Certificates",
-					"value": true
-				}]
+				"options": [
+					{
+						"label": "None",
+						"value": false
+					},
+					{
+						"label": "Java Keystore",
+						"value": "jks"
+					},
+					{
+						"label": "Certificates",
+						"value": true
+					}
+				]
 			},
 			{
 				"inputLabel": "Certificate Authority",
@@ -262,7 +272,7 @@
 				"inputType": "checkbox",
 				"dependency": {
 					"key": "ssl",
-					"value":  [true, "true", "jks"]
+					"value": [true, "true", "jks"]
 				}
 			}
 		]
@@ -312,13 +322,16 @@
 				"inputLabel": "SSH Auth Method",
 				"inputKeyword": "ssh_method",
 				"inputType": "select",
-				"options": [{
-					"value": "privateKey", 
-					"label": "Private Key"
-				}, {
-					"value": "password",
-					"label": "Password"
-				}],
+				"options": [
+					{
+						"value": "privateKey",
+						"label": "Private Key"
+					},
+					{
+						"value": "password",
+						"label": "Password"
+					}
+				],
 				"disable": {
 					"key": "ssh",
 					"value": false
@@ -371,7 +384,8 @@
 				}
 			}
 		]
-	}, {
+	},
+	{
 		"lowerTab": "Advanced",
 		"structure": [
 			{

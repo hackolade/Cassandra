@@ -133,8 +133,6 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 
 			if (nestedType !== undefined) {
 				return nestedType;
-			} else {
-				return '';
 			}
 		} else {
 			return 'text';

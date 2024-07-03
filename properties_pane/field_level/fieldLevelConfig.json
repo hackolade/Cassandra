@@ -1548,8 +1548,6 @@ making sure that you maintain a proper JSON format.
 					}
 				]
 			},
-			"minItems",
-			"maxItems",
 			"uniqueItems",
 			"additionalItems",
 			"comments"

@@ -1,6 +1,6 @@
 {
     "name": "Cassandra",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "author": "hackolade",
     "engines": {
         "hackolade": "5.4.7",
@@ -44,8 +44,7 @@
         "cassandra-driver": "4.7.2",
         "fast-xml-parser": "4.4.0",
         "jks-js": "1.1.3",
-        "lodash": "4.17.21",
-        "tunnel-ssh": "github:hackolade/tunnel-ssh"
+        "lodash": "4.17.21"
     },
     "lint-staged": {
         "*.{js,json}": "prettier --write"
@@ -73,12 +72,6 @@
         "lint-staged": "14.0.1",
         "prettier": "3.2.5",
         "simple-git-hooks": "2.11.1"
-    },
-    "overrides": {
-        "tunnel-ssh": {
-            "cpu-features": "npm:-@0.0.1",
-            "ssh2": "npm:-@0.0.1"
-        }
     },
     "release": true
 }

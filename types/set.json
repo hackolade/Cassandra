@@ -10,8 +10,6 @@
 		"dependencies": [],
 		"primaryKey": false,
 		"properties": [],
-		"minProperties": "",
-		"maxProperties": "",
 		"additionalProperties": false
 	},
 	"subtypes": {

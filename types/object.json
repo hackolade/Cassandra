@@ -27,7 +27,8 @@
 				"uuid",
 				"timeuuid",
 				"udt",
-				"vector"
+				"vector",
+				"object"
 			]
 		}
 	}

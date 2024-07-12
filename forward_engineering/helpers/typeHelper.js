@@ -21,7 +21,7 @@ const ifType = type => {
 const getModeType = (type, defaultType, udtTypeMap) => {
 	if (type) {
 		const mode = getFieldConfig(type, 'mode');
-		const definedType = mode && mode.options ? mode.options[0] : type;
+		const definedType = mode?.options ? mode.options[0] : type;
 
 		return getHandlerByType(
 			type,
@@ -91,7 +91,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 			const typeConfig = getTypeConfig(arraySchema.type);
 			if (typeConfig.subtypes && arraySchema.subtype) {
 				const subTypeConfig = typeConfig.subtypes[arraySchema.subtype];
-				if (subTypeConfig && subTypeConfig.childValueType) {
+				if (subTypeConfig?.childValueType) {
 					return getModeType(subTypeConfig.childValueType, defaultType, udtTypeMap);
 				}
 			}
@@ -113,7 +113,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 			const typeConfig = getTypeConfig(objectSchema.type);
 			if (typeConfig.subtypes && objectSchema.subtype) {
 				const subTypeConfig = typeConfig.subtypes[objectSchema.subtype];
-				if (subTypeConfig && subTypeConfig.childValueType) {
+				if (subTypeConfig?.childValueType) {
 					return getModeType(subTypeConfig.childValueType, defaultType, udtTypeMap);
 				}
 			}
@@ -133,8 +133,6 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 
 			if (nestedType !== undefined) {
 				return nestedType;
-			} else {
-				('');
 			}
 		} else {
 			return 'text';
@@ -157,7 +155,7 @@ const getStructuralTypeHandler = (type, isNeedToBeFrozen, udtTypeMap) => {
 		const keyType = canTypeHaveSubtype(propertyData.keyType, propertyData.keySubtype)
 			? propertyData.keySubtype
 			: getModeType(propertyData.keyType, 'text', udtTypeMap);
-		const valueType = getValueTypeFromObject(propertyData, 'text', udtTypeMap, propertyName);
+		const valueType = getValueTypeFromObject(propertyData, 'text', udtTypeMap);
 
 		return `map<${keyType}, ${valueType}>`;
 	};

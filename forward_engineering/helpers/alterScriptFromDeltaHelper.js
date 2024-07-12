@@ -142,13 +142,13 @@ const getPropertiesForUpdateTable = (properties = []) => {
 		}
 		const newField = value.compMod?.newField || {};
 		const oldField = value.compMod?.oldField || {};
-		Object.entries(newField).map(([keyNewField, valueNewField]) => {
+		Object.entries(newField).forEach(([keyNewField, valueNewField]) => {
 			if (oldField[keyNewField] !== valueNewField) {
 				value[keyNewField] = valueNewField;
 			}
 			if (keyNewField === 'name' && oldField[keyNewField] !== valueNewField) {
 				name = valueNewField;
-			}
+			} 
 		});
 		return [name, value];
 	});

@@ -1,23 +1,23 @@
 {
 	"model": {
-		"modelName": "New model",
+		"modelName": "new_model",
 		"dbVersion": "5.x",
 		"dbVendor": "Cassandra"
 	},
 	"container": {
-		"name": "New keyspace",
+		"name": "new_keyspace",
 		"indexes": [],
 		"replStrategy": "SimpleStrategy",
 		"addToCqlScript": true
 	},
 	"collection": {
-		"collectionName": "New table",
+		"collectionName": "new_table",
 		"collectionUsers": [],
 		"collation": {},
 		"tableOptions": {}
 	},
 	"field": {
-		"name": "New column",
+		"name": "new_column",
 		"subtype": {
 			"valueDependencies": [
 				{
@@ -52,21 +52,21 @@
 		"viewOn": ""
 	},
 	"UDFs": {
-		"name": "New UDF",
+		"name": "new_udf",
 		"udfID": "",
 		"udfDescription": "",
 		"udfFunction": "",
 		"udfComments": ""
 	},
 	"UDAs": {
-		"name": "New UDA",
+		"name": "new_uda",
 		"udfID": "",
 		"udfDescription": "",
 		"udfFunction": "",
 		"udfComments": ""
 	},
 	"SecIndxs": {
-		"name": "New Index",
+		"name": "new_index",
 		"indexType": "Secondary",
 		"SecIndxKey": "",
 		"SecIndxID": "",

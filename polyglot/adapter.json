@@ -65,6 +65,17 @@
 				"to": {
 					"mode": "double"
 				}
+			},
+			{
+				"from": {
+					"type": "numeric"
+				},
+				"to": {
+					"mode": "float"
+				},
+				"parent": {
+					"type": "vector"
+				}
 			}
 		],
 		"entity": [["setEntityCompositeKeys", "compositePartitionKey", "primaryKey"]]

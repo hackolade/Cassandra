@@ -61,7 +61,7 @@ module.exports = {
 		}
 	},
 
-	disconnect: function (connectionInfo, cb, app) {
+	disconnect: function (connectionInfo, logger, cb, app) {
 		cassandraHelper(app.require('lodash')).close(app);
 		cb();
 	},
@@ -79,7 +79,7 @@ module.exports = {
 					logger.log('info', 'Connection successful', 'Test connection');
 				}
 
-				this.disconnect(connectionInfo, () => {}, app);
+				this.disconnect(connectionInfo, logger, () => {}, app);
 
 				return cb(cassandraHelper(app.require('lodash')).prepareError(error));
 			},

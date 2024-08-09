@@ -1,5 +1,5 @@
 /**
- * Copyright © 2016-2018 by IntegrIT S.A. dba Hackolade.  All rights reserved.
+ * Copyright © 2016-2022 by IntegrIT S.A. dba Hackolade.  All rights reserved.
  *
  * The copyright to the computer software herein is the property of IntegrIT S.A.
  * The software may be used and/or copied only with the written permission of
@@ -44,57 +44,12 @@
 		"field": [
 			{
 				"from": {
-					"primaryKey": true
-				},
-				"to": {
-					"compositePartitionKey": true
-				}
-			},
-			{
-				"from": {
-					"mode": "float8"
-				},
-				"to": {
-					"mode": "float"
-				}
-			},
-			{
-				"from": {
-					"mode": "real"
-				},
-				"to": {
-					"mode": "double"
-				}
-			},
-			{
-				"from": {
-					"type": "numeric"
-				},
-				"to": {
-					"mode": "float"
-				},
-				"parent": {
 					"type": "vector"
+				},
+				"to": {
+					"subtype": "vector<float>"
 				}
 			}
-		],
-		"entity": [["setEntityCompositeKeys", "compositePartitionKey", "primaryKey"]]
-	},
-	"postConvert": {
-		"modify": {
-			"field": [
-				[
-					"updateModelDefinitionOfFirstOrder",
-					{
-						"from": {
-							"type": "map"
-						},
-						"to": {
-							"type": "udt"
-						}
-					}
-				]
-			]
-		}
+		]
 	}
 }

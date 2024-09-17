@@ -2,10 +2,11 @@
 
 const { getTypeByData } = require('./typeHelper');
 const { commentDeactivatedStatement } = require('./generalHelper');
+const { joinActivatedAndDeactivatedStatements } = require('./joinActivatedAndDeactivatedStatements');
 
 module.exports = {
 	getColumnDefinition(properties, udtTypeMap = {}, isParentActivated = false) {
-		return Object.keys(properties)
+		const statements = Object.keys(properties)
 			.map(name => {
 				const data = properties[name];
 				const typeDefinition = getTypeDefinition(data, udtTypeMap, name);
@@ -17,8 +18,9 @@ module.exports = {
 					return commentDeactivatedStatement(columnStatement, data.isActivated, isParentActivated, false);
 				}
 			})
-			.filter(column => column)
-			.join(',\n');
+			.filter(column => column);
+
+		return joinActivatedAndDeactivatedStatements({ statements, indent: '\n' });
 	},
 };
 

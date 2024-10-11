@@ -22,7 +22,10 @@
             ]
         },
         "features": {
-            "views": true,
+            "views": {
+                "enabled": true,
+                "disablePipelines": true
+            },
             "nestedCollections": false,
             "disablePatternField": true,
             "enableForwardEngineering": true,

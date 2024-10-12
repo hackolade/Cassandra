@@ -1,6 +1,6 @@
 {
     "name": "Cassandra",
-    "version": "0.2.8",
+    "version": "0.2.9",
     "author": "hackolade",
     "engines": {
         "hackolade": "5.4.7",
@@ -23,9 +23,9 @@
         },
         "features": {
             "views": {
-				"enabled": true,
-				"disablePipelines": true
-			},
+                "enabled": true,
+                "disablePipelines": true
+            },
             "nestedCollections": false,
             "disablePatternField": true,
             "enableForwardEngineering": true,

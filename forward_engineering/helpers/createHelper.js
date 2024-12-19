@@ -45,7 +45,7 @@ const getCreateTableScript = (data, isKeyspaceActivated) => {
 
 	const cqlScript = getScript([UDF, UDA, ...UDT, table, indexes]);
 
-	return commentDeactivatedStatement(cqlScript, isEntityActivated && isKeyspaceActivated);
+	return commentDeactivatedStatement(cqlScript, isEntityActivated, isKeyspaceActivated);
 };
 
 const getScript = structure => {

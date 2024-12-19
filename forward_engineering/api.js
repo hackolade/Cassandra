@@ -36,7 +36,9 @@ module.exports = {
 
 				callback(null, buildContainerLevelAlterScript(data.jsonSchema, udtTypeMap, data));
 			} else {
-				let script = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, true)}`;
+				const isKeyspaceActivated = retrieveIsItemActivated(data.containerData);
+				const statement = `${getKeyspaceStatement(data.containerData)}\n\n${getCreateTableScript(data, isKeyspaceActivated)}`;
+				const script = commentDeactivatedStatement(statement, isKeyspaceActivated);
 				callback(null, script);
 			}
 		} catch (e) {

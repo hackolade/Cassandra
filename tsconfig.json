@@ -26,6 +26,6 @@
 		"forceConsistentCasingInFileNames": true,
 		"typeRoots": ["./node_modules/@types", "./types"]
 	},
-	"include": ["reverse_engineering", "forward_engineering"],
+	"include": ["reverse_engineering", "forward_engineering", "api"],
 	"exclude": ["**/node_modules/**", "release/**/*"]
 }

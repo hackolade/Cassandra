@@ -1,5 +1,6 @@
 'use strict';
 
+const { partition, get, uniqBy, identity, isEmpty, values, trim, first, uniq } = require('lodash');
 const { dependencies } = require('./appDependencies');
 const { commentDeactivatedStatement } = require('./commentsHelper');
 const {
@@ -13,9 +14,7 @@ const { getOptions, getPrimaryKeyList } = require('./tableHelper');
 const columnsToName = column => column.name;
 
 const joinColumns = (columns = [], isParentActivated) => {
-	let [activatedColumns, deactivatedColumns] = dependencies.lodash.partition(columns, column =>
-		dependencies.lodash.get(column, 'isActivated', true),
-	);
+	let [activatedColumns, deactivatedColumns] = partition(columns, column => get(column, 'isActivated', true));
 	deactivatedColumns = deactivatedColumns.map(columnsToName).join(', ');
 	activatedColumns = activatedColumns.map(columnsToName).join(', ');
 	const getDeactivatedStatement = columns => commentDeactivatedStatement(columns, false, isParentActivated, 'INLINE');
@@ -34,30 +33,28 @@ const getColumn = (collectionRefsDefinitionsMap, id, columns = {}) => {
 };
 
 const getColumnNames = (collectionRefsDefinitionsMap, columns) => {
-	return dependencies.lodash
-		.uniqBy(
-			Object.keys(columns).map(name => {
-				const id = dependencies.lodash.get(columns, [name, 'GUID']);
+	return uniqBy(
+		Object.keys(columns).map(name => {
+			const id = get(columns, [name, 'GUID']);
 
-				const itemDataId = Object.keys(collectionRefsDefinitionsMap).find(viewFieldId => {
-					const definitionData = collectionRefsDefinitionsMap[viewFieldId];
+			const itemDataId = Object.keys(collectionRefsDefinitionsMap).find(viewFieldId => {
+				const definitionData = collectionRefsDefinitionsMap[viewFieldId];
 
-					return definitionData.definitionId === id;
-				});
-				const itemData = collectionRefsDefinitionsMap[itemDataId];
-				const columnName = `"${dependencies.lodash.get(itemData, 'name', name)}"`;
-				const isActivated = dependencies.lodash.get(columns[name], 'isActivated');
+				return definitionData.definitionId === id;
+			});
+			const itemData = collectionRefsDefinitionsMap[itemDataId];
+			const columnName = `"${get(itemData, 'name', name)}"`;
+			const isActivated = get(columns[name], 'isActivated');
 
-				return { name: columnName, isActivated };
-			}),
-			'name',
-		)
-		.filter(dependencies.lodash.identity);
+			return { name: columnName, isActivated };
+		}),
+		'name',
+	).filter(identity);
 };
 
 const getViewColumns = (collectionRefsDefinitionsMap, properties) => {
 	return Object.keys(properties).reduce((columns, name) => {
-		const id = dependencies.lodash.get(properties, [name, 'GUID']);
+		const id = get(properties, [name, 'GUID']);
 
 		const itemDataId = Object.keys(collectionRefsDefinitionsMap).find(viewFieldId => {
 			const definitionData = collectionRefsDefinitionsMap[viewFieldId];
@@ -68,16 +65,14 @@ const getViewColumns = (collectionRefsDefinitionsMap, properties) => {
 
 		return {
 			...columns,
-			[dependencies.lodash.get(itemData, 'name', name)]: properties[name],
+			[get(itemData, 'name', name)]: properties[name],
 		};
 	}, {});
 };
 
 const getWhereStatement = (columns = [], isParentActivated) => {
-	const [activatedColumns, deactivatedColumns] = dependencies.lodash.partition(columns, column =>
-		dependencies.lodash.get(column, 'isActivated', true),
-	);
-	if (dependencies.lodash.isEmpty(columns) || deactivatedColumns.length === columns.length) {
+	const [activatedColumns, deactivatedColumns] = partition(columns, column => get(column, 'isActivated', true));
+	if (isEmpty(columns) || deactivatedColumns.length === columns.length) {
 		return '';
 	}
 
@@ -102,7 +97,7 @@ const getWhereStatement = (columns = [], isParentActivated) => {
 
 const getNamesByIds = (collectionRefsDefinitionsMap, ids, columns = {}) => {
 	return ids.reduce((hash, id) => {
-		const name = dependencies.lodash.get(collectionRefsDefinitionsMap, [id, 'name']);
+		const name = get(collectionRefsDefinitionsMap, [id, 'name']);
 		const column = getColumn(collectionRefsDefinitionsMap, id, columns);
 		const isActivated = column.isActivated;
 		if (!name) {
@@ -141,9 +136,8 @@ const getCompositeKeys = ({ collectionRefsDefinitionsMap, viewData, key, columns
 		columns,
 	);
 
-	return dependencies.lodash
-		.values(partitionKeysHash)
-		.filter(dependencies.lodash.identity)
+	return values(partitionKeysHash)
+		.filter(identity)
 		.map(field => ({ ...field, name: `"${field.name}"` }));
 };
 
@@ -164,7 +158,7 @@ const getPrimaryKeyScript = ({ collectionRefsDefinitionsMap, viewData, isParentA
 	return `PRIMARY KEY (${keysList})`;
 };
 
-const addTab = script => dependencies.lodash.trim(script || '').replace(/  /g, '    ');
+const addTab = script => trim(script || '').replace(/  /g, '    ');
 
 const getOptionsScript = ({ collectionRefsDefinitionsMap, viewData, columns, isParentActivated }) => {
 	const clusteringKeyData = getClusteringKeyData(collectionRefsDefinitionsMap, viewData, columns);
@@ -241,7 +235,7 @@ module.exports = {
 	}) {
 		let script = [];
 		const columns = getViewColumns(collectionRefsDefinitionsMap, schema.properties || {});
-		const view = dependencies.lodash.first(viewData) || {};
+		const view = first(viewData) || {};
 
 		const entityName = retrieveEntityName(entityData);
 		const bucketName = retrieveContainerName(containerData);
@@ -261,7 +255,7 @@ module.exports = {
 		const optionsScript = getOptionsScript({ collectionRefsDefinitionsMap, viewData, columns, isParentActivated });
 		script.push(`CREATE MATERIALIZED VIEW ${ifNotExist ? `IF NOT EXISTS ` : ``}${name}`);
 
-		if (dependencies.lodash.isEmpty(columns)) {
+		if (isEmpty(columns)) {
 			script = script.concat(
 				getEmptyViewScript({
 					viewData,
@@ -280,7 +274,7 @@ module.exports = {
 			script.push(`FROM ${tableName}`);
 			script.push(
 				getWhereStatement(
-					dependencies.lodash.uniq([
+					uniq([
 						...getPrimaryKeys(collectionRefsDefinitionsMap, viewData, columns),
 						...getCompositeKeys({ collectionRefsDefinitionsMap, viewData, key: 'whereClause', columns }),
 					]),

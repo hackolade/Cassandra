@@ -1,3 +1,4 @@
+const { omit, get, last } = require('lodash');
 const { getTypeByData } = require('./typeHelper');
 const { dependencies } = require('./appDependencies');
 const { getKeySpaceScript } = require('./updateHelpers/keySpaceHelper');
@@ -118,17 +119,15 @@ const getUpdate = updateData => {
 const getIsColumnInIndex = (item, columnName, data) => {
 	const itemData = {
 		properties: item.properties || {},
-		...dependencies.lodash.omit(item.role || {}, ['properties']),
+		...omit(item.role || {}, ['properties']),
 	};
 
 	const dataSources = [itemData, data.modelDefinitions];
-	const secIndexes = dependencies.lodash
-		.get(item, 'role.SecIndxs', [])
+	const secIndexes = get(item, 'role.SecIndxs', [])
 		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index, key: 'SecIndxKey' }))
 		.map(index => index.name)
 		.filter(Boolean);
-	const searchIndexes = dependencies.lodash
-		.get(item, 'role.searchIndexColumns', [])
+	const searchIndexes = get(item, 'role.searchIndexColumns', [])
 		.map(index => getDataColumnIndex({ dataSources, idToNameHashTable: {}, column: index }))
 		.map(index => index.name)
 		.filter(Boolean);
@@ -148,7 +147,7 @@ const getPropertiesForUpdateTable = (properties = []) => {
 			}
 			if (keyNewField === 'name' && oldField[keyNewField] !== valueNewField) {
 				name = valueNewField;
-			} 
+			}
 		});
 		return [name, value];
 	});
@@ -250,7 +249,7 @@ const handleItem = (item, udtMap, generator, data) => {
 		return alterTableScript;
 	}
 
-	const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
+	const isOldModel = checkIsOldModel(get(data, 'modelData'));
 	const itemProperties = item.properties;
 
 	alterTableScript = Object.keys(itemProperties).reduce((alterTableScript, tableKey) => {
@@ -260,7 +259,7 @@ const handleItem = (item, udtMap, generator, data) => {
 			return alterTableScript;
 		}
 
-		const codeName = dependencies.lodash.get(itemProperties, `${tableKey}.role.code`, '');
+		const codeName = get(itemProperties, `${tableKey}.role.code`, '');
 		const tableName = codeName.length ? codeName : tableKey;
 		const tableProperties = itemProperties[tableKey].properties || {};
 
@@ -283,9 +282,9 @@ const handleItem = (item, udtMap, generator, data) => {
 			data.internalDefinitions,
 			data.externalDefinitions,
 			{ properties: tableProperties },
-			{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.properties', []) },
-			{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
-			{ properties: dependencies.lodash.get(itemProperties[tableKey], 'role.compMod.oldProperties', []) },
+			{ properties: get(itemProperties[tableKey], 'role.properties', []) },
+			{ properties: get(itemProperties[tableKey], 'role.compMod.newProperties', []) },
+			{ properties: get(itemProperties[tableKey], 'role.compMod.oldProperties', []) },
 		];
 
 		if (itemCompModData.created) {
@@ -366,7 +365,7 @@ const handleProperties = ({
 		let columnType = getTypeByData(property, udtMap, columnName);
 
 		if (property.$ref && !columnType) {
-			columnType = dependencies.lodash.last(property.$ref.split('/'));
+			columnType = last(property.$ref.split('/'));
 		}
 
 		if (!columnType) {

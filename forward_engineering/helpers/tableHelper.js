@@ -1,5 +1,6 @@
 'use strict';
 
+const { partition } = require('lodash');
 const {
 	retrieveContainerName,
 	retrieveEntityName,
@@ -119,10 +120,7 @@ const commentDeactivatedKeys = (keysIds, keysHash, isParentActivated) => {
 		return `"${joinKeys(keysIds)}"`;
 	}
 
-	const [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(
-		keysIds,
-		id => keysHash[id].isActivated !== false,
-	);
+	const [activatedKeys, deactivatedKeys] = partition(keysIds, id => keysHash[id].isActivated !== false);
 	if (deactivatedKeys.length === 0) {
 		return `"${joinKeys(activatedKeys)}"`;
 	} else if (activatedKeys.length === 0) {

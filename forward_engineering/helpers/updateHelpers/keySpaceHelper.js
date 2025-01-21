@@ -1,4 +1,5 @@
 const { dependencies } = require('../appDependencies');
+const { isEqual, intersectionWith, xorWith } = require('lodash');
 const { getReplication, getDurableWrites } = require('../keyspaceHelper');
 const { retrivePropertyFromConfig } = require('../generalHelper');
 const { AlterScriptDto } = require('../types/AlterScriptDto');
@@ -63,11 +64,11 @@ const getDataForScript = (newElements, oldElements, requiredProps) => {
 		dataForDropScript = oldElements;
 	} else {
 		const difference = (newElement, oldElement) =>
-			requiredProps.every(prop => dependencies.lodash.isEqual(newElement[prop], oldElement[prop]));
+			requiredProps.every(prop => isEqual(newElement[prop], oldElement[prop]));
 
-		const equalElements = dependencies.lodash.intersectionWith(newElements, oldElements, difference);
-		dataForAddScript = dependencies.lodash.xorWith(newElements, equalElements, difference);
-		dataForDropScript = dependencies.lodash.xorWith(oldElements, equalElements, difference);
+		const equalElements = intersectionWith(newElements, oldElements, difference);
+		dataForAddScript = xorWith(newElements, equalElements, difference);
+		dataForDropScript = xorWith(oldElements, equalElements, difference);
 	}
 	return {
 		dataForAddScript,
@@ -105,7 +106,7 @@ const replicationProps = ['replStrategy', 'replFactory', 'dataCenters'];
 const getIsModifyKeysSpace = (keySpaceData, props) => {
 	return props.some(prop => {
 		const { new: newElements, old: oldElements } = keySpaceData[prop] || {};
-		return newElements && oldElements && !dependencies.lodash.isEqual(newElements, oldElements);
+		return newElements && oldElements && !isEqual(newElements, oldElements);
 	});
 };
 

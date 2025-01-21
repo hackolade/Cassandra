@@ -1,3 +1,4 @@
+const { partition, get } = require('lodash');
 const { inlineComment } = require('../commentsHelper');
 const { dependencies } = require('../appDependencies');
 
@@ -190,9 +191,9 @@ const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActi
 		});
 	};
 
-	let [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(
+	let [activatedKeys, deactivatedKeys] = partition(
 		validClusteredKeys,
-		({ keyId }) => dependencies.lodash.get(clusteringKeysHash, `${keyId}.isActivated`) !== false,
+		({ keyId }) => get(clusteringKeysHash, `${keyId}.isActivated`) !== false,
 	);
 	activatedKeys = mapKeys(activatedKeys);
 	deactivatedKeys = mapKeys(deactivatedKeys);

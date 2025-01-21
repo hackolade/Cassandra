@@ -13,15 +13,14 @@ const { parseToString } = require('../helpers/tableOptionService/parseToString')
 const { getViewName } = require('../helpers/updateHelpers/viewHelper');
 const { getOptionsScript } = require('../helpers/viewHelper');
 const { wrapInQuotes } = require('../helpers/updateHelpers/generalHelper');
+const assignTemplates = require('../utils/assignTemplates');
 
 const alterTablePrefix = (tableName, keySpace) =>
 	keySpace
 		? `ALTER TABLE ${wrapInQuotes(keySpace)}.${wrapInQuotes(tableName)}`
 		: `ALTER TABLE ${wrapInQuotes(tableName)}`;
 
-module.exports = app => {
-	const { assignTemplates } = app.require('@hackolade/ddl-fe-utils');
-
+module.exports = () => {
 	return {
 		dropTable(name) {
 			return assignTemplates(templates.dropTable, { name });

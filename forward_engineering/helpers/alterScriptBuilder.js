@@ -1,4 +1,4 @@
-const { dependencies } = require('./appDependencies');
+const { uniqWith, isEqual } = require('lodash');
 const { getAlterScriptDtos } = require('./alterScriptFromDeltaHelper');
 const { commentDeactivatedStatement, getApplyDropStatement } = require('./generalHelper');
 
@@ -94,7 +94,7 @@ const sortScript = scriptDtos => {
 };
 const buildContainerLevelAlterScript = (jsonSchema, udtMap, data) => {
 	let alterScriptDtos = getAlterScriptDtos(jsonSchema, udtMap, data);
-	alterScriptDtos = dependencies.lodash.uniqWith(alterScriptDtos, dependencies.lodash.isEqual);
+	alterScriptDtos = uniqWith(alterScriptDtos, isEqual);
 	alterScriptDtos = getCommentedDropScript(alterScriptDtos, data);
 	const scriptData = sortScript(alterScriptDtos);
 

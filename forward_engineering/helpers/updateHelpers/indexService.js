@@ -1,4 +1,4 @@
-const { dependencies } = require('../appDependencies');
+const { isEqual, get, uniq, keys } = require('lodash');
 
 const REDUNDANT_OPTIONS = ['id'];
 
@@ -33,15 +33,13 @@ const SEARCH_INDEX_PROFILES_DATA_FOR_PREPARE = {
 	},
 };
 
-const isDiff = (oldValue, newValue) => !dependencies.lodash.isEqual(oldValue, newValue);
-
 const getModifiedProperties = (oldProperties, newProperties) => {
 	return Object.entries(newProperties).reduce((acc, [name, value]) => {
 		if (REDUNDANT_OPTIONS.includes(name)) {
 			return acc;
 		}
 
-		if (!oldProperties.hasOwnProperty(name) || isDiff(oldProperties[name], value)) {
+		if (!oldProperties.hasOwnProperty(name) || !isEqual(oldProperties[name], value)) {
 			return Object.assign({}, acc, { [name]: value });
 		}
 
@@ -58,7 +56,7 @@ const getDefaultPropertiesByName = (propertiesNames, oldProperties, defaultPrope
 	return propertiesNames.reduce((acc, propertyName) => {
 		if (
 			defaultProperties.hasOwnProperty(propertyName) &&
-			isDiff(dependencies.lodash.get(oldProperties, propertyName), defaultProperties[propertyName])
+			!isEqual(get(oldProperties, propertyName), defaultProperties[propertyName])
 		) {
 			return Object.assign({}, acc, { [propertyName]: defaultProperties[propertyName] });
 		}
@@ -124,13 +122,10 @@ const isEqualIndex =
 	(oldData = {}, newData = {}) => {
 		newData = Object.assign({}, defaultData, newData);
 		oldData = Object.assign({}, defaultData, oldData);
-		const keys = dependencies.lodash
-			.uniq([...dependencies.lodash.keys(newData), ...dependencies.lodash.keys(oldData)])
-			.filter(key => !redundantProperty.includes(key));
-		return keys.reduce(
-			(isEqual, key) => (isEqual && dependencies.lodash.isEqual(newData[key], oldData[key]) ? isEqual : false),
-			true,
-		);
+
+		return uniq([...keys(newData), ...keys(oldData)])
+			.filter(key => !redundantProperty.includes(key))
+			.reduce((isEqual, key) => (isEqual && isEqual(newData[key], oldData[key]) ? isEqual : false), true);
 	};
 
 const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumns = []) => {

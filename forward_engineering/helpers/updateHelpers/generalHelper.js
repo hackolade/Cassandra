@@ -1,4 +1,4 @@
-const { dependencies } = require('../appDependencies');
+const { includes, toUpper } = require('lodash');
 const { ReservedWordsAsArray } = require('../enums/reservedWords');
 const mergeArrays = (first, sec) => {
 	return [...first, ...sec];
@@ -56,10 +56,7 @@ const fieldTypeCompatible = (oldType, newType) => {
 	return true;
 };
 
-const wrapInQuotes = name =>
-	/\s|\W/.test(name) || dependencies.lodash.includes(ReservedWordsAsArray, dependencies.lodash.toUpper(name))
-		? `"${name}"`
-		: name;
+const wrapInQuotes = name => (/\s|\W/.test(name) || includes(ReservedWordsAsArray, toUpper(name)) ? `"${name}"` : name);
 
 module.exports = {
 	mergeArrays,

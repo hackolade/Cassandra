@@ -89,7 +89,7 @@ const seedOptionsWithValues = (options, valueObject) =>
 			return option;
 		}
 
-		return Object.assign({}, option, { value });
+		return { ...option, value };
 	});
 
 const getOptionsFromTab = config => {

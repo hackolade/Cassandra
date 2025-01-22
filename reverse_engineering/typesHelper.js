@@ -55,11 +55,7 @@ module.exports = _ => {
 		const valueType = getChildTypeByProperties(properties);
 		const subtype = getSubType(appType.type, valueType);
 
-		return Object.assign({}, appType, keySubtype, {
-			keyType,
-			subtype,
-			properties,
-		});
+		return { ...appType, ...keySubtype, keyType, subtype, properties };
 	};
 
 	const handleTuple = (appType, column, sample, udtHash) => {
@@ -72,7 +68,7 @@ module.exports = _ => {
 			return handledValueData;
 		});
 
-		return Object.assign({}, appType, { items });
+		return { ...appType, items };
 	};
 
 	const handleList = (appType, column, sample, udtHash) => {
@@ -81,10 +77,7 @@ module.exports = _ => {
 		const valueType = (items[0] || { type: 'text' }).type;
 		const subtype = getSubType(appType.type, valueType);
 
-		return Object.assign({}, appType, {
-			items: _.uniqWith(items, _.isEqual),
-			subtype,
-		});
+		return { ...appType, items: _.uniqWith(items, _.isEqual), subtype };
 	};
 
 	const handleVector = (appType, column, sample, udtHash) => {
@@ -162,9 +155,10 @@ module.exports = _ => {
 		}
 
 		return Object.keys(sample).reduce((result, propertyName) => {
-			return Object.assign({}, result, {
+			return {
+				...result,
 				[propertyName]: getColumnType(valueData, udtHash, sample[propertyName]),
-			});
+			};
 		}, {});
 	};
 

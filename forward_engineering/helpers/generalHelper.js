@@ -89,8 +89,6 @@ const getIndexProfiles = (searchIndexProfiles, dbVersion) => {
 const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
 const getNameWithKeyspace = (keyspaceName, name) => `${keyspaceName ? `"${keyspaceName}".` : ''}${name}`;
 
-// const getTypeConfig = type => getTypesConfig()[type];
-
 const getFieldConfig = (type, property) => {
 	const fieldLevelConfig = getFieldLevelConfig().structure;
 
@@ -103,7 +101,7 @@ const getFieldConfig = (type, property) => {
 };
 
 const eachField = (jsonSchema, callback) => {
-	const resultSchema = Object.assign({}, jsonSchema);
+	const resultSchema = { ...jsonSchema };
 
 	const eachProperty = (properties, callback) => {
 		return Object.keys(properties).reduce((resultSchema, propertyName) => {

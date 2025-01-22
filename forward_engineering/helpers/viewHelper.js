@@ -100,12 +100,12 @@ const getNamesByIds = (collectionRefsDefinitionsMap, ids, columns = {}) => {
 		const name = get(collectionRefsDefinitionsMap, [id, 'name']);
 		const column = getColumn(collectionRefsDefinitionsMap, id, columns);
 		const isActivated = column.isActivated;
+
 		if (!name) {
 			return hash;
 		}
-		return Object.assign({}, hash, {
-			[id]: { name: name, isActivated },
-		});
+
+		return { ...hash, [id]: { name, isActivated } };
 	}, {});
 };
 

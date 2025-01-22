@@ -133,10 +133,15 @@ const transformCachingOption = option => {
 
 		return null;
 	};
-	const createValueObject = (keys, rows) => Object.assign({}, keys && { keys }, rows && { rows_per_partition: rows });
+	const createValueObject = (keys, rows) => ({
+		...(keys && { keys }),
+		...(rows && { rows_per_partition: rows }),
+	});
+
 	const allowedValues = ['ALL', 'NONE'];
 	const keys = validateKeys(option.value['keys']);
 	const rows = validateRows(option.value['rowsPerPartition']);
+
 	if (!keys && !rows) {
 		return null;
 	}

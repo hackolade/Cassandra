@@ -57,8 +57,8 @@ const isDiffCaching = (oldValue, value) => {
 		return caches;
 	};
 
-	const jsonOld = Object.assign({}, updateKeys(oldValue), { id: null });
-	const jsonNew = Object.assign({}, updateKeys(value), { id: null });
+	const jsonOld = { ...updateKeys(oldValue), id: null };
+	const jsonNew = { ...updateKeys(value), id: null };
 
 	return !isEqual(jsonOld, jsonNew);
 };
@@ -72,7 +72,7 @@ const getModifiedAndNewOptions = (newOptions, oldOptions) => {
 		}
 
 		if (!oldOptions.hasOwnProperty(name) || isDiff(oldOptions[name], value, name)) {
-			return Object.assign({}, acc, { [name]: value });
+			return { ...acc, [name]: value };
 		}
 
 		return acc;
@@ -91,7 +91,7 @@ const getDefaultOptionsByName = (optionNames, oldOptions) => {
 			optionDefaultValues.hasOwnProperty(optionName) &&
 			isDiff(get(oldOptions, optionName), optionDefaultValues[optionName], optionName)
 		) {
-			return Object.assign({}, acc, { [optionName]: optionDefaultValues[optionName] });
+			return { ...acc, [optionName]: optionDefaultValues[optionName] };
 		}
 
 		return acc;
@@ -102,6 +102,7 @@ module.exports = {
 	getDiff(newOptions, oldOptions) {
 		const modifiedAndNewOptions = getModifiedAndNewOptions(newOptions, oldOptions);
 		const deletedOptionNames = getDeletedOptions(newOptions, oldOptions);
-		return Object.assign({}, modifiedAndNewOptions, getDefaultOptionsByName(deletedOptionNames, oldOptions));
+
+		return { ...modifiedAndNewOptions, ...getDefaultOptionsByName(deletedOptionNames, oldOptions) };
 	},
 };

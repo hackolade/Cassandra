@@ -40,7 +40,7 @@ const getModifiedProperties = (oldProperties, newProperties) => {
 		}
 
 		if (!oldProperties.hasOwnProperty(name) || !isEqual(oldProperties[name], value)) {
-			return Object.assign({}, acc, { [name]: value });
+			return { ...acc, [name]: value };
 		}
 
 		return acc;
@@ -58,7 +58,7 @@ const getDefaultPropertiesByName = (propertiesNames, oldProperties, defaultPrope
 			defaultProperties.hasOwnProperty(propertyName) &&
 			!isEqual(get(oldProperties, propertyName), defaultProperties[propertyName])
 		) {
-			return Object.assign({}, acc, { [propertyName]: defaultProperties[propertyName] });
+			return { ...acc, [propertyName]: defaultProperties[propertyName] };
 		}
 
 		return acc;
@@ -91,11 +91,8 @@ const getDropProperties = (oldData, newData, defaultData = {}) => {
 const getDiffOptions =
 	defaultData =>
 	(oldData = {}, newData = {}) => {
-		const modifyData = getModifiedProperties(
-			Object.assign({}, defaultData, oldData),
-			Object.assign({}, defaultData, newData),
-		);
-		const deleteDataProperties = getDeletedProperties(oldData, Object.assign({}, defaultData, newData));
+		const modifyData = getModifiedProperties({ ...defaultData, ...oldData }, { ...defaultData, ...newData });
+		const deleteDataProperties = getDeletedProperties(oldData, { ...defaultData, ...newData });
 
 		return {
 			modifyData,
@@ -106,10 +103,7 @@ const getDiffOptions =
 const getDiff =
 	defaultData =>
 	(oldData = {}, newData = {}) => {
-		const modifyData = getModifiedProperties(
-			Object.assign({}, defaultData, oldData),
-			Object.assign({}, defaultData, newData),
-		);
+		const modifyData = getModifiedProperties({ ...defaultData, ...oldData }, { ...defaultData, ...newData });
 
 		return {
 			modifyData,
@@ -120,12 +114,12 @@ const getDiff =
 const isEqualIndex =
 	(defaultData, redundantProperty) =>
 	(oldData = {}, newData = {}) => {
-		newData = Object.assign({}, defaultData, newData);
-		oldData = Object.assign({}, defaultData, oldData);
+		newData = { ...defaultData, ...newData };
+		oldData = { ...defaultData, ...oldData };
 
 		return uniq([...keys(newData), ...keys(oldData)])
 			.filter(key => !redundantProperty.includes(key))
-			.reduce((isEqual, key) => (isEqual && isEqual(newData[key], oldData[key]) ? isEqual : false), true);
+			.reduce((isEqual, key) => isEqual?.(newData[key], oldData[key]) ?? false, true);
 	};
 
 const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumns = []) => {

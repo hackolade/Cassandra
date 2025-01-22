@@ -2,8 +2,6 @@ const { applyToInstance, testConnection } = require('./helpers/dbConnectionServi
 const { generateScript } = require('./generateScript');
 const { generateViewScript } = require('./generateViewScript');
 const { generateContainerScript } = require('./generateContainerScript');
-const { setDependencies } = require('./helpers/appDependencies');
-const { initPluginConfiguration } = require('../helpers/levelConfigHelper');
 const { isDropInStatements } = require('./isDropInStatements');
 
 module.exports = {

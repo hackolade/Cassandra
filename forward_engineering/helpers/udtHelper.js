@@ -17,7 +17,13 @@ const getUdtScripts = (keyspaceName, sources, udtMap, isParentActivated) => {
 
 const setFrozenForAllUdt = udtTypeMap => {
 	return Object.keys(udtTypeMap).reduce((typeMap, typeName) => {
-		return Object.assign(typeMap, { [typeName]: Object.assign({}, udtTypeMap[typeName], { frozen: true }) });
+		return {
+			...typeMap,
+			[typeName]: {
+				...udtTypeMap[typeName],
+				frozen: true,
+			},
+		};
 	}, {});
 };
 
@@ -108,11 +114,11 @@ const sortUdt = definitionJsonSchema => {
 		}
 	});
 
-	let properties = {};
+	const properties = {};
 
 	orderedUdtNames.forEach(udtName => {
 		if (definitionJsonSchema.properties[udtName]) {
-			properties[udtName] = Object.assign({}, definitionJsonSchema.properties[udtName]);
+			properties[udtName] = { ...definitionJsonSchema.properties[udtName] };
 		}
 	});
 

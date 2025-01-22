@@ -512,7 +512,7 @@ const getModelDefinitionsDto = (child, udtMap, data) => {
  * @returns {[(AlterScriptDto|undefined)]}
  */
 const getAlterScriptDtos = (child, udtMap, data) => {
-	const generalUdtTypeMap = Object.assign({}, udtMap, getUdtMap([child]));
+	const generalUdtTypeMap = { ...udtMap, ...getUdtMap([child]) };
 
 	return [
 		...getEntitiesDto(child, generalUdtTypeMap, data),

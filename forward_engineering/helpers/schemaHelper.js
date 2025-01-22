@@ -74,11 +74,11 @@ const findFieldMetadataById = (id, source, allAttributes) => {
 
 const getAttributesDataByIds = (ids, sources, allAttributes) => {
 	return ids.reduce((hash, id) => {
-		for (let i = 0; i < sources.length; i++) {
-			const fieldData = findFieldMetadataById(id, sources[i], allAttributes);
+		for (const source of sources) {
+			const fieldData = findFieldMetadataById(id, source, allAttributes);
 
 			if (fieldData?.name) {
-				return Object.assign({}, hash, { [id]: fieldData });
+				return { ...hash, [id]: fieldData };
 			}
 		}
 

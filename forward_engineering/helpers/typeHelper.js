@@ -46,9 +46,7 @@ const getScalarType = (type, udtTypeMap) => {
 	const geoSpatialType = propertyData => `'${propertyData.subType || 'PointType'}'`;
 	const getJsonType = propertyData => {
 		if (propertyData.physicalType) {
-			return getHandlerByType(propertyData.physicalType)(
-				Object.assign(propertyData, { type: propertyData.physicalType }),
-			);
+			return getHandlerByType(propertyData.physicalType)({ ...propertyData, type: propertyData.physicalType });
 		}
 	};
 

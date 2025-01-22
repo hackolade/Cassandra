@@ -10,6 +10,7 @@ const CqlLexer = require('./parser/CqlLexer.js');
 const CqlParser = require('./parser/CqlParser.js');
 const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
 const ExprErrorListener = require('./antlrErrorListener');
+const { initPluginConfiguration } = require('helpers/levelConfigHelper');
 
 const handleFileData = filePath => {
 	return new Promise((resolve, reject) => {
@@ -38,6 +39,8 @@ module.exports = {
 
 	reFromFile: async (data, logger, callback) => {
 		try {
+			initPluginConfiguration(data.pluginConfiguration, logger);
+
 			const input = await handleFileData(data.filePath);
 			const chars = new antlr4.InputStream(input);
 			const lexer = new CqlLexer.CqlLexer(chars);

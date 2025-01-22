@@ -64,7 +64,7 @@ function generateContainerScript(data, logger, callback, app) {
 				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
 				const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
 				const entityData = data.entityData[entityId];
-				const udtTypeMap = Object.assign({}, generalUdtTypeMap, getUdtMap([internalDefinitions, jsonSchema]));
+				const udtTypeMap = { ...generalUdtTypeMap, ...getUdtMap([internalDefinitions, jsonSchema]) };
 
 				const entityName = retrieveEntityName(entityData);
 				const isEntityActivated = retrieveIsItemActivated(entityData);

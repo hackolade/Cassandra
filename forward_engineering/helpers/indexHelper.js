@@ -146,10 +146,11 @@ const unwindIndexes = indexes => {
 		return [
 			...result,
 			...(index.SecIndxKey || []).map((key, i) => {
-				return Object.assign({}, index, {
+				return {
+					...index,
 					name: i > 0 ? index.name + '_' + i : index.name,
 					SecIndxKey: key,
-				});
+				};
 			}),
 		];
 	}, []);

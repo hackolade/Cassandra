@@ -1,16 +1,17 @@
-'use strict';
-
-const { retrieveIsItemActivated, commentDeactivatedStatement } = require('../generalHelper');
-const { sortUdt, prepareDefinitions } = require('../udtHelper');
-const { getKeyspaceStatement } = require('../keyspaceHelper');
-const { getCreateTableScript } = require('../createHelper');
-const { setDependencies } = require('../appDependencies');
-const { getScriptOptions } = require('../getScriptOptions');
-const { buildContainerLevelAlterScript } = require('../alterScriptBuilder');
+const { retrieveIsItemActivated, commentDeactivatedStatement } = require('./helpers/generalHelper');
+const { sortUdt, prepareDefinitions } = require('./helpers/udtHelper');
+const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
+const { getCreateTableScript } = require('./helpers/createHelper');
+const { setDependencies } = require('./helpers/appDependencies');
+const { getScriptOptions } = require('./helpers/getScriptOptions');
+const { buildContainerLevelAlterScript } = require('./helpers/alterScriptBuilder');
+const { initPluginConfiguration } = require('../helpers/levelConfigHelper');
 
 function generateScript(data, logger, callback, app) {
 	try {
+		initPluginConfiguration(data.pluginConfiguration, logger);
 		setDependencies(app);
+
 		const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
 		const jsonSchema = JSON.parse(data.jsonSchema);
 		const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));

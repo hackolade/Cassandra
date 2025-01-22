@@ -1,7 +1,7 @@
 const { dependencies } = require('../appDependencies');
 const { isEqual, intersectionWith, xorWith } = require('lodash');
 const { getReplication, getDurableWrites } = require('../keyspaceHelper');
-const { retrivePropertyFromConfig } = require('../generalHelper');
+const { retrievePropertyFromConfig } = require('../generalHelper');
 const { AlterScriptDto } = require('../types/AlterScriptDto');
 
 const getDropUDFScript = udfData => (udfData.name ? `DROP FUNCTION IF EXISTS ${udfData.name};` : '');
@@ -113,18 +113,18 @@ const getIsModifyKeysSpace = (keySpaceData, props) => {
 const getKeySpaceScript = ({ child, mode }) => {
 	const keyspaceData = [child.role];
 	const keySpaceName = child.role.code || child.role.name;
-	const replicationStrategyProp = retrivePropertyFromConfig(keyspaceData, 0, 'replStrategy', '');
-	const replicationFactorProp = retrivePropertyFromConfig(keyspaceData, 0, 'replFactor', undefined);
-	const dataCentersProp = retrivePropertyFromConfig(keyspaceData, 0, 'dataCenters', []);
-	const durableWritesProp = retrivePropertyFromConfig(keyspaceData, 0, 'durableWrites', false);
-	const compMod = retrivePropertyFromConfig(keyspaceData, 0, 'compMod', {});
+	const replicationStrategyProp = retrievePropertyFromConfig(keyspaceData, 0, 'replStrategy', '');
+	const replicationFactorProp = retrievePropertyFromConfig(keyspaceData, 0, 'replFactor', undefined);
+	const dataCentersProp = retrievePropertyFromConfig(keyspaceData, 0, 'dataCenters', []);
+	const durableWritesProp = retrievePropertyFromConfig(keyspaceData, 0, 'durableWrites', false);
+	const compMod = retrievePropertyFromConfig(keyspaceData, 0, 'compMod', {});
 
 	const replication = getReplication(replicationStrategyProp, replicationFactorProp, dataCentersProp);
 	const durableWrites = getDurableWrites(durableWritesProp);
 
 	if (mode === 'add') {
-		const udfData = retrivePropertyFromConfig(keyspaceData, 0, 'UDFs', []);
-		const udaData = retrivePropertyFromConfig(keyspaceData, 0, 'UDAs', []);
+		const udfData = retrievePropertyFromConfig(keyspaceData, 0, 'UDFs', []);
+		const udaData = retrievePropertyFromConfig(keyspaceData, 0, 'UDAs', []);
 
 		return [
 			AlterScriptDto.getInstance(

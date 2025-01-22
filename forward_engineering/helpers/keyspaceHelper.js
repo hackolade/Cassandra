@@ -1,4 +1,4 @@
-const { tab, retrieveContainerName, retrivePropertyFromConfig } = require('./generalHelper');
+const { tab, retrieveContainerName, retrievePropertyFromConfig } = require('./generalHelper');
 
 const getCreateStatement = ({ name, replication, durableWrites, ifNotExist }) =>
 	`CREATE KEYSPACE ${ifNotExist ? `IF NOT EXISTS ` : ``}"${name}" \n${tab(replication)}\n${durableWrites}; \n\nUSE "${name}";`;
@@ -35,10 +35,10 @@ const getFactor = factor => +factor || 1;
 
 const getKeyspaceStatement = keyspaceData => {
 	const keyspaceName = retrieveContainerName(keyspaceData);
-	const replicationStrategy = retrivePropertyFromConfig(keyspaceData, 0, 'replStrategy', '');
-	const replicationFactor = retrivePropertyFromConfig(keyspaceData, 0, 'replFactor', undefined);
-	const dataCenters = retrivePropertyFromConfig(keyspaceData, 0, 'dataCenters', []);
-	const durableWrites = retrivePropertyFromConfig(keyspaceData, 0, 'durableWrites', false);
+	const replicationStrategy = retrievePropertyFromConfig(keyspaceData, 0, 'replStrategy', '');
+	const replicationFactor = retrievePropertyFromConfig(keyspaceData, 0, 'replFactor', undefined);
+	const dataCenters = retrievePropertyFromConfig(keyspaceData, 0, 'dataCenters', []);
+	const durableWrites = retrievePropertyFromConfig(keyspaceData, 0, 'durableWrites', false);
 
 	if (keyspaceData[0] && !keyspaceData[0].addToCqlScript) {
 		return '';
@@ -49,7 +49,7 @@ const getKeyspaceStatement = keyspaceData => {
 			name: keyspaceName,
 			replication: getReplication(replicationStrategy, replicationFactor, dataCenters),
 			durableWrites: getDurableWrites(durableWrites),
-			ifNotExist: retrivePropertyFromConfig(keyspaceData, 0, 'keyspaceIfNotExist', undefined),
+			ifNotExist: retrievePropertyFromConfig(keyspaceData, 0, 'keyspaceIfNotExist', undefined),
 		});
 	}
 };

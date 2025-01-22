@@ -6,7 +6,7 @@ const { commentDeactivatedStatement } = require('./commentsHelper');
 const {
 	retrieveContainerName,
 	retrieveEntityName,
-	retrivePropertyFromConfig,
+	retrievePropertyFromConfig,
 	retrieveIsItemActivated,
 } = require('./generalHelper');
 const { getOptions, getPrimaryKeyList } = require('./tableHelper');
@@ -110,7 +110,7 @@ const getNamesByIds = (collectionRefsDefinitionsMap, ids, columns = {}) => {
 };
 
 const getClusteringKeyData = (collectionRefsDefinitionsMap, viewData, columns) => {
-	const clusteringKeys = retrivePropertyFromConfig(viewData, 0, 'compositeClusteringKey', []);
+	const clusteringKeys = retrievePropertyFromConfig(viewData, 0, 'compositeClusteringKey', []);
 
 	const clusteringKeysHash = getNamesByIds(
 		collectionRefsDefinitionsMap,
@@ -129,7 +129,7 @@ const getPrimaryKeys = (collectionRefsDefinitionsMap, viewData, columns) => {
 };
 
 const getCompositeKeys = ({ collectionRefsDefinitionsMap, viewData, key, columns }) => {
-	const partitionKeys = retrivePropertyFromConfig(viewData, 0, key, []);
+	const partitionKeys = retrievePropertyFromConfig(viewData, 0, key, []);
 	const partitionKeysHash = getNamesByIds(
 		collectionRefsDefinitionsMap,
 		partitionKeys.map(key => key.keyId),
@@ -142,7 +142,7 @@ const getCompositeKeys = ({ collectionRefsDefinitionsMap, viewData, key, columns
 };
 
 const getPrimaryKeyScript = ({ collectionRefsDefinitionsMap, viewData, isParentActivated, columns }) => {
-	const partitionKeys = retrivePropertyFromConfig(viewData, 0, 'compositePartitionKey', []);
+	const partitionKeys = retrievePropertyFromConfig(viewData, 0, 'compositePartitionKey', []);
 	const partitionKeysHash = getNamesByIds(
 		collectionRefsDefinitionsMap,
 		partitionKeys.map(key => key.keyId),
@@ -162,8 +162,8 @@ const addTab = script => trim(script || '').replace(/  /g, '    ');
 
 const getOptionsScript = ({ collectionRefsDefinitionsMap, viewData, columns, isParentActivated }) => {
 	const clusteringKeyData = getClusteringKeyData(collectionRefsDefinitionsMap, viewData, columns);
-	const tableComment = retrivePropertyFromConfig(viewData, 0, 'comments', '');
-	const tableOptions = retrivePropertyFromConfig(viewData, 0, 'tableOptions', '');
+	const tableComment = retrievePropertyFromConfig(viewData, 0, 'comments', '');
+	const tableOptions = retrievePropertyFromConfig(viewData, 0, 'tableOptions', '');
 
 	return addTab(
 		getOptions(

@@ -1,5 +1,3 @@
-'use strict';
-
 const {
 	retrieveContainerName,
 	retrieveEntityName,
@@ -10,20 +8,22 @@ const {
 	commentDeactivatedStatement,
 	getUserDefinedAggregations,
 	getUserDefinedFunctions,
-} = require('../generalHelper');
-const { getTableStatement } = require('../tableHelper');
-const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('../udtHelper');
-const { getIndexes } = require('../indexHelper');
-const { getKeyspaceStatement } = require('../keyspaceHelper');
-const { getViewScript } = require('../viewHelper');
-const { setDependencies } = require('../appDependencies');
-const { getScriptOptions } = require('../getScriptOptions');
-const { buildContainerLevelAlterScript } = require('../alterScriptBuilder');
-const { joinScripts } = require('./joinScripts');
+} = require('./helpers/generalHelper');
+const { getTableStatement } = require('./helpers/tableHelper');
+const { sortUdt, getUdtMap, getUdtScripts, prepareDefinitions } = require('./helpers/udtHelper');
+const { getIndexes } = require('./helpers/indexHelper');
+const { getKeyspaceStatement } = require('./helpers/keyspaceHelper');
+const { getViewScript } = require('./helpers/viewHelper');
+const { setDependencies } = require('./helpers/appDependencies');
+const { getScriptOptions } = require('./helpers/getScriptOptions');
+const { buildContainerLevelAlterScript } = require('./helpers/alterScriptBuilder');
+const { joinScripts } = require('./helpers/joinScripts');
+const { initPluginConfiguration } = require('../helpers/levelConfigHelper');
 
 function generateContainerScript(data, logger, callback, app) {
 	try {
 		setDependencies(app);
+		initPluginConfiguration(data.pluginConfiguration, logger);
 		if (data.isUpdateScript) {
 			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
 			data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };

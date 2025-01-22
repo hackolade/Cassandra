@@ -1,10 +1,11 @@
-'use strict';
-
-const { getViewScript } = require('../viewHelper');
-const { setDependencies } = require('../appDependencies');
+const { getViewScript } = require('./helpers/viewHelper');
+const { setDependencies } = require('./helpers/appDependencies');
+const { initPluginConfiguration } = require('../helpers/levelConfigHelper');
 
 function generateViewScript(data, logger, callback, app) {
 	setDependencies(app);
+	initPluginConfiguration(data.pluginConfiguration, logger);
+
 	const viewSchema = JSON.parse(data.jsonSchema || '{}');
 	const entitySchema = JSON.parse(data.jsonSchema[viewSchema.viewOn] || '{}');
 

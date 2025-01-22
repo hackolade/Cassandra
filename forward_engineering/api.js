@@ -1,18 +1,16 @@
-'use strict';
-
-const { sortUdt, prepareDefinitions } = require('./helpers/udtHelper');
-const { setDependencies } = require('./helpers/appDependencies');
 const { applyToInstance, testConnection } = require('./helpers/dbConnectionService/index');
-const { isDropInStatements } = require('./helpers/alterScriptBuilder');
-
-const { generateScript } = require('./helpers/buildScript/generateScript');
-const { generateViewScript } = require('./helpers/buildScript/generateViewScript');
-const { generateContainerScript } = require('./helpers/buildScript/generateContainerScript');
+const { generateScript } = require('./generateScript');
+const { generateViewScript } = require('./generateViewScript');
+const { generateContainerScript } = require('./generateContainerScript');
+const { setDependencies } = require('./helpers/appDependencies');
+const { initPluginConfiguration } = require('../helpers/levelConfigHelper');
+const { isDropInStatements } = require('./isDropInStatements');
 
 module.exports = {
 	generateScript,
 	generateViewScript,
 	generateContainerScript,
+	isDropInStatements,
 
 	applyToInstance(connectionInfo, logger, callback, app) {
 		logger.clear();
@@ -29,33 +27,5 @@ module.exports = {
 
 	testConnection(connectionInfo, logger, callback, app) {
 		testConnection(connectionInfo, app).then(callback, callback);
-	},
-
-	isDropInStatements(data, logger, callback, app) {
-		try {
-			setDependencies(app);
-			let result;
-			const { udtTypeMap, modelDefinitions, externalDefinitions } = prepareDefinitions(data);
-
-			if (data.level === 'container') {
-				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions };
-				result = data.entities
-					.map(entityId => {
-						const jsonSchema = JSON.parse(data.jsonSchema[entityId]);
-						data.internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions[entityId]));
-						return isDropInStatements(jsonSchema, data.udtTypeMap, data);
-					})
-					.some(Boolean);
-			} else if (data.level === 'entity') {
-				const jsonSchema = JSON.parse(data.jsonSchema);
-				const internalDefinitions = sortUdt(JSON.parse(data.internalDefinitions));
-				data = { ...data, udtTypeMap, modelDefinitions, externalDefinitions, jsonSchema, internalDefinitions };
-				result = isDropInStatements(data.jsonSchema, data.udtTypeMap, data);
-			}
-
-			callback(null, result);
-		} catch (e) {
-			callback({ message: e.message, stack: e.stack });
-		}
 	},
 };

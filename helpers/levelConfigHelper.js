@@ -1,49 +1,36 @@
 const fs = require('fs');
 const path = require('path');
 
-const getConfig = pathToConfig => {
-	try {
-		const config = fs.readFileSync(path.join(__dirname, '..', pathToConfig));
+let pluginConfiguration = {};
+let logger = {};
+const descriptors = {};
 
-		return JSON.parse(config.toString().replace(/\/\*[\s\S]*?\*\//g, ''));
+const initPluginConfiguration = (config, appLogger) => {
+	logger = appLogger;
+	pluginConfiguration = config || {};
+};
+
+const getTypeConfig = typeName => {
+	if (descriptors[typeName]) {
+		return descriptors[typeName];
+	}
+
+	try {
+		descriptors[typeName] = require(`../types/${typeName}.json`);
+
+		return descriptors[typeName];
 	} catch (e) {
 		return {};
 	}
 };
 
-const cacheResult = method => {
-	let result;
+const getFieldLevelConfig = type => pluginConfiguration.fieldLevelConfig;
 
-	return (...args) => {
-		if (!result) {
-			result = method(...args);
-		}
-
-		return result;
-	};
-};
-
-const getFieldLevelConfig = cacheResult(() =>
-	getConfig(path.join('properties_pane', 'field_level', 'fieldLevelConfig.json')),
-);
-const getEntityLevelConfig = cacheResult(() =>
-	getConfig(path.join('properties_pane', 'entity_level', 'entityLevelConfig.json')),
-);
-
-const getTypesConfig = cacheResult(() => {
-	const getName = typeFile => typeFile.replace(/\.json/, '');
-	const typeDir = path.join(__dirname, '..', 'types');
-	const types = fs.readdirSync(typeDir);
-
-	return types.reduce((typesMap, fileName) => {
-		typesMap[getName(fileName)] = getConfig(path.join('types', fileName));
-
-		return typesMap;
-	}, {});
-});
+const getEntityLevelConfig = () => pluginConfiguration.entityLevelConfig;
 
 module.exports = {
-	getEntityLevelConfig,
+	initPluginConfiguration,
+	getTypeConfig,
 	getFieldLevelConfig,
-	getTypesConfig,
+	getEntityLevelConfig,
 };

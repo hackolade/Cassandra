@@ -100,7 +100,7 @@ function generateContainerScript(data, logger, callback, app) {
 			});
 
 			cqlScriptData.push(
-				data.views.map(viewId => {
+				...data.views.map(viewId => {
 					const viewSchema = JSON.parse(data.jsonSchema[viewId] || '{}');
 
 					return getViewScript({

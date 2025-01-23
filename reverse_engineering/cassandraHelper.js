@@ -1,6 +1,6 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
-let _;
+const _ = require('lodash');
 const fs = require('fs');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../helpers/levelConfigHelper');
@@ -15,7 +15,7 @@ const state = {
 
 const COLUMNS_TO_FILTER_OUT = ['solr_query'];
 
-module.exports = _ => {
+module.exports = () => {
 	const requireKeyStore = app =>
 		new Promise((resolve, reject) => {
 			return app.require('java-ssl', (err, Keystore) => {

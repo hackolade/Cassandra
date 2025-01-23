@@ -1,4 +1,6 @@
-module.exports = _ => {
+const _ = require('lodash');
+
+module.exports = () => {
 	const handleItem = (properties, record, propertyValue) => {
 		if (_.isUndefined(propertyValue)) {
 			return record;

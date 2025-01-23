@@ -1,5 +1,3 @@
-'use strict';
-
 const attributesForReturn = ['isActivated', 'type', 'compositePartitionKey'];
 
 const getAttributes = (field = {}, allAttributes = false) => {

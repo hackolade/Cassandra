@@ -1,5 +1,3 @@
-'use strict';
-
 const { getTypeConfig } = require('../../helpers/levelConfigHelper');
 const { getFieldLevelConfig } = require('../../helpers/levelConfigHelper');
 

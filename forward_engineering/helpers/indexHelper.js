@@ -1,5 +1,3 @@
-'use strict';
-
 const { commentDeactivatedStatement, inlineComment } = require('./commentsHelper');
 const { tab, getTableNameStatement } = require('./generalHelper');
 const { getNamesByIds } = require('./schemaHelper');

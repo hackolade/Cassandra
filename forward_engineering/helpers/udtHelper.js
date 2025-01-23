@@ -1,5 +1,3 @@
-'use strict';
-
 const { tab, getNameWithKeyspace, eachField } = require('./generalHelper');
 const { getColumnDefinition } = require('./columnHelper');
 

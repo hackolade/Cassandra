@@ -1,5 +1,3 @@
-'use strict';
-
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');

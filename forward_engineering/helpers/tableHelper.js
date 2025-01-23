@@ -1,5 +1,3 @@
-'use strict';
-
 const { partition } = require('lodash');
 const {
 	retrieveContainerName,

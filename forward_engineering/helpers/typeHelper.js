@@ -1,5 +1,3 @@
-'use strict';
-
 const { getFieldConfig, canTypeHaveSubtype } = require('./generalHelper');
 const { getTypeConfig } = require('../../helpers/levelConfigHelper');
 

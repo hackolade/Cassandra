@@ -1,7 +1,4 @@
-'use strict';
-
 const { partition, get, uniqBy, identity, isEmpty, values, trim, first, uniq } = require('lodash');
-const { dependencies } = require('./appDependencies');
 const { commentDeactivatedStatement } = require('./commentsHelper');
 const {
 	retrieveContainerName,

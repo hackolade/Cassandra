@@ -525,7 +525,7 @@ module.exports = () => {
 		columns
 			.filter(column => !_.includes(COLUMNS_TO_FILTER_OUT, column.name))
 			.forEach(column => {
-				const columnType = typesHelper(_).getColumnType(
+				const columnType = typesHelper().getColumnType(
 					column,
 					udtHash,
 					sample ? sample[column.name] : undefined,
@@ -971,7 +971,7 @@ module.exports = () => {
 			}
 			packageData = {
 				...packageData,
-				documents: filterComplexUdt(_).filterUdts(schema.properties, data.records),
+				documents: filterComplexUdt().filterUdts(schema.properties, data.records),
 			};
 		} else if (!includeEmptyCollection) {
 			packageData = null;

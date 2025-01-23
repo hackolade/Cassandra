@@ -4,7 +4,7 @@ const applyToInstance = cassandraHelper => (connectionInfo, logger, app) => {
 		const usePosition = script.indexOf('USE');
 		script = script.substring(usePosition);
 	}
-	const cassandra = cassandraHelper(app.require('lodash'));
+	const cassandra = cassandraHelper();
 
 	return cassandra
 		.connect(app)(connectionInfo)

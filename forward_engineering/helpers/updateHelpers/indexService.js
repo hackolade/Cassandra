@@ -119,7 +119,7 @@ const isEqualIndex =
 
 		return uniq([...keys(newData), ...keys(oldData)])
 			.filter(key => !redundantProperty.includes(key))
-			.reduce((isEqual, key) => isEqual?.(newData[key], oldData[key]) ?? false, true);
+			.reduce((isEquals, key) => (isEquals && isEqual(newData[key], oldData[key]) ? isEquals : false), true);
 	};
 
 const prepareSearchIndexProfile = (oldProfiles = [], newProfiles = [], oldColumns = []) => {

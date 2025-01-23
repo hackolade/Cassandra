@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const types = require('cassandra-driver').types;
 const defaultData = require('../properties_pane/defaultData.json');
 const abbrHash = {
@@ -8,7 +9,7 @@ const abbrHash = {
 };
 const defaultColumnName = defaultData.field.name;
 
-module.exports = _ => {
+module.exports = () => {
 	const getColumnType = (column, udtHash, sample) => {
 		const fullCassandraType = types.getDataTypeNameByCode(column.type || column);
 		const cassandraType = fullCassandraType.split('<')[0];

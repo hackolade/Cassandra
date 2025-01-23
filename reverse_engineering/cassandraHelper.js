@@ -599,7 +599,7 @@ module.exports = _ => {
 	};
 
 	const getOptionsFromTab = config => {
-		const optionsBlock = config.structure.find(prop => prop.propertyName === 'Options');
+		const optionsBlock = config.structure.find(prop => prop.fieldName === 'Options');
 		return optionsBlock.structure;
 	};
 

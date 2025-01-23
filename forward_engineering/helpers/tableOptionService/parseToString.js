@@ -36,7 +36,7 @@ const convertKeywordToTableOptionName = keyword => {
 };
 
 const transformOption = option => {
-	if (specialOptions.includes(option.propertyKeyword)) {
+	if (specialOptions.includes(option.fieldKeyword)) {
 		return transformSpecialOption(option);
 	}
 
@@ -44,7 +44,7 @@ const transformOption = option => {
 };
 
 const transformSpecialOption = option => {
-	switch (option.propertyKeyword) {
+	switch (option.fieldKeyword) {
 		case CACHING:
 			return transformCachingOption(option);
 		case OTHER:
@@ -55,7 +55,7 @@ const transformSpecialOption = option => {
 };
 
 const transformOptionByPropertyType = option => {
-	switch (option.propertyType) {
+	switch (option.fieldType) {
 		case TEXT:
 			return transformTextOption(option);
 		case CHECKBOX:
@@ -69,11 +69,9 @@ const transformOptionByPropertyType = option => {
 	}
 };
 
-const transformTextOption = option =>
-	`${convertKeywordToTableOptionName(option['propertyKeyword'])} = '${option.value}'`;
+const transformTextOption = option => `${convertKeywordToTableOptionName(option['fieldKeyword'])} = '${option.value}'`;
 
-const transformNumericOption = option =>
-	`${convertKeywordToTableOptionName(option['propertyKeyword'])} = ${option.value}`;
+const transformNumericOption = option => `${convertKeywordToTableOptionName(option['fieldKeyword'])} = ${option.value}`;
 
 const transformDetailsOptions = option => {
 	const getStringValue = value => {
@@ -85,7 +83,7 @@ const transformDetailsOptions = option => {
 	};
 	const stringValue = getStringValue(option.value);
 	const trimmedValue = stringValue.replace(/\n/g, '');
-	return `${convertKeywordToTableOptionName(option['propertyKeyword'])} = ${changeQuotes(trimmedValue)}`;
+	return `${convertKeywordToTableOptionName(option['fieldKeyword'])} = ${changeQuotes(trimmedValue)}`;
 };
 
 const transformOtherOptions = option => {
@@ -104,7 +102,7 @@ const transformOtherOptions = option => {
 };
 
 const transformBooleanOption = option => {
-	const keyword = option['propertyKeyword'];
+	const keyword = option['fieldKeyword'];
 	if (!Boolean(option.value)) {
 		return null;
 	}

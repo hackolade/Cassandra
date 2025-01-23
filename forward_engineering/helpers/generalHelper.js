@@ -93,7 +93,7 @@ const getFieldConfig = (type, property) => {
 	if (!fieldLevelConfig[type]) {
 		return;
 	}
-	const propertyData = fieldLevelConfig[type].find(config => config.propertyKeyword === property);
+	const propertyData = fieldLevelConfig[type].find(config => config.fieldKeyword === property);
 
 	return propertyData;
 };

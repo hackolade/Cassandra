@@ -1,3 +1,4 @@
+const { partition, get } = require('lodash');
 const { inlineComment } = require('../commentsHelper');
 const { dependencies } = require('../appDependencies');
 
@@ -35,7 +36,7 @@ const convertKeywordToTableOptionName = keyword => {
 };
 
 const transformOption = option => {
-	if (specialOptions.includes(option.propertyKeyword)) {
+	if (specialOptions.includes(option.fieldKeyword)) {
 		return transformSpecialOption(option);
 	}
 
@@ -43,7 +44,7 @@ const transformOption = option => {
 };
 
 const transformSpecialOption = option => {
-	switch (option.propertyKeyword) {
+	switch (option.fieldKeyword) {
 		case CACHING:
 			return transformCachingOption(option);
 		case OTHER:
@@ -54,7 +55,7 @@ const transformSpecialOption = option => {
 };
 
 const transformOptionByPropertyType = option => {
-	switch (option.propertyType) {
+	switch (option.fieldType) {
 		case TEXT:
 			return transformTextOption(option);
 		case CHECKBOX:
@@ -68,11 +69,9 @@ const transformOptionByPropertyType = option => {
 	}
 };
 
-const transformTextOption = option =>
-	`${convertKeywordToTableOptionName(option['propertyKeyword'])} = '${option.value}'`;
+const transformTextOption = option => `${convertKeywordToTableOptionName(option['fieldKeyword'])} = '${option.value}'`;
 
-const transformNumericOption = option =>
-	`${convertKeywordToTableOptionName(option['propertyKeyword'])} = ${option.value}`;
+const transformNumericOption = option => `${convertKeywordToTableOptionName(option['fieldKeyword'])} = ${option.value}`;
 
 const transformDetailsOptions = option => {
 	const getStringValue = value => {
@@ -84,7 +83,7 @@ const transformDetailsOptions = option => {
 	};
 	const stringValue = getStringValue(option.value);
 	const trimmedValue = stringValue.replace(/\n/g, '');
-	return `${convertKeywordToTableOptionName(option['propertyKeyword'])} = ${changeQuotes(trimmedValue)}`;
+	return `${convertKeywordToTableOptionName(option['fieldKeyword'])} = ${changeQuotes(trimmedValue)}`;
 };
 
 const transformOtherOptions = option => {
@@ -103,7 +102,7 @@ const transformOtherOptions = option => {
 };
 
 const transformBooleanOption = option => {
-	const keyword = option['propertyKeyword'];
+	const keyword = option['fieldKeyword'];
 	if (!Boolean(option.value)) {
 		return null;
 	}
@@ -132,10 +131,15 @@ const transformCachingOption = option => {
 
 		return null;
 	};
-	const createValueObject = (keys, rows) => Object.assign({}, keys && { keys }, rows && { rows_per_partition: rows });
+	const createValueObject = (keys, rows) => ({
+		...(keys && { keys }),
+		...(rows && { rows_per_partition: rows }),
+	});
+
 	const allowedValues = ['ALL', 'NONE'];
 	const keys = validateKeys(option.value['keys']);
 	const rows = validateRows(option.value['rowsPerPartition']);
+
 	if (!keys && !rows) {
 		return null;
 	}
@@ -190,9 +194,9 @@ const addClustering = (clusteringKeys, clusteringKeysHash, options, isParentActi
 		});
 	};
 
-	let [activatedKeys, deactivatedKeys] = dependencies.lodash.partition(
+	let [activatedKeys, deactivatedKeys] = partition(
 		validClusteredKeys,
-		({ keyId }) => dependencies.lodash.get(clusteringKeysHash, `${keyId}.isActivated`) !== false,
+		({ keyId }) => get(clusteringKeysHash, `${keyId}.isActivated`) !== false,
 	);
 	activatedKeys = mapKeys(activatedKeys);
 	deactivatedKeys = mapKeys(deactivatedKeys);

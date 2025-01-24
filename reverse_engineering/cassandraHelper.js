@@ -1,6 +1,6 @@
 const cassandra = require('cassandra-driver');
 const typesHelper = require('./typesHelper');
-let _;
+const _ = require('lodash');
 const fs = require('fs');
 const { createTableOptionsFromMeta } = require('./helpers/createTableOptionsFromMeta');
 const { getEntityLevelConfig } = require('../helpers/levelConfigHelper');
@@ -15,7 +15,7 @@ const state = {
 
 const COLUMNS_TO_FILTER_OUT = ['solr_query'];
 
-module.exports = _ => {
+module.exports = () => {
 	const requireKeyStore = app =>
 		new Promise((resolve, reject) => {
 			return app.require('java-ssl', (err, Keystore) => {
@@ -196,12 +196,7 @@ module.exports = _ => {
 	const isSsl = ssl => ssl && ssl !== 'false';
 
 	const getSslOptions = (info, app, logger) => {
-		const add = (key, value, obj) =>
-			!value
-				? obj
-				: Object.assign({}, obj, {
-						[key]: value,
-					});
+		const add = (key, value, obj) => (!value ? obj : { ...obj, [key]: value });
 		if (!isSsl(info.ssl)) {
 			return Promise.resolve({});
 		}
@@ -279,19 +274,15 @@ module.exports = _ => {
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 
 		return getSslOptions(info, app, logger).then(sslOptions => {
-			return new cassandra.Client(
-				Object.assign(
-					{
-						contactPoints,
-						authProvider,
-						socketOptions: {
-							readTimeout,
-						},
-					},
-					getPolicy(info, logger),
-					sslOptions,
-				),
-			);
+			return new cassandra.Client({
+				contactPoints,
+				authProvider,
+				socketOptions: {
+					readTimeout,
+				},
+				...getPolicy(info, logger),
+				...sslOptions,
+			});
 		});
 	};
 
@@ -302,17 +293,15 @@ module.exports = _ => {
 				? { username: 'token', password: info.astraToken }
 				: { username: info.user, password: info.password };
 
-		const client = new cassandra.Client(
-			Object.assign({
-				cloud: {
-					secureConnectBundle: info.secureConnectBundle,
-				},
-				credentials,
-				socketOptions: {
-					readTimeout,
-				},
-			}),
-		);
+		const client = new cassandra.Client({
+			cloud: {
+				secureConnectBundle: info.secureConnectBundle,
+			},
+			credentials,
+			socketOptions: {
+				readTimeout,
+			},
+		});
 
 		return Promise.resolve(client);
 	};
@@ -320,9 +309,9 @@ module.exports = _ => {
 	const getClient = (app, info, logger) => {
 		if (info.clusterType === 'apolloCloud') {
 			return getCloudClient(info);
-		} else {
-			return getDistributedClient(app, info, logger);
 		}
+
+		return getDistributedClient(app, info, logger);
 	};
 
 	const connect = (app, logger) => async info => {
@@ -536,7 +525,7 @@ module.exports = _ => {
 		columns
 			.filter(column => !_.includes(COLUMNS_TO_FILTER_OUT, column.name))
 			.forEach(column => {
-				const columnType = typesHelper(_).getColumnType(
+				const columnType = typesHelper().getColumnType(
 					column,
 					udtHash,
 					sample ? sample[column.name] : undefined,
@@ -610,7 +599,7 @@ module.exports = _ => {
 	};
 
 	const getOptionsFromTab = config => {
-		const optionsBlock = config.structure.find(prop => prop.propertyName === 'Options');
+		const optionsBlock = config.structure.find(prop => prop.fieldName === 'Options');
 		return optionsBlock.structure;
 	};
 
@@ -947,9 +936,10 @@ module.exports = _ => {
 				return schema;
 			}
 
-			return Object.assign({}, schema, {
+			return {
+				...schema,
 				[name]: { $ref: `#collection/definitions/${tableName}/${name}` },
-			});
+			};
 		}, {});
 	};
 
@@ -981,7 +971,7 @@ module.exports = _ => {
 			}
 			packageData = {
 				...packageData,
-				documents: filterComplexUdt(_).filterUdts(schema.properties, data.records),
+				documents: filterComplexUdt().filterUdts(schema.properties, data.records),
 			};
 		} else if (!includeEmptyCollection) {
 			packageData = null;
@@ -1040,9 +1030,10 @@ module.exports = _ => {
 			return Object.keys(obj1)
 				.concat(Object.keys(obj2))
 				.reduce((result, key) => {
-					return Object.assign({}, result, {
+					return {
+						...result,
 						[key]: merge(obj1[key], obj2[key]),
-					});
+					};
 				}, {});
 		};
 		const merge = (doc1, doc2) => {

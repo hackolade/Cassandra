@@ -1,8 +1,7 @@
 let dependencies = {};
 
-const setDependencies = app => {
-	dependencies.lodash = app.require('lodash');
-	dependencies.provider = require('../ddlProvider/ddlProvider')(app);
+const setDependencies = () => {
+	dependencies.provider = require('../ddlProvider/ddlProvider')();
 };
 
 module.exports = {

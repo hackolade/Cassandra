@@ -1,6 +1,5 @@
-'use strict';
-
-const { getEntityLevelConfig, getFieldLevelConfig, getTypesConfig } = require('../../helpers/levelConfigHelper');
+const { getTypeConfig } = require('../../helpers/levelConfigHelper');
+const { getFieldLevelConfig } = require('../../helpers/levelConfigHelper');
 
 const TAB_SIZE = 2;
 
@@ -23,24 +22,24 @@ const tab = (text, count = 1) => {
 		.join('\n');
 };
 
-const retrivePropertyFromConfig = (config, tab, propertyName, defaultValue = '') =>
+const retrievePropertyFromConfig = (config, tab, propertyName, defaultValue = '') =>
 	((config || [])[tab] || {})[propertyName] || defaultValue;
 
 const retrieveContainerName = containerConfig =>
-	retrivePropertyFromConfig(containerConfig, 0, 'code', retrivePropertyFromConfig(containerConfig, 0, 'name', ''));
+	retrievePropertyFromConfig(containerConfig, 0, 'code', retrievePropertyFromConfig(containerConfig, 0, 'name', ''));
 const retrieveEntityName = entityConfig =>
-	retrivePropertyFromConfig(
+	retrievePropertyFromConfig(
 		entityConfig,
 		0,
 		'code',
-		retrivePropertyFromConfig(entityConfig, 0, 'collectionName', ''),
+		retrievePropertyFromConfig(entityConfig, 0, 'collectionName', ''),
 	);
-const retrieveUDF = containerConfig => retrivePropertyFromConfig(containerConfig, 1, 'UDFs', []);
-const retrieveUDA = containerConfig => retrivePropertyFromConfig(containerConfig, 2, 'UDAs', []);
+const retrieveUDF = containerConfig => retrievePropertyFromConfig(containerConfig, 1, 'UDFs', []);
+const retrieveUDA = containerConfig => retrievePropertyFromConfig(containerConfig, 2, 'UDAs', []);
 const retrieveIndexes = (entityConfig, dbVersion) => {
 	const indexTab = entityConfig[1];
 	const result = {
-		indexes: retrivePropertyFromConfig(entityConfig, 1, 'SecIndxs', []),
+		indexes: retrievePropertyFromConfig(entityConfig, 1, 'SecIndxs', []),
 	};
 
 	if (indexTab.searchIndex) {
@@ -88,21 +87,19 @@ const getIndexProfiles = (searchIndexProfiles, dbVersion) => {
 const getTableNameStatement = (keyspaceName, tableName) => getNameWithKeyspace(keyspaceName, `"${tableName}"`);
 const getNameWithKeyspace = (keyspaceName, name) => `${keyspaceName ? `"${keyspaceName}".` : ''}${name}`;
 
-const getTypeConfig = type => getTypesConfig()[type];
-
 const getFieldConfig = (type, property) => {
 	const fieldLevelConfig = getFieldLevelConfig().structure;
 
 	if (!fieldLevelConfig[type]) {
 		return;
 	}
-	const propertyData = fieldLevelConfig[type].find(config => config.propertyKeyword === property);
+	const propertyData = fieldLevelConfig[type].find(config => config.fieldKeyword === property);
 
 	return propertyData;
 };
 
 const eachField = (jsonSchema, callback) => {
-	const resultSchema = Object.assign({}, jsonSchema);
+	const resultSchema = { ...jsonSchema };
 
 	const eachProperty = (properties, callback) => {
 		return Object.keys(properties).reduce((resultSchema, propertyName) => {
@@ -204,7 +201,7 @@ module.exports = {
 	retrieveUDF,
 	retrieveUDA,
 	retrieveIndexes,
-	retrivePropertyFromConfig,
+	retrievePropertyFromConfig,
 	getTableNameStatement,
 	getFieldConfig,
 	getTypeConfig,

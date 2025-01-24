@@ -1,15 +1,15 @@
-'use strict';
-
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
 const logHelper = require('./logHelper');
 const commandsService = require('./commandsService');
+const async = require('async');
 const fs = require('fs');
 const antlr4 = require('antlr4');
 const CqlLexer = require('./parser/CqlLexer.js');
 const CqlParser = require('./parser/CqlParser.js');
 const cqlToCollectionsVisitor = require('./cqlToCollectionsVisitor.js');
 const ExprErrorListener = require('./antlrErrorListener');
+const { initPluginConfiguration } = require('../helpers/levelConfigHelper');
 
 const handleFileData = filePath => {
 	return new Promise((resolve, reject) => {
@@ -25,7 +25,7 @@ const handleFileData = filePath => {
 
 module.exports = {
 	connect: function (connectionInfo, logger, cb, app) {
-		cassandraHelper(app.require('lodash'))
+		cassandraHelper()
 			.connect(
 				app,
 				logger,
@@ -38,6 +38,8 @@ module.exports = {
 
 	reFromFile: async (data, logger, callback) => {
 		try {
+			initPluginConfiguration(data.pluginConfiguration, logger);
+
 			const input = await handleFileData(data.filePath);
 			const chars = new antlr4.InputStream(input);
 			const lexer = new CqlLexer.CqlLexer(chars);
@@ -62,7 +64,7 @@ module.exports = {
 	},
 
 	disconnect: function (connectionInfo, logger, cb, app) {
-		cassandraHelper(app.require('lodash')).close(app);
+		cassandraHelper().close(app);
 		cb();
 	},
 
@@ -81,18 +83,18 @@ module.exports = {
 
 				this.disconnect(connectionInfo, logger, () => {}, app);
 
-				return cb(cassandraHelper(app.require('lodash')).prepareError(error));
+				return cb(cassandraHelper().prepareError(error));
 			},
 			app,
 		);
 	},
 
 	getDbCollectionsNames: function (connectionInfo, logger, cb, app) {
-		const async = app.require('async');
+		initPluginConfiguration(connectionInfo.pluginConfiguration, logger);
 
 		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
-		const cassandra = cassandraHelper(app.require('lodash'));
+		const cassandra = cassandraHelper();
 
 		cassandra
 			.connect(
@@ -140,8 +142,9 @@ module.exports = {
 	},
 
 	getDbCollectionsData: function (data, logger, cb, app) {
-		const async = app.require('async');
-		const cassandra = cassandraHelper(app.require('lodash'));
+		initPluginConfiguration(data.pluginConfiguration, logger);
+
+		const cassandra = cassandraHelper();
 		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
 
 		const tables = data.collectionData.collections;

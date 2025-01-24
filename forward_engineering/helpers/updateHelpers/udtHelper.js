@@ -1,3 +1,4 @@
+const { get, xorWith, isEqual, isEmpty } = require('lodash');
 const { dependencies } = require('../appDependencies');
 const { getColumnDefinition } = require('../columnHelper');
 const { eachField } = require('../generalHelper');
@@ -56,7 +57,7 @@ const getAddToUDT = addToUDTData => {
 
 const getKeySpaces = role => {
 	const keySpaces = role.compMod?.bucketsWithCurrentDefinition;
-	return !dependencies.lodash.isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
+	return !isEmpty(keySpaces) ? keySpaces : DEFAULT_KEY_SPACE;
 };
 
 /**
@@ -124,14 +125,14 @@ const getUpdateScript = (item, data, udtMap) => {
 	const keySpaces = getKeySpaces(role);
 	const udtName = role.code || role.name;
 	return Object.entries(properties).reduce((script, [propertyName, property]) => {
-		const itemOldName = dependencies.lodash.get(property, 'compMod.oldField.name');
-		const itemNewName = dependencies.lodash.get(property, 'compMod.newField.name');
+		const itemOldName = get(property, 'compMod.oldField.name');
+		const itemNewName = get(property, 'compMod.newField.name');
 		const { compMod = {} } = property;
 
 		const oldFieldType = getTypeByData(prepareField(compMod.oldField, property), udtMap, 'newField');
 		const newFieldType = getTypeByData(prepareField(compMod.newField, property), udtMap, 'oldField');
 
-		const isOldModel = checkIsOldModel(dependencies.lodash.get(data, 'modelData'));
+		const isOldModel = checkIsOldModel(get(data, 'modelData'));
 		const newScript = Object.keys(keySpaces).reduce((script, keySpaceName) => {
 			const changeType =
 				newFieldType &&
@@ -229,7 +230,7 @@ const sortAddedUdt = udt => {
 		return child.compMod?.created;
 	});
 
-	const otherUdt = dependencies.lodash.xorWith(items, createdUdt, dependencies.lodash.isEqual);
+	const otherUdt = xorWith(items, createdUdt, isEqual);
 	createdUdt = createdUdt.map(item => {
 		const itemName = Object.keys(item.properties)[0];
 		return [itemName, item];

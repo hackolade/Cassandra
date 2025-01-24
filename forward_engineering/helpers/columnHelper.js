@@ -1,5 +1,3 @@
-'use strict';
-
 const { getTypeByData } = require('./typeHelper');
 const { commentDeactivatedStatement } = require('./generalHelper');
 const { joinActivatedAndDeactivatedStatements } = require('./joinActivatedAndDeactivatedStatements');

@@ -732,7 +732,7 @@ class Visitor extends CqlParserVisitor {
 				keyType: description1.type,
 				keySubtype: description2.mode,
 				subtype: `map<${complexTypeMapper(description2.type || '')}>`,
-				properties: [Object.assign({ name: 'New column' }, description2)],
+				properties: [{ name: 'New column', ...description2 }],
 			};
 		}
 
@@ -1077,9 +1077,10 @@ const tableOptionsHashMap = {
 
 const getViewSchema = (tableName, columns) => {
 	return columns.reduce((schema, name) => {
-		return Object.assign({}, schema, {
+		return {
+			...schema,
 			[name]: { $ref: `#collection/definitions/${tableName}/${name}` },
-		});
+		};
 	}, {});
 };
 

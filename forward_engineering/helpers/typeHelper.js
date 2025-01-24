@@ -1,6 +1,5 @@
-'use strict';
-
-const { getFieldConfig, getTypeConfig, canTypeHaveSubtype } = require('./generalHelper');
+const { getFieldConfig, canTypeHaveSubtype } = require('./generalHelper');
+const { getTypeConfig } = require('../../helpers/levelConfigHelper');
 
 const ifType = type => {
 	let result;
@@ -45,9 +44,7 @@ const getScalarType = (type, udtTypeMap) => {
 	const geoSpatialType = propertyData => `'${propertyData.subType || 'PointType'}'`;
 	const getJsonType = propertyData => {
 		if (propertyData.physicalType) {
-			return getHandlerByType(propertyData.physicalType)(
-				Object.assign(propertyData, { type: propertyData.physicalType }),
-			);
+			return getHandlerByType(propertyData.physicalType)({ ...propertyData, type: propertyData.physicalType });
 		}
 	};
 

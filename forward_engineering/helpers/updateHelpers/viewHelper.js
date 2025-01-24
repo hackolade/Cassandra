@@ -1,3 +1,4 @@
+const { isEqual } = require('lodash');
 const { getViewScript: generateViewScript } = require('../viewHelper');
 const { dependencies } = require('../appDependencies');
 const { AlterScriptDto } = require('../types/AlterScriptDto');
@@ -8,7 +9,7 @@ const modifyProperties = ['code', 'name'];
 const getIsOnlyOptionsModify = compMod => {
 	const isModifyProperties = modifyProperties.some(property => {
 		const { new: newProperty, old: oldProperty } = compMod[property] || {};
-		return !dependencies.lodash.isEqual(newProperty, oldProperty);
+		return !isEqual(newProperty, oldProperty);
 	});
 
 	const { tableOptions = {}, comments = {} } = compMod;
@@ -24,7 +25,7 @@ const getIsOnlyOptionsModify = compMod => {
 };
 
 const getProperty = (newProperty, oldProperty) => {
-	if (!oldProperty || !dependencies.lodash.isEqual(newProperty, oldProperty)) {
+	if (!oldProperty || !isEqual(newProperty, oldProperty)) {
 		return newProperty;
 	} else if (!newProperty) {
 		return oldProperty;

@@ -1,3 +1,4 @@
+const { isEmpty, last, omit, isEqual, omitBy, differenceWith, values } = require('lodash');
 const { getTypeByData } = require('../typeHelper');
 const { getNamesByIds } = require('../schemaHelper');
 const { dependencies } = require('../appDependencies');
@@ -82,14 +83,11 @@ const prepareField = (field, dataSources) => {
 	const fieldAfterTransform = propertiesFromArrayToObj(field);
 
 	return eachField(fieldAfterTransform, field => {
-		if (field?.type !== 'reference' || dependencies.lodash.isEmpty(field.refIdPath)) {
+		if (field?.type !== 'reference' || isEmpty(field.refIdPath)) {
 			return field;
 		}
 
-		const preparedField =
-			getNamesByIds([dependencies.lodash.last(field.refIdPath)], dataSources)[
-				dependencies.lodash.last(field.refIdPath)
-			] || {};
+		const preparedField = getNamesByIds([last(field.refIdPath)], dataSources)[last(field.refIdPath)] || {};
 		return {
 			...field,
 			...preparedField,
@@ -136,7 +134,7 @@ const addToKeysHashType = (keysHash, keys) => {
 		return {
 			...keysHash,
 			[id]: {
-				...dependencies.lodash.omit(key, 'type'),
+				...omit(key, 'type'),
 				...(type ? { type } : {}),
 			},
 		};
@@ -144,13 +142,13 @@ const addToKeysHashType = (keysHash, keys) => {
 };
 
 const deleteFalseValuesIfNotPresentInOtherColumn = (left, right) =>
-	dependencies.lodash.omitBy(left, (value, key) => value === false && !right[key]);
+	omitBy(left, (value, key) => value === false && !right[key]);
 
 const areTableKeyColumnsEqual = (column1, column2) => {
 	const comparedColumn1 = deleteFalseValuesIfNotPresentInOtherColumn(column1, column2);
 	const comparedColumn2 = deleteFalseValuesIfNotPresentInOtherColumn(column2, column1);
 
-	return dependencies.lodash.isEqual(comparedColumn1, comparedColumn2);
+	return isEqual(comparedColumn1, comparedColumn2);
 };
 
 const tableKeysIsEqual = ({ newKeys = [], oldKeys = [], dataSources }) => {
@@ -171,13 +169,9 @@ const tableKeysIsEqual = ({ newKeys = [], oldKeys = [], dataSources }) => {
 		),
 		oldKeys,
 	);
-	const difference = dependencies.lodash.differenceWith(
-		dependencies.lodash.values(newKeysHash),
-		dependencies.lodash.values(oldKeysHash),
-		areTableKeyColumnsEqual,
-	);
+	const difference = differenceWith(values(newKeysHash), values(oldKeysHash), areTableKeyColumnsEqual);
 
-	return dependencies.lodash.isEmpty(difference);
+	return isEmpty(difference);
 };
 
 const isTableChange = ({ item, dataSources }) => {
@@ -199,7 +193,7 @@ const isTableChange = ({ item, dataSources }) => {
 	return (
 		!compositeClusteringKeyIsEqual ||
 		!compositePartitionKeyIsEqual ||
-		tableProperties.some(property => !dependencies.lodash.isEqual(compMod[property]?.new, compMod[property]?.old))
+		tableProperties.some(property => !isEqual(compMod[property]?.new, compMod[property]?.old))
 	);
 };
 

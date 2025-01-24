@@ -24,12 +24,14 @@ const handleCompressionOption = tableMeta => {
 
 const handleCompactionOption = tableMeta => {
 	const { compactionClass, compactionOptions } = tableMeta;
-	const valueObj = Object.assign({}, { class: compactionClass }, compactionOptions);
+	const valueObj = { class: compactionClass, ...compactionOptions };
+
 	return changeQuotes(JSON.stringify(valueObj));
 };
 
 const handleCashingOption = tableMeta => {
 	const obj = JSON.parse(tableMeta.caching);
+
 	return {
 		keys: obj.keys,
 		rowsPerPartition: obj['rows_per_partition'],
@@ -37,14 +39,14 @@ const handleCashingOption = tableMeta => {
 };
 
 const generateTableOptionsReducer = tableMeta => (options, configOption) => {
-	const optionName = configOption.propertyKeyword;
+	const optionName = configOption.fieldKeyword;
 	if (specialOptions.includes(optionName)) {
 		const specialOptionValue = handleSpecialOption(optionName, tableMeta);
-		return Object.assign({}, options, { [optionName]: specialOptionValue });
+		return { ...options, [optionName]: specialOptionValue };
 	}
 
 	if (tableMeta.hasOwnProperty(optionName)) {
-		return Object.assign({}, options, { [optionName]: tableMeta[optionName] });
+		return { ...options, [optionName]: tableMeta[optionName] };
 	}
 
 	return options;

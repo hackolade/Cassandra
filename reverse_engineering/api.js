@@ -1,6 +1,5 @@
 const cassandraHelper = require('./cassandraHelper');
 const systemKeyspaces = require('./package').systemKeyspaces;
-const logHelper = require('./logHelper');
 const commandsService = require('./commandsService');
 const async = require('async');
 const fs = require('fs');

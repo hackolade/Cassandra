@@ -69,8 +69,6 @@ module.exports = {
 	},
 
 	testConnection: function (connectionInfo, logger, cb, app) {
-		logInfo('Test connection', connectionInfo, logger);
-
 		this.connect(
 			connectionInfo,
 			logger,
@@ -92,7 +90,6 @@ module.exports = {
 	getDbCollectionsNames: function (connectionInfo, logger, cb, app) {
 		initPluginConfiguration(connectionInfo.pluginConfiguration, logger);
 
-		logInfo('Retrieving keyspaces and tables information', connectionInfo, logger);
 		const { includeSystemCollection } = connectionInfo;
 		const cassandra = cassandraHelper();
 
@@ -145,8 +142,6 @@ module.exports = {
 		initPluginConfiguration(data.pluginConfiguration, logger);
 
 		const cassandra = cassandraHelper();
-		logger.log('info', data, 'Retrieving schema', data.hiddenKeys);
-
 		const tables = data.collectionData.collections;
 		const keyspacesNames = data.collectionData.dataBaseNames;
 		const includeEmptyCollection = data.includeEmptyCollection;
@@ -281,12 +276,6 @@ module.exports = {
 			},
 		);
 	},
-};
-
-const logInfo = (step, connectionInfo, logger) => {
-	logger.clear();
-	logger.log('info', logHelper.getSystemInfo(connectionInfo.appVersion), step);
-	logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
 };
 
 const progress = (logger, keyspace, table, message) => {

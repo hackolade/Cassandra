@@ -7,6 +7,7 @@ const { getEntityLevelConfig } = require('../helpers/levelConfigHelper');
 const CassandraRetryPolicy = require('./cassandraRetryPolicy');
 const xmlParser = require('fast-xml-parser');
 const filterComplexUdt = require('./helpers/filterComplexUdt');
+const { escapeV6IpForURL } = require('./helpers/escapeV6IPForURL');
 
 const state = {
 	client: null,
@@ -270,7 +271,7 @@ module.exports = () => {
 				? { username: 'token', password: info.astraToken }
 				: { username: info.user, password: info.password };
 		const authProvider = new cassandra.auth.PlainTextAuthProvider(credentials.username, credentials.password);
-		const contactPoints = info.hosts.map(item => `${item.host}:${item.port}`);
+		const contactPoints = info.hosts.map(item => `${escapeV6IpForURL({ host: item.host })}:${item.port}`);
 		const readTimeout = validateRequestTimeout(info.requestTimeout, info.queryRequestTimeout);
 
 		return getSslOptions(info, app, logger).then(sslOptions => {

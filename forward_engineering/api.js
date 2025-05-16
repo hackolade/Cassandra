@@ -11,6 +11,9 @@ module.exports = {
 	isDropInStatements,
 
 	applyToInstance(connectionInfo, logger, callback, app) {
+		logger.clear();
+		logger.log('info', connectionInfo, 'connectionInfo', connectionInfo.hiddenKeys);
+
 		applyToInstance(connectionInfo, logger, app)
 			.then(result => {
 				callback(null, result);

@@ -18,7 +18,7 @@
 	"TOOLBAR___ADD_VIEW": "Add View",
 	"TOOLBAR___INSERT_FIELD": "Insert Column",
 	"TOOLBAR___APPEND_FIELD": "Append Column",
-	"TOOLBAR___TOGGLE_FIELD_DETAILS": "Toggle Field Details",
+	"TOOLBAR___FIELD_DETAILS": "Field Details",
 	"TOOLBAR___SHOW_FOREIGN_MASTER": "Toggle Foreign Master",
 	"TOOLBAR___SHOW_MODEL_VIEW": "Toggle Model Views",
 	"TOOLBAR___DISTRIBUTE_ORTHOGONALLY": "Distribute Tables Orthogonally",

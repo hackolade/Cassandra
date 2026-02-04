@@ -24,7 +24,7 @@ esbuild
 		outdir: RELEASE_FOLDER_PATH,
 		minify: true,
 		logLevel: 'info',
-		external: ['lodash'],
+		external: ['lodash', '@webpod/ip'],
 		plugins: [
 			clean({
 				patterns: [DEFAULT_RELEASE_FOLDER_PATH],
@@ -33,6 +33,12 @@ esbuild
 				assets: {
 					from: [path.join('node_modules', 'lodash', '**', '*')],
 					to: [path.join('node_modules', 'lodash')],
+				},
+			}),
+			copy({
+				assets: {
+					from: [path.join('node_modules', '@webpod/ip', '**', '*')],
+					to: [path.join('node_modules', '@webpod/ip')],
 				},
 			}),
 			copyFolderFiles({

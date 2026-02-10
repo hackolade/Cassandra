@@ -1,0 +1,25 @@
+diff --git a/node_modules/cassandra-driver/lib/utils.js b/node_modules/cassandra-driver/lib/utils.js
+index dfc217a..192232d 100644
+--- a/node_modules/cassandra-driver/lib/utils.js
++++ b/node_modules/cassandra-driver/lib/utils.js
+@@ -20,6 +20,20 @@ const util = require('util');
+ const net = require('net');
+ const { EventEmitter } = require('events');
+ 
++// Polyfill for util.isDate removed in Node.js 24
++if (typeof util.isDate === 'undefined') {
++  util.isDate = function(value) {
++    return value instanceof Date;
++  };
++}
++
++// Polyfill for util.isString removed in Node.js 24
++if (typeof util.isString === 'undefined') {
++  util.isString = function(value) {
++    return typeof value === 'string';
++  };
++}
++
+ const errors = require('./errors');
+ const promiseUtils = require('./promise-utils');
+ 

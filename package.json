@@ -46,7 +46,7 @@
         "@webpod/ip": "0.6.1",
         "antlr4": "4.8.0",
         "async": "3.2.6",
-        "cassandra-driver": "4.8.0",
+        "cassandra-driver": "4.3.1",
         "fast-xml-parser": "5.3.4",
         "jks-js": "1.1.5",
         "lodash": "4.17.23"

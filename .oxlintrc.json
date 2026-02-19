@@ -20,6 +20,8 @@
 		"**/*.d.ts",
 		"**/*.e2e.ts",
 		"**/*.spec.ts",
+		"**/*Parser.js",
+		"**/*Visitor.js",
 		".git",
 		".idea",
 		".vscode",
@@ -28,6 +30,9 @@
 		"node_modules",
 		"out/**/*",
 		"release",
-		"reverse_engineering/node_modules"
+		"reverse_engineering/antlr",
+		"reverse_engineering/cqlToCollectionsVisitor.js",
+		"reverse_engineering/node_modules",
+		"reverse_engineering/parser"
 	]
 }

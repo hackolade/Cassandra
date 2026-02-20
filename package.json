@@ -1,6 +1,6 @@
 {
     "name": "Cassandra",
-    "version": "0.2.15",
+    "version": "0.2.16",
     "author": "hackolade",
     "engines": {
         "hackolade": "5.4.7",

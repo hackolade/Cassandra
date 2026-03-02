@@ -47,7 +47,7 @@
         "antlr4": "4.8.0",
         "async": "3.2.6",
         "cassandra-driver": "4.3.1",
-        "fast-xml-parser": "5.3.7",
+        "fast-xml-parser": "5.3.8",
         "jks-js": "1.1.5",
         "lodash": "4.17.23"
     },
@@ -78,6 +78,6 @@
     },
     "overrides": {
         "fast-xml-parser": "$fast-xml-parser",
-        "minimatch": "10.2.1"
+        "minimatch": "10.2.4"
     }
 }

@@ -79,7 +79,7 @@
     "overrides": {
         "adm-zip": "0.6.0",
         "fast-xml-parser": "$fast-xml-parser",
-        "minimatch": "10.2.4",
-        "brace-expansion": "5.0.8"
+        "minimatch": "10.2.6",
+        "brace-expansion": "5.0.9"
     }
 }

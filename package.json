@@ -72,14 +72,14 @@
         "antlr4": "4.8.0",
         "async": "3.2.6",
         "cassandra-driver": "4.3.1",
-        "fast-xml-parser": "5.7.3",
+        "fast-xml-parser": "5.11.1",
         "jks-js": "1.1.5",
         "lodash": "4.18.1"
     },
     "overrides": {
-        "adm-zip": "0.6.0",
+        "adm-zip": "0.6.1",
         "fast-xml-parser": "$fast-xml-parser",
         "minimatch": "10.2.6",
-        "brace-expansion": "5.0.9"
+        "brace-expansion": "5.0.12"
     }
 }
